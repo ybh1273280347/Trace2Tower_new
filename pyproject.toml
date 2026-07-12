@@ -6,8 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "trace2tower"
 version = "0.1.0"
 description = "Reproducible Trace2Tower experiment framework"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "openai>=2.32,<3",
+    "pyarrow>=19,<20",
+    "python-dotenv>=1.0,<2",
+]
 
 [project.optional-dependencies]
 dev = [
