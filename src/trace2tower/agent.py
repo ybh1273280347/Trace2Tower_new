@@ -182,6 +182,7 @@ class AgentEvaluator:
         )
         self.trajectory_writer.write(
             EpisodeTrajectory(
+                run_id=run_id,
                 benchmark=entry.benchmark,
                 split=entry.split,
                 method=method,

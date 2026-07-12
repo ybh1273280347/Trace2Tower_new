@@ -105,3 +105,53 @@ def test_runner_resumes_only_failed_episode(tmp_path: Path) -> None:
     assert (second.completed, second.failed, second.skipped) == (1, 0, 5)
     assert len(results_path.read_text(encoding="utf-8").splitlines()) == 6
     assert "simulated interruption" in errors_path.read_text(encoding="utf-8")
+
+
+def test_runner_shares_episode_semaphore_across_shards(tmp_path: Path) -> None:
+    entries = [
+        ManifestEntry(
+            benchmark=Benchmark.WEBSHOP,
+            split=ExperimentSplit.TRAIN,
+            sample_id=f"webshop:{index}",
+            dataset_index=index,
+            source_split="goals",
+            repeat_id=0,
+        )
+        for index in range(6)
+    ]
+    active = 0
+    maximum_active = 0
+
+    async def execute(entry: ManifestEntry, shard_id: int) -> EpisodeResult:
+        nonlocal active, maximum_active
+        active += 1
+        maximum_active = max(maximum_active, active)
+        await asyncio.sleep(0.01)
+        active -= 1
+        return make_result(entry, shard_id)
+
+    async def run() -> None:
+        shared_semaphore = asyncio.Semaphore(2)
+        await asyncio.gather(
+            *(
+                run_shard(
+                    entries,
+                    method=MethodName.NO_SKILL,
+                    shard_id=shard_id,
+                    num_shards=2,
+                    writer=EpisodeResultWriter(
+                        EpisodeCheckpoint(
+                            tmp_path / f"results-{shard_id}.jsonl",
+                            tmp_path / f"errors-{shard_id}.jsonl",
+                        )
+                    ),
+                    executor=execute,
+                    max_concurrency=3,
+                    episode_semaphore=shared_semaphore,
+                )
+                for shard_id in range(2)
+            )
+        )
+
+    asyncio.run(run())
+    assert maximum_active == 2

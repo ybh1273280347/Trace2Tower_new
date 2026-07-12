@@ -9,7 +9,6 @@ RUN apt-get update && \
 
 COPY third_party/TextWorld /opt/textworld
 COPY third_party/ALFWorld /opt/alfworld
-COPY services/alfworld_server.py /opt/trace2tower/alfworld_server.py
 
 RUN python -m pip install --upgrade pip && \
     sed -i 's/from textworld.envs.zmachine.jericho import JerichoEnv/JerichoEnv = None/' \
@@ -34,6 +33,8 @@ RUN python -m pip install --upgrade pip && \
 
 RUN sed -i '/alfred_thor_env/d; /alfred_hybrid/d' \
       /opt/alfworld/alfworld/agents/environment/__init__.py
+
+COPY services/alfworld_server.py /opt/trace2tower/alfworld_server.py
 
 WORKDIR /opt/trace2tower
 

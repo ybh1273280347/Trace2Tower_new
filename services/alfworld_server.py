@@ -14,7 +14,7 @@ from pydantic import BaseModel
 DATA_ROOT = Path(os.environ.get("ALFWORLD_GAMES_ROOT", "/data/games/games")).resolve()
 app = FastAPI()
 sessions = {}
-environment_load_lock = threading.Lock()
+textworld_lock = threading.Lock()
 
 
 class ResetRequest(BaseModel):
@@ -53,8 +53,8 @@ def reset(request: ResetRequest) -> dict:
         raise HTTPException(status_code=400, detail="invalid game path")
 
     infos = textworld.EnvInfos(won=True, admissible_commands=True)
-    # TextWorld 的模块级 Tatsu parser 不能被多个 reset 线程同时调用。
-    with environment_load_lock:
+    # TextWorld 的模块级 Tatsu parser 不能被多个环境线程同时调用。
+    with textworld_lock:
         environment = textworld.start(
             str(game_path),
             infos=infos,
@@ -71,7 +71,8 @@ def step(request: StepRequest) -> dict:
     environment = sessions.get(request.session_id)
     if environment is None:
         raise HTTPException(status_code=404, detail="unknown session")
-    state, reward, done = environment.step(request.action)
+    with textworld_lock:
+        state, reward, done = environment.step(request.action)
     return state_payload(request.session_id, state, reward, done)
 
 

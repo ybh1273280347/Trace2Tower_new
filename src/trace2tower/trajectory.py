@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import tempfile
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -47,6 +48,7 @@ class StepRecord:
 
 @dataclass(frozen=True, slots=True)
 class EpisodeTrajectory:
+    run_id: str
     benchmark: Benchmark
     split: ExperimentSplit
     method: MethodName
@@ -70,6 +72,7 @@ class EpisodeTrajectory:
     @classmethod
     def from_record(cls, record: dict[str, Any]) -> EpisodeTrajectory:
         trajectory = cls(
+            run_id=str(record["run_id"]),
             benchmark=Benchmark(record["benchmark"]),
             split=ExperimentSplit(record["split"]),
             method=MethodName(record["method"]),
@@ -144,10 +147,16 @@ class TrajectoryReader:
 
 
 def materialize_trajectory_shard(input_dir: Path, output_path: Path) -> int:
-    trajectories = sorted(
-        TrajectoryReader.read_episode_files(input_dir),
-        key=lambda trajectory: trajectory.trajectory_id,
+    return write_trajectory_jsonl(
+        TrajectoryReader.read_episode_files(input_dir), output_path
     )
+
+
+def write_trajectory_jsonl(
+    trajectories: Iterable[EpisodeTrajectory], output_path: Path
+) -> int:
+    ordered = sorted(trajectories, key=lambda trajectory: trajectory.trajectory_id)
+    TrajectoryReader._validate_unique(tuple(ordered))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         "w",
@@ -157,7 +166,7 @@ def materialize_trajectory_shard(input_dir: Path, output_path: Path) -> int:
         newline="\n",
     ) as output_file:
         temporary_path = Path(output_file.name)
-        for trajectory in trajectories:
+        for trajectory in ordered:
             json.dump(
                 trajectory.to_record(),
                 output_file,
@@ -168,4 +177,4 @@ def materialize_trajectory_shard(input_dir: Path, output_path: Path) -> int:
         output_file.flush()
         os.fsync(output_file.fileno())
     os.replace(temporary_path, output_path)
-    return len(trajectories)
+    return len(ordered)

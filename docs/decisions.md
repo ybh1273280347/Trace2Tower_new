@@ -22,6 +22,7 @@
 - `deepseek-v4-flash` with thinking disabled executes training and test episodes.
 - `gpt-5.4` with `reasoning_effort=none` performs skill extraction, merge, and card rendering.
 - Provider credentials live only in the ignored `.env` file.
+- The paired trajectory pilot selected `deepseek-v4-flash` for the shared No-Skill training pool. `deepseek-v4-pro` remains diagnostic-only and is not mixed into the pool; all skill methods therefore consume trajectories from one fixed generator policy.
 
 ## Recovery contract
 
@@ -34,7 +35,7 @@
 - `billable_tokens` remains null when a provider does not explicitly return a billable-token field; it is not inferred from total tokens.
 - No-Skill training rollout writes one atomic episode file before completing its result checkpoint, then deterministically materializes the shard's episode files into the shared `shard-XX.jsonl` pool. This prevents partial lines and duplicate trajectories while preserving independent shard recovery.
 - `--max-episodes` limits the already-selected shard and is only a bounded verification control; omitting it executes the full fixed shard.
-- ALFWorld serializes only TextWorld game loading because its module-level Tatsu parser is not thread-safe. Active environment steps and model calls retain their configured concurrency.
+- ALFWorld serializes TextWorld calls that reach its module-level Tatsu parsers, including game loading and environment steps. Model calls remain concurrent, and the matrix launcher shares one episode semaphore and one API semaphore across all shards.
 
 ## Method boundaries
 

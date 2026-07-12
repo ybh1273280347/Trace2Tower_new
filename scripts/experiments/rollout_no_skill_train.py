@@ -58,6 +58,7 @@ async def collect_benchmark(
     common: dict,
     benchmark_config: dict,
     runtime: CommonLLMRuntime | None,
+    episode_semaphore: asyncio.Semaphore | None = None,
 ) -> dict:
     manifest_path = Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl"
     entries = read_manifest(manifest_path)
@@ -127,12 +128,13 @@ async def collect_benchmark(
         writer=writer,
         executor=execute,
         max_concurrency=common["episode_concurrency"],
+        episode_semaphore=episode_semaphore,
         max_episodes=options.max_episodes,
     )
     pool_path = (
         Path(common["trajectories_dir"])
         / benchmark
-        / "no_skill_train"
+        / getattr(options, "trajectory_pool_name", "no_skill_train")
         / f"{shard_name}.jsonl"
     )
     trajectory_count = materialize_trajectory_shard(episode_dir, pool_path)
@@ -140,6 +142,7 @@ async def collect_benchmark(
         "run_id": options.run_id,
         "benchmark": benchmark.value,
         "method": MethodName.NO_SKILL.value,
+        "agent_model": getattr(options, "agent_model", None) or os.getenv("AGENT_MODEL"),
         "shard_id": options.shard_id,
         "num_shards": options.num_shards,
         "manifest_path": manifest_path.as_posix(),
@@ -167,6 +170,7 @@ async def main(options: argparse.Namespace) -> None:
         },
         "methods": {"no_skill": load_yaml(config_root / "no_skill.yaml")},
     }
+    agent_model = options.agent_model or resolved_config["methods"]["no_skill"]["agent_model"]
     invocation = {
         "benchmark": options.benchmark,
         "method": str(options.method),
@@ -175,6 +179,7 @@ async def main(options: argparse.Namespace) -> None:
         "max_episodes": options.max_episodes,
         "dry_run": options.dry_run,
         "run_id": options.run_id,
+        "agent_model": agent_model,
     }
     print(yaml.safe_dump({"resolved_config": resolved_config, "invocation": invocation}))
 
@@ -187,6 +192,7 @@ async def main(options: argparse.Namespace) -> None:
         return
 
     load_dotenv(options.env)
+    os.environ["AGENT_MODEL"] = agent_model
     write_yaml(Path(common["runs_dir"]) / options.run_id / "resolved-config.yaml", resolved_config)
     runtime = CommonLLMRuntime(
         max_concurrency=common["global_api_concurrency"],
@@ -211,6 +217,7 @@ if __name__ == "__main__":
     parser.add_argument("--num-shards", type=int, default=10)
     parser.add_argument("--max-episodes", type=int)
     parser.add_argument("--run-id", default="no-skill-train-v1")
+    parser.add_argument("--agent-model")
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     parser.add_argument("--dry-run", action="store_true")

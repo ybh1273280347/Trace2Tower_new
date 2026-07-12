@@ -31,6 +31,7 @@ async def run_shard(
     writer: EpisodeResultWriter,
     executor: EpisodeExecutor,
     max_concurrency: int,
+    episode_semaphore: asyncio.Semaphore | None = None,
     max_episodes: int | None = None,
     dry_run: bool = False,
 ) -> RunSummary:
@@ -46,7 +47,7 @@ async def run_shard(
     if max_concurrency <= 0:
         raise ValueError("max_concurrency must be positive")
 
-    semaphore = asyncio.Semaphore(max_concurrency)
+    semaphore = episode_semaphore or asyncio.Semaphore(max_concurrency)
 
     async def execute(entry: ManifestEntry) -> bool:
         async with semaphore:
