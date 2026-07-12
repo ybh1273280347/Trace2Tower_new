@@ -1,6 +1,5 @@
 # Local specifications and reference material
-*.md
-/docs/
+/*.md
 /third_party/
 /Datasets/
 

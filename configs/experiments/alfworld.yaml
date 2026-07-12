@@ -1,0 +1,7 @@
+benchmark: alfworld
+dataset_root: Datasets/alfworld
+splits:
+  train: train
+  dev: valid_seen
+  test: valid_unseen
+max_steps: 20
