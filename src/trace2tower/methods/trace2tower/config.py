@@ -19,6 +19,8 @@ class Trace2TowerConfig:
     max_high_path_length: int = 4
     high_min_support_ratio: float = 0.02
     high_path_epsilon: float = 1e-6
+    high_top_k: int = 1
+    direct_mid_top_k: int = 2
 
     def __post_init__(self) -> None:
         if self.failure_penalty < 0:
@@ -33,6 +35,8 @@ class Trace2TowerConfig:
             raise ValueError("High path support ratio must be in [0, 1]")
         if self.high_path_epsilon <= 0:
             raise ValueError("High path epsilon must be positive")
+        if self.high_top_k != 1 or self.direct_mid_top_k != 2:
+            raise ValueError("Trace2Tower retrieval uses fixed High Top-1 and Mid Top-2")
 
     @classmethod
     def from_record(cls, record: dict) -> Trace2TowerConfig:
@@ -57,4 +61,6 @@ class Trace2TowerConfig:
             max_high_path_length=int(record.get("max_high_path_length", 4)),
             high_min_support_ratio=float(record.get("high_min_support_ratio", 0.02)),
             high_path_epsilon=float(record.get("high_path_epsilon", 1e-6)),
+            high_top_k=int(record.get("high_top_k", 1)),
+            direct_mid_top_k=int(record.get("direct_mid_top_k", 2)),
         )

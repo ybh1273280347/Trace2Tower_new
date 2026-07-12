@@ -83,6 +83,20 @@ class MidSkillCard:
     def to_record(self) -> dict:
         return asdict(self)
 
+    @classmethod
+    def from_record(cls, record: Mapping) -> MidSkillCard:
+        return cls(
+            skill_id=str(record["skill_id"]),
+            member_segment_ids=tuple(record["member_segment_ids"]),
+            name=str(record["name"]),
+            description=str(record["description"]),
+            procedure=tuple(record["procedure"]),
+            constraints=tuple(record["constraints"]),
+            grounding_actions=tuple(
+                PrimitiveAction(value) for value in record["grounding_actions"]
+            ),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class HighSkillCard:
@@ -94,6 +108,16 @@ class HighSkillCard:
 
     def to_record(self) -> dict:
         return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: Mapping) -> HighSkillCard:
+        return cls(
+            skill_id=str(record["skill_id"]),
+            ordered_mid_ids=tuple(record["ordered_mid_ids"]),
+            name=str(record["name"]),
+            description=str(record["description"]),
+            procedure=tuple(record["procedure"]),
+        )
 
 
 def build_mid_render_inputs(
