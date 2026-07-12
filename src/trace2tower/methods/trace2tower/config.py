@@ -16,6 +16,9 @@ class Trace2TowerConfig:
     min_mid_clusters: int
     max_mid_clusters: int
     random_state: int
+    max_high_path_length: int = 4
+    high_min_support_ratio: float = 0.02
+    high_path_epsilon: float = 1e-6
 
     def __post_init__(self) -> None:
         if self.failure_penalty < 0:
@@ -24,6 +27,12 @@ class Trace2TowerConfig:
             raise ValueError("invalid Mid cluster range")
         if self.semantic_only and self.method is not MethodName.SEMANTIC_CLUSTERING:
             raise ValueError("semantic_only requires the semantic clustering method")
+        if self.max_high_path_length < 2:
+            raise ValueError("max High path length must be at least two")
+        if not 0 <= self.high_min_support_ratio <= 1:
+            raise ValueError("High path support ratio must be in [0, 1]")
+        if self.high_path_epsilon <= 0:
+            raise ValueError("High path epsilon must be positive")
 
     @classmethod
     def from_record(cls, record: dict) -> Trace2TowerConfig:
@@ -45,4 +54,7 @@ class Trace2TowerConfig:
             min_mid_clusters=int(record["min_mid_clusters"]),
             max_mid_clusters=int(record["max_mid_clusters"]),
             random_state=int(record["random_state"]),
+            max_high_path_length=int(record.get("max_high_path_length", 4)),
+            high_min_support_ratio=float(record.get("high_min_support_ratio", 0.02)),
+            high_path_epsilon=float(record.get("high_path_epsilon", 1e-6)),
         )

@@ -30,6 +30,8 @@ class LLMUsage:
     input_tokens: int | None
     output_tokens: int | None
     billable_tokens: int | None
+    cached_input_tokens: int | None = None
+    cache_write_input_tokens: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,6 +113,7 @@ class CommonLLMRuntime:
         tool_choice: str | dict[str, Any] | None = None,
         temperature: float | None = None,
         max_output_tokens: int = 4096,
+        prompt_cache_key: str | None = None,
     ) -> ChatResult:
         if role is ModelRole.EMBEDDING:
             raise ValueError("embedding role does not support chat")
@@ -125,6 +128,8 @@ class CommonLLMRuntime:
             request["tool_choice"] = tool_choice
         if temperature is not None:
             request["temperature"] = temperature
+        if prompt_cache_key is not None:
+            request["prompt_cache_key"] = prompt_cache_key
         if role is ModelRole.AGENT:
             request["max_tokens"] = max_output_tokens
             request["extra_body"] = {
@@ -196,8 +201,17 @@ class CommonLLMRuntime:
     def _usage(usage: Any) -> LLMUsage:
         if usage is None:
             return LLMUsage(None, None, None)
+        details = getattr(usage, "prompt_tokens_details", None)
+        if isinstance(details, dict):
+            cached_tokens = details.get("cached_tokens")
+            cache_write_tokens = details.get("cache_write_tokens")
+        else:
+            cached_tokens = getattr(details, "cached_tokens", None)
+            cache_write_tokens = getattr(details, "cache_write_tokens", None)
         return LLMUsage(
             input_tokens=getattr(usage, "prompt_tokens", None),
             output_tokens=getattr(usage, "completion_tokens", None),
             billable_tokens=None,
+            cached_input_tokens=cached_tokens,
+            cache_write_input_tokens=cache_write_tokens,
         )

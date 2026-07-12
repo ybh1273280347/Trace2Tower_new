@@ -127,3 +127,27 @@ class MidCluster:
 
     def to_record(self) -> dict:
         return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class HighPath:
+    path_id: str
+    ordered_mid_ids: tuple[str, ...]
+    positive_support: float
+    negative_support: float
+    contrastive_score: float
+    supporting_trajectory_ids: tuple[str, ...]
+
+    def to_record(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: dict) -> HighPath:
+        return cls(
+            path_id=str(record["path_id"]),
+            ordered_mid_ids=tuple(record["ordered_mid_ids"]),
+            positive_support=float(record["positive_support"]),
+            negative_support=float(record["negative_support"]),
+            contrastive_score=float(record["contrastive_score"]),
+            supporting_trajectory_ids=tuple(record["supporting_trajectory_ids"]),
+        )
