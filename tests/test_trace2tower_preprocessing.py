@@ -1,0 +1,279 @@
+from __future__ import annotations
+
+import asyncio
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from trace2tower.benchmarks.models import ClickableKind
+from trace2tower.manifests import Benchmark, ExperimentSplit
+from trace2tower.methods.trace2tower.action_parser import (
+    parse_alfworld_action,
+    parse_webshop_action,
+)
+from trace2tower.methods.trace2tower.models import (
+    PrimitiveAction,
+    SegmentInstance,
+    StepTransition,
+    WebShopEventType,
+    WebShopPageType,
+)
+from trace2tower.methods.trace2tower.segmentation import (
+    calibrate_segmentation_penalty,
+    segment_boundaries,
+)
+from trace2tower.methods.trace2tower.transitions import build_transitions
+from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
+from trace2tower.methods.trace2tower.webshop_events import (
+    WebShopEventClassifier,
+    classify_webshop_steps,
+    segment_webshop_trajectory,
+)
+from trace2tower.results import FinishReason, MethodName
+from trace2tower.trajectory import EpisodeTrajectory, StepRecord
+
+
+@pytest.mark.parametrize(
+    ("action", "expected"),
+    (
+        ("go to fridge 1", PrimitiveAction.GOTO),
+        ("take tomato 1 from fridge 1", PrimitiveAction.PICK),
+        ("put tomato 1 in/on microwave 1", PrimitiveAction.PUT),
+        ("move tomato 1 to garbagecan 1", PrimitiveAction.PUT),
+        ("open fridge 1", PrimitiveAction.OPEN),
+        ("close fridge 1", PrimitiveAction.CLOSE),
+        ("use desklamp 1", PrimitiveAction.TOGGLE),
+        ("heat tomato 1 with microwave 1", PrimitiveAction.HEAT),
+        ("clean egg 1 with sinkbasin 1", PrimitiveAction.CLEAN),
+        ("cool apple 1 with fridge 1", PrimitiveAction.COOL),
+        ("slice apple 1 with knife 1", PrimitiveAction.SLICE),
+        ("inventory", PrimitiveAction.INVENTORY),
+        ("examine shelf 1", PrimitiveAction.EXAMINE),
+        ("look", PrimitiveAction.LOOK),
+    ),
+)
+def test_parse_alfworld_official_commands(action: str, expected: PrimitiveAction) -> None:
+    assert parse_alfworld_action("take_action", {"action": action}) is expected
+
+
+def test_action_parsers_reject_wrong_tool_or_argument() -> None:
+    assert parse_alfworld_action("take_action", {"action": "looking glass"}) is PrimitiveAction.INVALID
+    assert parse_alfworld_action("click_action", {"action": "look"}) is PrimitiveAction.INVALID
+    assert parse_webshop_action("search_action", {"keywords": "rug"}) is PrimitiveAction.SEARCH
+    assert parse_webshop_action("click_action", {"value": "Buy Now"}) is PrimitiveAction.CLICK
+    assert parse_webshop_action("click_action", {"keywords": "rug"}) is PrimitiveAction.INVALID
+
+
+def webshop_step(
+    index: int,
+    action_name: str,
+    arguments: dict,
+    clickable_types: dict[str, ClickableKind] | None = None,
+) -> StepRecord:
+    return StepRecord(
+        step_index=index,
+        observation=f"before-{index}",
+        action_name=action_name,
+        action_arguments=arguments,
+        next_observation=f"after-{index}",
+        reward=0,
+        done=False,
+        valid_action=True,
+        admissible_actions=tuple((clickable_types or {}).keys()),
+        clickable_types=clickable_types or {},
+    )
+
+
+def test_webshop_event_priority_and_page_state() -> None:
+    steps = (
+        webshop_step(0, "search_action", {"keywords": "blue rug"}),
+        webshop_step(1, "search_action", {"keywords": "blue round rug"}),
+        webshop_step(2, "click_action", {"value": "next >"}, {"next >": ClickableKind.BUTTON}),
+        webshop_step(3, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}),
+        webshop_step(4, "click_action", {"value": "blue"}, {"blue": ClickableKind.OPTION}),
+        webshop_step(5, "click_action", {"value": "Features"}, {"Features": ClickableKind.BUTTON}),
+        webshop_step(6, "click_action", {"value": "< prev"}, {"< prev": ClickableKind.BUTTON}),
+        webshop_step(7, "click_action", {"value": "Back to Search"}, {"Back to Search": ClickableKind.BUTTON}),
+        webshop_step(8, "search_action", {"keywords": "rug"}),
+        webshop_step(9, "click_action", {"value": "B087654321"}),
+        webshop_step(10, "click_action", {"value": "Buy Now"}, {"Buy Now": ClickableKind.BUTTON}),
+    )
+    assert classify_webshop_steps(steps) == (
+        WebShopEventType.QUERY_FORMULATION,
+        WebShopEventType.QUERY_REFINEMENT,
+        WebShopEventType.RESULT_NAVIGATION,
+        WebShopEventType.CANDIDATE_SELECTION,
+        WebShopEventType.OPTION_SELECTION,
+        WebShopEventType.ATTRIBUTE_INSPECTION,
+        WebShopEventType.DETAIL_BACKTRACKING,
+        WebShopEventType.SEARCH_BACKTRACKING,
+        WebShopEventType.QUERY_REFINEMENT,
+        WebShopEventType.CANDIDATE_SELECTION,
+        WebShopEventType.PURCHASE_DECISION,
+    )
+
+
+def test_webshop_dom_types_override_fallback_and_other_click_keeps_page() -> None:
+    classifier = WebShopEventClassifier(WebShopPageType.RESULTS, searched=True)
+    other = webshop_step(
+        0,
+        "click_action",
+        {"value": "B012345678"},
+        {"B012345678": ClickableKind.BUTTON},
+    )
+    assert classifier.classify(other) is WebShopEventType.OTHER_CLICK
+    assert classifier.page is WebShopPageType.RESULTS
+    assert classifier.classify(webshop_step(1, "click_action", {"value": "< prev"})) is WebShopEventType.RESULT_NAVIGATION
+
+    unknown = WebShopEventClassifier(WebShopPageType.UNKNOWN, searched=True)
+    assert unknown.classify(webshop_step(0, "click_action", {"value": "B012345678"})) is WebShopEventType.CANDIDATE_SELECTION
+
+
+def test_webshop_consecutive_events_merge_with_closed_boundaries() -> None:
+    steps = (
+        webshop_step(0, "search_action", {"keywords": "blue shirt"}),
+        webshop_step(1, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}),
+        webshop_step(2, "click_action", {"value": "blue"}, {"blue": ClickableKind.OPTION}),
+        webshop_step(3, "click_action", {"value": "large"}, {"large": ClickableKind.OPTION}),
+        webshop_step(4, "click_action", {"value": "Buy Now"}, {"Buy Now": ClickableKind.BUTTON}),
+    )
+    trajectory = EpisodeTrajectory(
+        run_id="test-run",
+        benchmark=Benchmark.WEBSHOP,
+        split=ExperimentSplit.TRAIN,
+        method=MethodName.NO_SKILL,
+        sample_id="webshop:1000",
+        repeat_id=0,
+        task_goal="buy a blue large shirt",
+        steps=steps,
+        primary_score=1,
+        finish_reason=FinishReason.COMPLETED,
+    )
+    transitions = build_transitions(trajectory)
+    segments = segment_webshop_trajectory(
+        trajectory,
+        transitions,
+        tuple((float(index), 1.0) for index in range(len(steps))),
+    )
+    assert [(segment.event_type, segment.start_step, segment.end_step) for segment in segments] == [
+        (WebShopEventType.QUERY_FORMULATION, 0, 0),
+        (WebShopEventType.CANDIDATE_SELECTION, 1, 1),
+        (WebShopEventType.OPTION_SELECTION, 2, 3),
+        (WebShopEventType.PURCHASE_DECISION, 4, 4),
+    ]
+    option_segment = segments[2]
+    assert len(option_segment.raw_actions) == 2
+    assert option_segment.observation_before == "before-2"
+    assert option_segment.observation_after == "after-3"
+    assert option_segment.embedding == (2.5, 1.0)
+    assert SegmentInstance.from_record(option_segment.to_record()) == option_segment
+    assert StepTransition.from_record(transitions[0].to_record()) == transitions[0]
+    assert [transition.primitive_action for transition in transitions] == [
+        PrimitiveAction.SEARCH,
+        PrimitiveAction.CLICK,
+        PrimitiveAction.CLICK,
+        PrimitiveAction.CLICK,
+        PrimitiveAction.CLICK,
+    ]
+
+
+def test_change_point_dp_uses_semantic_groups_and_maximum_length() -> None:
+    grouped = [(1.0, 0.0)] * 3 + [(0.0, 1.0)] * 3
+    assert segment_boundaries(grouped, penalty=0.1) == ((0, 2), (3, 5))
+    assert segment_boundaries([(1.0, 0.0)] * 7, penalty=1) == ((0, 5), (6, 6))
+
+    calibration = calibrate_segmentation_penalty(
+        (grouped, grouped),
+        target_segment_length=3,
+        max_segment_length=6,
+    )
+    assert calibration.median_segment_length == 3
+    assert calibration.segment_count == 4
+
+    unreachable = calibrate_segmentation_penalty(
+        (((1.0, 0.0),),),
+        target_segment_length=3,
+        max_segment_length=6,
+    )
+    assert unreachable.median_segment_length == 1
+    assert unreachable.segment_count == 1
+
+
+def test_transition_encoder_reuses_content_hash_cache(tmp_path: Path) -> None:
+    class FakeRuntime:
+        def __init__(self):
+            self.calls = []
+
+        async def embed(self, texts):
+            self.calls.append(tuple(texts))
+            return SimpleNamespace(
+                vectors=tuple((float(len(text)), 1.0) for text in texts)
+            )
+
+    async def run() -> None:
+        cache_path = tmp_path / "embeddings.sqlite"
+        first_runtime = FakeRuntime()
+        first_encoder = TransitionEncoder(
+            first_runtime,
+            cache_path=cache_path,
+            model="test-model",
+            dimension=2,
+            batch_size=8,
+        )
+        first = await first_encoder.embed(("a", "bb", "a"))
+        assert first_runtime.calls == [("a", "bb")]
+        assert first == ((1.0, 1.0), (2.0, 1.0), (1.0, 1.0))
+
+        second_runtime = FakeRuntime()
+        second_encoder = TransitionEncoder(
+            second_runtime,
+            cache_path=cache_path,
+            model="test-model",
+            dimension=2,
+            batch_size=8,
+        )
+        second = await second_encoder.embed(("bb", "a"))
+        assert second_runtime.calls == []
+        assert second == ((2.0, 1.0), (1.0, 1.0))
+
+    asyncio.run(run())
+
+
+def test_transition_encoder_keeps_successful_batches_after_peer_failure(tmp_path: Path) -> None:
+    class FailingRuntime:
+        def __init__(self, fail_text: str | None):
+            self.fail_text = fail_text
+            self.calls = []
+
+        async def embed(self, texts):
+            self.calls.append(tuple(texts))
+            if self.fail_text in texts:
+                raise RuntimeError("simulated provider failure")
+            return SimpleNamespace(vectors=tuple((float(len(text)), 1.0) for text in texts))
+
+    async def run() -> None:
+        cache_path = tmp_path / "embeddings.sqlite"
+        first_runtime = FailingRuntime("bad")
+        encoder = TransitionEncoder(
+            first_runtime,
+            cache_path=cache_path,
+            model="test-model",
+            dimension=2,
+            batch_size=1,
+        )
+        with pytest.raises(RuntimeError, match="simulated provider failure"):
+            await encoder.embed(("good", "bad"))
+
+        second_runtime = FailingRuntime(None)
+        resumed = TransitionEncoder(
+            second_runtime,
+            cache_path=cache_path,
+            model="test-model",
+            dimension=2,
+            batch_size=1,
+        )
+        assert await resumed.embed(("good", "bad")) == ((4.0, 1.0), (3.0, 1.0))
+        assert second_runtime.calls == [("bad",)]
+
+    asyncio.run(run())

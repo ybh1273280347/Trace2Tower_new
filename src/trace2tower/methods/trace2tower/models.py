@@ -1,0 +1,119 @@
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+from enum import StrEnum
+
+
+class PrimitiveAction(StrEnum):
+    GOTO = "GOTO"
+    PICK = "PICK"
+    PUT = "PUT"
+    OPEN = "OPEN"
+    CLOSE = "CLOSE"
+    TOGGLE = "TOGGLE"
+    HEAT = "HEAT"
+    CLEAN = "CLEAN"
+    COOL = "COOL"
+    SLICE = "SLICE"
+    INVENTORY = "INVENTORY"
+    EXAMINE = "EXAMINE"
+    LOOK = "LOOK"
+    SEARCH = "SEARCH"
+    CLICK = "CLICK"
+    INVALID = "INVALID"
+
+
+class WebShopPageType(StrEnum):
+    SEARCH = "SEARCH"
+    RESULTS = "RESULTS"
+    ITEM = "ITEM"
+    ITEM_DETAIL = "ITEM_DETAIL"
+    TERMINAL = "TERMINAL"
+    UNKNOWN = "UNKNOWN"
+
+
+class WebShopEventType(StrEnum):
+    QUERY_FORMULATION = "QUERY_FORMULATION"
+    QUERY_REFINEMENT = "QUERY_REFINEMENT"
+    RESULT_NAVIGATION = "RESULT_NAVIGATION"
+    CANDIDATE_SELECTION = "CANDIDATE_SELECTION"
+    OPTION_SELECTION = "OPTION_SELECTION"
+    ATTRIBUTE_INSPECTION = "ATTRIBUTE_INSPECTION"
+    DETAIL_BACKTRACKING = "DETAIL_BACKTRACKING"
+    SEARCH_BACKTRACKING = "SEARCH_BACKTRACKING"
+    PURCHASE_DECISION = "PURCHASE_DECISION"
+    OTHER_CLICK = "OTHER_CLICK"
+
+
+@dataclass(frozen=True, slots=True)
+class StepTransition:
+    transition_id: str
+    trajectory_id: str
+    step_index: int
+    goal: str
+    observation_before: str
+    raw_action: str
+    primitive_action: PrimitiveAction
+    observation_after: str
+    trajectory_score: float
+
+    def to_record(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: dict) -> StepTransition:
+        return cls(
+            transition_id=str(record["transition_id"]),
+            trajectory_id=str(record["trajectory_id"]),
+            step_index=int(record["step_index"]),
+            goal=str(record["goal"]),
+            observation_before=str(record["observation_before"]),
+            raw_action=str(record["raw_action"]),
+            primitive_action=PrimitiveAction(record["primitive_action"]),
+            observation_after=str(record["observation_after"]),
+            trajectory_score=float(record["trajectory_score"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SegmentInstance:
+    segment_id: str
+    trajectory_id: str
+    start_step: int
+    end_step: int
+    transition_ids: tuple[str, ...]
+    embedding: tuple[float, ...]
+    trajectory_score: float
+    event_type: WebShopEventType | None
+    raw_actions: tuple[str, ...]
+    observation_before: str
+    observation_after: str
+
+    def to_record(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: dict) -> SegmentInstance:
+        event_type = record["event_type"]
+        return cls(
+            segment_id=str(record["segment_id"]),
+            trajectory_id=str(record["trajectory_id"]),
+            start_step=int(record["start_step"]),
+            end_step=int(record["end_step"]),
+            transition_ids=tuple(record["transition_ids"]),
+            embedding=tuple(float(value) for value in record["embedding"]),
+            trajectory_score=float(record["trajectory_score"]),
+            event_type=WebShopEventType(event_type) if event_type is not None else None,
+            raw_actions=tuple(record["raw_actions"]),
+            observation_before=str(record["observation_before"]),
+            observation_after=str(record["observation_after"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SegmentationCalibration:
+    penalty: float
+    target_segment_length: int
+    median_segment_length: float
+    trajectory_count: int
+    segment_count: int

@@ -1,0 +1,162 @@
+from __future__ import annotations
+
+import re
+from typing import Sequence
+
+from trace2tower.benchmarks.models import ClickableKind
+from trace2tower.methods.trace2tower.models import (
+    SegmentInstance,
+    StepTransition,
+    WebShopEventType,
+    WebShopPageType,
+)
+from trace2tower.methods.trace2tower.transitions import build_transitions
+from trace2tower.trajectory import EpisodeTrajectory, StepRecord
+
+
+DETAIL_VALUES = {"description", "features", "reviews", "attributes"}
+ASIN_PATTERN = re.compile(r"^[A-Za-z0-9]{8,16}$")
+
+
+class WebShopEventClassifier:
+    def __init__(
+        self,
+        page: WebShopPageType = WebShopPageType.SEARCH,
+        *,
+        searched: bool = False,
+    ):
+        self.page = page
+        self.searched = searched
+
+    def classify(self, step: StepRecord) -> WebShopEventType:
+        if step.action_name == "search_action" and isinstance(
+            (step.action_arguments or {}).get("keywords"), str
+        ):
+            event = (
+                WebShopEventType.QUERY_REFINEMENT
+                if self.searched
+                else WebShopEventType.QUERY_FORMULATION
+            )
+            self.searched = True
+            self.page = WebShopPageType.RESULTS
+            return event
+
+        if step.action_name != "click_action" or not isinstance(
+            (step.action_arguments or {}).get("value"), str
+        ):
+            return WebShopEventType.OTHER_CLICK
+
+        raw_value = step.action_arguments["value"]
+        value = raw_value.strip().casefold()
+        if value == "buy now":
+            event = WebShopEventType.PURCHASE_DECISION
+        elif value == "back to search":
+            event = WebShopEventType.SEARCH_BACKTRACKING
+        elif self.page is WebShopPageType.RESULTS and value in {"next >", "< prev"}:
+            event = WebShopEventType.RESULT_NAVIGATION
+        elif self.page is WebShopPageType.ITEM_DETAIL and value == "< prev":
+            event = WebShopEventType.DETAIL_BACKTRACKING
+        elif self.page is WebShopPageType.ITEM and value in DETAIL_VALUES:
+            event = WebShopEventType.ATTRIBUTE_INSPECTION
+        else:
+            clickable_kind = next(
+                (
+                    kind
+                    for clickable, kind in step.clickable_types.items()
+                    if clickable.casefold() == value
+                ),
+                None,
+            )
+            if self.page is WebShopPageType.RESULTS and (
+                clickable_kind is ClickableKind.PRODUCT_LINK
+                or (not step.clickable_types and value not in {"next >", "< prev", "back to search"})
+            ):
+                event = WebShopEventType.CANDIDATE_SELECTION
+            elif self.page is WebShopPageType.UNKNOWN and ASIN_PATTERN.fullmatch(
+                raw_value.strip()
+            ):
+                event = WebShopEventType.CANDIDATE_SELECTION
+            elif self.page is WebShopPageType.ITEM and (
+                clickable_kind is ClickableKind.OPTION
+                or (
+                    not step.clickable_types
+                    and value not in DETAIL_VALUES | {"buy now", "back to search"}
+                    and not ASIN_PATTERN.fullmatch(raw_value.strip())
+                )
+            ):
+                event = WebShopEventType.OPTION_SELECTION
+            else:
+                event = WebShopEventType.OTHER_CLICK
+
+        page_updates = {
+            WebShopEventType.QUERY_FORMULATION: WebShopPageType.RESULTS,
+            WebShopEventType.QUERY_REFINEMENT: WebShopPageType.RESULTS,
+            WebShopEventType.RESULT_NAVIGATION: WebShopPageType.RESULTS,
+            WebShopEventType.CANDIDATE_SELECTION: WebShopPageType.ITEM,
+            WebShopEventType.OPTION_SELECTION: WebShopPageType.ITEM,
+            WebShopEventType.ATTRIBUTE_INSPECTION: WebShopPageType.ITEM_DETAIL,
+            WebShopEventType.DETAIL_BACKTRACKING: WebShopPageType.ITEM,
+            WebShopEventType.SEARCH_BACKTRACKING: WebShopPageType.SEARCH,
+            WebShopEventType.PURCHASE_DECISION: WebShopPageType.TERMINAL,
+        }
+        if event is not WebShopEventType.OTHER_CLICK:
+            self.page = page_updates[event]
+        return event
+
+
+def classify_webshop_steps(steps: Sequence[StepRecord]) -> tuple[WebShopEventType, ...]:
+    classifier = WebShopEventClassifier()
+    return tuple(classifier.classify(step) for step in steps)
+
+
+def segment_webshop_trajectory(
+    trajectory: EpisodeTrajectory,
+    transitions: Sequence[StepTransition] | None = None,
+    embeddings: Sequence[Sequence[float]] | None = None,
+) -> tuple[SegmentInstance, ...]:
+    aligned_transitions = tuple(transitions or build_transitions(trajectory))
+    if len(aligned_transitions) != len(trajectory.steps):
+        raise ValueError("trajectory and transitions must align")
+    if embeddings is not None and len(embeddings) != len(aligned_transitions):
+        raise ValueError("trajectory and embeddings must align")
+    events = classify_webshop_steps(trajectory.steps)
+    if not events:
+        return ()
+
+    boundaries = []
+    start = 0
+    for index in range(1, len(events) + 1):
+        if index == len(events) or events[index] is not events[start]:
+            boundaries.append((start, index - 1, events[start]))
+            start = index
+
+    segments = []
+    for start, end, event in boundaries:
+        if embeddings is None:
+            embedding = ()
+        else:
+            segment_vectors = embeddings[start : end + 1]
+            embedding = tuple(
+                sum(vector[index] for vector in segment_vectors) / len(segment_vectors)
+                for index in range(len(segment_vectors[0]))
+            )
+        segments.append(SegmentInstance(
+            segment_id=f"{trajectory.trajectory_id}:segment:{start}-{end}",
+            trajectory_id=trajectory.trajectory_id,
+            start_step=start,
+            end_step=end,
+            transition_ids=tuple(
+                transition.transition_id
+                for transition in aligned_transitions[start : end + 1]
+            ),
+            embedding=embedding,
+            trajectory_score=trajectory.primary_score,
+            event_type=event,
+            raw_actions=tuple(
+                transition.raw_action
+                for transition in aligned_transitions[start : end + 1]
+            ),
+            observation_before=aligned_transitions[start].observation_before,
+            observation_after=aligned_transitions[end].observation_after,
+        ))
+    return tuple(segments)

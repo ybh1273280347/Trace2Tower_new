@@ -11,3 +11,6 @@ provider_timeout_seconds: 120
 retry_base_seconds: 1
 agent_temperature: 0
 agent_max_output_tokens: 512
+embedding_dimension: 4096
+embedding_batch_size: 16
+transition_embedding_cache: artifacts/cache/transition-embeddings.sqlite

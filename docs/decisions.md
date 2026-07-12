@@ -39,6 +39,7 @@
 
 ## Method boundaries
 
-- PUE was accidental source text and is not part of the method or experiments.
 - WebShop event classification follows the supplemental deterministic page-state rules and consecutive equal events are merged.
+- ALFWorld change-point segmentation uses within-segment SSE over L2-normalized transition embeddings. Candidate segment costs are precomputed once, and penalty calibration minimizes distance from the target median segment length of 3 with a maximum segment length of 6.
+- Transition embeddings are cached by `(embedding model, SHA-256 transition text)` as little-endian float32 vectors. Provider batch size is fixed at 16 after a 64-item full-transition batch repeatedly returned HTTP 500 during the pilot.
 - Test data is frozen: skill construction, parameter selection, and refinement use training data only.
