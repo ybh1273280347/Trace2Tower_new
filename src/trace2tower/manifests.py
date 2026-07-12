@@ -33,6 +33,17 @@ class ManifestEntry:
     source_split: str
     repeat_id: int
 
+    @classmethod
+    def from_record(cls, record: dict) -> ManifestEntry:
+        return cls(
+            benchmark=Benchmark(record["benchmark"]),
+            split=ExperimentSplit(record["split"]),
+            sample_id=str(record["sample_id"]),
+            dataset_index=int(record["dataset_index"]),
+            source_split=str(record["source_split"]),
+            repeat_id=int(record["repeat_id"]),
+        )
+
     @property
     def manifest_key(self) -> tuple[str, str, str, int]:
         return self.benchmark, self.split, self.sample_id, self.repeat_id
@@ -109,6 +120,26 @@ def shard_counts(entries: Iterable[ManifestEntry], num_shards: int) -> list[int]
     for index, _ in enumerate(ordered):
         counts[index % num_shards] += 1
     return counts
+
+
+def select_shard(
+    entries: Iterable[ManifestEntry], shard_id: int, num_shards: int
+) -> list[ManifestEntry]:
+    if num_shards <= 0:
+        raise ValueError("num_shards must be positive")
+    if shard_id < 0 or shard_id >= num_shards:
+        raise ValueError(f"shard_id must be in [0, {num_shards})")
+    ordered = sorted(entries, key=lambda entry: (entry.sample_id, entry.repeat_id))
+    return [entry for index, entry in enumerate(ordered) if index % num_shards == shard_id]
+
+
+def read_manifest(path: Path) -> list[ManifestEntry]:
+    entries = [
+        ManifestEntry.from_record(json.loads(line))
+        for line in path.read_text(encoding="utf-8").splitlines()
+    ]
+    validate_manifest(entries)
+    return entries
 
 
 def write_manifest(path: Path, entries: Iterable[ManifestEntry]) -> None:

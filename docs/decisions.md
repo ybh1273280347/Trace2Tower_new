@@ -27,6 +27,9 @@
 - Provider and network errors are written to a separate error JSONL and remain eligible for rerun.
 - Resume uses `(benchmark, split, method, sample_id, repeat_id)` as the completion key.
 - A partial final JSONL line left by process interruption is discarded on startup before execution resumes.
+- All Trace2Tower-owned model calls share one configured API semaphore. The common runtime disables SDK retries and applies the experiment retry policy itself.
+- Episode concurrency and provider concurrency are separate limits. Both default to 10 in the frozen common configuration.
+- `billable_tokens` remains null when a provider does not explicitly return a billable-token field; it is not inferred from total tokens.
 
 ## Method boundaries
 

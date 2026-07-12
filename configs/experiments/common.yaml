@@ -2,3 +2,8 @@ manifests_dir: artifacts/manifests
 repeat_ids:
   - 0
 num_shards: 10
+global_api_concurrency: 10
+episode_concurrency: 10
+provider_max_attempts: 5
+provider_timeout_seconds: 120
+retry_base_seconds: 1

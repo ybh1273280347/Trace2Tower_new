@@ -45,6 +45,9 @@ class EpisodeCheckpoint:
     def pending(self, episode_keys: Iterable[EpisodeKey]) -> list[EpisodeKey]:
         return [key for key in episode_keys if key not in self._completed]
 
+    def is_completed(self, episode_key: EpisodeKey) -> bool:
+        return episode_key in self._completed
+
     def write_result(self, record: Mapping[str, Any]) -> bool:
         key = EpisodeKey.from_record(record)
         if record.get("primary_score") is None or record.get("error") is not None:
