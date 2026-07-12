@@ -42,4 +42,6 @@
 - WebShop event classification follows the supplemental deterministic page-state rules and consecutive equal events are merged.
 - ALFWorld change-point segmentation uses within-segment SSE over L2-normalized transition embeddings. Candidate segment costs are precomputed once, and penalty calibration minimizes distance from the target median segment length of 3 with a maximum segment length of 6.
 - Transition embeddings are cached by `(embedding model, SHA-256 transition text)` as little-endian float32 vectors. Provider batch size is fixed at 16 after a 64-item full-transition batch repeatedly returned HTTP 500 during the pilot.
+- Outcome smoothing uses `(own_score + sum(semantic_similarity * neighbor_score)) / (1 + sum(semantic_similarity))`; the fixed unit prior therefore belongs to the segment's own trajectory outcome.
+- Eigengap selection is restricted to 2 through 20 Mid clusters, then clamped by node count and the available non-degenerate eigenvectors. Ties select the smaller K. Semantic-Only consumes the Full build's selected K rather than running eigengap itself.
 - Test data is frozen: skill construction, parameter selection, and refinement use training data only.

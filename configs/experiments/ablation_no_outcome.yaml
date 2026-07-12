@@ -1,0 +1,9 @@
+method: trace2tower_no_outcome
+semantic_only: false
+use_transition_edge: true
+use_outcome_edge: false
+use_contrastive_decomposition: true
+failure_penalty: 1.0
+min_mid_clusters: 2
+max_mid_clusters: 20
+random_state: 42

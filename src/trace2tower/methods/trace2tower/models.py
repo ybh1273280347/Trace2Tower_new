@@ -117,3 +117,13 @@ class SegmentationCalibration:
     median_segment_length: float
     trajectory_count: int
     segment_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class MidCluster:
+    cluster_id: str
+    member_segment_ids: tuple[str, ...]
+    centroid: tuple[float, ...]
+
+    def to_record(self) -> dict:
+        return asdict(self)
