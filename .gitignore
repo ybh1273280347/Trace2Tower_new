@@ -1,0 +1,33 @@
+# Local specifications and reference material
+*.md
+/docs/
+/third_party/
+/Datasets/
+
+# Credentials and local editor state
+.env
+.env.*
+.idea/
+.vscode/
+
+# Experiment outputs and local runtime state
+/artifacts/
+/checkpoints/
+/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.pytest-tmp/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Build outputs
+/build/
+/dist/
