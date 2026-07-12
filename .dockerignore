@@ -1,0 +1,10 @@
+**
+!docker/
+!docker/alfworld-runtime.Dockerfile
+!services/
+!services/alfworld_server.py
+!third_party/
+!third_party/ALFWorld/
+!third_party/ALFWorld/**
+!third_party/TextWorld/
+!third_party/TextWorld/**

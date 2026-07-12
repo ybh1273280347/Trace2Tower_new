@@ -15,7 +15,10 @@ from typing import Any
 
 SOURCE_REPOSITORIES = {
     "agentbench": Path("third_party/AgentBench"),
+    "alfworld": Path("third_party/ALFWorld"),
     "skillx": Path("third_party/SkillX"),
+    "textworld": Path("third_party/TextWorld"),
+    "webshop": Path("third_party/WebShop"),
 }
 
 

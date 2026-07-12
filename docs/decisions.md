@@ -4,7 +4,7 @@
 
 - Top-level source documents, local datasets, credentials, third-party repositories, checkpoints, and experiment artifacts are not tracked.
 - Project-owned conclusions under `docs/` are tracked.
-- AgentBench, SkillX, and Princeton WebShop remain external source checkouts; source-lock records their revisions and dirty state.
+- AgentBench, SkillX, Princeton WebShop, ALFWorld, and TextWorld remain external source checkouts; source-lock records their revisions and dirty state.
 
 ## Dataset contract
 
@@ -13,6 +13,8 @@
 - ALFWorld uses local `train` (3553) for training, `valid_seen` (140) for development smoke tests, and `valid_unseen` (134) for final testing.
 - WebShop preserves the planned global goal ranges: training `[1000, 12000)` and testing `[0, 200)`. These ranges are available in the local 12087-goal dataset.
 - AgentBench's action tools, interaction limits, and official score semantics remain the behavioral reference. Full AgentBench Docker images are not required.
+- ALFWorld runs through a pinned Python 3.9 sidecar containing the exact local ALFWorld and TextWorld revisions. The local game data is mounted read-only; no full AgentBench image is built.
+- WebShop uses the upstream reward implementation and a resumable SQLite FTS5/BM25 index over the same local `id + contents` search corpus. Its ranking is not bit-identical to Lucene, but the fixed index and adapter are shared by every compared method.
 
 ## Model contract
 

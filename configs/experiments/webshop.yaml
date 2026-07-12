@@ -1,5 +1,7 @@
 benchmark: webshop
 dataset_root: Datasets/webshop
+search_index: Datasets/webshop/search.sqlite
+source_root: third_party/WebShop
 splits:
   train:
     start: 1000

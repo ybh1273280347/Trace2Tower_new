@@ -1,5 +1,6 @@
 benchmark: alfworld
 dataset_root: Datasets/alfworld
+server_url: http://127.0.0.1:18080
 splits:
   train: train
   dev: valid_seen
