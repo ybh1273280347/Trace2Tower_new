@@ -32,6 +32,9 @@
 - All Trace2Tower-owned model calls share one configured API semaphore. The common runtime disables SDK retries and applies the experiment retry policy itself.
 - Episode concurrency and provider concurrency are separate limits. Both default to 10 in the frozen common configuration.
 - `billable_tokens` remains null when a provider does not explicitly return a billable-token field; it is not inferred from total tokens.
+- No-Skill training rollout writes one atomic episode file before completing its result checkpoint, then deterministically materializes the shard's episode files into the shared `shard-XX.jsonl` pool. This prevents partial lines and duplicate trajectories while preserving independent shard recovery.
+- `--max-episodes` limits the already-selected shard and is only a bounded verification control; omitting it executes the full fixed shard.
+- ALFWorld serializes only TextWorld game loading because its module-level Tatsu parser is not thread-safe. Active environment steps and model calls retain their configured concurrency.
 
 ## Method boundaries
 

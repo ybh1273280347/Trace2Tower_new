@@ -75,6 +75,8 @@ async def main(options: argparse.Namespace) -> None:
             retry_base_seconds=common["retry_base_seconds"],
         ),
         TrajectoryWriter(output / "trajectories"),
+        temperature=common["agent_temperature"],
+        max_output_tokens=common["agent_max_output_tokens"],
     )
     runtime = evaluator.runtime
     try:

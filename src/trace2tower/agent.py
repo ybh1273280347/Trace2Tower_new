@@ -11,9 +11,18 @@ from trace2tower.trajectory import EpisodeTrajectory, StepRecord, TrajectoryWrit
 
 
 class AgentEvaluator:
-    def __init__(self, runtime: CommonLLMRuntime, trajectory_writer: TrajectoryWriter):
+    def __init__(
+        self,
+        runtime: CommonLLMRuntime,
+        trajectory_writer: TrajectoryWriter,
+        *,
+        temperature: float,
+        max_output_tokens: int,
+    ):
         self.runtime = runtime
         self.trajectory_writer = trajectory_writer
+        self.temperature = temperature
+        self.max_output_tokens = max_output_tokens
 
     async def run_episode(
         self,
@@ -56,8 +65,8 @@ class AgentEvaluator:
                     messages,
                     tools=environment.tool_schemas,
                     tool_choice="required",
-                    temperature=0,
-                    max_output_tokens=512,
+                    temperature=self.temperature,
+                    max_output_tokens=self.max_output_tokens,
                 )
                 if llm_result.usage.input_tokens is None or llm_result.usage.output_tokens is None:
                     token_usage_available = False

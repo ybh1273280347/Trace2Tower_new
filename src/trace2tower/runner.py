@@ -31,9 +31,14 @@ async def run_shard(
     writer: EpisodeResultWriter,
     executor: EpisodeExecutor,
     max_concurrency: int,
+    max_episodes: int | None = None,
     dry_run: bool = False,
 ) -> RunSummary:
     selected = select_shard(entries, shard_id, num_shards)
+    if max_episodes is not None:
+        if max_episodes <= 0:
+            raise ValueError("max_episodes must be positive")
+        selected = selected[:max_episodes]
     pending = [entry for entry in selected if not writer.is_completed(entry, method)]
     skipped = len(selected) - len(pending)
     if dry_run:

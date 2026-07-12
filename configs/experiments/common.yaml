@@ -1,4 +1,6 @@
 manifests_dir: artifacts/manifests
+runs_dir: artifacts/runs
+trajectories_dir: artifacts/trajectories
 repeat_ids:
   - 0
 num_shards: 10
@@ -7,3 +9,5 @@ episode_concurrency: 10
 provider_max_attempts: 5
 provider_timeout_seconds: 120
 retry_base_seconds: 1
+agent_temperature: 0
+agent_max_output_tokens: 512
