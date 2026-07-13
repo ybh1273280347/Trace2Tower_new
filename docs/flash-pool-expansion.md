@@ -204,3 +204,17 @@ Tower 的 cap 交互与 Flash 不同。对 Pro，success-only cap 8 相对 cap 3
 在 mixed Mid 上把 mixed High 换为 success-only High 只有 `+0.0042` reward，CI `[-0.0527, +0.0562]`；在 mixed High 下把 mixed Mid 换为 success-only Mid 只有 `+0.0031`，CI `[-0.0506, +0.0553]`。相反，在 success-only Mid 上使用同源 success-only High 带来 `+0.0639` reward，CI `[+0.0132, +0.1207]`，以及 `+8.0%` 满分成功率，CI `[+2.0%, +15.3%]`。Mid 来源与 High 来源的差分中的差分为 `+0.0597`，CI `[-0.0158, +0.1481]`，方向支持交互但区间仍跨零。
 
 因此当前最准确的机制结论是：Pro 的 success-only cap 8 优势不是来自可独立移植的一张通用 High 卡，而是来自 success-only Mid 与其同源 High 之间的语义兼容。Mixed 证据改变了 Mid 卡的边界和措辞，即使 High 的结构 ID 相同，单独替换 High 文本也不能恢复收益。对层级技能系统，父卡与子技能应作为联合契约评估；仅按 High 的结构支持或单卡质量筛选不足以预测执行收益。
+
+## 额外发现：Pro 的 cap 8 优势不能跨 cohort 复现
+
+为避免将 test ID 150-199 上的 success-only cap 8 优势误判为 Pro 的固定偏好，在此前用于 Flash cap sweep 的独立 test ID 50-149 上运行 Pro NoSkill、success-only cap 3 和 cap 8，每种方法 100 个任务、三次重复，共 300 个完整 episode key，且无未解决错误。
+
+| 50-149 方法 | Mean reward | 满分成功率 | Completion |
+|---|---:|---:|---:|
+| Pro NoSkill | 0.6487 | 43.7% | 84.7% |
+| Pro success-only cap 3 | 0.6980 | 48.7% | 89.0% |
+| Pro success-only cap 8 | 0.6553 | 44.0% | 88.3% |
+
+cap 3 相对 NoSkill 的 reward 为 `+0.0493`，95% CI `[-0.0070, +0.1088]`，满分成功率为 `+5.0%`；cap 8 相对 NoSkill 只有 `+0.0066` reward，CI `[-0.0636, +0.0751]`，满分成功率 `+0.3%`。在该 cohort 内，cap 8 相对 cap 3 为 `-0.0427` reward，CI `[-0.0929, +0.0053]`，满分成功率低 `4.7%`，CI `[-9.3%, -0.3%]`，并且每个 episode 多使用约 6,876 个输入 token。
+
+这与 ID 150-199 上 cap 8 相对 cap 3 的 `+0.0603` reward 和 `+6.7%` 满分成功率方向相反。两个 cohort 的 cap8-minus-cap3 reward 差分为 `+0.1031`，task-cluster bootstrap 95% CI `[+0.0246, +0.1897]`，证明 cap 效应存在显著 cohort 交互。因此不能将前一 cohort 的结果表述为“强模型固定偏好更大 cap”；更准确的结论是 Pro 能利用更多同源成功上下文，但收益取决于任务分布和检索集合。全局默认仍应保持 cap 3，cap 8 仅作为任务依赖的局部消融。
