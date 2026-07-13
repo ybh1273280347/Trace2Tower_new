@@ -3,12 +3,16 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -18,6 +22,7 @@ class SkillXAdapterUsage:
     output_tokens: int = 0
     cached_input_tokens: int = 0
     validation_failures: int = 0
+    transport_failures: int = 0
 
 
 class SkillXLLMAdapter:
@@ -41,6 +46,7 @@ class SkillXLLMAdapter:
         self.retry_delay_seconds = retry_delay_seconds
         self.usage = SkillXAdapterUsage()
         self.validation_diagnostics: list[dict[str, Any]] = []
+        self.transport_diagnostics: list[dict[str, Any]] = []
 
     async def ainvoke(
         self,
@@ -49,6 +55,8 @@ class SkillXLLMAdapter:
         regex_extractor: Callable[[str], Any] | None = None,
         **kwargs,
     ) -> str:
+        if self.transport_diagnostics:
+            raise RuntimeError("SkillX transport circuit breaker is open")
         converted = [_message_record(message) for message in messages]
         system_prompt = next(
             (message["content"] for message in converted if message["role"] == "system"),
@@ -56,13 +64,37 @@ class SkillXLLMAdapter:
         )
         cache_key = f"skillx:{hashlib.sha256(system_prompt.encode()).hexdigest()[:16]}"
         for attempt in range(self.max_validation_attempts):
-            result = await self.runtime.chat(
-                ModelRole.RENDERER,
-                converted,
-                temperature=self.temperature,
-                max_output_tokens=int(kwargs.get("max_tokens", self.max_output_tokens)),
-                prompt_cache_key=cache_key,
-            )
+            try:
+                result = await self.runtime.chat(
+                    ModelRole.RENDERER,
+                    converted,
+                    temperature=self.temperature,
+                    max_output_tokens=int(
+                        kwargs.get("max_tokens", self.max_output_tokens)
+                    ),
+                    prompt_cache_key=cache_key,
+                )
+            except Exception as exc:
+                diagnostic = {
+                    "prompt_sha256": hashlib.sha256(
+                        system_prompt.encode()
+                    ).hexdigest(),
+                    "attempt": attempt + 1,
+                    "exception_type": type(exc).__name__,
+                    "message": str(exc),
+                    "status_code": getattr(exc, "status_code", None),
+                }
+                self.transport_diagnostics.append(diagnostic)
+                self.usage = SkillXAdapterUsage(
+                    calls=self.usage.calls,
+                    input_tokens=self.usage.input_tokens,
+                    output_tokens=self.usage.output_tokens,
+                    cached_input_tokens=self.usage.cached_input_tokens,
+                    validation_failures=self.usage.validation_failures,
+                    transport_failures=self.usage.transport_failures + 1,
+                )
+                logger.error("SkillX transport failure: %s", diagnostic)
+                raise
             self.usage = SkillXAdapterUsage(
                 calls=self.usage.calls + 1,
                 input_tokens=self.usage.input_tokens + (result.usage.input_tokens or 0),
@@ -70,6 +102,7 @@ class SkillXLLMAdapter:
                 cached_input_tokens=self.usage.cached_input_tokens
                 + (result.usage.cached_input_tokens or 0),
                 validation_failures=self.usage.validation_failures,
+                transport_failures=self.usage.transport_failures,
             )
             content = result.content
             if content is None:
@@ -120,6 +153,7 @@ class SkillXLLMAdapter:
             output_tokens=self.usage.output_tokens,
             cached_input_tokens=self.usage.cached_input_tokens,
             validation_failures=self.usage.validation_failures + 1,
+            transport_failures=self.usage.transport_failures,
         )
         raise ValueError("SkillX output failed its official parser validation")
 

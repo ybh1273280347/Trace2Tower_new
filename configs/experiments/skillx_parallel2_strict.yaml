@@ -9,10 +9,13 @@ expansion_strategy: null
 filter_threshold: 0.999
 batch_size: 1
 max_concurrent: 2
+provider_max_attempts: 1
+provider_timeout_seconds: 120
 llm_temperature: 0
 llm_max_output_tokens: 10240
-llm_validation_attempts: 30
+llm_validation_attempts: 1
 llm_retry_delay_seconds: 3
+component_max_retries: 1
 similarity_threshold: 0.45
 plan_top_k: 3
 skills_per_step: 4

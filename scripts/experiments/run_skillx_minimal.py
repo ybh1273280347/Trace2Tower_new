@@ -107,8 +107,14 @@ async def main(options: argparse.Namespace) -> int:
             int(common["global_api_concurrency"]),
             int(config["max_concurrent"]),
         ),
-        max_attempts=common["provider_max_attempts"],
-        timeout_seconds=common["provider_timeout_seconds"],
+        max_attempts=int(
+            config.get("provider_max_attempts", common["provider_max_attempts"])
+        ),
+        timeout_seconds=float(
+            config.get(
+                "provider_timeout_seconds", common["provider_timeout_seconds"]
+            )
+        ),
         retry_base_seconds=common["retry_base_seconds"],
     )
     llm = SkillXLLMAdapter(
@@ -132,6 +138,15 @@ async def main(options: argparse.Namespace) -> int:
         verbose=True,
     )
     pipeline.clusterer.embedding_service = embedding
+    component_max_retries = int(config.get("component_max_retries", 5))
+    pipeline.plan_extractor.max_retries = component_max_retries
+    pipeline.skill_extractor.max_retries = component_max_retries
+    if hasattr(pipeline.skill_extractor, "functional_extractor"):
+        pipeline.skill_extractor.functional_extractor.max_retries = (
+            component_max_retries
+        )
+    if hasattr(pipeline.skill_extractor, "atomic_extractor"):
+        pipeline.skill_extractor.atomic_extractor.max_retries = component_max_retries
     started_at = datetime.now(UTC)
     try:
         results = await pipeline.run(
@@ -148,6 +163,21 @@ async def main(options: argparse.Namespace) -> int:
     finished_at = datetime.now(UTC)
 
     library = results["skill_library"].to_dict()
+    if llm.usage.transport_failures:
+        write_json(
+            options.output_dir / "failure-report.json",
+            {
+                "skillx_commit": upstream["commit"],
+                "config_sha256": config_sha256,
+                "source_trajectories_sha256": canonical_sha256(
+                    [trajectory.to_record() for trajectory in trajectories]
+                ),
+                "llm_usage": asdict(llm.usage),
+                "transport_diagnostics": llm.transport_diagnostics,
+                "validation_diagnostics": llm.validation_diagnostics,
+            },
+        )
+        raise RuntimeError("SkillX model transport failed")
     skills = library["skills"]
     if not skills["functional"] and not skills["atomic"]:
         raise RuntimeError("SkillX produced no executable skills")
@@ -173,6 +203,7 @@ async def main(options: argparse.Namespace) -> int:
         "epoch_statistics": epoch_statistics,
         "llm_usage": asdict(llm.usage),
         "validation_diagnostics": llm.validation_diagnostics,
+        "transport_diagnostics": llm.transport_diagnostics,
         "embedding_input_tokens": embedding.input_tokens,
         "library_sha256": canonical_sha256(library),
     }
