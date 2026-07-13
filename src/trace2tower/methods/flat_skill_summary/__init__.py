@@ -1,0 +1,1 @@
+"""Flat Skill Summary baseline."""
