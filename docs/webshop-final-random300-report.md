@@ -88,6 +88,8 @@ SkillX 相对 NoSkill 的 reward 增益具有显著模型交互：Pro 上为 `+0
 6. **技能作用存在模型依赖。** SkillX 对 Pro 的 reward 有正向显著增益，对 Flash 没有；模型交互 CI 不跨零。这比单独观察某一个模型更能解释此前强弱模型差异。
 7. **Mixed 是必须保留的错误轨迹消融。** 它没有显著优于 Success-only Tower；这只描述本轮消融结果，不决定该消融是否应当执行。
 
-本 Random-300 只用于冻结配置的正式测试。后续配置改进必须在新的验证样本上完成，再使用新的未见测试样本评估。
+本 Random-300 只用于冻结配置的正式测试。WebShop 实验线现已封版，不再启动新的配置搜索；后续只允许从冻结结果复算、审计或修正文档，不得使用本测试结果反向修改方法。
 
 主矩阵完成后追加的 Mid-only 机制结果单独见 [WebShop Mid-only 机制消融](webshop-mid-only-ablation.md)。该消融用于解释 Mid/High 层作用，不改变本文冻结配置的主结果。
+
+统一结论、潜在优势、机制解释和证据边界见 [Trace2Tower WebShop 完整实验报告](webshop-complete-experiment-report.md)。
