@@ -13,6 +13,8 @@ Semantic-Only, Full, and the three edge ablations retain build configurations bu
 
 Every skill method requires one explicit `BENCHMARK=PATH` artifact assignment per selected benchmark. The matrix parses the full content-addressed library or snapshot, validates its benchmark and internal identity, and records its SHA-256 in `resolved-config.yaml`. Static retrieval Top-1/Top-2 settings must also match the embedded Tower configuration.
 
+Static High retrieval additionally accepts an execution-time cosine threshold recorded in the resolved method configuration. Threshold `-1.0` preserves the original always-select-Top-1 behavior. Diagnostic retrieval reports retain the Top-1 candidate even when the threshold rejects it, so absence of a High skill is distinguishable from an empty High index.
+
 All methods use the frozen `deepseek-v4-flash` agent policy unless an explicit diagnostic override is recorded. Credentials are loaded from `.env` only for real execution.
 
 ## Execution And Recovery

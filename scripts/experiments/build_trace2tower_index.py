@@ -131,9 +131,13 @@ async def main(options: argparse.Namespace) -> int:
                 {card.skill_id: card for card in mid_cards},
                 high_top_k=config.high_top_k,
                 direct_mid_top_k=config.direct_mid_top_k,
+                high_similarity_threshold=options.high_similarity_threshold,
             )
             retrieval = {
                 "skill_ids": selected.skill_ids,
+                "high_candidate": asdict(selected.high_candidate)
+                if selected.high_candidate
+                else None,
                 "high_match": asdict(selected.high_match)
                 if selected.high_match
                 else None,
@@ -181,6 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--query-goal")
     parser.add_argument("--query-observation")
+    parser.add_argument("--high-similarity-threshold", type=float, default=-1.0)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))

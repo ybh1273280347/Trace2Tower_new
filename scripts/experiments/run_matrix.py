@@ -151,7 +151,13 @@ def create_provider(
             max_skills=int(method_config["max_skills"]),
         )
     if artifact.method is MethodName.TRACE2TOWER_STATIC:
-        provider = Trace2TowerSkillProvider.from_path(runtime, artifact.path)
+        provider = Trace2TowerSkillProvider.from_path(
+            runtime,
+            artifact.path,
+            high_similarity_threshold=float(
+                method_config["high_similarity_threshold"]
+            ),
+        )
         if (
             provider.snapshot.config.high_top_k != int(method_config["high_top_k"])
             or provider.snapshot.config.direct_mid_top_k

@@ -43,6 +43,7 @@ def test_retrieval_expands_high_then_deduplicates_direct_mid() -> None:
         mids,
     )
     assert result.skill_ids == ("high_a", "mid_b", "mid_c", "mid_a")
+    assert result.high_candidate.skill_id == "high_a"
     assert result.high_match.skill_id == "high_a"
     assert tuple(match.skill_id for match in result.direct_mid_matches) == (
         "mid_a",
@@ -68,8 +69,48 @@ def test_retrieval_without_high_uses_direct_mid_only() -> None:
         mids,
     )
     assert result.high_card is None
+    assert result.high_candidate is None
     assert result.high_match is None
     assert result.skill_ids == ("mid_a", "mid_b")
+
+
+def test_retrieval_preserves_rejected_high_candidate_as_evidence() -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
+    high = HighSkillCard(
+        "high_a",
+        ("mid_a", "mid_b"),
+        "Combined strategy",
+        "Use for the combined task.",
+        ("Execute children in order.",),
+    )
+    result = retrieve_tower(
+        (0.5, 0.5),
+        (1.0, 0.0),
+        SkillEmbeddingIndex(("high_a",), ((1.0, 0.0),)),
+        SkillEmbeddingIndex(("mid_a", "mid_b"), ((1.0, 0.0), (0.0, 1.0))),
+        {"high_a": high},
+        mids,
+        high_similarity_threshold=0.8,
+    )
+    assert result.high_candidate.skill_id == "high_a"
+    assert result.high_candidate.cosine_similarity == pytest.approx(2**-0.5)
+    assert result.high_match is None
+    assert result.high_card is None
+    assert result.skill_ids == ("mid_a", "mid_b")
+    assert "Combined strategy" not in result.context
+
+
+def test_retrieval_rejects_invalid_high_similarity_threshold() -> None:
+    with pytest.raises(ValueError, match="similarity threshold"):
+        retrieve_tower(
+            (),
+            (),
+            SkillEmbeddingIndex((), ()),
+            SkillEmbeddingIndex((), ()),
+            {},
+            {},
+            high_similarity_threshold=1.01,
+        )
 
 
 def test_embedding_index_rejects_dimension_mismatch() -> None:

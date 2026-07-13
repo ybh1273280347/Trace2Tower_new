@@ -148,3 +148,22 @@ def test_provider_selects_from_complete_snapshot_and_reports_embedding_cost() ->
     assert selection.skill_ids == ("high_ab", "mid_a", "mid_b")
     assert selection.model_input_tokens == 23
     assert "Combined" in selection.context
+
+
+def test_provider_applies_configured_high_similarity_threshold() -> None:
+    class FakeRuntime:
+        async def embed(self, texts) -> EmbeddingResult:
+            return EmbeddingResult(
+                ((1.0, 0.0), (1.0, 0.0)),
+                LLMUsage(23, None, None),
+                1,
+            )
+
+    provider = Trace2TowerSkillProvider(
+        FakeRuntime(),
+        complete_snapshot(),
+        high_similarity_threshold=0.8,
+    )
+    selection = asyncio.run(provider.select("goal", "initial observation"))
+    assert selection.skill_ids == ("mid_a", "mid_b")
+    assert "Combined" not in selection.context

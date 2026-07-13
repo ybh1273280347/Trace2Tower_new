@@ -11,6 +11,7 @@ from trace2tower.semantic_index import SkillEmbeddingIndex, SkillMatch
 class TowerRetrieval:
     high_card: HighSkillCard | None
     mid_cards: tuple[MidSkillCard, ...]
+    high_candidate: SkillMatch | None
     high_match: SkillMatch | None
     direct_mid_matches: tuple[SkillMatch, ...]
     skill_ids: tuple[str, ...]
@@ -27,13 +28,22 @@ def retrieve_tower(
     *,
     high_top_k: int = 1,
     direct_mid_top_k: int = 2,
+    high_similarity_threshold: float = -1.0,
 ) -> TowerRetrieval:
+    if not -1 <= high_similarity_threshold <= 1:
+        raise ValueError("High similarity threshold must be in [-1, 1]")
     missing_high_cards = set(high_index.skill_ids) - set(high_cards)
     missing_mid_cards = set(mid_index.skill_ids) - set(mid_cards)
     if missing_high_cards or missing_mid_cards:
         raise ValueError("skill embedding index references missing cards")
     high_matches = high_index.search(high_query_vector, high_top_k)
-    high_match = high_matches[0] if high_matches else None
+    high_candidate = high_matches[0] if high_matches else None
+    high_match = (
+        high_candidate
+        if high_candidate
+        and high_candidate.cosine_similarity >= high_similarity_threshold
+        else None
+    )
     high_card = high_cards[high_match.skill_id] if high_match else None
     if high_card and not set(high_card.ordered_mid_ids) <= set(mid_cards):
         raise ValueError("retrieved High card references missing child Mid cards")
@@ -49,6 +59,7 @@ def retrieve_tower(
     return TowerRetrieval(
         high_card=high_card,
         mid_cards=selected_mid_cards,
+        high_candidate=high_candidate,
         high_match=high_match,
         direct_mid_matches=direct_mid_matches,
         skill_ids=skill_ids,

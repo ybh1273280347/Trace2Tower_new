@@ -26,4 +26,12 @@ Fresh paired runs used WebShop training samples `1001` and `1002`, neither of wh
 
 Both tasks retrieved `high_a4b61e1af12c`. Its High path is supported by one successful training trajectory, repeats a Mid child in the order `mid_0003 -> mid_0000 -> mid_0003`, and renders to seven substantially overlapping strategy steps. The observed High cosine similarities were `0.4656` and `0.5062`, below the corresponding direct-Mid matches (`0.6180` through `0.6663`). All six High paths in this build have only one supporting successful trajectory.
 
-The expanded Tower therefore still fails the bounded quality gate and is not eligible for full rollout. The next experiment treats these two tasks as diagnostic calibration only and tests a confidence-gated High retrieval rule on fresh pool-external samples; it must not report the calibration pair as held-out evidence.
+The expanded Tower therefore still fails the bounded quality gate and is not eligible for full rollout. Samples `1001` and `1002` are treated as diagnostic calibration only and are not reported as held-out evidence.
+
+## High Confidence Gate Ablation
+
+Retrieval now supports an explicit High cosine-similarity threshold while preserving the rejected Top-1 candidate separately from the accepted match in diagnostic reports. Existing behavior is represented by threshold `-1.0`; no stored Tower schema or identity changed. A calibrated threshold of `0.55` rejected High on samples `1001` and `1002` and reduced injected context from roughly 5.5k to 2.5-2.6k characters without changing direct-Mid ranking.
+
+The actual ablation used fresh pool-external training samples `1003` and `1004`. Against the same No-Skill pair, both gated and ungated Static scored mean reward `0.75` versus `0.5`, with one win and one tie. The gated version averaged 9 steps and 21,147 reported input tokens; the ungated version averaged 7 steps and 19,106.5 input tokens. Both used one invalid action across the pair and neither provider reported billable tokens.
+
+The threshold therefore did not improve held-out reward and worsened observed step and input-token efficiency in this two-task diagnostic. It remains an executable ablation control, but the Static default stays `-1.0` rather than promoting the calibrated `0.55`. This sample is too small for a performance claim; its purpose is to reject an unsupported default change.
