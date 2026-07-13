@@ -49,6 +49,33 @@ def write_json(path: Path, payload: object) -> None:
     os.replace(temporary, path)
 
 
+def write_manifest(path: Path, selections: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sample_ids = [sample_id for group in selections for sample_id in group["sample_ids"]]
+    with tempfile.NamedTemporaryFile(
+        "w", delete=False, dir=path.parent, encoding="utf-8", newline="\n"
+    ) as output:
+        temporary = Path(output.name)
+        for sample_id in sorted(sample_ids, key=lambda value: int(value.split(":")[1])):
+            dataset_index = int(sample_id.split(":")[1])
+            json.dump(
+                {
+                    "benchmark": "webshop",
+                    "split": "test",
+                    "sample_id": sample_id,
+                    "dataset_index": dataset_index,
+                    "source_split": "goals",
+                    "repeat_id": 0,
+                },
+                output,
+                separators=(",", ":"),
+            )
+            output.write("\n")
+        output.flush()
+        os.fsync(output.fileno())
+    os.replace(temporary, path)
+
+
 def main(options: argparse.Namespace) -> int:
     goals = json.loads(options.goals.read_text(encoding="utf-8"))
     if len(goals) < options.candidate_end:
@@ -85,6 +112,7 @@ def main(options: argparse.Namespace) -> int:
         name: {"path": path.as_posix(), "sha256": sha256_file(path)}
         for name, path in artifacts.items()
     }
+    write_manifest(options.manifest_output, selections)
     protocol = {
         "version": "webshop-final-random300-v1",
         "benchmark": "webshop",
@@ -92,6 +120,8 @@ def main(options: argparse.Namespace) -> int:
         "candidate_semantics": "WebShop held-out goal indices below the train split start",
         "goals_path": options.goals.as_posix(),
         "goals_sha256": sha256_file(options.goals),
+        "execution_manifest_path": options.manifest_output.as_posix(),
+        "execution_manifest_sha256": sha256_file(options.manifest_output),
         "preexisting_used_id_count": len(used),
         "preexisting_used_ids_sha256": canonical_hash(sorted(used)),
         "unused_candidate_count_before_sampling": len(candidates),
@@ -160,6 +190,11 @@ if __name__ == "__main__":
         "--output",
         type=Path,
         default=Path("configs/experiments/webshop_final_random300_v1.json"),
+    )
+    parser.add_argument(
+        "--manifest-output",
+        type=Path,
+        default=Path("artifacts/manifests/webshop-final-random300-v1/webshop_test.jsonl"),
     )
     options = parser.parse_args()
     if not options.seed:

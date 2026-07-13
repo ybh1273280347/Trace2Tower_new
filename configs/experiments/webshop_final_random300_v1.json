@@ -8,6 +8,8 @@
   "candidate_semantics": "WebShop held-out goal indices below the train split start",
   "goals_path": "Datasets/webshop/goals.json",
   "goals_sha256": "5ac4982eb019ff0167a8dbfe30cbcc13c2170438c7ba7abbc7ec24ea8b942170",
+  "execution_manifest_path": "artifacts/manifests/webshop-final-random300-v1/webshop_test.jsonl",
+  "execution_manifest_sha256": "b055ef5458374c0b8e34935dd59d83f1a90d023bf93fb6a7d2c27c61bcd8fc3e",
   "preexisting_used_id_count": 278,
   "preexisting_used_ids_sha256": "094fcaf534770114eaf4bd5385a5fe5fde6436b01f01ae864ee275e226b87d8d",
   "unused_candidate_count_before_sampling": 800,
@@ -374,5 +376,5 @@
       "sample_count": 100
     }
   ],
-  "selection_id": "selection_a4089c5e54d754fe"
+  "selection_id": "selection_32248afcaee8da76"
 }
