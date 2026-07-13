@@ -1,1 +1,1 @@
-"""Adapters for the pinned upstream SkillX pipeline."""
+"""Pinned SkillX extraction adapters and executable retrieval projection."""

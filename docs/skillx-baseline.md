@@ -33,4 +33,26 @@ This proves the pinned official pipeline and adapters execute end to end. Becaus
 
 The retained functional skill is relevant to the successful rug task, but its declared precondition says execution begins on the product page while its first instruction calls `click_action('< prev')`. That action belongs to a detail subsection in the source trajectory and may be invalid under the stated precondition. Passing SkillX's official filters therefore does not prove executable skill quality.
 
-The single-source cost and this precondition mismatch do not justify scaling SkillX extraction yet. The baseline is kept for comparison, but the next evidence gate is retrieval plus one execution smoke using the generated library. Full pilot extraction remains deferred until that smoke shows the retained skills can be injected without degrading the agent trajectory.
+The single-source cost and this precondition mismatch did not justify scaling extraction before execution evidence. The baseline is kept for comparison, and the generated library was therefore passed through a retrieval-and-execution gate before any larger build.
+
+## Retrieval And Execution Gate
+
+The execution projection preserves the exact source library SHA-256, pinned upstream commit, each source record SHA-256, stable semantic IDs, card-text hashes, and separate plan and skill indexes. Retrieval reproduces SkillX's inference order with the shared asynchronous embedding runtime:
+
+1. retrieve Top-3 plans for the task at similarity threshold 0.45 and select the first;
+2. split that plan with the upstream line rules;
+3. retrieve Top-4 skills per plan step at the same threshold;
+4. deduplicate by stable skill ID and cap the final list at 10.
+
+The one-plan, one-skill WebShop projection is `skillxlib_8e2ea4328cb70e0f`. Its first build embedded two texts using 1,204 input tokens; the immediate rebuild reused both vectors with zero new calls.
+
+The execution smoke replayed the exact source task with `deepseek-v4-flash`:
+
+| Method trajectory | Score | Steps | Invalid actions | Injected context |
+|---|---:|---:|---:|---:|
+| Source No-Skill | 1.0 | 11 | 1 | 0 |
+| SkillX replay | 0.3333 | 8 | 0 | 5,874 chars |
+
+The injected replay selected `french vanilla sundara` instead of the requested `french cellar`, inspected Features and Attributes, and purchased it. This is one paired task, not a performance estimate or proof that SkillX caused the entire difference. It is sufficient as a cost gate: the extracted guidance was executable and shortened the path, but did not preserve the task's decisive constraint. Full SkillX pilot extraction is therefore not expanded at this stage.
+
+The first two smoke attempts also exposed undeclared WebShop runtime dependencies before any episode execution. `click` and the exact `en_core_web_sm` 3.8.0 model are now locked project dependencies so official reward semantics no longer depend on packages installed in a global Python environment. Re-running the completed smoke skipped the episode with zero additional model calls.
