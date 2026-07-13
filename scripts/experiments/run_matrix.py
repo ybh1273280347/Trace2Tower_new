@@ -193,6 +193,14 @@ def create_provider(
             direct_mid_mmr_lambda=float(
                 method_config.get("direct_mid_mmr_lambda", 0.75)
             ),
+            lifecycle_report_path=(
+                Path(method_config["lifecycle_report"])
+                if method_config.get("lifecycle_report")
+                else None
+            ),
+            status_tie_epsilon=float(
+                method_config.get("status_tie_epsilon", 0.0)
+            ),
         )
         if (
             provider.snapshot.config.high_top_k != int(method_config["high_top_k"])

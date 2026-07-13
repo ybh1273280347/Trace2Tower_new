@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from trace2tower.methods.trace2tower.models import PrimitiveAction
@@ -122,6 +124,56 @@ def test_retrieval_supports_direct_mid_top_one() -> None:
     assert tuple(match.skill_id for match in result.direct_mid_matches) == ("mid_a",)
     assert result.skill_ids == ("mid_a",)
     assert "Name mid_b" not in result.context
+
+
+@pytest.mark.parametrize("candidate_top_k", (None, 100))
+def test_downweighted_skill_must_clear_fixed_near_tie_band(candidate_top_k) -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_active", "mid_down")}
+    active_cosine = 0.995
+    result = retrieve_tower(
+        (),
+        (1.0, 0.0),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex(
+            ("mid_down", "mid_active"),
+            (
+                (1.0, 0.0),
+                (active_cosine, math.sqrt(1 - active_cosine**2)),
+            ),
+        ),
+        {},
+        mids,
+        direct_mid_top_k=1,
+        direct_mid_candidate_top_k=candidate_top_k,
+        direct_mid_similarity_threshold=0.0,
+        downweighted_skill_ids=frozenset({"mid_down"}),
+        status_tie_epsilon=0.01,
+    )
+    assert result.direct_mid_matches[0].skill_id == "mid_active"
+    assert result.direct_mid_matches[0].cosine_similarity == pytest.approx(active_cosine)
+
+
+def test_downweighted_skill_remains_selectable_when_relevance_gap_exceeds_band() -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_active", "mid_down")}
+    active_cosine = 0.98
+    result = retrieve_tower(
+        (),
+        (1.0, 0.0),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex(
+            ("mid_down", "mid_active"),
+            (
+                (1.0, 0.0),
+                (active_cosine, math.sqrt(1 - active_cosine**2)),
+            ),
+        ),
+        {},
+        mids,
+        direct_mid_top_k=1,
+        downweighted_skill_ids=frozenset({"mid_down"}),
+        status_tie_epsilon=0.01,
+    )
+    assert result.direct_mid_matches[0].skill_id == "mid_down"
 
 
 def test_retrieval_preserves_rejected_high_candidate_as_evidence() -> None:

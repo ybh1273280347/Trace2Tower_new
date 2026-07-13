@@ -54,7 +54,11 @@ class SkillEmbeddingIndex:
         return tuple(match.skill_id for match in self.search(query_vector, count))
 
     def search(
-        self, query_vector: Sequence[float], count: int
+        self,
+        query_vector: Sequence[float],
+        count: int,
+        *,
+        score_penalties: Mapping[str, float] | None = None,
     ) -> tuple[SkillMatch, ...]:
         if count < 0:
             raise ValueError("retrieval count must be non-negative")
@@ -72,9 +76,18 @@ class SkillEmbeddingIndex:
             out=np.full(len(vectors), -np.inf),
             where=(vector_norms > 0) & (query_norm > 0),
         )
+        penalties = score_penalties or {}
+        if set(penalties) - set(self.skill_ids) or any(
+            penalty < 0 for penalty in penalties.values()
+        ):
+            raise ValueError("skill score penalties are invalid")
         ranked = sorted(
             zip(self.skill_ids, scores, strict=True),
-            key=lambda item: (-item[1], item[0]),
+            key=lambda item: (
+                -(item[1] - penalties.get(item[0], 0.0)),
+                -item[1],
+                item[0],
+            ),
         )
         return tuple(
             SkillMatch(skill_id, float(score)) for skill_id, score in ranked[:count]
@@ -91,6 +104,7 @@ def diverse_search(
     dedup_similarity_threshold: float,
     relevance_weight: float,
     max_count: int,
+    score_penalties: Mapping[str, float] | None = None,
 ) -> DiverseSkillMatches:
     if candidate_count <= 0 or max_count <= 0:
         raise ValueError("diverse retrieval counts must be positive")
@@ -103,8 +117,16 @@ def diverse_search(
     if not 0 <= relevance_weight <= 1:
         raise ValueError("MMR relevance weight must be between zero and one")
 
-    candidates = index.search(query_vector, candidate_count)
-    best_similarity = candidates[0].cosine_similarity if candidates else -1.0
+    penalties = score_penalties or {}
+    candidates = index.search(
+        query_vector,
+        candidate_count,
+        score_penalties=penalties,
+    )
+    best_similarity = max(
+        (match.cosine_similarity for match in candidates),
+        default=-1.0,
+    )
     filtered = tuple(
         match
         for match in candidates
@@ -128,7 +150,10 @@ def diverse_search(
         ranked = sorted(
             remaining,
             key=lambda match: (
-                -_mmr_score(match, selected, vectors, relevance_weight),
+                -(
+                    _mmr_score(match, selected, vectors, relevance_weight)
+                    - penalties.get(match.skill_id, 0.0)
+                ),
                 -match.cosine_similarity,
                 match.skill_id,
             ),

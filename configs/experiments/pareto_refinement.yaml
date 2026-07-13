@@ -2,3 +2,5 @@ refinement_round: 1
 cost_field: chat_tokens
 missing_cost_policy: reject_ranking
 physical_deletion: false
+minimum_exposure_count: 10
+status_tie_epsilon: 0.01

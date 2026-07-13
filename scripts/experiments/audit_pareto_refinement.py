@@ -44,6 +44,8 @@ def main(options: argparse.Namespace) -> int:
         "cost_field": "chat_tokens",
         "missing_cost_policy": "reject_ranking",
         "physical_deletion": False,
+        "minimum_exposure_count": 10,
+        "status_tie_epsilon": 0.01,
     }
     if config != expected_config:
         raise ValueError("Pareto refinement config changed outside the frozen contract")
@@ -112,10 +114,18 @@ def main(options: argparse.Namespace) -> int:
         for item in ranked:
             scope = (item.benchmark, item.skill_level, item.refinement_round)
             by_scope.setdefault(scope, []).append(item)
-        report["downweight"] = [
-            select_downweight(items, {item.skill_id for item in items}).to_record()
-            for items in by_scope.values()
-        ]
+        minimum_exposure = int(config["minimum_exposure_count"])
+        report["downweight"] = []
+        for items in by_scope.values():
+            eligible = {
+                item.skill_id
+                for item in items
+                if item.exposure_count >= minimum_exposure
+            }
+            if eligible:
+                report["downweight"].append(
+                    select_downweight(items, eligible).to_record()
+                )
     write_json(options.output, report)
     print(yaml.safe_dump(report, sort_keys=False, allow_unicode=True))
     if options.require_complete and not audit.is_complete:

@@ -17,6 +17,8 @@ Each saving is divided by the corresponding No-Skill value, with a denominator f
 
 The frozen refinement config permits one round and defines cost as agent-chat prompt plus completion tokens. Retrieval embedding usage is excluded. Both chat token fields must be recorded by the run; missing evidence blocks ranking. The first round permits status downweighting but not physical deletion.
 
+At least 10 paired exposures are required before a skill can be downweighted. Retrieval retains raw cosine diagnostics and applies a fixed `0.01` status band: a downweighted skill must exceed an active alternative by more than `0.01` to rank ahead. The same constants are fixed before success-only or mixed deployment results are inspected.
+
 ## Non-Dominated Sorting
 
 Skills are compared only within the same benchmark, skill level, and refinement round. A skill dominates another when it is no worse on all four objectives and strictly better on at least one. Recursive front removal assigns `pareto_front_rank`, while each record also retains `dominated_by`, `dominates`, the full objective vector, exposure count, and exact paired episode keys.

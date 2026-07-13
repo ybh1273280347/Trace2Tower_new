@@ -38,16 +38,34 @@ def retrieve_tower(
     direct_mid_relative_margin: float = 0.08,
     direct_mid_dedup_similarity_threshold: float = 0.95,
     direct_mid_mmr_lambda: float = 0.75,
+    downweighted_skill_ids: frozenset[str] = frozenset(),
+    status_tie_epsilon: float = 0.0,
 ) -> TowerRetrieval:
     if not -1 <= high_similarity_threshold <= 1:
         raise ValueError("High similarity threshold must be in [-1, 1]")
     if not isinstance(include_high_child_context, bool):
         raise ValueError("High child context switch must be boolean")
+    if not 0 <= status_tie_epsilon <= 1:
+        raise ValueError("status tie epsilon must be in [0, 1]")
     missing_high_cards = set(high_index.skill_ids) - set(high_cards)
     missing_mid_cards = set(mid_index.skill_ids) - set(mid_cards)
     if missing_high_cards or missing_mid_cards:
         raise ValueError("skill embedding index references missing cards")
-    high_matches = high_index.search(high_query_vector, high_top_k)
+    known_skill_ids = set(high_cards) | set(mid_cards)
+    if not downweighted_skill_ids <= known_skill_ids:
+        raise ValueError("lifecycle status references missing skills")
+    score_penalties = {
+        skill_id: status_tie_epsilon for skill_id in downweighted_skill_ids
+    }
+    high_matches = high_index.search(
+        high_query_vector,
+        high_top_k,
+        score_penalties={
+            skill_id: penalty
+            for skill_id, penalty in score_penalties.items()
+            if skill_id in high_cards
+        },
+    )
     high_candidate = high_matches[0] if high_matches else None
     high_match = (
         high_candidate
@@ -59,7 +77,15 @@ def retrieve_tower(
     if high_card and not set(high_card.ordered_mid_ids) <= set(mid_cards):
         raise ValueError("retrieved High card references missing child Mid cards")
     if direct_mid_candidate_top_k is None:
-        direct_mid_matches = mid_index.search(mid_query_vector, direct_mid_top_k)
+        direct_mid_matches = mid_index.search(
+            mid_query_vector,
+            direct_mid_top_k,
+            score_penalties={
+                skill_id: penalty
+                for skill_id, penalty in score_penalties.items()
+                if skill_id in mid_cards
+            },
+        )
         direct_mid_candidates = direct_mid_matches
         direct_mid_filtered = direct_mid_matches
         direct_mid_deduplicated = direct_mid_matches
@@ -73,6 +99,11 @@ def retrieve_tower(
             dedup_similarity_threshold=direct_mid_dedup_similarity_threshold,
             relevance_weight=direct_mid_mmr_lambda,
             max_count=direct_mid_top_k,
+            score_penalties={
+                skill_id: penalty
+                for skill_id, penalty in score_penalties.items()
+                if skill_id in mid_cards
+            },
         )
         direct_mid_candidates = stages.candidates
         direct_mid_filtered = stages.filtered

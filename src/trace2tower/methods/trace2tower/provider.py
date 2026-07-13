@@ -6,6 +6,7 @@ from pathlib import Path
 from trace2tower.agent import SkillSelection
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.trace2tower.retrieval import retrieve_tower
+from trace2tower.methods.trace2tower.refinement import SkillStatus
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
 
 
@@ -22,6 +23,8 @@ class Trace2TowerSkillProvider:
         direct_mid_relative_margin: float = 0.08,
         direct_mid_dedup_similarity_threshold: float = 0.95,
         direct_mid_mmr_lambda: float = 0.75,
+        downweighted_skill_ids: frozenset[str] = frozenset(),
+        status_tie_epsilon: float = 0.0,
     ):
         snapshot.require_complete()
         if not -1 <= high_similarity_threshold <= 1:
@@ -37,6 +40,8 @@ class Trace2TowerSkillProvider:
         self.direct_mid_relative_margin = direct_mid_relative_margin
         self.direct_mid_dedup_similarity_threshold = direct_mid_dedup_similarity_threshold
         self.direct_mid_mmr_lambda = direct_mid_mmr_lambda
+        self.downweighted_skill_ids = downweighted_skill_ids
+        self.status_tie_epsilon = status_tie_epsilon
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
@@ -45,12 +50,32 @@ class Trace2TowerSkillProvider:
         cls,
         runtime: CommonLLMRuntime,
         snapshot_path: Path,
+        lifecycle_report_path: Path | None = None,
         **kwargs,
     ) -> Trace2TowerSkillProvider:
         payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+        snapshot = TowerSnapshot.from_record(payload)
+        downweighted_skill_ids = frozenset()
+        if lifecycle_report_path is not None:
+            lifecycle = json.loads(lifecycle_report_path.read_text(encoding="utf-8"))
+            if (
+                lifecycle.get("tower_snapshot_id") != snapshot.snapshot_id
+                or lifecycle.get("ranking_status") != "complete"
+            ):
+                raise ValueError("lifecycle report does not bind to this Tower snapshot")
+            updates = lifecycle.get("downweight", ())
+            if any(
+                update.get("new_status") != SkillStatus.DOWNWEIGHTED.value
+                for update in updates
+            ):
+                raise ValueError("lifecycle report contains an invalid status update")
+            downweighted_skill_ids = frozenset(
+                str(update["skill_id"]) for update in updates
+            )
         return cls(
             runtime,
-            TowerSnapshot.from_record(payload),
+            snapshot,
+            downweighted_skill_ids=downweighted_skill_ids,
             **kwargs,
         )
 
@@ -74,6 +99,8 @@ class Trace2TowerSkillProvider:
             direct_mid_relative_margin=self.direct_mid_relative_margin,
             direct_mid_dedup_similarity_threshold=self.direct_mid_dedup_similarity_threshold,
             direct_mid_mmr_lambda=self.direct_mid_mmr_lambda,
+            downweighted_skill_ids=self.downweighted_skill_ids,
+            status_tie_epsilon=self.status_tie_epsilon,
         )
         return SkillSelection(
             skill_ids=retrieval.skill_ids,
