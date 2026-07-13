@@ -5,10 +5,10 @@ from __future__ import annotations
 import json
 import os
 import tempfile
-from dataclasses import asdict, dataclass
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass, replace
 from enum import StrEnum
 from pathlib import Path
-from typing import Iterable
 
 import pyarrow.parquet as parquet
 
@@ -110,6 +110,34 @@ def validate_manifest(entries: Iterable[ManifestEntry]) -> None:
         if entry.manifest_key in seen:
             raise ValueError(f"duplicate manifest entry: {entry.manifest_key}")
         seen.add(entry.manifest_key)
+
+
+def expand_manifest_repeats(
+    entries: Iterable[ManifestEntry], repeat_ids: Iterable[int]
+) -> list[ManifestEntry]:
+    selected = list(entries)
+    repeats = tuple(repeat_ids)
+    if not repeats:
+        return selected
+    if any(repeat_id < 0 for repeat_id in repeats) or len(set(repeats)) != len(repeats):
+        raise ValueError("repeat IDs must be unique non-negative integers")
+
+    templates = {}
+    signatures = {}
+    for entry in selected:
+        key = (entry.benchmark, entry.split, entry.sample_id)
+        signature = (entry.dataset_index, entry.source_split)
+        if key in signatures and signatures[key] != signature:
+            raise ValueError("sample repeat entries disagree on dataset provenance")
+        templates.setdefault(key, entry)
+        signatures[key] = signature
+    expanded = [
+        replace(template, repeat_id=repeat_id)
+        for template in templates.values()
+        for repeat_id in sorted(repeats)
+    ]
+    validate_manifest(expanded)
+    return expanded
 
 
 def shard_counts(entries: Iterable[ManifestEntry], num_shards: int) -> list[int]:

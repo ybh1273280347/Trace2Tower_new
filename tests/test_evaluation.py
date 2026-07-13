@@ -33,6 +33,7 @@ def result(
     invalid: int = 0,
     input_tokens: int | None = 10,
     billable_tokens: int | None = None,
+    repeat_id: int = 0,
 ) -> EpisodeResult:
     return EpisodeResult(
         "run",
@@ -40,7 +41,7 @@ def result(
         ExperimentSplit.TEST,
         method,
         f"{benchmark}:{index}",
-        0,
+        repeat_id,
         0,
         score,
         bool(score) if benchmark is Benchmark.ALFWORLD else None,
@@ -153,10 +154,36 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
     )
     assert first == second
     assert first.mean_difference == 0.5
+    assert (first.pair_count, first.task_count) == (2, 2)
     assert first.confidence_interval == (0.0, 1.0)
     assert (first.candidate_wins, first.ties, first.candidate_losses) == (1, 1, 0)
     assert first.billable_token_pair_coverage == 0.5
     assert first.mean_billable_token_difference == -2
+
+
+def test_paired_bootstrap_clusters_repeats_by_sample() -> None:
+    baseline = tuple(
+        result(0, MethodName.NO_SKILL, 0.0, repeat_id=repeat_id)
+        for repeat_id in range(3)
+    ) + (result(1, MethodName.NO_SKILL, 1.0),)
+    candidate = tuple(
+        result(0, MethodName.TRACE2TOWER_STATIC, 1.0, repeat_id=repeat_id)
+        for repeat_id in range(3)
+    ) + (result(1, MethodName.TRACE2TOWER_STATIC, 0.0),)
+    comparison = paired_bootstrap(
+        baseline,
+        candidate,
+        benchmark=Benchmark.WEBSHOP,
+        split=ExperimentSplit.TEST,
+        baseline_method=MethodName.NO_SKILL,
+        candidate_method=MethodName.TRACE2TOWER_STATIC,
+        bootstrap_samples=10000,
+        bootstrap_seed=42,
+        confidence_level=0.95,
+    )
+    assert (comparison.pair_count, comparison.task_count) == (4, 2)
+    assert comparison.mean_difference == 0
+    assert comparison.confidence_interval == (-1.0, 1.0)
 
 
 def test_resolved_errors_are_not_reported_as_final_failures() -> None:

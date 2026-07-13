@@ -87,3 +87,22 @@ def test_sample_selection_requires_every_requested_manifest_id() -> None:
     ]
     with pytest.raises(ValueError, match="absent"):
         select_entries(entries, ("webshop:3",))
+
+
+def test_sample_selection_expands_explicit_repeat_ids() -> None:
+    entries = [
+        ManifestEntry(
+            Benchmark.WEBSHOP,
+            ExperimentSplit.TRAIN,
+            "webshop:1",
+            1,
+            "goals",
+            0,
+        )
+    ]
+    selected = matrix_module().select_entries(
+        entries,
+        ("webshop:1",),
+        (0, 1, 2),
+    )
+    assert [entry.repeat_id for entry in selected] == [0, 1, 2]

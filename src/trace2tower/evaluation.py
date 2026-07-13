@@ -197,6 +197,7 @@ class PairwiseComparison:
     baseline_method: MethodName
     candidate_method: MethodName
     pair_count: int
+    task_count: int
     primary_metric: PrimaryMetricName
     mean_difference: float
     confidence_level: float
@@ -363,11 +364,15 @@ def paired_bootstrap(
     if set(baseline) != set(candidate) or not baseline:
         raise ValueError("paired bootstrap requires identical non-empty episode keys")
     ordered_keys = tuple(sorted(baseline))
-    differences = np.asarray(
-        [
-            candidate[key].primary_score - baseline[key].primary_score
-            for key in ordered_keys
-        ],
+    episode_differences = np.asarray(
+        [candidate[key].primary_score - baseline[key].primary_score for key in ordered_keys],
+        dtype=np.float64,
+    )
+    differences_by_sample = {}
+    for key, difference in zip(ordered_keys, episode_differences, strict=True):
+        differences_by_sample.setdefault(key.sample_id, []).append(float(difference))
+    task_differences = np.asarray(
+        [fmean(values) for _, values in sorted(differences_by_sample.items())],
         dtype=np.float64,
     )
     rng = np.random.default_rng(bootstrap_seed)
@@ -375,8 +380,12 @@ def paired_bootstrap(
     batch_size = 512
     for start in range(0, bootstrap_samples, batch_size):
         end = min(start + batch_size, bootstrap_samples)
-        indices = rng.integers(0, len(differences), size=(end - start, len(differences)))
-        means[start:end] = differences[indices].mean(axis=1)
+        indices = rng.integers(
+            0,
+            len(task_differences),
+            size=(end - start, len(task_differences)),
+        )
+        means[start:end] = task_differences[indices].mean(axis=1)
     alpha = (1 - confidence_level) / 2
     interval = np.quantile(means, (alpha, 1 - alpha), method="linear")
     metric = (
@@ -399,15 +408,16 @@ def paired_bootstrap(
         baseline_method=baseline_method,
         candidate_method=candidate_method,
         pair_count=len(ordered_keys),
+        task_count=len(task_differences),
         primary_metric=metric,
-        mean_difference=float(differences.mean()),
+        mean_difference=float(task_differences.mean()),
         confidence_level=confidence_level,
         confidence_interval=(float(interval[0]), float(interval[1])),
         bootstrap_samples=bootstrap_samples,
         bootstrap_seed=bootstrap_seed,
-        candidate_wins=int(np.sum(differences > 0)),
-        ties=int(np.sum(differences == 0)),
-        candidate_losses=int(np.sum(differences < 0)),
+        candidate_wins=int(np.sum(episode_differences > 0)),
+        ties=int(np.sum(episode_differences == 0)),
+        candidate_losses=int(np.sum(episode_differences < 0)),
         mean_step_difference=fmean(
             candidate[key].steps - baseline[key].steps for key in ordered_keys
         ),

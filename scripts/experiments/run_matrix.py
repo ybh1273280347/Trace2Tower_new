@@ -18,7 +18,13 @@ from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
 from trace2tower.checkpoint import EpisodeCheckpoint
 from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry, read_manifest
+from trace2tower.manifests import (
+    Benchmark,
+    ExperimentSplit,
+    ManifestEntry,
+    expand_manifest_repeats,
+    read_manifest,
+)
 from trace2tower.methods.flat_skill_summary.models import FlatSkillLibrary
 from trace2tower.methods.flat_skill_summary.provider import FlatSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
@@ -172,14 +178,18 @@ def create_provider(
 
 
 def select_entries(
-    entries: list[ManifestEntry], sample_ids: tuple[str, ...]
+    entries: list[ManifestEntry],
+    sample_ids: tuple[str, ...],
+    repeat_ids: tuple[int, ...] = (),
 ) -> list[ManifestEntry]:
-    if not sample_ids:
-        return entries
-    selected = [entry for entry in entries if entry.sample_id in set(sample_ids)]
-    if {entry.sample_id for entry in selected} != set(sample_ids):
+    selected = (
+        [entry for entry in entries if entry.sample_id in set(sample_ids)]
+        if sample_ids
+        else entries
+    )
+    if sample_ids and {entry.sample_id for entry in selected} != set(sample_ids):
         raise ValueError("one or more selected sample IDs are absent from the manifest")
-    return selected
+    return expand_manifest_repeats(selected, repeat_ids)
 
 
 async def run_matrix_shard(
@@ -353,6 +363,7 @@ async def main(options: argparse.Namespace) -> int:
                 Path(common["manifests_dir"]) / f"{benchmark}_{split}.jsonl"
             ),
             tuple(options.sample_id),
+            tuple(options.repeat_id),
         )
         for benchmark in benchmarks
     }
@@ -368,6 +379,10 @@ async def main(options: argparse.Namespace) -> int:
             for benchmark, artifact in artifacts.items()
         },
     }
+    if options.repeat_id:
+        resolved_config["selection"] = {
+            "repeat_ids": sorted(options.repeat_id),
+        }
     invocation = {
         "benchmark": options.benchmark,
         "split": split.value,
@@ -376,6 +391,7 @@ async def main(options: argparse.Namespace) -> int:
         "num_shards": options.num_shards,
         "max_episodes": options.max_episodes,
         "sample_ids": list(options.sample_id),
+        "repeat_ids": sorted(options.repeat_id),
         "dry_run": options.dry_run,
         "run_id": options.run_id,
         "agent_model": agent_model,
@@ -457,6 +473,7 @@ async def main(options: argparse.Namespace) -> int:
         "benchmarks": [benchmark.value for benchmark in benchmarks],
         "shard_ids": list(shard_ids),
         "num_shards": options.num_shards,
+        "repeat_ids": sorted(options.repeat_id),
         "started_at": started_at.isoformat(),
         "finished_at": datetime.now(UTC).isoformat(),
         "shards": records,
@@ -477,6 +494,7 @@ if __name__ == "__main__":
     parser.add_argument("--method", choices=EXECUTABLE_METHODS, required=True)
     parser.add_argument("--artifact", action="append", default=[])
     parser.add_argument("--sample-id", action="append", default=[])
+    parser.add_argument("--repeat-id", action="append", type=int, default=[])
     parser.add_argument("--shard-id", default="all")
     parser.add_argument("--num-shards", type=int, default=10)
     parser.add_argument("--max-episodes", type=int)

@@ -35,6 +35,8 @@ A run ID cannot be reused with a different resolved configuration. Resume skips 
 
 Dry-run validates manifests, method config, artifact identities, sample selection, and shard assignment without loading credentials, creating checkpoints, repairing partial files, or writing a run directory.
 
+`--repeat-id` explicitly expands selected samples into independent checkpoint keys without changing the on-disk manifest. The override is recorded under `selection.repeat_ids` in the immutable resolved config and in matrix metadata. Omitting it preserves the manifest's existing repeat IDs and legacy resolved-config shape.
+
 ## Dry-Run Evidence
 
 The ten-shard training dry-run selected every task exactly once:

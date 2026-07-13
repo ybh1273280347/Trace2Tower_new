@@ -16,7 +16,12 @@ from trace2tower.evaluation import (
     paired_bootstrap,
     unresolved_failures,
 )
-from trace2tower.manifests import Benchmark, ExperimentSplit, read_manifest
+from trace2tower.manifests import (
+    Benchmark,
+    ExperimentSplit,
+    expand_manifest_repeats,
+    read_manifest,
+)
 from trace2tower.results import EpisodeResult, MethodName
 
 
@@ -92,6 +97,7 @@ def main(options: argparse.Namespace) -> int:
     ]
     if options.sample_id and {entry.sample_id for entry in entries} != set(options.sample_id):
         raise ValueError("one or more selected sample IDs are absent from the manifest")
+    entries = expand_manifest_repeats(entries, options.repeat_id)
     if not entries:
         raise ValueError("evaluation selection is empty")
     selected_keys = {
@@ -194,6 +200,7 @@ def main(options: argparse.Namespace) -> int:
             options.config.read_bytes()
         ).hexdigest(),
         "selected_sample_ids": sorted({entry.sample_id for entry in entries}),
+        "selected_repeat_ids": sorted({entry.repeat_id for entry in entries}),
         "expected_episode_count": len(entries),
         "result_source_hashes": source_hashes,
         "error_source_hashes": {
@@ -243,8 +250,8 @@ def render_markdown(report: dict, pairwise: list[dict]) -> str:
         lines.extend(
             (
                 "",
-                "| Candidate vs No-Skill | Mean difference | 95% CI | Pairs |",
-                "|---|---:|---:|---:|",
+                "| Candidate vs No-Skill | Mean difference | 95% CI | Episodes | Tasks |",
+                "|---|---:|---:|---:|---:|",
             )
         )
         for comparison in pairwise:
@@ -252,7 +259,8 @@ def render_markdown(report: dict, pairwise: list[dict]) -> str:
             lines.append(
                 f"| {comparison['candidate_method']} | "
                 f"{comparison['mean_difference']:.6f} | "
-                f"[{lower:.6f}, {upper:.6f}] | {comparison['pair_count']} |"
+                f"[{lower:.6f}, {upper:.6f}] | {comparison['pair_count']} | "
+                f"{comparison['task_count']} |"
             )
     lines.extend(("", f"Unresolved failures: {report['unresolved_failure_count']}", ""))
     return "\n".join(lines)
@@ -267,6 +275,7 @@ if __name__ == "__main__":
     parser.add_argument("--errors", action="append", default=[])
     parser.add_argument("--construction-cost", action="append", default=[])
     parser.add_argument("--sample-id", action="append", default=[])
+    parser.add_argument("--repeat-id", action="append", type=int, default=[])
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--config",
