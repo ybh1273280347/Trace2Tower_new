@@ -519,6 +519,18 @@ async def main(options: argparse.Namespace) -> int:
         "agent_model": agent_model,
         "agent_endpoint_role": options.agent_endpoint_role,
         "benchmarks": [benchmark.value for benchmark in benchmarks],
+        "benchmark": benchmarks[0].value if len(benchmarks) == 1 else None,
+        "sample_ids": list(options.sample_id),
+        "artifacts": {
+            benchmark.value: artifact.to_record()
+            for benchmark, artifact in artifacts.items()
+        },
+        "snapshot_id": (
+            next(iter(artifacts.values())).artifact_id
+            if len(artifacts) == 1
+            and method is MethodName.TRACE2TOWER_STATIC
+            else None
+        ),
         "shard_ids": list(shard_ids),
         "num_shards": options.num_shards,
         "repeat_ids": sorted(options.repeat_id),

@@ -4,3 +4,4 @@ missing_cost_policy: reject_ranking
 physical_deletion: false
 minimum_exposure_count: 10
 status_tie_epsilon: 0.01
+downweight_requires_dominated: true

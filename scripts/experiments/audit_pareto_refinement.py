@@ -46,6 +46,7 @@ def main(options: argparse.Namespace) -> int:
         "physical_deletion": False,
         "minimum_exposure_count": 10,
         "status_tie_epsilon": 0.01,
+        "downweight_requires_dominated": True,
     }
     if config != expected_config:
         raise ValueError("Pareto refinement config changed outside the frozen contract")
@@ -121,6 +122,7 @@ def main(options: argparse.Namespace) -> int:
                 item.skill_id
                 for item in items
                 if item.exposure_count >= minimum_exposure
+                and item.pareto_front_rank > 1
             }
             if eligible:
                 report["downweight"].append(

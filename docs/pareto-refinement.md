@@ -17,7 +17,7 @@ Each saving is divided by the corresponding No-Skill value, with a denominator f
 
 The frozen refinement config permits one round and defines cost as agent-chat prompt plus completion tokens. Retrieval embedding usage is excluded. Both chat token fields must be recorded by the run; missing evidence blocks ranking. The first round permits status downweighting but not physical deletion.
 
-At least 10 paired exposures are required before a skill can be downweighted. Retrieval retains raw cosine diagnostics and applies a fixed `0.01` status band: a downweighted skill must exceed an active alternative by more than `0.01` to rank ahead. The same constants are fixed before success-only or mixed deployment results are inspected.
+At least 10 paired exposures are required before a skill can be downweighted, and F1 skills are protected: only a skill on a dominated front (`pareto_front_rank > 1`) is eligible. Retrieval retains raw cosine diagnostics and applies a fixed `0.01` status band: a downweighted skill must exceed an active alternative by more than `0.01` to rank ahead. The same constants are fixed before success-only or mixed deployment results are inspected.
 
 ## Non-Dominated Sorting
 
