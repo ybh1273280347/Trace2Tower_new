@@ -1,0 +1,3 @@
+method: trace2tower_static
+high_top_k: 1
+direct_mid_top_k: 2
