@@ -1769,7 +1769,7 @@
       "sha256": "e6ea29fed1352fffbb3d446599c582bc5162eedac4cf30e19e548e0aeaf80930"
     },
     {
-      "path": "docs/retrieval.md",
+      "path": "docs/methods/retrieval.md",
       "sha256": "59cdbdac60c217460116a7396515e50c48d76bd676ebe60cbe7f4f42d8034bfb"
     },
     {
@@ -1818,27 +1818,27 @@
     },
     {
       "path": "scripts/experiments/freeze_webshop.py",
-      "sha256": "ee3a4919e1df36609a0a39aa098386f4f772dcdb3b132ac7ef97441676acf925"
+      "sha256": "86ea72358f14d26eadb85217390b1640fcfb3843e5942f3b029896d573130932"
     },
     {
-      "path": "docs/webshop-validation-and-final-test-protocol.md",
-      "sha256": "36a7a14c65975a1dd12539662873daa6dff8a8972fc62c407431559fdae3fba4"
+      "path": "docs/protocols/webshop-validation-and-final-test.md",
+      "sha256": "ba3cb2c1d48f612db5f4e5a4263fef1f2fb5dcb448e6d6a23c5823a34bfdca2e"
     },
     {
-      "path": "docs/webshop-final-random300-report.md",
-      "sha256": "180d0277c48712627477dcae06320b2134707cb6b9f86cadb4f1b014f2eeb748"
+      "path": "docs/reports/webshop/final-random300-report.md",
+      "sha256": "e6b90c37b4a592c7beb6a358645c62b114c87fba18058e7058615e95c3198755"
     },
     {
-      "path": "docs/webshop-mid-only-ablation.md",
-      "sha256": "2cad6be5e1871fe1d2fd1076c90612e5fb7366b92feda8838539bc707d579b10"
+      "path": "docs/reports/webshop/mid-only-ablation.md",
+      "sha256": "29ad528a823c447dd21dd7c18b4e4da53e03e980db57aadbc9537543e986f8d8"
     },
     {
-      "path": "docs/skillx-baseline.md",
-      "sha256": "de2b1e489dc2729d043acf8be78e61d64a6762153679cb1355bbb23fa360768a"
+      "path": "docs/baselines/skillx.md",
+      "sha256": "d4afd3bcdbcf5fcefeb997ca43336fe683d8521d56c7a2742b9aa1d36a65af7c"
     },
     {
-      "path": "docs/webshop-complete-experiment-report.md",
-      "sha256": "43d9e7ec45106220ee3a9adeb98f4f47ecdd2f574c84bcf00eea9cc9a8b6d0b7"
+      "path": "docs/reports/webshop/complete-experiment-report.md",
+      "sha256": "46373a201a9893244b8e17dec84b3e5ba01fce1fbff6e1013fee051778ca55af"
     }
   ]
 }

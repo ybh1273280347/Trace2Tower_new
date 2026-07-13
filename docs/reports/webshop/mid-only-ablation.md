@@ -73,4 +73,4 @@ Mixed 的完整补偿模式如下，差值均为 `Full - Mid-only`：
 
 同一 Mid 上比较原同源 High 与交叉 High，四个 reward 差异的置信区间均跨零。因此目前不能声称 High 必须与 Mid 同源，也不能声称某一种 High 普遍更优；能够稳定落下的是，High 的补偿可以跨 evidence 库迁移，且对较弱的 mixed Mid 更有价值。完整机器可读统计位于 `artifacts/evaluations/webshop-cross-high-random300-v1/report.json`。
 
-本消融不参与配置选择。统一机制解释和 WebShop 封版边界见 [Trace2Tower WebShop 完整实验报告](webshop-complete-experiment-report.md)。
+本消融不参与配置选择。统一机制解释和 WebShop 封版边界见 [Trace2Tower WebShop 完整实验报告](complete-experiment-report.md)。

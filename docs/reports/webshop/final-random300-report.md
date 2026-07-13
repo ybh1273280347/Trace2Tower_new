@@ -2,7 +2,7 @@
 
 ## 实验口径
 
-本报告只汇报冻结配置在正式测试集上的结果，不使用测试结果反向选择配置。配置选择依据见 [WebShop 验证与正式测试口径](webshop-validation-and-final-test-protocol.md)。
+本报告只汇报冻结配置在正式测试集上的结果，不使用测试结果反向选择配置。配置选择依据见 [WebShop 验证与正式测试口径](../../protocols/webshop-validation-and-final-test.md)。
 
 正式测试使用预注册 selection `selection_32248afcaee8da76`：从此前未出现在任何 result 或 error 中的候选样本里，以三个固定随机种子各抽取 100 个任务，共 300 个互不重复的任务。每个任务执行 3 次，因此每个模型-方法条件包含 900 个 episode。
 
@@ -90,6 +90,6 @@ SkillX 相对 NoSkill 的 reward 增益具有显著模型交互：Pro 上为 `+0
 
 本 Random-300 只用于冻结配置的正式测试。WebShop 实验线现已封版，不再启动新的配置搜索；后续只允许从冻结结果复算、审计或修正文档，不得使用本测试结果反向修改方法。
 
-主矩阵完成后追加的 Mid-only 机制结果单独见 [WebShop Mid-only 机制消融](webshop-mid-only-ablation.md)。该消融用于解释 Mid/High 层作用，不改变本文冻结配置的主结果。
+主矩阵完成后追加的 Mid-only 机制结果单独见 [WebShop Mid-only 机制消融](mid-only-ablation.md)。该消融用于解释 Mid/High 层作用，不改变本文冻结配置的主结果。
 
-统一结论、潜在优势、机制解释和证据边界见 [Trace2Tower WebShop 完整实验报告](webshop-complete-experiment-report.md)。
+统一结论、潜在优势、机制解释和证据边界见 [Trace2Tower WebShop 完整实验报告](complete-experiment-report.md)。

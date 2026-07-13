@@ -55,7 +55,7 @@ FROZEN_FILES = (
     "configs/experiments/trace2tower_static_diverse3.yaml",
     "configs/experiments/trace2tower_static_diverse3_mid_only.yaml",
     "src/trace2tower/methods/trace2tower/config.py",
-    "docs/retrieval.md",
+    "docs/methods/retrieval.md",
     "artifacts/manifests/webshop-final-random300-v1/webshop_test.jsonl",
     "artifacts/flat_skill_summary/webshop-flash50-repeat4-mmr-v1/library.json",
     "artifacts/trace2tower/towers/webshop-flash50-repeat4-success-only-task-support10-cap3-v4.json",
@@ -68,11 +68,11 @@ FROZEN_FILES = (
     "scripts/experiments/summarize_webshop_final_random300.py",
     "scripts/experiments/summarize_webshop_cross_high_random300.py",
     "scripts/experiments/freeze_webshop.py",
-    "docs/webshop-validation-and-final-test-protocol.md",
-    "docs/webshop-final-random300-report.md",
-    "docs/webshop-mid-only-ablation.md",
-    "docs/skillx-baseline.md",
-    "docs/webshop-complete-experiment-report.md",
+    "docs/protocols/webshop-validation-and-final-test.md",
+    "docs/reports/webshop/final-random300-report.md",
+    "docs/reports/webshop/mid-only-ablation.md",
+    "docs/baselines/skillx.md",
+    "docs/reports/webshop/complete-experiment-report.md",
 )
 
 
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("docs/webshop-freeze-manifest.json"),
+        default=Path("docs/reports/webshop/freeze-manifest.json"),
     )
     parser.add_argument("--verify", action="store_true")
     raise SystemExit(main(parser.parse_args()))
