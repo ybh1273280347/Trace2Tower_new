@@ -11,5 +11,5 @@ max_high_path_length: 4
 high_min_support_ratio: 0.10
 high_path_epsilon: 0.000001
 high_top_k: 1
-direct_mid_top_k: 3
+direct_mid_top_k: 8
 event_type_stratification: true

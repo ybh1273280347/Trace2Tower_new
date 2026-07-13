@@ -138,3 +138,15 @@ The cap sweep consumes test IDs 50-149 and is treated as validation rather than 
 | Mixed Tower | 0.6740 | 48.7% | 90.7% | 7.12 | 23,500 |
 
 Mixed versus success-only is `+0.0079` reward with CI `[-0.0181, +0.0353]` and `+0.7%` full success with CI `[0.0%, +2.0%]`; the success interval touches zero and is not claimed significant. Mixed uses 3,010 fewer input tokens per episode. Mixed versus NoSkill is `-0.0187` reward with CI `[-0.0929, +0.0609]` and `+0.7%` full success with CI `[-7.3%, +8.7%]`. The final conclusion is narrow: cap 8 prevents mixed evidence from being harmed by aggressive retrieval truncation and mixed is at least competitive with success-only, but neither Tower establishes an improvement over NoSkill on the untouched holdout.
+
+## 中文结论：Mixed 与检索上限的交互
+
+可以稳定得出以下经验结论：Mixed Tower 在全局最优的 cap 3 下失效，并不是因为失败轨迹天然有害，而是因为 mixed 证据把行为边界拆得更细，形成 19 个 Mid；success-only 只有 16 个 Mid。两者都只能向模型注入最多三个直接 Mid 时，mixed 中互补的查询、核验和决策步骤更容易被截断在 Top-3 之外。这个解释由检索覆盖统计支持，但仍属于机制推断，不等同于单独证明某一张被裁掉的卡必然有用。
+
+在新增的 100 个 WebShop 验证任务上，mixed 相对 success-only 的满分成功率差随 cap 改变为：cap 3 `-4.7%`，95% CI `[-9.0%, -1.0%]`；cap 5 `0.0%`；cap 8 `+1.3%`；cap 12 `-0.3%`。因此 cap 3 对 mixed 的压制是可重复且达到区间不跨零的结果，而放宽 cap 只能消除该负效应，尚未证明 mixed 会稳定显著优于 success-only。
+
+变化并非“cap 越大越好”。Mixed 从 cap 3 到 5 只有 24/100 个任务的检索集合变化，从 cap 5 到 8 只剩 9 个，从 cap 8 到 12 仅 1 个；平均证明技能数也在 `6.25 -> 6.35 -> 6.36` 附近饱和。cap 12 的回落因此不能解释为更多 mixed 信息持续进入上下文，更可能是边界任务变化与 rollout 方差。cap 8 只是 mixed 的局部最优覆盖点。
+
+全局配置仍选择 cap 3。对标准 success-only 控制，cap 3 比 cap 8 的满分成功率高 `4.3%`，95% CI `[0.7%, 9.0%]`，每个 episode 少约 7,053 个输入 token；mixed 从 cap 3 放宽到 cap 8 只增加 `1.7%` 满分成功率，区间下界为零，reward 区间仍跨零。为了 mixed 的局部趋势把所有方法统一放宽到 cap 8，会牺牲更稳定的 success-only 成功率和成本。因此 cap 3 是全局默认，mixed-cap8 保留为解释 mixed 潜力的专项消融，而不是默认执行配置。
+
+High 消融进一步表明，mixed 的正向趋势主要可能来自对比证据筛掉较弱 High：success-only 有 26 个 High，mixed 只有 17 个；加入 High 对 success-only 的 reward 方向为 `-0.0186`，对 mixed 为 `+0.0100`。两者区间仍跨零，所以当前不能声称 High 已被证明有效，只能说明 mixed 的潜在价值更可能位于“对高层路径做负证据过滤”，而不是简单增加更多 Mid。
