@@ -97,6 +97,19 @@ def test_high_path_compression_support_and_max_length_are_deterministic() -> Non
     assert [path.to_record() for path in paths] == [path.to_record() for path in reversed_paths]
 
 
+def test_high_paths_require_positive_contrastive_evidence() -> None:
+    path_records = (
+        record("positive-1", 1.0, ("p1a1", "p1b")),
+        record("positive-2", 1.0, ("p2a", "p2b")),
+        record("negative-1", 0.5, ("n1a", "n1c")),
+    )
+    path_clusters = (
+        MidCluster("mid_a", ("p1a1", "p2a", "n1a"), ()),
+        MidCluster("mid_b", ("p1b", "p2b", "n1c"), ()),
+    )
+    assert mine_high_paths(path_records, path_clusters, max_path_length=2) == ()
+
+
 def test_mid_evidence_requires_a_cluster_partition() -> None:
     inputs = build_mid_render_inputs(records(), clusters())
     assert sum(item.support_count for item in inputs) == 8

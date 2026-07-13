@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 from trace2tower.results import MethodName
 
@@ -21,6 +21,7 @@ class Trace2TowerConfig:
     high_path_epsilon: float = 1e-6
     high_top_k: int = 1
     direct_mid_top_k: int = 2
+    event_type_stratification: bool = False
 
     def __post_init__(self) -> None:
         if self.failure_penalty < 0:
@@ -38,6 +39,12 @@ class Trace2TowerConfig:
         if self.high_top_k != 1 or self.direct_mid_top_k not in (1, 2):
             raise ValueError("Trace2Tower retrieval uses High Top-1 and Mid Top-1 or Top-2")
 
+    def to_record(self) -> dict:
+        record = asdict(self)
+        if not self.event_type_stratification:
+            record.pop("event_type_stratification")
+        return record
+
     @classmethod
     def from_record(cls, record: dict) -> Trace2TowerConfig:
         boolean_fields = (
@@ -48,6 +55,10 @@ class Trace2TowerConfig:
         )
         if any(not isinstance(record[field], bool) for field in boolean_fields):
             raise ValueError("Trace2Tower switches must be booleans")
+        if "event_type_stratification" in record and not isinstance(
+            record["event_type_stratification"], bool
+        ):
+            raise ValueError("event-type stratification switch must be boolean")
         return cls(
             method=MethodName(record["method"]),
             semantic_only=record["semantic_only"],
@@ -63,4 +74,7 @@ class Trace2TowerConfig:
             high_path_epsilon=float(record.get("high_path_epsilon", 1e-6)),
             high_top_k=int(record.get("high_top_k", 1)),
             direct_mid_top_k=int(record.get("direct_mid_top_k", 2)),
+            event_type_stratification=record.get(
+                "event_type_stratification", False
+            ),
         )

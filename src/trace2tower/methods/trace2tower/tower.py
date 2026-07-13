@@ -141,7 +141,7 @@ class TowerSnapshot:
         return {
             "version": self.version,
             "benchmark": self.benchmark,
-            "config": asdict(self.config),
+            "config": self.config.to_record(),
             "training_trajectory_ids": self.training_trajectory_ids,
             "source_hashes": asdict(self.source_hashes),
             "low_skills": [skill.to_record() for skill in self.low_skills],

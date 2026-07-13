@@ -73,6 +73,11 @@ def mine_high_paths(
         negative_support = negative_count / len(negative_ids) if negative_ids else 0.0
         if positive_support < min_support_ratio:
             continue
+        contrastive_score = positive_support * math.log(
+            (positive_support + epsilon) / (negative_support + epsilon)
+        )
+        if contrastive_score <= 0:
+            continue
         path_key = "\x1f".join(ordered_mid_ids).encode("utf-8")
         paths.append(
             HighPath(
@@ -80,8 +85,7 @@ def mine_high_paths(
                 ordered_mid_ids=ordered_mid_ids,
                 positive_support=positive_support,
                 negative_support=negative_support,
-                contrastive_score=positive_support
-                * math.log((positive_support + epsilon) / (negative_support + epsilon)),
+                contrastive_score=contrastive_score,
                 supporting_trajectory_ids=tuple(sorted(trajectory_ids)),
             )
         )

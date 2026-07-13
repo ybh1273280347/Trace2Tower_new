@@ -7,7 +7,7 @@ from scipy import sparse
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.graph import GraphComponents, build_graph
-from trace2tower.methods.trace2tower.models import SegmentInstance
+from trace2tower.methods.trace2tower.models import SegmentInstance, WebShopEventType
 from trace2tower.methods.trace2tower.spectral import (
     cluster_representation,
     semantic_only_clustering,
@@ -38,6 +38,7 @@ def segment(
     step: int,
     embedding: tuple[float, ...],
     score: float,
+    event_type: WebShopEventType | None = None,
 ) -> SegmentInstance:
     return SegmentInstance(
         segment_id=segment_id,
@@ -47,7 +48,7 @@ def segment(
         transition_ids=(f"{segment_id}:transition",),
         embedding=embedding,
         trajectory_score=score,
-        event_type=None,
+        event_type=event_type,
         raw_actions=("look",),
         observation_before="before",
         observation_after="after",
@@ -120,6 +121,60 @@ def test_graph_components_and_ablation_formulas() -> None:
     )
 
 
+def test_event_stratification_excludes_cross_event_edges() -> None:
+    query = WebShopEventType.QUERY_FORMULATION
+    purchase = WebShopEventType.PURCHASE_DECISION
+    groups = (
+        (segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),
+        (segment("q1", "t1", 0, (1.0, 0.0), 1.0, query),),
+        (segment("p0", "t2", 0, (1.0, 0.0), 1.0, purchase),),
+    )
+    unrestricted = build_graph(groups, config())
+    compatible = build_graph(groups, config(event_type_stratification=True))
+    assert unrestricted.semantic[0, 2] > 0
+    assert compatible.semantic[0, 1] > 0
+    assert compatible.semantic[0, 2] == 0
+    assert compatible.semantic[1, 2] == 0
+
+
+def test_event_stratification_selects_neighbors_and_clusters_within_event() -> None:
+    query = WebShopEventType.QUERY_FORMULATION
+    purchase = WebShopEventType.PURCHASE_DECISION
+    groups = tuple(
+        (segment(f"q{index}", f"t{index}", 0, (1.0, 0.0), 1.0, query),)
+        for index in range(2)
+    ) + tuple(
+        (
+            segment(
+                f"p{index}",
+                f"t{index + 2}",
+                0,
+                (1.0, 0.0),
+                1.0,
+                purchase,
+            ),
+        )
+        for index in range(12)
+    )
+    graph = build_graph(groups, config(event_type_stratification=True))
+    assert graph.semantic[0, 1] > 0
+    assert graph.semantic[0, 2] == 0
+    clustering = spectral_clustering(
+        graph,
+        config(event_type_stratification=True),
+    )
+    query_labels = set(clustering.labels[:2])
+    purchase_labels = set(clustering.labels[2:])
+    assert query_labels.isdisjoint(purchase_labels)
+
+
+def test_config_rejects_non_boolean_event_stratification_switch() -> None:
+    record = config().to_record()
+    record["event_type_stratification"] = "true"
+    with pytest.raises(ValueError, match="event-type stratification switch"):
+        Trace2TowerConfig.from_record(record)
+
+
 def test_zero_degree_laplacian_is_finite() -> None:
     graph = build_graph(
         ((segment("s0", "t0", 0, (0.0, 0.0), 0.0),),),
@@ -143,6 +198,7 @@ def two_block_graph() -> GraphComponents:
     )
     return GraphComponents(
         segment_ids=tuple(f"s{index}" for index in range(8)),
+        event_types=(None,) * 8,
         segment_embeddings=embeddings,
         rho=np.ones(8),
         semantic=adjacency,

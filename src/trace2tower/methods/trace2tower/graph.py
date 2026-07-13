@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 import numpy as np
 from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import SegmentInstance
+from trace2tower.methods.trace2tower.models import SegmentInstance, WebShopEventType
 
 
 @dataclass(frozen=True, slots=True)
 class GraphComponents:
     segment_ids: tuple[str, ...]
+    event_types: tuple[WebShopEventType | None, ...]
     segment_embeddings: np.ndarray
     rho: np.ndarray
     semantic: sparse.csr_matrix
@@ -60,14 +61,29 @@ def build_graph(
 
     requested_neighbors = min(30, max(10, math.ceil(math.log2(max(len(segments), 2)))))
     neighbor_count = min(requested_neighbors, len(segments) - 1)
-    semantic_neighbors = _nearest_neighbors(normalized_embeddings, neighbor_count)
-    transition_neighbors = _nearest_neighbors(normalized_contexts, neighbor_count)
+    if config.event_type_stratification:
+        event_types = tuple(segment.event_type for segment in segments)
+        semantic_neighbors = _nearest_neighbors_by_group(
+            normalized_embeddings, event_types, neighbor_count
+        )
+        transition_neighbors = _nearest_neighbors_by_group(
+            normalized_contexts, event_types, neighbor_count
+        )
+    else:
+        semantic_neighbors = _nearest_neighbors(normalized_embeddings, neighbor_count)
+        transition_neighbors = _nearest_neighbors(normalized_contexts, neighbor_count)
     candidate_edges = {
         tuple(sorted((source, target)))
         for neighbors in (semantic_neighbors, transition_neighbors)
         for source, targets in enumerate(neighbors)
         for target in targets
         if source != target
+        and (
+            not config.event_type_stratification
+            or segments[source].event_type is None
+            or segments[target].event_type is None
+            or segments[source].event_type == segments[target].event_type
+        )
     }
 
     scores = np.clip(
@@ -153,6 +169,7 @@ def build_graph(
     ).tocsr()
     return GraphComponents(
         segment_ids=tuple(segment.segment_id for segment in segments),
+        event_types=tuple(segment.event_type for segment in segments),
         segment_embeddings=embeddings,
         rho=rho,
         semantic=semantic,
@@ -202,3 +219,25 @@ def _nearest_neighbors(values: np.ndarray, neighbor_count: int) -> tuple[np.ndar
         np.asarray([target for target in targets if target != source][:neighbor_count])
         for source, targets in enumerate(raw_neighbors)
     )
+
+
+def _nearest_neighbors_by_group(
+    values: np.ndarray,
+    group_ids: Sequence[object],
+    neighbor_count: int,
+) -> tuple[np.ndarray, ...]:
+    if len(values) != len(group_ids):
+        raise ValueError("neighbor values and group IDs must align")
+    groups: dict[object, list[int]] = {}
+    for index, group_id in enumerate(group_ids):
+        groups.setdefault(group_id, []).append(index)
+    neighbors = [np.empty(0, dtype=np.int64) for _ in group_ids]
+    for indices in groups.values():
+        local_neighbors = _nearest_neighbors(
+            values[indices], min(neighbor_count, len(indices) - 1)
+        )
+        for local_source, local_targets in enumerate(local_neighbors):
+            neighbors[indices[local_source]] = np.asarray(
+                [indices[target] for target in local_targets], dtype=np.int64
+            )
+    return tuple(neighbors)

@@ -15,6 +15,8 @@ Every skill method requires one explicit `BENCHMARK=PATH` artifact assignment pe
 
 Static High retrieval additionally accepts an execution-time cosine threshold recorded in the resolved method configuration. Threshold `-1.0` preserves the original always-select-Top-1 behavior. Diagnostic retrieval reports retain the Top-1 candidate even when the threshold rejects it, so absence of a High skill is distinguishable from an empty High index.
 
+The optional WebShop event-stratified Tower is executable through the same Static provider because its graph-build choice and complete provenance are embedded in the content-addressed snapshot. It is not the selected default artifact: despite pure stage cards, its four-task calibration failed before fresh validation.
+
 All methods use the frozen `deepseek-v4-flash` agent policy unless an explicit diagnostic override is recorded. Credentials are loaded from `.env` only for real execution.
 
 ## Execution And Recovery

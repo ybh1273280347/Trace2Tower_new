@@ -55,3 +55,21 @@ A content-addressed Top-1 variant, `tower_f2d5abf612995707`, reused the same 50 
 On calibration samples `1005` through `1008`, Top-1 cut injected context from 2,920 to 1,387 characters but reduced mean reward from Top-2's `0.7431` to `0.6875`. Sample `1007` regressed from completed reward `0.2222` to task-limit reward zero. Mean steps increased from 8 to 11, invalid actions from 0.25 to 0.75 per episode, and reported input tokens from 21,161.25 to 30,156.25 per episode because longer trajectories outweighed the shorter prefix.
 
 Top-1 therefore fails the calibration gate and is not run on fresh validation samples. Top-2 remains the selected retrieval setting: the second card is textually overlapping, but this experiment provides behavioral evidence that it still carries useful guidance.
+
+## Twenty-Pair Validation
+
+The four-pair directional result was expanded to 20 new WebShop training samples. The deterministic selection chose the lowest numeric sample IDs absent from both the 50-trajectory Tower provenance and every prior WebShop training result: `1009`, `1011-1019`, `1021-1029`, and `1031`. Both methods completed exact `20/20` result and trajectory coverage with no unresolved errors.
+
+No-Skill achieved mean reward `0.7542`; the six-Mid, zero-High Static Tower achieved `0.7729`. The paired difference was only `+0.01875`, with 3 wins, 15 ties, 2 losses, and a 95% bootstrap interval of `[-0.05, 0.09375]`. Static added 0.65 steps, 0.1 invalid actions, and 4,272.7 reported input tokens per episode. Billable-token coverage remained zero. The result does not satisfy a broader-rollout gate because the reward interval includes harm and every observed efficiency measure regressed.
+
+All 20 tasks retrieved the identical `mid_0002 + mid_0003` pair. Full-index diagnostics showed that positive, negative, and tied outcomes had overlapping cosine scores and Top-2 margins, so a similarity threshold cannot separate beneficial injection from harmful injection. Cluster audit then exposed the structural cause: the six clusters had weighted event-type purity `0.2161` and each mixed search, navigation, option, inspection, backtracking, and purchase stages. Their rendered cards therefore described nearly the same end-to-end workflow.
+
+## Event-Stratified Ablation
+
+An optional `event_type_stratification` build contract was added without changing legacy snapshot identities. When enabled, semantic and transition neighbors, outcome smoothing neighborhoods, and final spectral clustering remain within deterministic WebShop event types. The final K is clamped to cover every observed event type; additional clusters are allocated within event strata. A strictly positive contrastive-score guard also prevents High paths that are equally or more common in unsuccessful trajectories from becoming formal skills.
+
+On the same 50 trajectories, weighted event purity increased from `0.2161` to `1.0`. The build produced 14 stage-specific Mid cards and six positive-contrastive High paths at `10%` minimum positive support. Immediate reruns reused all 14 Mid and six High cards and all 20 index vectors. The complete snapshot is `tower_94993ee334a6a439`, SHA-256 `30210d91f48fa1b0b15bfacad7afeb89e818dbcd38ee87c2f933a5ef791bc997`.
+
+Four previously diagnosed samples formed a calibration-only quality check: one old Static win (`1019`), two losses (`1022`, `1027`), and one high-cost tie (`1012`). With High enabled, the event-stratified Tower selected the same generic High and six total skills on every task and scored `1.30` total reward versus the old Tower's `1.75`. Rejecting High reduced context from 5,856 to 2,159 characters and restored sample `1019`, but regressed sample `1012` to a 20-step zero-reward result; total reward was only `1.4167`.
+
+The event-stratified variant therefore proves and fixes the structural purity defect but fails the behavioral calibration gate under reset-time retrieval. It is not run on fresh validation samples and is not promoted. The evidence points to the remaining boundary: one-time retrieval at the generic WebShop search page selects the same broad strategy for unrelated goals, even when the underlying cards are structurally distinct.
