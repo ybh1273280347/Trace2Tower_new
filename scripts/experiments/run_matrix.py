@@ -542,8 +542,8 @@ if __name__ == "__main__":
     parser.add_argument("--agent-model")
     parser.add_argument(
         "--agent-endpoint-role",
-        choices=(ModelRole.AGENT, ModelRole.RENDERER),
-        default=ModelRole.AGENT,
+        choices=(ModelRole.AGENT.value, ModelRole.RENDERER.value),
+        default=ModelRole.AGENT.value,
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--method-config", type=Path)
