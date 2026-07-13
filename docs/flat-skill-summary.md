@@ -35,3 +35,11 @@ These two episodes prove retrieval, context injection, execution, and persistenc
 | Compact action/result chain | 11 | 57,142 | 0 | 57,142 |
 
 The extended prompt did trigger cache reporting, but its non-cached input alone exceeded the entire concise run, so it was rejected. The compact chain removes directly observable duplicate observations and remains the formal implementation, but identical routing and prompt hashes produced inconsistent provider token accounting; no billing reduction is claimed from that comparison. The proven cost reduction is deterministic card and embedding reuse, which makes unchanged rebuilds free of new model calls.
+
+## Repeated Execution Gate
+
+The formal compact WebShop library `flatlib_d4f4c1fcba5270e9` was evaluated on four source-external training tasks with repeat IDs `0`, `1`, and `2`. Its four card sources are `1000`, `10009`, `10018`, and `10027`; none overlap evaluation tasks `1012`, `1019`, `1022`, and `1027`.
+
+Flat achieved mean reward `0.5556` versus repeated No-Skill `0.4306`. The task-clustered difference was `+0.125` with interval `[-0.1111, 0.375]`; 12 episode pairs contained 5 wins, 5 ties, and 2 losses. It reduced steps by 0.83 per episode while adding 1,625.5 reported input tokens and 0.25 invalid actions. Billable-token coverage remained zero.
+
+Per-task repeated differences were `+0.2222`, `+0.5`, `0`, and `-0.2222`. Unlike both Tower variants, Flat selected different card combinations across goals. This is directional evidence for task-specific successful-trajectory retrieval, but four independent tasks cannot establish a positive interval. The next gate expands the library from the same 50-trajectory Flash pool and evaluates it on fresh repeated tasks.
