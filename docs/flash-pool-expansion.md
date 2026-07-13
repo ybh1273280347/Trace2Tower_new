@@ -81,3 +81,15 @@ Static retrieval now exposes an execution-time `include_high_child_context` swit
 On the four event-stratified calibration tasks, compact High context reduced injected text from 5,856 to 3,341 characters. Total reward nevertheless fell from the full event-stratified Tower's `1.30` to `1.25`, and sample `1019` regressed from completed reward `0.05` to a 20-step zero-reward result. Total reported input tokens changed only from 119,401 to 117,460 because the longer failed trajectory consumed the prefix repeatedly.
 
 The compact variant therefore fails before fresh validation. Child prose is redundant at the text level, but this single-run behavioral evidence does not prove it is valueless; the default retains it. The large path variation across otherwise close configurations also motivates replicated evaluation before further method promotion.
+
+## Replicated Event-Tower Check
+
+The event-stratified Full High, No High, and compact High variants were rerun on the same four calibration tasks with repeat IDs `0`, `1`, and `2`. Each variant completed exact `12/12` coverage and was compared to the shared repeated No-Skill baseline using task-cluster bootstrap.
+
+| Variant | Mean reward difference | 95% task-cluster CI | Mean step difference | Mean input difference |
+|---|---:|---:|---:|---:|
+| Full High | -0.0681 | [-0.2361, 0.1000] | -1.67 | +1,988.8 |
+| No High | -0.1167 | [-0.2778, 0.0944] | +4.00 | +23,161.0 |
+| Compact High | -0.0556 | [-0.1944, 0.0833] | -1.00 | +1,468.5 |
+
+Compact High is the least harmful event-stratified variant, but all three have negative mean reward and intervals crossing zero. No variant proceeds to fresh samples. The replicated result confirms that event purity and concise context are insufficient when reset-time retrieval supplies generic workflow guidance rather than task-specific experience.
