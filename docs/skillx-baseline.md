@@ -2,11 +2,11 @@
 
 ## Upstream Boundary
 
-SkillX is executed from commit `36747f424a17ea041e476adf2ff976a206ec9c30` with one tracked local patch: `patches/skillx/transactional-merge.patch`. The other 18 protected algorithm and prompt files must remain byte-identical to the pinned commit. The checker records both the official base hash and approved patched hash for `pipeline.py` and rejects any other protected change.
+SkillX is executed from commit `36747f424a17ea041e476adf2ff976a206ec9c30` with two tracked local patches applied in order: `patches/skillx/transactional-merge.patch` and `patches/skillx/stage-recovery.patch`. The other 18 protected algorithm and prompt files must remain byte-identical to the pinned commit. The checker records both the official base hash and approved patched hash for `pipeline.py` and rejects any other protected change.
 
-The patch changes failure preservation, not extraction, filtering, clustering, prompts, or retrieval. Before merge, all filtered skills and cluster assignments are written under the run's `upstream/recovery/epoch-N` directory. Merge is an all-or-nothing transaction: all clusters must succeed before merged skills are committed; one failure rolls the whole epoch back to the complete pre-merge skill backup. Partial merge outputs and parser diagnostics remain in the recovery directory, so no extracted skill is silently discarded and merge can be investigated without repeating the expensive extraction stages.
+The patches change failure preservation, not extraction, filtering, clustering, prompts, or retrieval. Complete summarized trajectories, plans, and raw extracted skills are atomically checkpointed at stage boundaries and restored only under an exact source/configuration contract. Before merge, all filtered skills and cluster assignments are written under the run's `upstream/recovery/epoch-N` directory. Merge is an all-or-nothing transaction: all clusters must succeed before merged skills are committed; one failure rolls the whole epoch back to the complete pre-merge skill backup. Partial merge outputs and parser diagnostics remain in the recovery directory, so no extracted skill is silently discarded and transport failures no longer require repeating completed extraction stages.
 
-Trace2Tower owns three runtime adapters and the failure-preservation patch:
+Trace2Tower owns three runtime adapters and the failure-preservation patches:
 
 - trajectories are converted to SkillX's `task_history` format while preserving the real ALFWorld and WebShop tool names and arguments;
 - official prompt messages are passed unchanged through the shared `gpt-5.4` renderer endpoint, with validation delegated to SkillX's own regex parser;
@@ -55,6 +55,6 @@ The execution smoke replayed the exact source task with `deepseek-v4-flash`:
 | Source No-Skill | 1.0 | 11 | 1 | 0 |
 | SkillX replay | 0.3333 | 8 | 0 | 5,874 chars |
 
-The injected replay selected `french vanilla sundara` instead of the requested `french cellar`, inspected Features and Attributes, and purchased it. This is one paired task, not a performance estimate or proof that SkillX caused the entire difference. It is sufficient as a cost gate: the extracted guidance was executable and shortened the path, but did not preserve the task's decisive constraint. Full SkillX pilot extraction is therefore not expanded at this stage.
+The injected replay selected `french vanilla sundara` instead of the requested `french cellar`, inspected Features and Attributes, and purchased it. This is one paired task, not a performance estimate or proof that SkillX caused the entire difference. It established only that the adapter could execute the official output. The formal baseline subsequently expands the official pipeline over the fixed pool of 94 full-success WebShop training trajectories; its test result is reported separately from this historical smoke run.
 
 The first two smoke attempts also exposed undeclared WebShop runtime dependencies before any episode execution. `click` and the exact `en_core_web_sm` 3.8.0 model are now locked project dependencies so official reward semantics no longer depend on packages installed in a global Python environment. Re-running the completed smoke skipped the episode with zero additional model calls.

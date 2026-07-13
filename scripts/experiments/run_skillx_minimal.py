@@ -126,6 +126,22 @@ async def main(options: argparse.Namespace) -> int:
     )
     embedding = SkillXEmbeddingAdapter(runtime)
     options.output_dir.mkdir(parents=True, exist_ok=True)
+    recovery_contract = {
+        "skillx_commit": upstream["commit"],
+        "config_sha256": config_sha256,
+        "source_trajectories_sha256": canonical_sha256(
+            [trajectory.to_record() for trajectory in trajectories]
+        ),
+    }
+    recovery_contract_path = options.output_dir / "recovery-contract.json"
+    if recovery_contract_path.exists():
+        existing_contract = json.loads(
+            recovery_contract_path.read_text(encoding="utf-8")
+        )
+        if existing_contract != recovery_contract:
+            raise ValueError("SkillX recovery contract differs from this invocation")
+    else:
+        write_json(recovery_contract_path, recovery_contract)
     pipeline = IterativeSkillPipeline(
         llm=llm,
         benchmark=options.benchmark.value,

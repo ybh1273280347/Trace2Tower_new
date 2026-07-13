@@ -1,0 +1,97 @@
+diff --git a/pipeline.py b/pipeline.py
+--- a/pipeline.py
++++ b/pipeline.py
+@@ -335,6 +335,23 @@ class IterativeSkillPipeline:
+             "merged_skills": [],
+             "statistics": {}
+         }
++        stage_dir = self.output_dir / "recovery" / f"epoch-{epoch}" / "stages"
++        stage_dir.mkdir(parents=True, exist_ok=True)
++
++        def load_stage(name: str):
++            path = stage_dir / f"{name}.json"
++            if not path.exists():
++                return None
++            return json.loads(path.read_text(encoding="utf-8"))
++
++        def save_stage(name: str, value) -> None:
++            path = stage_dir / f"{name}.json"
++            temporary = path.with_suffix(".tmp")
++            temporary.write_text(
++                json.dumps(value, ensure_ascii=False, indent=2) + "\n",
++                encoding="utf-8",
++            )
++            temporary.replace(path)
+ 
+         # Step 1: Filter successful trajectories
+         logger.info(f"[Epoch {epoch}] Step 1: Filtering successful trajectories...")
+@@ -348,15 +365,26 @@ class IterativeSkillPipeline:
+ 
+         # Step 1.5: Summarize long tool responses (前置，覆盖原始轨迹)
+         logger.info(f"[Epoch {epoch}] Step 1.5: Summarizing tool responses...")
+-        successful = await self.tool_summary.summarize_multiple(
+-            successful,
+-            batch_size=batch_size,
+-            max_concurrent=max_concurrent
+-        )
++        summarized = load_stage("summarized-trajectories")
++        if summarized is None:
++            successful = await self.tool_summary.summarize_multiple(
++                successful,
++                batch_size=batch_size,
++                max_concurrent=max_concurrent
++            )
++            save_stage("summarized-trajectories", successful)
++        else:
++            successful = summarized
++            logger.info(
++                f"[Epoch {epoch}] Restored {len(successful)} summarized trajectories"
++            )
+ 
+         # Step 2: Extract plans (if not skipped)
+         if not skip_plan_extraction:
+-            if self.plan_strategy == "shortest":
++            new_plans = load_stage("plans")
++            if new_plans is not None:
++                logger.info(f"[Epoch {epoch}] Restored {len(new_plans)} plans")
++            elif self.plan_strategy == "shortest":
+                 # Strategy 1: Select shortest trajectory per task, extract one plan each
+                 shortest_per_task = self._select_shortest_per_task(successful)
+                 logger.info(
+@@ -389,6 +417,9 @@ class IterativeSkillPipeline:
+                 logger.info(f"[Epoch {epoch}] Combining plans...")
+                 new_plans = await self.plan_combiner.combine_grouped_plans(grouped_plans)
+ 
++            if not (stage_dir / "plans.json").exists():
++                save_stage("plans", new_plans)
++
+             plans.update(new_plans)
+             epoch_result["plans"] = new_plans
+             logger.info(f"[Epoch {epoch}] Extracted {len(new_plans)} plans")
+@@ -408,13 +439,19 @@ class IterativeSkillPipeline:
+ 
+         # Step 4: Extract skills (轨迹已在 Step 1.5 总结)
+         logger.info(f"[Epoch {epoch}] Step 4: Extracting skills...")
+-        extraction_results = await self.skill_extractor.extract_batch(
+-            prepared,
+-            batch_size=batch_size,
+-            max_concurrent=max_concurrent
+-        )
+-
+-        all_skills = collect_skills_from_results(extraction_results, self.skill_type)
++        all_skills = load_stage("extracted-skills")
++        if all_skills is None:
++            extraction_results = await self.skill_extractor.extract_batch(
++                prepared,
++                batch_size=batch_size,
++                max_concurrent=max_concurrent
++            )
++            all_skills = collect_skills_from_results(
++                extraction_results, self.skill_type
++            )
++            save_stage("extracted-skills", all_skills)
++        else:
++            logger.info(f"[Epoch {epoch}] Restored {len(all_skills)} extracted skills")
+         epoch_result["extracted_skills"] = all_skills
+         epoch_result["statistics"]["extracted_skills"] = len(all_skills)
+ 
