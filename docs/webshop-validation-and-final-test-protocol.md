@@ -1,79 +1,98 @@
 # WebShop 验证与正式测试口径
 
-本文固定 Trace2Tower WebShop 实验的配置选择依据，并作为后续正式实验报告的验证协议章节。本文只使用主要配置验证集说明调参决策，不讨论轨迹池扩容过程或其他诊断实验。
+本文固定 Trace2Tower WebShop 的配置选择依据。验证集只用于选择配置，不作为最终性能证据；正式测试结果不得反向修改 cap、证据策略、技能 artifact 或检索参数。
 
-## 主要配置验证集
+## 验证集与统计口径
 
-- 样本：`webshop:50-149`，共 100 个独立任务。
-- 重复：每个任务使用 `repeat_id = 0, 1, 2`，每个方法共 300 个 episode。
-- 主要指标：mean reward 与满分成功率；满分定义固定为 `primary_score >= 0.999`。
-- 统计单位：先在同一任务内平均三次重复，再以 100 个任务为 cluster 做 10,000 次 bootstrap，置信水平 95%。三次重复不作为三个独立样本。
-- 配置选择顺序：满分成功率优先，其次 mean reward，最后比较输入 token、步数和无效动作成本。
-- 验证集只用于选择一次配置；配置冻结后，不得根据正式测试结果修改 cap、证据策略、技能 artifact 或检索参数。
+- 样本：`webshop:50-149`，共 100 个任务。
+- 重复：每个任务使用 `repeat_id = 0, 1, 2`，每个条件共 300 个 episode。
+- 执行模型：`deepseek-v4-flash`。
+- 主要指标：mean reward 与满分成功率；满分定义为 `primary_score >= 0.999`。
+- 统计单位：先在同一任务内平均 3 次重复，再以 100 个任务为 cluster 做 10,000 次 bootstrap，置信水平 95%。
+- 选择顺序：满分成功率优先，其次 mean reward，最后比较输入 token、步数和无效动作成本。
 
-## Flat Skill 配置选择
+## 数据完整性审计
 
-Flat 使用 staged retrieval：先取 Top-100 候选，再应用绝对相似度阈值 `0.45`、相对最佳分数 margin `0.08`、相似度高于 `0.95` 的近重复去除，以及 MMR relevance weight `0.75`。
+本次审计直接读取各 run 的 `results.jsonl`、`resolved-config.yaml` 和绑定 artifact，不复用旧汇总文件。审计覆盖 NoSkill、Flat cap3/cap8，以及 success-only/mixed Tower 的 cap3/5/8/12，共 11 个条件。
 
-验证集上，最多注入八张卡的 staged-cap8 相对 Top-3 reward 下降 `0.0404`，95% CI `[-0.0795, -0.0059]`。GPT-5.4 self-filter 虽然缩短了上下文，但没有恢复 reward。更多卡片因此构成可重复的上下文噪声，而不是额外收益。
+| 检查项 | 结果 |
+|---|---|
+| Episode 覆盖 | 每个条件均为 300/300 |
+| Key 集合 | 每组都严格等于 100 个任务 × 3 repeats |
+| 重复或越界 key | 0 |
+| 未解决 error | 0 |
+| Agent 模型 | 全部为 `deepseek-v4-flash` |
+| 输入 token 缺失 | 0/3,300 |
+| Flat 可比性 | cap3 与 cap8 使用同一 library，除 `flat_top_k` 外检索配置相同 |
+| Tower 可比性 | 同一证据策略的四个 cap 使用完全相同的训练轨迹、技能卡、聚类和向量索引，仅 cap 契约不同 |
+| 训练来源 | Flat 与 success-only 使用 94 条满分训练轨迹；mixed 使用 173 条训练轨迹；全部来自 train split |
+| 训练/验证重叠 | 0 |
 
-最终冻结：
+因此主要 rollout 数据是干净且可配对的，不需要重新调用模型。旧版 Flat CI 与本文声明的 task-cluster 口径不一致；本文已从原始 episode 重新计算并更正，不能沿用旧的显著性表述。
 
-- `retrieval_strategy: diverse`
-- `flat_candidate_top_k: 100`
-- `flat_similarity_threshold: 0.45`
-- `flat_relative_margin: 0.08`
-- `flat_dedup_similarity_threshold: 0.95`
-- `flat_mmr_lambda: 0.75`
-- `flat_top_k: 3`
+## Flat 配置选择
 
-## Tower Cap 与证据策略选择
+Flat staged retrieval 固定使用 Top-100 候选、绝对相似度阈值 `0.45`、相对最佳分数 margin `0.08`、近重复阈值 `0.95` 和 MMR relevance weight `0.75`，只比较最终注入上限 3 与 8。
 
-主要验证集同时比较 success-only 与 mixed 两种证据策略，以及直接 Mid cap 3、5、8、12。
+| Cap | Mean reward | 满分成功率 | Completion | 平均步数 | 每 episode 输入 token |
+|---:|---:|---:|---:|---:|---:|
+| 3 | **0.7276** | **47.3%** | **94.7%** | **8.18** | **25,082** |
+| 8 | 0.6871 | 44.3% | 91.0% | 8.42 | 35,119 |
 
-| Cap | Success-only reward | Success-only 满分率 | Mixed reward | Mixed 满分率 | Success-only 每 episode 累计输入 token | Mixed 每 episode 累计输入 token |
-|---:|---:|---:|---:|---:|---:|---:|
-| 3 | 0.6966 | 48.7% | 0.6748 | 44.0% | 25,035 | 23,693 |
-| 5 | 0.7043 | 45.0% | 0.6798 | 45.0% | 27,187 | 23,804 |
-| 8 | 0.6760 | 44.3% | 0.6862 | 45.7% | 32,088 | 24,268 |
-| 12 | 0.6756 | 44.0% | 0.6748 | 43.7% | 32,286 | 25,276 |
+cap3 相对 cap8 的 reward 差为 `+0.0405`，95% CI `[-0.0014, +0.0843]`；满分成功率差为 `+3.0%`，95% CI `[-1.0%, +7.0%]`。两项区间都跨零，因此不能声称 cap3 已显著优于 cap8。
 
-这里的输入 token 是 Agent 完成一个 episode 时各步模型请求的累计输入量，包含固定提示、任务、逐步历史 observation/action 和重复携带的技能上下文；它不是技能构建成本，也不是入选训练轨迹数。Success-only 与 mixed 会形成不同的 Mid 聚类、卡片长度和向量分布，因此即使 cap 相同，经过阈值、去重和 MMR 后实际注入的卡数与文本长度也不同。以 cap8 为例，success-only 平均技能上下文为 7,285 字符、记录 7.95 个唯一 Mid ID、运行 8.09 步；mixed 分别为 3,845 字符、5.35 个 Mid ID和 7.50 步，所以 success-only 的累计输入 token 更高。
+配置选择仍然明确：cap3 的满分率和 reward 点估计都更高，每 episode 少 10,038 个输入 token，平均步数也更少。按预先固定的选择顺序，最终冻结 `flat_top_k: 3`。这里的结论是“cap3 在验证目标和成本上占优”，不是“更多卡片已被统计证明有害”。
 
-按“满分成功优先”的冻结规则，success-only cap3 的满分率 `48.7%` 为标准控制中的最高值。相对 success-only cap8，cap3 的满分率高 `4.3%`，95% CI `[0.7%, 9.0%]`，并且每个 episode 少约 7,053 个输入 token。cap5 的 reward 略高，但满分率低 `3.7%` 且成本更高，不能取代 cap3。
+## Tower 配置选择
 
-在 cap3 下，mixed 相对 success-only 的 reward 差为 `-0.0218`，95% CI `[-0.0661, 0.0208]`；满分成功率低 `4.7%`，95% CI `[-9.0%, -1.0%]`。因此 mixed 不能作为默认策略。它仍然保留在正式实验矩阵中，因为“保留有信息价值的错误轨迹”是核心消融问题；保留该方法不代表使用验证集宣称它优于 success-only。
+下表所有数字均由原始 300 个 episode 重算。纵向格式避免把 evidence strategy 与 cap 两个变量混在同一单元格中。
 
-最终冻结：
+| Evidence | Cap | Mean reward | 满分成功率 | Completion | 平均步数 | 每 episode 输入 token |
+|---|---:|---:|---:|---:|---:|---:|
+| Success-only | 3 | 0.6966 | **48.7%** | 93.3% | **7.48** | **25,035** |
+| Success-only | 5 | **0.7043** | 45.0% | 93.0% | 7.64 | 27,187 |
+| Success-only | 8 | 0.6760 | 44.3% | 90.3% | 8.09 | 32,088 |
+| Success-only | 12 | 0.6756 | 44.0% | 91.0% | 7.99 | 32,286 |
+| Mixed | 3 | 0.6748 | 44.0% | 93.0% | **7.39** | **23,693** |
+| Mixed | 5 | 0.6798 | 45.0% | **94.0%** | 7.43 | 23,804 |
+| Mixed | 8 | **0.6862** | **45.7%** | 93.7% | 7.50 | 24,268 |
+| Mixed | 12 | 0.6748 | 43.7% | 93.3% | 7.58 | 25,276 |
 
-- Tower 默认直接 Mid cap：`3`
-- High top-k：`1`
-- 检索策略：与 Flat 相同的 staged/diverse retrieval
-- 默认证据策略：`success-only`
-- 关键消融：`mixed`，使用同一 cap3 预算
-- 不进入正式主矩阵：cap5、cap8、cap12、self-filter、Mid-only 或交叉 High 变体
+### Cap 选择
 
-## 正式测试预注册
+Success-only 是标准控制。cap3 的满分成功率 `48.7%` 为该策略最高值：
 
-正式测试在配置冻结后，从抽样前从未出现在任何实验 result 或 error 中的 WebShop 样本里抽取。选择协议为 `selection_32248afcaee8da76`：
+- 相对 cap8，cap3 满分率高 `4.3%`，95% CI `[+0.7%, +9.0%]`；reward 高 `0.0206`，CI `[-0.0189, +0.0624]`；每 episode 少 7,053 个输入 token。
+- 相对 cap5，cap3 满分率高 `3.7%`，CI `[0.0%, +8.0%]`；reward 低 `0.0076`，CI `[-0.0493, +0.0340]`；每 episode 少 2,151 个输入 token。
 
-- 三个固定抽样 seed：`20260713`、`20260714`、`20260715`。
-- 每个 seed 无放回抽取 100 个任务，三个集合之间也不重叠。
-- 合计 300 个独立任务；每任务重复三次；每个模型-方法组合共 900 个 episode。
-- 执行 manifest SHA-256：`b055ef5458374c0b8e34935dd59d83f1a90d023bf93fb6a7d2c27c61bcd8fc3e`。
+cap5 只有 reward 点估计略高，满分率更低且成本更高。按“满分成功率优先”的冻结规则，Tower 最终选择 cap3。
 
-正式矩阵固定为两个执行模型：
+### Evidence 选择
 
-- `deepseek-v4-flash`
-- `deepseek-v4-pro`
+在同一 cap3 预算下，mixed 相对 success-only 的 reward 差为 `-0.0218`，95% CI `[-0.0661, +0.0208]`；满分成功率差为 `-4.7%`，95% CI `[-9.0%, -1.0%]`。因此默认 evidence strategy 选择 success-only。
 
-每个模型固定运行四种方法：
+Mixed 仍保留为正式消融，用于回答错误和部分成功轨迹是否提供额外价值；它不参与默认配置选择。该设计与 SkillX baseline 严格区分：SkillX 只使用成功轨迹。
 
-- NoSkill
-- Flat Skill cap3
-- Success-only Tower cap3
-- Mixed Tower cap3
+## Token 口径
 
-报告先分别给出三个 seed 的 100-task/300-episode 结果，再给出合并后的 300-task/900-episode 结果。合并置信区间以 300 个 `sample_id` 为 cluster；技能方法只与同模型、相同 `(sample_id, repeat_id)` 的 NoSkill 做配对比较。
+输入 token 是 Agent 在一个 episode 中各步模型请求的累计输入量，包括固定提示、任务、逐步交互历史和重复携带的技能上下文；它不是技能构建成本，也不是入选训练轨迹数。
 
-正式测试结果只用于评估冻结方法的泛化表现，不再用于选择新配置。若正式测试显示某个未冻结变体可能更优，该观察只能成为后续独立实验的假设，不能回写本轮主结果。
+Success-only 与 mixed 会形成不同的技能卡和向量分布。经过相似度阈值、去重和 MMR 后，两者实际注入的卡数、文本长度和执行步数都可能不同，因此 success-only 的累计输入 token 高于 mixed 并不矛盾。
+
+## 冻结配置
+
+| 组件 | 正式配置 |
+|---|---|
+| Flat | staged/diverse retrieval，cap3 |
+| Tower | staged/diverse direct-Mid retrieval，cap3 |
+| High | top-k 1 |
+| 默认 evidence | success-only |
+| 关键消融 | mixed，使用同一 cap3 预算 |
+
+cap5、cap8、cap12、self-filter、Mid-only 和交叉 High 变体均不进入正式主矩阵。
+
+## 正式测试边界
+
+正式测试使用预注册 selection `selection_32248afcaee8da76`，包含 300 个此前未出现在任何 result 或 error 中的任务，每任务重复 3 次。执行 manifest SHA-256 为 `b055ef5458374c0b8e34935dd59d83f1a90d023bf93fb6a7d2c27c61bcd8fc3e`。
+
+正式矩阵固定为两个模型（Flash、Pro）和四种方法（NoSkill、Flat cap3、Success-only Tower cap3、Mixed Tower cap3）。正式结果只评估冻结方法的泛化表现，不再用于选择新配置。
