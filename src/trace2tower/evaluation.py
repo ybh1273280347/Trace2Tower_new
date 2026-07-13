@@ -11,6 +11,8 @@ import numpy as np
 from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
 from trace2tower.results import EpisodeResult, FinishReason, MethodName
 
+FULL_SUCCESS_THRESHOLD = 0.999
+
 
 class PrimaryMetricName(StrEnum):
     SUCCESS_RATE = "success_rate"
@@ -158,6 +160,9 @@ class MethodAggregate:
     official_result_coverage: float
     primary_metric: PrimaryMetricName
     primary_metric_mean: float
+    full_success_threshold: float
+    full_success_count: int
+    full_success_rate: float
     completion_rate: float
     mean_steps: float
     total_steps: int
@@ -202,6 +207,11 @@ class PairwiseComparison:
     mean_difference: float
     confidence_level: float
     confidence_interval: tuple[float, float]
+    full_success_threshold: float
+    baseline_full_success_rate: float
+    candidate_full_success_rate: float
+    full_success_rate_difference: float
+    full_success_rate_confidence_interval: tuple[float, float]
     bootstrap_samples: int
     bootstrap_seed: int
     candidate_wins: int
@@ -307,6 +317,14 @@ def aggregate_method(
         official_result_coverage=audit.official_result_coverage,
         primary_metric=primary_metric,
         primary_metric_mean=fmean(result.primary_score for result in results),
+        full_success_threshold=FULL_SUCCESS_THRESHOLD,
+        full_success_count=sum(
+            result.primary_score >= FULL_SUCCESS_THRESHOLD for result in results
+        ),
+        full_success_rate=sum(
+            result.primary_score >= FULL_SUCCESS_THRESHOLD for result in results
+        )
+        / len(results),
         completion_rate=sum(
             result.finish_reason is FinishReason.COMPLETED for result in results
         )
@@ -375,8 +393,24 @@ def paired_bootstrap(
         [fmean(values) for _, values in sorted(differences_by_sample.items())],
         dtype=np.float64,
     )
+    full_success_differences_by_sample = {}
+    for key in ordered_keys:
+        difference = float(
+            candidate[key].primary_score >= FULL_SUCCESS_THRESHOLD
+        ) - float(baseline[key].primary_score >= FULL_SUCCESS_THRESHOLD)
+        full_success_differences_by_sample.setdefault(key.sample_id, []).append(
+            difference
+        )
+    full_success_task_differences = np.asarray(
+        [
+            fmean(values)
+            for _, values in sorted(full_success_differences_by_sample.items())
+        ],
+        dtype=np.float64,
+    )
     rng = np.random.default_rng(bootstrap_seed)
     means = np.empty(bootstrap_samples, dtype=np.float64)
+    full_success_means = np.empty(bootstrap_samples, dtype=np.float64)
     batch_size = 512
     for start in range(0, bootstrap_samples, batch_size):
         end = min(start + batch_size, bootstrap_samples)
@@ -386,8 +420,14 @@ def paired_bootstrap(
             size=(end - start, len(task_differences)),
         )
         means[start:end] = task_differences[indices].mean(axis=1)
+        full_success_means[start:end] = full_success_task_differences[indices].mean(
+            axis=1
+        )
     alpha = (1 - confidence_level) / 2
     interval = np.quantile(means, (alpha, 1 - alpha), method="linear")
+    full_success_interval = np.quantile(
+        full_success_means, (alpha, 1 - alpha), method="linear"
+    )
     metric = (
         PrimaryMetricName.SUCCESS_RATE
         if benchmark is Benchmark.ALFWORLD
@@ -413,6 +453,20 @@ def paired_bootstrap(
         mean_difference=float(task_differences.mean()),
         confidence_level=confidence_level,
         confidence_interval=(float(interval[0]), float(interval[1])),
+        full_success_threshold=FULL_SUCCESS_THRESHOLD,
+        baseline_full_success_rate=fmean(
+            baseline[key].primary_score >= FULL_SUCCESS_THRESHOLD
+            for key in ordered_keys
+        ),
+        candidate_full_success_rate=fmean(
+            candidate[key].primary_score >= FULL_SUCCESS_THRESHOLD
+            for key in ordered_keys
+        ),
+        full_success_rate_difference=float(full_success_task_differences.mean()),
+        full_success_rate_confidence_interval=(
+            float(full_success_interval[0]),
+            float(full_success_interval[1]),
+        ),
         bootstrap_samples=bootstrap_samples,
         bootstrap_seed=bootstrap_seed,
         candidate_wins=int(np.sum(episode_differences > 0)),

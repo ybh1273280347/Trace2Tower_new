@@ -235,31 +235,37 @@ def render_markdown(report: dict, pairwise: list[dict]) -> str:
         f"Split: `{report['split']}`  ",
         f"Expected episodes per method: {report['expected_episode_count']}",
         "",
-        "| Method | Primary metric | Mean | Steps | Invalid rate | Billable coverage |",
-        "|---|---|---:|---:|---:|---:|",
+        "| Method | Mean reward | Full success | Completion | Steps | Invalid rate |",
+        "|---|---:|---:|---:|---:|---:|",
     ]
     for method, aggregate in sorted(report["methods"].items()):
         lines.append(
-            f"| {method} | {aggregate['primary_metric']} | "
-            f"{aggregate['primary_metric_mean']:.6f} | "
+            f"| {method} | {aggregate['primary_metric_mean']:.6f} | "
+            f"{aggregate['full_success_rate']:.3%} | "
+            f"{aggregate['completion_rate']:.3%} | "
             f"{aggregate['mean_steps']:.3f} | "
-            f"{aggregate['invalid_action_rate']:.6f} | "
-            f"{aggregate['billable_token_coverage']:.3f} |"
+            f"{aggregate['invalid_action_rate']:.6f} |"
         )
     if pairwise:
         lines.extend(
             (
                 "",
-                "| Candidate vs No-Skill | Mean difference | 95% CI | Episodes | Tasks |",
-                "|---|---:|---:|---:|---:|",
+                "| Candidate vs No-Skill | Reward difference | Reward 95% CI | Full-success difference | Success 95% CI | Episodes | Tasks |",
+                "|---|---:|---:|---:|---:|---:|---:|",
             )
         )
         for comparison in pairwise:
             lower, upper = comparison["confidence_interval"]
+            success_lower, success_upper = comparison[
+                "full_success_rate_confidence_interval"
+            ]
             lines.append(
                 f"| {comparison['candidate_method']} | "
                 f"{comparison['mean_difference']:.6f} | "
-                f"[{lower:.6f}, {upper:.6f}] | {comparison['pair_count']} | "
+                f"[{lower:.6f}, {upper:.6f}] | "
+                f"{comparison['full_success_rate_difference']:.3%} | "
+                f"[{success_lower:.3%}, {success_upper:.3%}] | "
+                f"{comparison['pair_count']} | "
                 f"{comparison['task_count']} |"
             )
     lines.extend(("", f"Unresolved failures: {report['unresolved_failure_count']}", ""))

@@ -73,6 +73,9 @@ def test_aggregate_uses_benchmark_metric_and_pooled_invalid_rate() -> None:
     assert audit.is_complete
     assert aggregate.primary_metric.value == "mean_reward"
     assert aggregate.primary_metric_mean == 0.75
+    assert aggregate.full_success_threshold == 0.999
+    assert aggregate.full_success_count == 1
+    assert aggregate.full_success_rate == 0.5
     assert aggregate.invalid_action_rate == 0.2
     assert aggregate.input_token_coverage == 1
     assert aggregate.billable_token_coverage == 0
@@ -156,6 +159,10 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
     assert first.mean_difference == 0.5
     assert (first.pair_count, first.task_count) == (2, 2)
     assert first.confidence_interval == (0.0, 1.0)
+    assert first.baseline_full_success_rate == 0.5
+    assert first.candidate_full_success_rate == 1
+    assert first.full_success_rate_difference == 0.5
+    assert first.full_success_rate_confidence_interval == (0.0, 1.0)
     assert (first.candidate_wins, first.ties, first.candidate_losses) == (1, 1, 0)
     assert first.billable_token_pair_coverage == 0.5
     assert first.mean_billable_token_difference == -2

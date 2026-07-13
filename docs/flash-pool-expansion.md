@@ -114,4 +114,27 @@ Across 150 held-out tasks and 450 paired episodes, staged-cap3 versus legacy Top
 
 High-path support is counted by distinct task separately within positive and negative evidence, so multiple repeats cannot inflate support. With a 10% positive-task threshold, the success-only Tower has 16 Mid and 26 High skills; the mixed Tower has 19 Mid and 17 High skills because negative evidence removes unsupported paths. Both complete snapshots use GPT-5.4-rendered cards and staged-cap3 direct retrieval.
 
-On the same held-out 50 tasks and three repeats, success-only Tower scores `-0.0298` versus NoSkill while mixed Tower scores `+0.0298`. Directly pairing mixed against success-only yields `+0.0596`, CI `[+0.0087, +0.1201]`, 1.87 fewer steps, and 15,149 fewer reported input tokens per episode. This supports the project policy of prioritizing full successes while retaining failures with explicit contrastive value; it must not be conflated with the success-only SkillX control.
+The first held-out 50-task run actually used direct-Mid cap 8, not cap 3. Under that configuration, success-only Tower scores `-0.0298` versus NoSkill while mixed Tower scores `+0.0298`. Directly pairing mixed against success-only yields `+0.0596`, CI `[+0.0087, +0.1201]`. This is retained as an encouraging local result, but it is not sufficient on its own to establish the mixed policy.
+
+An independent WebShop test set of 100 tasks, each with three repeats, was then evaluated under caps 3, 5, 8, and 12. WebShop full success is reported as the derived event `primary_score >= 0.999`; completion remains a separate environment outcome. Both reward and full-success differences use 10,000 bootstrap resamples over the 100 independent tasks after averaging each task's repeats.
+
+| Cap | Success-only reward | Mixed reward | Success-only full success | Mixed full success | Mixed reward difference | Mixed success difference |
+|---:|---:|---:|---:|---:|---:|---:|
+| 3 | 0.6966 | 0.6748 | 48.7% | 44.0% | -0.0218 | -4.7% `[-9.0%, -1.0%]` |
+| 5 | 0.7043 | 0.6798 | 45.0% | 45.0% | -0.0245 | 0.0% `[-4.7%, +4.7%]` |
+| 8 | 0.6760 | 0.6862 | 44.3% | 45.7% | +0.0102 | +1.3% `[-4.0%, +6.7%]` |
+| 12 | 0.6756 | 0.6748 | 44.0% | 43.7% | -0.0008 | -0.3% `[-4.7%, +3.7%]` |
+
+Cap 3 significantly suppresses mixed full success. Cap 8 is the local optimum for mixed and restores a positive direction, while cap 12 adds almost no mixed context and does not improve outcomes. On all 150 held-out tasks available under cap 8, mixed versus success-only is `+0.0267` reward with CI `[-0.0073, +0.0611]` and `+0.9%` full success with CI `[-2.9%, +4.9%]`. Mixed versus NoSkill is `+0.0063` reward and `-0.4%` full success; both intervals cross zero. The current evidence therefore supports a WebShop-specific positive trend for mixed evidence at cap 8, not a significant general improvement.
+
+A cap-8 High ablation further localizes the trend. Adding High to success-only changes reward by `-0.0186` and full success by `-1.0%`; adding High to mixed changes reward by `+0.0100` and full success by `+1.3%`. These intervals also cross zero, but the directions are consistent with negative evidence removing nine weaker High paths. Mixed Mid-only does not outperform success-only Mid-only, so any mixed advantage appears to come primarily from the smaller contrastively filtered High set rather than from adding more Mid clusters.
+
+The cap sweep consumes test IDs 50-149 and is treated as validation rather than final test evidence. After fixing cap 8, the untouched WebShop test IDs 150-199 were run once with NoSkill, success-only Tower, and mixed Tower, each with three repeats and exact 150/150 coverage.
+
+| Final holdout method | Mean reward | Full success | Completion | Mean steps | Mean input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.6927 | 48.0% | 92.0% | 7.11 | 17,670 |
+| Success-only Tower | 0.6661 | 48.0% | 92.0% | 7.06 | 26,510 |
+| Mixed Tower | 0.6740 | 48.7% | 90.7% | 7.12 | 23,500 |
+
+Mixed versus success-only is `+0.0079` reward with CI `[-0.0181, +0.0353]` and `+0.7%` full success with CI `[0.0%, +2.0%]`; the success interval touches zero and is not claimed significant. Mixed uses 3,010 fewer input tokens per episode. Mixed versus NoSkill is `-0.0187` reward with CI `[-0.0929, +0.0609]` and `+0.7%` full success with CI `[-7.3%, +8.7%]`. The final conclusion is narrow: cap 8 prevents mixed evidence from being harmed by aggressive retrieval truncation and mixed is at least competitive with success-only, but neither Tower establishes an improvement over NoSkill on the untouched holdout.
