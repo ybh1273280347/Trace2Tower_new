@@ -16,6 +16,8 @@ import yaml
 FULL_SUCCESS_THRESHOLD = 0.999
 BOOTSTRAP_SAMPLES = 10_000
 BOOTSTRAP_SEED = 42
+SKILLX_ARTIFACT_ID = "skillxlib_409dd86005b242ca"
+SKILLX_ARTIFACT_SHA256 = "b33cace93000d9bd500e006de02c8213119395981e163a91c72d9edc760bf4cc"
 
 
 @dataclass(frozen=True)
@@ -31,10 +33,12 @@ class Condition:
 CONDITIONS = (
     Condition("no_skill", "deepseek-v4-flash", "no_skill", "webshop-final-random300-flash-noskill-v1", "no_skill"),
     Condition("flat_cap3", "deepseek-v4-flash", "flat_skill_summary", "webshop-final-random300-flash-flat-cap3-v1", "flat_skill_summary", "flat_cap3"),
+    Condition("skillx_official", "deepseek-v4-flash", "skillx", "webshop-final-random300-flash-skillx-official-v1", "skillx", "skillx_official"),
     Condition("success_tower_cap3", "deepseek-v4-flash", "trace2tower_static", "webshop-final-random300-flash-success-tower-cap3-v1", "trace2tower_static", "success_only_tower_cap3"),
     Condition("mixed_tower_cap3", "deepseek-v4-flash", "trace2tower_static", "webshop-final-random300-flash-mixed-tower-cap3-v1", "trace2tower_static", "mixed_tower_cap3"),
     Condition("no_skill", "deepseek-v4-pro", "no_skill", "webshop-final-random300-pro-noskill-v1", "no_skill"),
     Condition("flat_cap3", "deepseek-v4-pro", "flat_skill_summary", "webshop-final-random300-pro-flat-cap3-v1", "flat_skill_summary", "flat_cap3"),
+    Condition("skillx_official", "deepseek-v4-pro", "skillx", "webshop-final-random300-pro-skillx-official-v1", "skillx", "skillx_official"),
     Condition("success_tower_cap3", "deepseek-v4-pro", "trace2tower_static", "webshop-final-random300-pro-success-tower-cap3-v1", "trace2tower_static", "success_only_tower_cap3"),
     Condition("mixed_tower_cap3", "deepseek-v4-pro", "trace2tower_static", "webshop-final-random300-pro-mixed-tower-cap3-v1", "trace2tower_static", "mixed_tower_cap3"),
 )
@@ -114,12 +118,26 @@ def validate_condition(
         raise ValueError(f"{condition.run_id} repeat selection differs from preregistration")
     if condition.label == "flat_cap3" and int(config["method"]["flat_top_k"]) != 3:
         raise ValueError("Flat final run is not cap 3")
+    if condition.label == "skillx_official" and (
+        float(config["method"]["similarity_threshold"]) != 0.45
+        or int(config["method"]["plan_top_k"]) != 3
+        or int(config["method"]["skills_per_step"]) != 4
+        or int(config["method"]["max_skills"]) != 10
+    ):
+        raise ValueError("SkillX final run differs from official retrieval settings")
     if "tower" in condition.label and int(config["method"]["direct_mid_top_k"]) != 3:
         raise ValueError("Tower final run is not cap 3")
     if condition.artifact_name:
         artifact = config["artifacts"]["webshop"]
-        expected = selection["method_artifacts"][condition.artifact_name]
-        if artifact["sha256"] != expected["sha256"]:
+        if condition.artifact_name == "skillx_official":
+            matches = (
+                artifact["artifact_id"] == SKILLX_ARTIFACT_ID
+                and artifact["sha256"] == SKILLX_ARTIFACT_SHA256
+            )
+        else:
+            expected = selection["method_artifacts"][condition.artifact_name]
+            matches = artifact["sha256"] == expected["sha256"]
+        if not matches:
             raise ValueError(f"{condition.run_id} artifact hash differs from preregistration")
     elif config["artifacts"]:
         raise ValueError("NoSkill final run unexpectedly binds an artifact")
@@ -375,7 +393,7 @@ def main(options: argparse.Namespace) -> int:
     for model in ("deepseek-v4-flash", "deepseek-v4-pro"):
         combined = {
             label: aggregate(rows_by_condition[(model, label)])
-            for label in ("no_skill", "flat_cap3", "success_tower_cap3", "mixed_tower_cap3")
+            for label in ("no_skill", "flat_cap3", "skillx_official", "success_tower_cap3", "mixed_tower_cap3")
         }
         baseline = rows_by_condition[(model, "no_skill")]
         comparisons = {
@@ -384,7 +402,7 @@ def main(options: argparse.Namespace) -> int:
                 rows_by_condition[(model, label)],
                 bootstrap_seed=BOOTSTRAP_SEED,
             )
-            for label in ("flat_cap3", "success_tower_cap3", "mixed_tower_cap3")
+            for label in ("flat_cap3", "skillx_official", "success_tower_cap3", "mixed_tower_cap3")
         }
         comparisons["mixed_vs_success_tower"] = paired_comparison(
             rows_by_condition[(model, "success_tower_cap3")],
@@ -393,6 +411,16 @@ def main(options: argparse.Namespace) -> int:
         )
         comparisons["success_tower_vs_flat"] = paired_comparison(
             rows_by_condition[(model, "flat_cap3")],
+            rows_by_condition[(model, "success_tower_cap3")],
+            bootstrap_seed=BOOTSTRAP_SEED,
+        )
+        comparisons["skillx_vs_flat"] = paired_comparison(
+            rows_by_condition[(model, "flat_cap3")],
+            rows_by_condition[(model, "skillx_official")],
+            bootstrap_seed=BOOTSTRAP_SEED,
+        )
+        comparisons["success_tower_vs_skillx"] = paired_comparison(
+            rows_by_condition[(model, "skillx_official")],
             rows_by_condition[(model, "success_tower_cap3")],
             bootstrap_seed=BOOTSTRAP_SEED,
         )
@@ -412,7 +440,7 @@ def main(options: argparse.Namespace) -> int:
                         if row["sample_id"] in selected
                     ]
                 )
-                for label in ("no_skill", "flat_cap3", "success_tower_cap3", "mixed_tower_cap3")
+                for label in ("no_skill", "flat_cap3", "skillx_official", "success_tower_cap3", "mixed_tower_cap3")
             }
             for model in ("deepseek-v4-flash", "deepseek-v4-pro")
         }
@@ -435,6 +463,7 @@ def main(options: argparse.Namespace) -> int:
                 )
                 for label in (
                     "flat_cap3",
+                    "skillx_official",
                     "success_tower_cap3",
                     "mixed_tower_cap3",
                 )
@@ -450,7 +479,7 @@ def main(options: argparse.Namespace) -> int:
             rows_by_condition[("deepseek-v4-pro", label)],
             bootstrap_seed=BOOTSTRAP_SEED,
         )
-        for label in ("flat_cap3", "success_tower_cap3", "mixed_tower_cap3")
+        for label in ("flat_cap3", "skillx_official", "success_tower_cap3", "mixed_tower_cap3")
     }
     cross_model = {
         "pro_vs_flash_no_skill": paired_comparison(

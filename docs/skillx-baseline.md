@@ -58,3 +58,9 @@ The execution smoke replayed the exact source task with `deepseek-v4-flash`:
 The injected replay selected `french vanilla sundara` instead of the requested `french cellar`, inspected Features and Attributes, and purchased it. This is one paired task, not a performance estimate or proof that SkillX caused the entire difference. It established only that the adapter could execute the official output. The formal baseline subsequently expands the official pipeline over the fixed pool of 94 full-success WebShop training trajectories; its test result is reported separately from this historical smoke run.
 
 The first two smoke attempts also exposed undeclared WebShop runtime dependencies before any episode execution. `click` and the exact `en_core_web_sm` 3.8.0 model are now locked project dependencies so official reward semantics no longer depend on packages installed in a global Python environment. Re-running the completed smoke skipped the episode with zero additional model calls.
+
+## Formal Random-300 Baseline
+
+The formal extraction used all 94 full-success WebShop training trajectories (26 tasks, 497 steps). GPT-5.4 produced 109 raw candidates; the official filters retained two atomic skills plus 26 planning skills. All 336 renderer calls completed with zero transport or parser-validation failures, and both singleton merge clusters committed without fallback.
+
+The resulting execution library `skillxlib_409dd86005b242ca` was evaluated on the same frozen Random-300 test selection as the other baselines, with three repeats per task. Flash and Pro each completed 900/900 episodes with zero errors. Full metrics, paired confidence intervals, and comparisons against NoSkill, Flat, and Tower are reported in [WebShop Random-300 正式测试报告](webshop-final-random300-report.md).
