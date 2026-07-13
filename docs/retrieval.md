@@ -1,6 +1,6 @@
 # Trace2Tower Retrieval
 
-Trace2Tower builds separate semantic indexes over rendered Mid and High cards using the shared `qwen3-embedding-8b` space. Card IDs and embedding vectors are persisted together and validated for uniqueness and a fixed nonzero dimension.
+Trace2Tower builds separate semantic indexes over rendered Mid and High cards using the shared `qwen3-embedding-8b` space. Card IDs, card-text SHA-256 values, and embedding vectors are persisted together and validated for uniqueness and a fixed nonzero dimension. A vector is reused only when both its stable ID and text hash match.
 
 For each task:
 
@@ -14,11 +14,11 @@ When no High card exists, retrieval falls back to Top-2 direct Mid. Cosine ties 
 
 ## Pilot
 
-The index builder reused the six already rendered pilot cards and made no agent or environment calls.
+The completed pilot tower contains every discovered Mid and High card.
 
 | Benchmark | Index | Cards | Embedding dimension | Retrieved IDs | Context chars |
 |---|---|---:|---:|---|---:|
-| ALFWorld | Mid / High | 2 / 1 | 4096 | 1 High + 2 unique Mid | 1,971 |
-| WebShop | Mid / High | 2 / 1 | 4096 | 1 High + 2 unique Mid | 2,780 |
+| ALFWorld | Mid / High | 6 / 2 | 4096 | 1 High + 3 unique Mid | 2,949 |
+| WebShop | Mid / High | 3 / 2 | 4096 | 1 High + 2 unique Mid | 3,192 |
 
-Both queries selected the available High card, expanded both children, and removed duplicate direct Mid matches. This validates the retrieval contract but is not a relevance evaluation because the pilot tower contains only one rendered High candidate per benchmark.
+An immediate repeat index build reused all 13 card vectors and made zero new embedding calls. The end-to-end smoke selected one of two High candidates in each benchmark, expanded its children, and removed duplicate direct Mid matches.

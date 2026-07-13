@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 from dataclasses import asdict
 from pathlib import Path
@@ -31,6 +32,50 @@ async def main(options: argparse.Namespace) -> int:
     high_cards = tuple(HighSkillCard.from_record(item) for item in payload["high_cards"])
     if not mid_cards:
         raise ValueError("retrieval index requires at least one Mid card")
+    mid_texts = {card.skill_id: mid_card_text(card) for card in mid_cards}
+    high_texts = {card.skill_id: high_card_text(card) for card in high_cards}
+    mid_hashes = {
+        skill_id: hashlib.sha256(text.encode("utf-8")).hexdigest()
+        for skill_id, text in mid_texts.items()
+    }
+    high_hashes = {
+        skill_id: hashlib.sha256(text.encode("utf-8")).hexdigest()
+        for skill_id, text in high_texts.items()
+    }
+    reusable_mid_vectors = {}
+    reusable_high_vectors = {}
+    if options.output.exists():
+        existing = json.loads(options.output.read_text(encoding="utf-8"))
+        existing_mid = SkillEmbeddingIndex.from_record(existing["mid_index"])
+        existing_high = SkillEmbeddingIndex.from_record(existing["high_index"])
+        if existing_mid.text_hashes:
+            reusable_mid_vectors = {
+                skill_id: vector
+                for skill_id, vector, text_hash in zip(
+                    existing_mid.skill_ids,
+                    existing_mid.vectors,
+                    existing_mid.text_hashes,
+                    strict=True,
+                )
+                if mid_hashes.get(skill_id) == text_hash
+            }
+        if existing_high.text_hashes:
+            reusable_high_vectors = {
+                skill_id: vector
+                for skill_id, vector, text_hash in zip(
+                    existing_high.skill_ids,
+                    existing_high.vectors,
+                    existing_high.text_hashes,
+                    strict=True,
+                )
+                if high_hashes.get(skill_id) == text_hash
+            }
+    missing_mid_ids = tuple(
+        skill_id for skill_id in mid_texts if skill_id not in reusable_mid_vectors
+    )
+    missing_high_ids = tuple(
+        skill_id for skill_id in high_texts if skill_id not in reusable_high_vectors
+    )
     runtime = CommonLLMRuntime(
         max_concurrency=common["global_api_concurrency"],
         max_attempts=common["provider_max_attempts"],
@@ -38,18 +83,33 @@ async def main(options: argparse.Namespace) -> int:
         retry_base_seconds=common["retry_base_seconds"],
     )
     try:
-        mid_result = await runtime.embed([mid_card_text(card) for card in mid_cards])
-        high_result = (
-            await runtime.embed([high_card_text(card) for card in high_cards])
-            if high_cards
+        mid_result = (
+            await runtime.embed([mid_texts[skill_id] for skill_id in missing_mid_ids])
+            if missing_mid_ids
             else None
         )
+        high_result = (
+            await runtime.embed([high_texts[skill_id] for skill_id in missing_high_ids])
+            if missing_high_ids
+            else None
+        )
+        new_mid_vectors = dict(
+            zip(missing_mid_ids, mid_result.vectors if mid_result else (), strict=True)
+        )
+        new_high_vectors = dict(
+            zip(missing_high_ids, high_result.vectors if high_result else (), strict=True)
+        )
+        all_mid_vectors = reusable_mid_vectors | new_mid_vectors
+        all_high_vectors = reusable_high_vectors | new_high_vectors
         mid_index = SkillEmbeddingIndex(
-            tuple(card.skill_id for card in mid_cards), mid_result.vectors
+            tuple(mid_texts),
+            tuple(all_mid_vectors[skill_id] for skill_id in mid_texts),
+            tuple(mid_hashes.values()),
         )
         high_index = SkillEmbeddingIndex(
-            tuple(card.skill_id for card in high_cards),
-            high_result.vectors if high_result else (),
+            tuple(high_texts),
+            tuple(all_high_vectors[skill_id] for skill_id in high_texts),
+            tuple(high_hashes.values()),
         )
         retrieval = None
         query_usage = None
@@ -92,7 +152,11 @@ async def main(options: argparse.Namespace) -> int:
         "mid_count": len(mid_cards),
         "high_count": len(high_cards),
         "embedding_dimension": len(mid_index.vectors[0]),
-        "mid_embedding_usage": asdict(mid_result.usage),
+        "reused_mid_embeddings": len(reusable_mid_vectors),
+        "new_mid_embeddings": len(missing_mid_ids),
+        "reused_high_embeddings": len(reusable_high_vectors),
+        "new_high_embeddings": len(missing_high_ids),
+        "mid_embedding_usage": asdict(mid_result.usage) if mid_result else None,
         "high_embedding_usage": asdict(high_result.usage) if high_result else None,
         "query_embedding_usage": query_usage,
         "retrieval": retrieval,

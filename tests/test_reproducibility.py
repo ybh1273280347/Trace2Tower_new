@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from trace2tower.reproducibility import build_source_lock, write_source_lock
+from trace2tower.reproducibility import (
+    SOURCE_REPOSITORIES,
+    build_source_lock,
+    write_source_lock,
+)
 
 
 def run_git(repository: Path, *arguments: str) -> str:
@@ -34,16 +38,19 @@ def initialize_repository(repository: Path, remote: str) -> str:
 @pytest.fixture
 def repository_tree(tmp_path: Path) -> tuple[Path, dict[str, str]]:
     commits = {
-        "main_repository": initialize_repository(tmp_path, "https://example.com/main.git"),
-        "agentbench": initialize_repository(
-            tmp_path / "third_party" / "AgentBench",
-            "https://example.com/agentbench.git",
-        ),
-        "skillx": initialize_repository(
-            tmp_path / "third_party" / "SkillX",
-            "https://example.com/skillx.git",
-        ),
+        "main_repository": initialize_repository(
+            tmp_path, "https://example.com/main.git"
+        )
     }
+    commits.update(
+        {
+            name: initialize_repository(
+                tmp_path / relative_path,
+                f"https://example.com/{name}.git",
+            )
+            for name, relative_path in SOURCE_REPOSITORIES.items()
+        }
+    )
     return tmp_path, commits
 
 

@@ -76,3 +76,8 @@ def test_embedding_index_rejects_dimension_mismatch() -> None:
     index = SkillEmbeddingIndex(("mid_a",), ((1.0, 0.0),))
     with pytest.raises(ValueError, match="dimension"):
         index.top_k((1.0,), 1)
+
+
+def test_embedding_index_requires_hash_alignment_when_hashes_are_present() -> None:
+    with pytest.raises(ValueError, match="text hashes"):
+        SkillEmbeddingIndex(("mid_a", "mid_b"), ((1.0,), (2.0,)), ("hash-a",))

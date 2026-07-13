@@ -128,6 +128,14 @@ class MidCluster:
     def to_record(self) -> dict:
         return asdict(self)
 
+    @classmethod
+    def from_record(cls, record: dict) -> MidCluster:
+        return cls(
+            cluster_id=str(record["cluster_id"]),
+            member_segment_ids=tuple(record["member_segment_ids"]),
+            centroid=tuple(float(value) for value in record["centroid"]),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class HighPath:

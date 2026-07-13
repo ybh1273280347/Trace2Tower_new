@@ -2,12 +2,34 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 
 from trace2tower.benchmarks.models import BenchmarkEnvironment, EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
 from trace2tower.manifests import Benchmark, ManifestEntry
 from trace2tower.results import EpisodeResult, FinishReason, MethodName
 from trace2tower.trajectory import EpisodeTrajectory, StepRecord, TrajectoryWriter
+
+
+@dataclass(frozen=True, slots=True)
+class SkillSelection:
+    skill_ids: tuple[str, ...]
+    context: str
+    model_input_tokens: int | None = 0
+    model_output_tokens: int | None = 0
+
+    def __post_init__(self) -> None:
+        if len(set(self.skill_ids)) != len(self.skill_ids):
+            raise ValueError("skill selection contains duplicate IDs")
+        if self.skill_ids and not self.context:
+            raise ValueError("a non-empty skill selection requires injected context")
+        token_counts = (self.model_input_tokens, self.model_output_tokens)
+        if any(value is not None and value < 0 for value in token_counts):
+            raise ValueError("skill selection token counts must be non-negative")
+
+
+SkillProvider = Callable[[str, str], Awaitable[SkillSelection]]
 
 
 class AgentEvaluator:
@@ -34,31 +56,45 @@ class AgentEvaluator:
         skill_context: str | None,
         shard_id: int,
         max_steps: int,
+        skill_ids: tuple[str, ...] = (),
+        skill_provider: SkillProvider | None = None,
     ) -> EpisodeResult:
+        if skill_provider is not None and (skill_context or skill_ids):
+            raise ValueError("skill_provider cannot be combined with precomputed skills")
         started = time.perf_counter()
         episode = await environment.reset(entry)
         state = episode.state
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "Solve the benchmark task by calling exactly one provided tool each turn. "
-                    "Use only actions shown as available."
-                ),
-            },
-            {
-                "role": "user",
-                "content": self._prompt(episode.task_goal, state, skill_context),
-            },
-        ]
         trajectory_steps = []
         invalid_actions = 0
-        input_tokens = 0
-        output_tokens = 0
-        token_usage_available = True
         finish_reason = FinishReason.TASK_LIMIT_REACHED
 
         try:
+            selection = (
+                await skill_provider(episode.task_goal, state.observation)
+                if skill_provider
+                else SkillSelection(skill_ids, skill_context or "")
+            )
+            input_tokens = selection.model_input_tokens or 0
+            output_tokens = selection.model_output_tokens or 0
+            input_usage_available = selection.model_input_tokens is not None
+            output_usage_available = selection.model_output_tokens is not None
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "Solve the benchmark task by calling exactly one provided tool each turn. "
+                        "Use only actions shown as available."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": self._prompt(
+                        episode.task_goal,
+                        state,
+                        selection.context,
+                    ),
+                },
+            ]
             for step_index in range(max_steps):
                 llm_result = await self.runtime.chat(
                     ModelRole.AGENT,
@@ -68,10 +104,13 @@ class AgentEvaluator:
                     temperature=self.temperature,
                     max_output_tokens=self.max_output_tokens,
                 )
-                if llm_result.usage.input_tokens is None or llm_result.usage.output_tokens is None:
-                    token_usage_available = False
+                if llm_result.usage.input_tokens is None:
+                    input_usage_available = False
                 else:
                     input_tokens += llm_result.usage.input_tokens
+                if llm_result.usage.output_tokens is None:
+                    output_usage_available = False
+                else:
                     output_tokens += llm_result.usage.output_tokens
 
                 if len(llm_result.tool_calls) != 1:
@@ -173,12 +212,12 @@ class AgentEvaluator:
             steps=len(trajectory_steps),
             invalid_actions=invalid_actions,
             finish_reason=finish_reason,
-            input_tokens=input_tokens if token_usage_available else None,
-            output_tokens=output_tokens if token_usage_available else None,
+            input_tokens=input_tokens if input_usage_available else None,
+            output_tokens=output_tokens if output_usage_available else None,
             billable_tokens=None,
             latency_ms=round((time.perf_counter() - started) * 1000),
-            skill_ids=(),
-            skill_context_chars=len(skill_context or ""),
+            skill_ids=selection.skill_ids,
+            skill_context_chars=len(selection.context),
         )
         self.trajectory_writer.write(
             EpisodeTrajectory(

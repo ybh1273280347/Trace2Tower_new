@@ -18,12 +18,15 @@ class SkillMatch:
 class SkillEmbeddingIndex:
     skill_ids: tuple[str, ...]
     vectors: tuple[tuple[float, ...], ...]
+    text_hashes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if len(self.skill_ids) != len(self.vectors):
             raise ValueError("skill IDs and embedding vectors must align")
         if len(set(self.skill_ids)) != len(self.skill_ids):
             raise ValueError("skill embedding index contains duplicate IDs")
+        if self.text_hashes and len(self.text_hashes) != len(self.skill_ids):
+            raise ValueError("skill IDs and text hashes must align")
         dimensions = {len(vector) for vector in self.vectors}
         if self.vectors and (len(dimensions) != 1 or 0 in dimensions):
             raise ValueError("skill embedding vectors must have one nonzero dimension")
@@ -38,6 +41,7 @@ class SkillEmbeddingIndex:
             vectors=tuple(
                 tuple(float(value) for value in vector) for vector in record["vectors"]
             ),
+            text_hashes=tuple(record.get("text_hashes", ())),
         )
 
     def top_k(self, query_vector: Sequence[float], count: int) -> tuple[str, ...]:

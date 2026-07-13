@@ -18,6 +18,16 @@ class LowSkill:
     primitive_action: PrimitiveAction
     action_template: str
 
+    def to_record(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: Mapping) -> LowSkill:
+        return cls(
+            primitive_action=PrimitiveAction(record["primitive_action"]),
+            action_template=str(record["action_template"]),
+        )
+
 
 LOW_SKILLS: dict[Benchmark, tuple[LowSkill, ...]] = {
     Benchmark.ALFWORLD: (

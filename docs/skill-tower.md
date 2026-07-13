@@ -26,12 +26,12 @@ The selected `deepseek-v4-flash` pilot trajectories were reused without another 
 
 | Benchmark | Trajectories | Mid clusters | High paths | Real cards rendered |
 |---|---:|---:|---:|---:|
-| ALFWorld | 10 | 6 | 2 | 2 Mid + 1 High |
-| WebShop | 5 | 3 | 2 | 2 Mid + 1 High |
+| ALFWorld | 10 | 6 | 2 | 6 Mid + 2 High |
+| WebShop | 5 | 3 | 2 | 3 Mid + 2 High |
 
 The top ALFWorld path has positive support `0.286`, negative support `0`, and score `3.589`. The top WebShop path has positive support `0.5`, negative support `0`, and score `6.561`.
 
-All six GPT-5.4 calls returned valid constrained tool payloads after using `tool_choice="required"`, which is compatible with the configured proxy. The named-function `tool_choice` form was rejected by that proxy on a High render and is not used.
+All 13 persisted card calls returned valid constrained tool payloads after using `tool_choice="required"`, which is compatible with the configured proxy. The named-function `tool_choice` form was rejected by that proxy on a High render and is not used. The builder reuses cards only when their builder-owned membership or path order still matches, and atomically checkpoints each newly rendered card.
 
 WebShop's top path forms a coherent search, variant verification, and purchase strategy. The small ALFWorld pilot produced a broader top path that combines a heat-and-discard behavior with a subsequent placement behavior. The renderer correctly preserved that structure. High path quality should therefore be judged again after expanding the Flash training trajectory pool; renderer text must not be used to repair structural evidence.
 

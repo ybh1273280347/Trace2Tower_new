@@ -11,8 +11,8 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-
 from rollout_no_skill_train import load_yaml, write_json
+
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.segmentation import segment_alfworld_trajectory
@@ -113,6 +113,8 @@ async def main(options: argparse.Namespace) -> None:
             {
                 "run_id": trajectory.run_id,
                 "benchmark": trajectory.benchmark.value,
+                "split": trajectory.split.value,
+                "trajectory_method": trajectory.method.value,
                 "trajectory_id": trajectory.trajectory_id,
                 "sample_id": trajectory.sample_id,
                 "repeat_id": trajectory.repeat_id,
