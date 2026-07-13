@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from enum import StrEnum
+from typing import Any
 
 from trace2tower.checkpoint import EpisodeCheckpoint, EpisodeKey
 from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
@@ -69,6 +70,8 @@ class EpisodeResult:
                 raise ValueError("ALFWorld score and success disagree")
         if self.benchmark is Benchmark.WEBSHOP and self.success is not None:
             raise ValueError("WebShop result does not define binary success")
+        if self.error is not None:
+            raise ValueError("official episode results cannot contain errors")
 
     @property
     def episode_key(self) -> EpisodeKey:
@@ -84,6 +87,43 @@ class EpisodeResult:
         record = asdict(self)
         record["skill_ids"] = list(self.skill_ids)
         return record
+
+    @classmethod
+    def from_record(cls, record: dict[str, Any]) -> EpisodeResult:
+        success = record.get("success")
+        return cls(
+            run_id=str(record["run_id"]),
+            benchmark=Benchmark(record["benchmark"]),
+            split=ExperimentSplit(record["split"]),
+            method=MethodName(record["method"]),
+            sample_id=str(record["sample_id"]),
+            repeat_id=int(record["repeat_id"]),
+            shard_id=int(record["shard_id"]),
+            primary_score=float(record["primary_score"]),
+            success=bool(success) if success is not None else None,
+            steps=int(record["steps"]),
+            invalid_actions=int(record["invalid_actions"]),
+            finish_reason=FinishReason(record["finish_reason"]),
+            input_tokens=(
+                int(record["input_tokens"])
+                if record.get("input_tokens") is not None
+                else None
+            ),
+            output_tokens=(
+                int(record["output_tokens"])
+                if record.get("output_tokens") is not None
+                else None
+            ),
+            billable_tokens=(
+                int(record["billable_tokens"])
+                if record.get("billable_tokens") is not None
+                else None
+            ),
+            latency_ms=int(record["latency_ms"]),
+            skill_ids=tuple(record.get("skill_ids", ())),
+            skill_context_chars=int(record["skill_context_chars"]),
+            error=record.get("error"),
+        )
 
 
 class EpisodeResultWriter:
