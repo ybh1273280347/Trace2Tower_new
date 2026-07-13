@@ -123,12 +123,41 @@ def test_library_round_trip_and_content_id_reject_tampering() -> None:
         FlatSkillLibrary.from_record(record)
 
 
-def test_flat_retrieval_returns_fixed_top_three_with_stable_order() -> None:
+def test_flat_retrieval_applies_relative_filter_and_near_duplicate_removal() -> None:
     current = library()
     cards = {item.skill_id: item for item in current.cards}
     result = retrieve_flat_skills((1.0, 0.0), current.index, cards)
-    assert result.skill_ids == ("flat_0", "flat_1", "flat_2")
-    assert result.context.count("## Skill:") == 3
+    assert tuple(match.skill_id for match in result.candidate_matches) == (
+        "flat_0",
+        "flat_1",
+        "flat_2",
+    )
+    assert tuple(match.skill_id for match in result.filtered_matches) == (
+        "flat_0",
+        "flat_1",
+    )
+    assert tuple(match.skill_id for match in result.deduplicated_matches) == ("flat_0",)
+    assert result.skill_ids == ("flat_0",)
+    assert result.context.count("## Skill:") == 1
+
+
+def test_flat_retrieval_uses_mmr_to_prefer_diversity() -> None:
+    cards = tuple(card(index) for index in range(3))
+    index = SkillEmbeddingIndex(
+        tuple(item.skill_id for item in cards),
+        ((0.8, 0.6), (0.94, 0.341), (0.93, -0.368)),
+        tuple(chr(98 + index) * 64 for index in range(3)),
+    )
+    result = retrieve_flat_skills(
+        (1.0, 0.0),
+        index,
+        {item.skill_id: item for item in cards},
+        relative_margin=0.2,
+        dedup_similarity_threshold=1.0,
+        mmr_lambda=0.0,
+        max_skills=2,
+    )
+    assert result.skill_ids == ("flat_1", "flat_2")
 
 
 def test_flat_provider_reports_query_embedding_cost() -> None:
@@ -140,5 +169,5 @@ def test_flat_provider_reports_query_embedding_cost() -> None:
     selection = asyncio.run(
         FlatSkillProvider(FakeEmbeddingRuntime(), library()).select("goal", "initial")
     )
-    assert selection.skill_ids == ("flat_0", "flat_1", "flat_2")
+    assert selection.skill_ids == ("flat_0",)
     assert selection.model_input_tokens == 11

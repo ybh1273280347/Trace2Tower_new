@@ -139,10 +139,19 @@ def create_provider(
     method_config: dict,
 ):
     if artifact.method is MethodName.FLAT_SKILL_SUMMARY:
+        retrieval_strategy = method_config.get("retrieval_strategy", "diverse")
         return FlatSkillProvider.from_path(
             runtime,
             artifact.path,
-            top_k=int(method_config["flat_top_k"]),
+            candidate_top_k=int(method_config.get("flat_candidate_top_k", 100)),
+            similarity_threshold=float(method_config.get("flat_similarity_threshold", 0.45)),
+            relative_margin=float(method_config.get("flat_relative_margin", 0.08)),
+            dedup_similarity_threshold=float(
+                method_config.get("flat_dedup_similarity_threshold", 0.95)
+            ),
+            mmr_lambda=float(method_config.get("flat_mmr_lambda", 0.75)),
+            max_skills=int(method_config["flat_top_k"]),
+            retrieval_strategy=retrieval_strategy,
         )
     if artifact.method is MethodName.SKILLX:
         schemas = environment_type(artifact.benchmark).tool_schemas
@@ -157,6 +166,7 @@ def create_provider(
             max_skills=int(method_config["max_skills"]),
         )
     if artifact.method is MethodName.TRACE2TOWER_STATIC:
+        diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
         provider = Trace2TowerSkillProvider.from_path(
             runtime,
             artifact.path,
@@ -166,6 +176,23 @@ def create_provider(
             include_high_child_context=method_config[
                 "include_high_child_context"
             ],
+            direct_mid_candidate_top_k=(
+                int(method_config["direct_mid_candidate_top_k"])
+                if diverse
+                else None
+            ),
+            direct_mid_similarity_threshold=float(
+                method_config.get("direct_mid_similarity_threshold", 0.45)
+            ),
+            direct_mid_relative_margin=float(
+                method_config.get("direct_mid_relative_margin", 0.08)
+            ),
+            direct_mid_dedup_similarity_threshold=float(
+                method_config.get("direct_mid_dedup_similarity_threshold", 0.95)
+            ),
+            direct_mid_mmr_lambda=float(
+                method_config.get("direct_mid_mmr_lambda", 0.75)
+            ),
         )
         if (
             provider.snapshot.config.high_top_k != int(method_config["high_top_k"])
@@ -332,7 +359,10 @@ async def main(options: argparse.Namespace) -> int:
         benchmark: load_yaml(options.config_root / f"{benchmark}.yaml")
         for benchmark in Benchmark
     }
-    method_config = load_yaml(options.config_root / METHOD_CONFIG_FILES[method])
+    method_config = load_yaml(
+        getattr(options, "method_config", None)
+        or options.config_root / METHOD_CONFIG_FILES[method]
+    )
     no_skill_config = load_yaml(options.config_root / "no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")
@@ -501,6 +531,7 @@ if __name__ == "__main__":
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--agent-model")
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
+    parser.add_argument("--method-config", type=Path)
     parser.add_argument("--env", type=Path, default=Path(".env"))
     parser.add_argument("--dry-run", action="store_true")
     raise SystemExit(asyncio.run(main(parser.parse_args())))

@@ -1,0 +1,11 @@
+method: trace2tower_static
+retrieval_strategy: diverse
+high_top_k: 1
+direct_mid_top_k: 8
+high_similarity_threshold: 0.45
+include_high_child_context: false
+direct_mid_candidate_top_k: 100
+direct_mid_similarity_threshold: 0.45
+direct_mid_relative_margin: 0.08
+direct_mid_dedup_similarity_threshold: 0.95
+direct_mid_mmr_lambda: 0.75

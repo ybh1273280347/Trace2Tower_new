@@ -17,6 +17,11 @@ class Trace2TowerSkillProvider:
         *,
         high_similarity_threshold: float = -1.0,
         include_high_child_context: bool = True,
+        direct_mid_candidate_top_k: int | None = None,
+        direct_mid_similarity_threshold: float = 0.45,
+        direct_mid_relative_margin: float = 0.08,
+        direct_mid_dedup_similarity_threshold: float = 0.95,
+        direct_mid_mmr_lambda: float = 0.75,
     ):
         snapshot.require_complete()
         if not -1 <= high_similarity_threshold <= 1:
@@ -27,6 +32,11 @@ class Trace2TowerSkillProvider:
         self.snapshot = snapshot
         self.high_similarity_threshold = high_similarity_threshold
         self.include_high_child_context = include_high_child_context
+        self.direct_mid_candidate_top_k = direct_mid_candidate_top_k
+        self.direct_mid_similarity_threshold = direct_mid_similarity_threshold
+        self.direct_mid_relative_margin = direct_mid_relative_margin
+        self.direct_mid_dedup_similarity_threshold = direct_mid_dedup_similarity_threshold
+        self.direct_mid_mmr_lambda = direct_mid_mmr_lambda
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
@@ -35,16 +45,13 @@ class Trace2TowerSkillProvider:
         cls,
         runtime: CommonLLMRuntime,
         snapshot_path: Path,
-        *,
-        high_similarity_threshold: float = -1.0,
-        include_high_child_context: bool = True,
+        **kwargs,
     ) -> Trace2TowerSkillProvider:
         payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
         return cls(
             runtime,
             TowerSnapshot.from_record(payload),
-            high_similarity_threshold=high_similarity_threshold,
-            include_high_child_context=include_high_child_context,
+            **kwargs,
         )
 
     async def select(self, task_goal: str, initial_observation: str) -> SkillSelection:
@@ -62,6 +69,11 @@ class Trace2TowerSkillProvider:
             direct_mid_top_k=self.snapshot.config.direct_mid_top_k,
             high_similarity_threshold=self.high_similarity_threshold,
             include_high_child_context=self.include_high_child_context,
+            direct_mid_candidate_top_k=self.direct_mid_candidate_top_k,
+            direct_mid_similarity_threshold=self.direct_mid_similarity_threshold,
+            direct_mid_relative_margin=self.direct_mid_relative_margin,
+            direct_mid_dedup_similarity_threshold=self.direct_mid_dedup_similarity_threshold,
+            direct_mid_mmr_lambda=self.direct_mid_mmr_lambda,
         )
         return SkillSelection(
             skill_ids=retrieval.skill_ids,

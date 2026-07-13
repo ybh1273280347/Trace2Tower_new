@@ -93,3 +93,25 @@ The event-stratified Full High, No High, and compact High variants were rerun on
 | Compact High | -0.0556 | [-0.1944, 0.0833] | -1.00 | +1,468.5 |
 
 Compact High is the least harmful event-stratified variant, but all three have negative mean reward and intervals crossing zero. No variant proceeds to fresh samples. The replicated result confirms that event purity and concise context are insufficient when reset-time retrieval supplies generic workflow guidance rather than task-specific experience.
+
+## Four-Rollout Experience Pool
+
+The 50 fixed WebShop training tasks were rerun independently with repeat IDs 0-3 using `deepseek-v4-flash`. Exact coverage is 200/200 trajectories with no execution errors. The pool contains 94 full successes, split 23/24/24/23 across repeats. This replaces the earlier 25-success evidence base for the new retrieval experiments.
+
+Two explicit evidence policies were materialized from the same pool. The SkillX-style success-only control contains all 94 full successes. The Trace2Tower mixed policy contains those 94 successes, 77 partial-reward failures, and two zero-reward failures whose task also has a successful repeat; 27 zero-reward trajectories without a successful same-task anchor are excluded. Every selection reason and excluded trajectory ID is recorded in the pool audit.
+
+Rendering and rollout use separate model roles. Flat, Mid, and High cards call `ModelRole.RENDERER`, bound to `gpt-5.4`; agent trajectories and validation call `ModelRole.AGENT`, bound to `deepseek-v4-flash`. New build reports persist `renderer_model` explicitly.
+
+## Pool And Retrieval Evaluation
+
+A held-out WebShop test evaluation used 50 tasks and three repeats per task. The Flat 2x2 experiment compared a four-card pool versus the new 94-card pool and legacy Top-3 versus staged retrieval. Direct paired effects show that pool expansion improves reward by `+0.0258` under legacy retrieval and `+0.0544` under staged retrieval. The latter 95% task-bootstrap interval is `[+0.0060, +0.1139]`, establishing that the larger pool is useful when retrieval can exploit it.
+
+The initial staged version selected up to eight cards and failed on 100 additional held-out tasks: `-0.0404` reward versus Top-3, with CI `[-0.0795, -0.0059]`. A GPT-5.4 self-filter reduced context but did not recover the Top-3 reward. The accepted staged configuration therefore caps selection at three cards while retaining Top-100 candidates, absolute threshold 0.45, best-relative margin 0.08, pairwise deduplication above 0.95, and MMR relevance weight 0.75.
+
+Across 150 held-out tasks and 450 paired episodes, staged-cap3 versus legacy Top-3 has reward difference `+0.0035`, CI `[-0.0263, +0.0327]`. It reduces mean steps by 0.25, invalid actions by 0.064, and reported input tokens by 1,335 per episode. The claim is behavioral equivalence with lower execution cost, not a proven reward improvement.
+
+## Informative Failure Ablation
+
+High-path support is counted by distinct task separately within positive and negative evidence, so multiple repeats cannot inflate support. With a 10% positive-task threshold, the success-only Tower has 16 Mid and 26 High skills; the mixed Tower has 19 Mid and 17 High skills because negative evidence removes unsupported paths. Both complete snapshots use GPT-5.4-rendered cards and staged-cap3 direct retrieval.
+
+On the same held-out 50 tasks and three repeats, success-only Tower scores `-0.0298` versus NoSkill while mixed Tower scores `+0.0298`. Directly pairing mixed against success-only yields `+0.0596`, CI `[+0.0087, +0.1201]`, 1.87 fewer steps, and 15,149 fewer reported input tokens per episode. This supports the project policy of prioritizing full successes while retaining failures with explicit contrastive value; it must not be conflated with the success-only SkillX control.

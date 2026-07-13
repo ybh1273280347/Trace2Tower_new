@@ -48,12 +48,24 @@ def mine_high_paths(
         raise ValueError("invalid High path mining configuration")
     sequences = trajectory_mid_sequences(records, clusters)
     records_by_id = {str(record["trajectory_id"]): record for record in records}
+    sample_by_trajectory = {
+        trajectory_id: str(record.get("sample_id", trajectory_id))
+        for trajectory_id, record in records_by_id.items()
+    }
     positive_ids = {
         trajectory_id
         for trajectory_id, record in records_by_id.items()
         if float(record["primary_score"]) >= success_threshold
     }
     negative_ids = set(records_by_id) - positive_ids
+    positive_samples = {
+        sample_by_trajectory[trajectory_id]
+        for trajectory_id in positive_ids
+    }
+    negative_samples = {
+        sample_by_trajectory[trajectory_id]
+        for trajectory_id in negative_ids
+    }
     supporting_ids: dict[tuple[str, ...], set[str]] = defaultdict(set)
     for trajectory_id, sequence in sequences.items():
         paths_in_trajectory = set()
@@ -67,10 +79,22 @@ def mine_high_paths(
 
     paths = []
     for ordered_mid_ids, trajectory_ids in supporting_ids.items():
-        positive_count = len(trajectory_ids & positive_ids)
-        negative_count = len(trajectory_ids & negative_ids)
-        positive_support = positive_count / len(positive_ids) if positive_ids else 0.0
-        negative_support = negative_count / len(negative_ids) if negative_ids else 0.0
+        supporting_positive_samples = {
+            sample_by_trajectory[trajectory_id] for trajectory_id in trajectory_ids
+            if trajectory_id in positive_ids
+        }
+        supporting_negative_samples = {
+            sample_by_trajectory[trajectory_id] for trajectory_id in trajectory_ids
+            if trajectory_id in negative_ids
+        }
+        positive_count = len(supporting_positive_samples)
+        negative_count = len(supporting_negative_samples)
+        positive_support = (
+            positive_count / len(positive_samples) if positive_samples else 0.0
+        )
+        negative_support = (
+            negative_count / len(negative_samples) if negative_samples else 0.0
+        )
         if positive_support < min_support_ratio:
             continue
         contrastive_score = positive_support * math.log(

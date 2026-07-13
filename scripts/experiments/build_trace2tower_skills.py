@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 from dataclasses import asdict
 from pathlib import Path
 
@@ -184,6 +185,7 @@ async def main(options: argparse.Namespace) -> int:
         write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
 
     report = {
+        "renderer_model": os.environ["RENDERER_MODEL"],
         **invocation,
         "trajectory_count": len(records),
         "mid_cluster_count": len(mid_inputs),

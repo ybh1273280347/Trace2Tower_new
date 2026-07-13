@@ -5,6 +5,7 @@ import asyncio
 import glob
 import hashlib
 import json
+import os
 from dataclasses import asdict
 from pathlib import Path
 
@@ -155,17 +156,23 @@ async def main(options: argparse.Namespace) -> int:
             if card.skill_id not in reusable_vectors
         )
         text_by_id = dict(zip((card.skill_id for card in ordered_cards), texts, strict=True))
-        embedding = (
-            await runtime.embed([text_by_id[skill_id] for skill_id in missing_embedding_ids])
-            if missing_embedding_ids
-            else None
-        )
+        embedding_results = []
+        batch_size = int(common["embedding_batch_size"])
+        for offset in range(0, len(missing_embedding_ids), batch_size):
+            batch_ids = missing_embedding_ids[offset : offset + batch_size]
+            embedding_results.append(
+                await runtime.embed([text_by_id[skill_id] for skill_id in batch_ids])
+            )
     finally:
         await runtime.close()
     new_vectors = dict(
         zip(
             missing_embedding_ids,
-            embedding.vectors if embedding else (),
+            (
+                vector
+                for result in embedding_results
+                for vector in result.vectors
+            ),
             strict=True,
         )
     )
@@ -191,9 +198,14 @@ async def main(options: argparse.Namespace) -> int:
         "card_count": len(cards),
         "library_id": library.library_id,
         "prompt_sha256": prompt_sha256,
+        "renderer_model": os.environ["RENDERER_MODEL"],
         "reused_embedding_count": len(reusable_vectors),
         "new_embedding_count": len(missing_embedding_ids),
-        "embedding_input_tokens": embedding.usage.input_tokens if embedding else None,
+        "embedding_input_tokens": (
+            sum(result.usage.input_tokens or 0 for result in embedding_results)
+            if embedding_results
+            else None
+        ),
     }
     write_json(options.output_dir / "report.json", report)
     print(yaml.safe_dump(report, sort_keys=False))

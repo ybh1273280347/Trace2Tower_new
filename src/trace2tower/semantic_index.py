@@ -13,6 +13,14 @@ class SkillMatch:
 
 
 @dataclass(frozen=True, slots=True)
+class DiverseSkillMatches:
+    candidates: tuple[SkillMatch, ...]
+    filtered: tuple[SkillMatch, ...]
+    deduplicated: tuple[SkillMatch, ...]
+    selected: tuple[SkillMatch, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class SkillEmbeddingIndex:
     skill_ids: tuple[str, ...]
     vectors: tuple[tuple[float, ...], ...]
@@ -71,3 +79,83 @@ class SkillEmbeddingIndex:
         return tuple(
             SkillMatch(skill_id, float(score)) for skill_id, score in ranked[:count]
         )
+
+
+def diverse_search(
+    index: SkillEmbeddingIndex,
+    query_vector: Sequence[float],
+    *,
+    candidate_count: int,
+    similarity_threshold: float,
+    relative_margin: float,
+    dedup_similarity_threshold: float,
+    relevance_weight: float,
+    max_count: int,
+) -> DiverseSkillMatches:
+    if candidate_count <= 0 or max_count <= 0:
+        raise ValueError("diverse retrieval counts must be positive")
+    if not 0 <= similarity_threshold <= 1:
+        raise ValueError("similarity threshold must be between zero and one")
+    if not 0 <= relative_margin <= 2:
+        raise ValueError("relative margin must be between zero and two")
+    if not 0 <= dedup_similarity_threshold <= 1:
+        raise ValueError("deduplication threshold must be between zero and one")
+    if not 0 <= relevance_weight <= 1:
+        raise ValueError("MMR relevance weight must be between zero and one")
+
+    candidates = index.search(query_vector, candidate_count)
+    best_similarity = candidates[0].cosine_similarity if candidates else -1.0
+    filtered = tuple(
+        match
+        for match in candidates
+        if match.cosine_similarity >= similarity_threshold
+        and match.cosine_similarity >= best_similarity - relative_margin
+    )
+    vectors = dict(zip(index.skill_ids, index.vectors, strict=True))
+    deduplicated = []
+    for match in filtered:
+        if any(
+            _cosine(vectors[match.skill_id], vectors[item.skill_id])
+            > dedup_similarity_threshold
+            for item in deduplicated
+        ):
+            continue
+        deduplicated.append(match)
+
+    remaining = list(deduplicated)
+    selected = []
+    while remaining and len(selected) < max_count:
+        ranked = sorted(
+            remaining,
+            key=lambda match: (
+                -_mmr_score(match, selected, vectors, relevance_weight),
+                -match.cosine_similarity,
+                match.skill_id,
+            ),
+        )
+        selected.append(ranked[0])
+        remaining.remove(ranked[0])
+    return DiverseSkillMatches(candidates, filtered, tuple(deduplicated), tuple(selected))
+
+
+def _mmr_score(
+    match: SkillMatch,
+    selected: list[SkillMatch],
+    vectors: Mapping[str, tuple[float, ...]],
+    relevance_weight: float,
+) -> float:
+    redundancy = max(
+        (
+            _cosine(vectors[match.skill_id], vectors[item.skill_id])
+            for item in selected
+        ),
+        default=0.0,
+    )
+    return relevance_weight * match.cosine_similarity - (1 - relevance_weight) * redundancy
+
+
+def _cosine(left: Sequence[float], right: Sequence[float]) -> float:
+    left_vector = np.asarray(left, dtype=np.float64)
+    right_vector = np.asarray(right, dtype=np.float64)
+    denominator = np.linalg.norm(left_vector) * np.linalg.norm(right_vector)
+    return float(left_vector @ right_vector / denominator) if denominator else -1.0
