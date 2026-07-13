@@ -37,6 +37,13 @@ def file_hashes(paths: list[Path]) -> dict[str, str]:
     }
 
 
+def result_paths(run_root: Path) -> list[Path]:
+    paths = sorted(run_root.glob("shard-*/results.jsonl"))
+    if not paths:
+        raise FileNotFoundError(f"no result shards found under {run_root}")
+    return paths
+
+
 def main(options: argparse.Namespace) -> int:
     config = load_yaml(options.config)
     expected_config = {
@@ -57,11 +64,30 @@ def main(options: argparse.Namespace) -> int:
         **{cluster.cluster_id: SkillLevel.MID for cluster in tower.mid_clusters},
         **{path.path_id: SkillLevel.HIGH for path in tower.high_paths},
     }
-    baseline = read_results(options.baseline_results)
-    skill = read_results(options.skill_results)
+    baseline_results = (
+        result_paths(options.baseline_run_root)
+        if options.baseline_run_root
+        else options.baseline_results
+    )
+    skill_results = (
+        result_paths(options.skill_run_root)
+        if options.skill_run_root
+        else options.skill_results
+    )
+    if not baseline_results or not skill_results:
+        raise ValueError("baseline and skill results are required")
+    baseline = read_results(baseline_results)
+    skill = read_results(skill_results)
+    baseline_metadata_paths = (
+        [options.baseline_matrix_metadata]
+        if options.baseline_matrix_metadata
+        else options.baseline_run_metadata
+    )
+    if not baseline_metadata_paths:
+        raise ValueError("baseline run metadata is required")
     baseline_metadata = [
         json.loads(path.read_text(encoding="utf-8"))
-        for path in options.baseline_run_metadata
+        for path in baseline_metadata_paths
     ]
     skill_report = json.loads(options.skill_run_report.read_text(encoding="utf-8"))
     execution_contract = validate_execution_contract(
@@ -90,8 +116,8 @@ def main(options: argparse.Namespace) -> int:
                 options.skill_run_report.read_bytes()
             ).hexdigest(),
         },
-        "baseline_result_hashes": file_hashes(options.baseline_results),
-        "skill_result_hashes": file_hashes(options.skill_results),
+        "baseline_result_hashes": file_hashes(baseline_results),
+        "skill_result_hashes": file_hashes(skill_results),
         "audit": audit.to_record(),
         "paired_episode_evidence": [
             evidence.to_record()
@@ -136,11 +162,14 @@ def main(options: argparse.Namespace) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--tower", type=Path, required=True)
-    parser.add_argument("--baseline-results", type=Path, nargs="+", required=True)
-    parser.add_argument("--skill-results", type=Path, nargs="+", required=True)
+    parser.add_argument("--baseline-results", type=Path, nargs="+")
+    parser.add_argument("--skill-results", type=Path, nargs="+")
+    parser.add_argument("--baseline-run-root", type=Path)
+    parser.add_argument("--skill-run-root", type=Path)
     parser.add_argument(
-        "--baseline-run-metadata", type=Path, nargs="+", required=True
+        "--baseline-run-metadata", type=Path, nargs="+"
     )
+    parser.add_argument("--baseline-matrix-metadata", type=Path)
     parser.add_argument("--skill-run-report", type=Path, required=True)
     parser.add_argument(
         "--config",
