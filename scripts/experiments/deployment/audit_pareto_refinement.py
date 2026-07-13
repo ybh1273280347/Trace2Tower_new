@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 import yaml
-from rollout_no_skill_train import load_yaml, write_json
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
 from trace2tower.methods.trace2tower.refinement import (
     RefinementEpisode,

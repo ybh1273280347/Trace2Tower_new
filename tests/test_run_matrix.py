@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 import pytest
@@ -15,12 +14,10 @@ from trace2tower.results import MethodName
 from trace2tower.semantic_index import SkillEmbeddingIndex
 
 
-def matrix_module():
-    scripts_path = str(Path("scripts/experiments").resolve())
-    if scripts_path not in sys.path:
-        sys.path.insert(0, scripts_path)
-    import run_matrix
+from scripts.experiments.run import run_matrix
 
+
+def matrix_module():
     return run_matrix
 
 

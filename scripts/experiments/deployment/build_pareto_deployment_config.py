@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from rollout_no_skill_train import load_yaml, write_yaml
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_yaml
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
 
 

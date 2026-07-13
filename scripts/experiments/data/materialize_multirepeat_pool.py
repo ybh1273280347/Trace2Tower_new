@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 
 import yaml
-from rollout_no_skill_train import write_json
+from scripts.experiments.run.rollout_no_skill_train import write_json
 
 from trace2tower.manifests import Benchmark, ExperimentSplit
 from trace2tower.results import MethodName

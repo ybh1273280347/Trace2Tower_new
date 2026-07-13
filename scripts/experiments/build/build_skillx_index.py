@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 
 import yaml
-from check_skillx_upstream import inspect_skillx
+from scripts.experiments.analyze.check_skillx_upstream import inspect_skillx
 from dotenv import load_dotenv
-from rollout_no_skill_train import load_yaml, write_json
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark

@@ -210,4 +210,4 @@ WebShop 实验线至此冻结。正式配置为 Success-only Tower、diverse dir
 
 冻结后允许的操作只有：从现有原始结果复算统计、审计哈希、修正文档错误，以及不改变结论的可复现性维护。不得再根据 WebShop 验证或 Random-300 结果选择新的 cap、prompt、evidence、检索策略或 artifact；任何新方法开发应转移到其他 benchmark 或建立全新、预注册且与本封版证据隔离的数据协议。
 
-机器可读冻结清单见 `freeze-manifest.json`，可在仓库根目录运行 `.venv\Scripts\python.exe scripts/experiments/freeze_webshop.py --verify` 复核。正式数字的详细配对统计见 [WebShop Random-300 正式测试报告](final-random300-report.md)，机制细节见 [WebShop Mid-only 机制消融](mid-only-ablation.md)，SkillX 复现边界见 [SkillX Baseline](../../baselines/skillx.md)。
+机器可读冻结清单见 `freeze-manifest.json`，可在仓库根目录运行 `uv run python -m scripts.experiments.freeze.freeze_webshop --verify` 复核。正式数字的详细配对统计见 [WebShop Random-300 正式测试报告](final-random300-report.md)，机制细节见 [WebShop Mid-only 机制消融](mid-only-ablation.md)，SkillX 复现边界见 [SkillX Baseline](../../baselines/skillx.md)。

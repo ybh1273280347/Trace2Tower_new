@@ -9,7 +9,7 @@ import yaml
 
 from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
 
-from rollout_no_skill_train import write_json
+from scripts.experiments.run.rollout_no_skill_train import write_json
 
 
 def main(options: argparse.Namespace) -> int:

@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import pytest
 
 
-def extension_module():
-    scripts_path = str(Path("scripts/experiments").resolve())
-    if scripts_path not in sys.path:
-        sys.path.insert(0, scripts_path)
-    import extend_no_skill_pool
+from scripts.experiments.run import extend_no_skill_pool
 
+
+def extension_module():
     return extend_no_skill_pool
 
 

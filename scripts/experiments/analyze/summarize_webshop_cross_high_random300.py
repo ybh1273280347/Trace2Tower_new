@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from summarize_webshop_final_random300 import (
+from scripts.experiments.analyze.summarize_webshop_final_random300 import (
     BOOTSTRAP_SEED,
     Condition,
     aggregate,

@@ -5,8 +5,8 @@ from pathlib import Path
 
 import yaml
 
-from rollout_no_skill_train import load_yaml, write_json
-from run_matrix import parse_shard_ids
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
+from scripts.experiments.run.run_matrix import parse_shard_ids
 from trace2tower.manifests import Benchmark, read_manifest
 from trace2tower.results import MethodName
 from trace2tower.trajectory_pool import audit_training_shard

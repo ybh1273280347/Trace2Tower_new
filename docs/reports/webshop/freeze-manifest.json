@@ -1809,16 +1809,16 @@
       "sha256": "cd3a79d4ee8a0a112f2d0959f32589ccd9917a076f08718193b763759b1d0064"
     },
     {
-      "path": "scripts/experiments/summarize_webshop_final_random300.py",
+      "path": "scripts/experiments/analyze/summarize_webshop_final_random300.py",
       "sha256": "0cc86955fb710a1bccae18ce37e6bb7faace414276aca7e46d25c1a96ceebe2a"
     },
     {
-      "path": "scripts/experiments/summarize_webshop_cross_high_random300.py",
-      "sha256": "495577c1ef6838dd4fac34b11f02f770c8003158c007ca0871c2975c0a5f1bb0"
+      "path": "scripts/experiments/analyze/summarize_webshop_cross_high_random300.py",
+      "sha256": "163535fa5b4d608dec82adcb1f6d6be15894804935e238fddc866bfa249f1509"
     },
     {
-      "path": "scripts/experiments/freeze_webshop.py",
-      "sha256": "86ea72358f14d26eadb85217390b1640fcfb3843e5942f3b029896d573130932"
+      "path": "scripts/experiments/freeze/freeze_webshop.py",
+      "sha256": "4f07a5b3ce9802e95cf5702f8f2b1ddf4d5fb43b1e75361f909fd886bd95c806"
     },
     {
       "path": "docs/protocols/webshop-validation-and-final-test.md",
@@ -1838,7 +1838,7 @@
     },
     {
       "path": "docs/reports/webshop/complete-experiment-report.md",
-      "sha256": "46373a201a9893244b8e17dec84b3e5ba01fce1fbff6e1013fee051778ca55af"
+      "sha256": "5d787e866881d9985a84231183701c2e99c2663ddc5da59d192c8744cbb7def4"
     }
   ]
 }

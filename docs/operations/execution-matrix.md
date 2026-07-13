@@ -2,7 +2,7 @@
 
 ## Executable Methods
 
-`scripts/experiments/run_matrix.py` currently exposes only methods with a verified execution provider and a complete artifact boundary:
+`scripts.experiments.run.run_matrix` currently exposes only methods with a verified execution provider and a complete artifact boundary:
 
 - `no_skill`
 - `flat_skill_summary`

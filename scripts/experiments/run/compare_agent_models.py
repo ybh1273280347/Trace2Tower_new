@@ -9,7 +9,12 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from rollout_no_skill_train import collect_benchmark, load_yaml, write_json, write_yaml
+from scripts.experiments.run.rollout_no_skill_train import (
+    collect_benchmark,
+    load_yaml,
+    write_json,
+    write_yaml,
+)
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.trajectory import TrajectoryReader

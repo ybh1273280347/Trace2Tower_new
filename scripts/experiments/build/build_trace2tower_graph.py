@@ -9,7 +9,7 @@ import numpy as np
 import yaml
 from scipy import sparse
 
-from rollout_no_skill_train import load_yaml, write_json
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.graph import build_graph, ordered_segment_groups
 from trace2tower.methods.trace2tower.models import SegmentInstance

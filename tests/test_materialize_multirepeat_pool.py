@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -10,8 +9,9 @@ from trace2tower.manifests import Benchmark, ExperimentSplit
 from trace2tower.results import FinishReason, MethodName
 from trace2tower.trajectory import EpisodeTrajectory
 
-sys.path.insert(0, str(Path("scripts/experiments").resolve()))
-from materialize_multirepeat_pool import validate_multirepeat_pool
+from scripts.experiments.data.materialize_multirepeat_pool import (
+    validate_multirepeat_pool,
+)
 
 
 def trajectory(sample_id: str, repeat_id: int, run_id: str = "source") -> EpisodeTrajectory:

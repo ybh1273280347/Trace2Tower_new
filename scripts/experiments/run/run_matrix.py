@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from rollout_no_skill_train import load_yaml, write_json, write_yaml
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json, write_yaml
 
 from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment

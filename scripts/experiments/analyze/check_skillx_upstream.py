@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 import yaml
-from rollout_no_skill_train import write_json
+from scripts.experiments.run.rollout_no_skill_train import write_json
 
 EXPECTED_COMMIT = "36747f424a17ea041e476adf2ff976a206ec9c30"
 PROTECTED_FILES = (

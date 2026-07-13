@@ -2,7 +2,7 @@
 
 ## Extension Contract
 
-The original five-episode `deepseek-v4-flash` pilot was extended in place to 20 episodes with `scripts/experiments/extend_no_skill_pool.py`. The extension preserves the original run ID, model, benchmark, method, shard assignment, agent execution settings, and trajectory pool. Before making provider calls it audits the existing prefix, checks the immutable pilot configuration hash, and requires the requested target to grow within the selected shard. After execution it requires exact result and trajectory coverage before writing an extension report.
+The original five-episode `deepseek-v4-flash` pilot was extended in place to 20 episodes with `scripts.experiments.run.extend_no_skill_pool`. The extension preserves the original run ID, model, benchmark, method, shard assignment, agent execution settings, and trajectory pool. Before making provider calls it audits the existing prefix, checks the immutable pilot configuration hash, and requires the requested target to grow within the selected shard. After execution it requires exact result and trajectory coverage before writing an extension report.
 
 The shard-0 extension selected 20 WebShop training episodes, skipped the five already complete episodes, completed 15 new episodes, and recorded no failures or coverage gaps. The resulting trajectory pool SHA-256 is `7dfc8680c08c33bf90908d8a5b871a1009a9bd44b8dc65bf49e1e92bc9e82136`.
 

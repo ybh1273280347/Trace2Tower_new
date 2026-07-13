@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from rollout_no_skill_train import load_yaml, write_json
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
