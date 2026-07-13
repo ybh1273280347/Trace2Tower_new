@@ -16,13 +16,17 @@ class Trace2TowerSkillProvider:
         snapshot: TowerSnapshot,
         *,
         high_similarity_threshold: float = -1.0,
+        include_high_child_context: bool = True,
     ):
         snapshot.require_complete()
         if not -1 <= high_similarity_threshold <= 1:
             raise ValueError("High similarity threshold must be in [-1, 1]")
+        if not isinstance(include_high_child_context, bool):
+            raise ValueError("High child context switch must be boolean")
         self.runtime = runtime
         self.snapshot = snapshot
         self.high_similarity_threshold = high_similarity_threshold
+        self.include_high_child_context = include_high_child_context
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
@@ -33,12 +37,14 @@ class Trace2TowerSkillProvider:
         snapshot_path: Path,
         *,
         high_similarity_threshold: float = -1.0,
+        include_high_child_context: bool = True,
     ) -> Trace2TowerSkillProvider:
         payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
         return cls(
             runtime,
             TowerSnapshot.from_record(payload),
             high_similarity_threshold=high_similarity_threshold,
+            include_high_child_context=include_high_child_context,
         )
 
     async def select(self, task_goal: str, initial_observation: str) -> SkillSelection:
@@ -55,6 +61,7 @@ class Trace2TowerSkillProvider:
             high_top_k=self.snapshot.config.high_top_k,
             direct_mid_top_k=self.snapshot.config.direct_mid_top_k,
             high_similarity_threshold=self.high_similarity_threshold,
+            include_high_child_context=self.include_high_child_context,
         )
         return SkillSelection(
             skill_ids=retrieval.skill_ids,

@@ -29,9 +29,12 @@ def retrieve_tower(
     high_top_k: int = 1,
     direct_mid_top_k: int = 2,
     high_similarity_threshold: float = -1.0,
+    include_high_child_context: bool = True,
 ) -> TowerRetrieval:
     if not -1 <= high_similarity_threshold <= 1:
         raise ValueError("High similarity threshold must be in [-1, 1]")
+    if not isinstance(include_high_child_context, bool):
+        raise ValueError("High child context switch must be boolean")
     missing_high_cards = set(high_index.skill_ids) - set(high_cards)
     missing_mid_cards = set(mid_index.skill_ids) - set(mid_cards)
     if missing_high_cards or missing_mid_cards:
@@ -52,6 +55,12 @@ def retrieve_tower(
     ordered_mid_ids = (*high_card.ordered_mid_ids, *direct_mid_ids) if high_card else direct_mid_ids
     unique_mid_ids = tuple(dict.fromkeys(ordered_mid_ids))
     selected_mid_cards = tuple(mid_cards[mid_id] for mid_id in unique_mid_ids)
+    context_mid_ids = (
+        unique_mid_ids
+        if include_high_child_context or not high_card
+        else tuple(dict.fromkeys(direct_mid_ids))
+    )
+    context_mid_cards = tuple(mid_cards[mid_id] for mid_id in context_mid_ids)
     skill_ids = (
         ((high_card.skill_id,) if high_card else ())
         + tuple(card.skill_id for card in selected_mid_cards)
@@ -63,7 +72,7 @@ def retrieve_tower(
         high_match=high_match,
         direct_mid_matches=direct_mid_matches,
         skill_ids=skill_ids,
-        context=format_tower_context(high_card, selected_mid_cards),
+        context=format_tower_context(high_card, context_mid_cards),
     )
 
 

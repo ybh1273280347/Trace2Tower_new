@@ -157,6 +157,9 @@ def create_provider(
             high_similarity_threshold=float(
                 method_config["high_similarity_threshold"]
             ),
+            include_high_child_context=method_config[
+                "include_high_child_context"
+            ],
         )
         if (
             provider.snapshot.config.high_top_k != int(method_config["high_top_k"])

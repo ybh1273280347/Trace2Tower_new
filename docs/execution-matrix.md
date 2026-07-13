@@ -17,6 +17,8 @@ Static High retrieval additionally accepts an execution-time cosine threshold re
 
 The optional WebShop event-stratified Tower is executable through the same Static provider because its graph-build choice and complete provenance are embedded in the content-addressed snapshot. It is not the selected default artifact: despite pure stage cards, its four-task calibration failed before fresh validation.
 
+Static execution also records whether High child-card bodies are included in model-visible context. Disabling them never removes proof IDs from episode results. The default is enabled because the compact-context calibration did not establish behavioral equivalence.
+
 All methods use the frozen `deepseek-v4-flash` agent policy unless an explicit diagnostic override is recorded. Credentials are loaded from `.env` only for real execution.
 
 ## Execution And Recovery

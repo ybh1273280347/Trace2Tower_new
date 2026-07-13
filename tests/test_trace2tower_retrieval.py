@@ -58,6 +58,40 @@ def test_retrieval_expands_high_then_deduplicates_direct_mid() -> None:
     assert "high_a" not in result.context
 
 
+def test_retrieval_can_omit_high_child_body_without_dropping_proof_ids() -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b", "mid_c")}
+    high = HighSkillCard(
+        "high_a",
+        ("mid_b", "mid_c"),
+        "Combined strategy",
+        "Use for the combined task.",
+        ("Execute children in order.",),
+    )
+    result = retrieve_tower(
+        (1.0, 0.0),
+        (1.0, 0.0),
+        SkillEmbeddingIndex(("high_a",), ((1.0, 0.0),)),
+        SkillEmbeddingIndex(
+            ("mid_a", "mid_b", "mid_c"),
+            ((1.0, 0.0), (0.9, 0.1), (0.0, 1.0)),
+        ),
+        {"high_a": high},
+        mids,
+        direct_mid_top_k=1,
+        include_high_child_context=False,
+    )
+    assert result.skill_ids == ("high_a", "mid_b", "mid_c", "mid_a")
+    assert tuple(card.skill_id for card in result.mid_cards) == (
+        "mid_b",
+        "mid_c",
+        "mid_a",
+    )
+    assert "Combined strategy" in result.context
+    assert "Name mid_a" in result.context
+    assert "Name mid_b" not in result.context
+    assert "Name mid_c" not in result.context
+
+
 def test_retrieval_without_high_uses_direct_mid_only() -> None:
     mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
     result = retrieve_tower(

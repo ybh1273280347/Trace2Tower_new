@@ -73,3 +73,11 @@ On the same 50 trajectories, weighted event purity increased from `0.2161` to `1
 Four previously diagnosed samples formed a calibration-only quality check: one old Static win (`1019`), two losses (`1022`, `1027`), and one high-cost tie (`1012`). With High enabled, the event-stratified Tower selected the same generic High and six total skills on every task and scored `1.30` total reward versus the old Tower's `1.75`. Rejecting High reduced context from 5,856 to 2,159 characters and restored sample `1019`, but regressed sample `1012` to a 20-step zero-reward result; total reward was only `1.4167`.
 
 The event-stratified variant therefore proves and fixes the structural purity defect but fails the behavioral calibration gate under reset-time retrieval. It is not run on fresh validation samples and is not promoted. The evidence points to the remaining boundary: one-time retrieval at the generic WebShop search page selects the same broad strategy for unrelated goals, even when the underlying cards are structurally distinct.
+
+## Compact High Context Ablation
+
+Static retrieval now exposes an execution-time `include_high_child_context` switch. Disabling it preserves the High ID, every ordered child Mid ID, direct-Mid IDs, and the complete Tower; only the model-visible body omits child cards already summarized by the High procedure. The default remains enabled, so existing execution behavior is unchanged.
+
+On the four event-stratified calibration tasks, compact High context reduced injected text from 5,856 to 3,341 characters. Total reward nevertheless fell from the full event-stratified Tower's `1.30` to `1.25`, and sample `1019` regressed from completed reward `0.05` to a 20-step zero-reward result. Total reported input tokens changed only from 119,401 to 117,460 because the longer failed trajectory consumed the prefix repeatedly.
+
+The compact variant therefore fails before fresh validation. Child prose is redundant at the text level, but this single-run behavioral evidence does not prove it is valueless; the default retains it. The large path variation across otherwise close configurations also motivates replicated evaluation before further method promotion.
