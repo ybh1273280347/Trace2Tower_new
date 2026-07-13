@@ -202,16 +202,20 @@ class CommonLLMRuntime:
         if usage is None:
             return LLMUsage(None, None, None)
         details = getattr(usage, "prompt_tokens_details", None)
+        extra = getattr(usage, "model_extra", None)
         if isinstance(details, dict):
             cached_tokens = details.get("cached_tokens")
             cache_write_tokens = details.get("cache_write_tokens")
         else:
             cached_tokens = getattr(details, "cached_tokens", None)
             cache_write_tokens = getattr(details, "cache_write_tokens", None)
+        billable_tokens = getattr(usage, "billable_tokens", None)
+        if billable_tokens is None and isinstance(extra, dict):
+            billable_tokens = extra.get("billable_tokens")
         return LLMUsage(
             input_tokens=getattr(usage, "prompt_tokens", None),
             output_tokens=getattr(usage, "completion_tokens", None),
-            billable_tokens=None,
+            billable_tokens=billable_tokens,
             cached_input_tokens=cached_tokens,
             cache_write_input_tokens=cache_write_tokens,
         )

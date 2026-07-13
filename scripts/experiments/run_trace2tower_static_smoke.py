@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import os
 from dataclasses import asdict
 from pathlib import Path
 
@@ -92,6 +93,7 @@ async def main(options: argparse.Namespace) -> int:
         "benchmark": options.benchmark.value,
         "split": options.split.value,
         "method": MethodName.TRACE2TOWER_STATIC.value,
+        "agent_model": os.getenv("AGENT_MODEL"),
         "snapshot_id": provider.snapshot.snapshot_id,
         "summary": asdict(summary),
     }
