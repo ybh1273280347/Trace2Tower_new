@@ -185,3 +185,22 @@ Tower 的 cap 交互与 Flash 不同。对 Pro，success-only cap 8 相对 cap 3
 最值得保留的额外发现是模型与技能的交互，而不是“Pro 裸能力一定更强”。在完全相同的 150 个 episode key 上，Pro NoSkill 相对 Flash NoSkill 的 reward 差为 `-0.0486`，95% CI `[-0.1328, +0.0348]`；加入同一 Flat cap 3 技能后，Pro 相对 Flash 的差变为 `+0.0329`，CI `[-0.0210, +0.0926]`。以每个任务三次重复均值做 task-cluster bootstrap，模型强度与 Flat 技能的差分中的差分为 `+0.0814`，95% CI `[+0.0021, +0.1613]`。这支持“强模型未必有更高 NoSkill 分数，但更能把检索到的成功经验转化为动作收益”的交互假设。
 
 该结论仍有边界：这里只比较两个 DeepSeek 端点、一个 WebShop holdout 和一个固定技能库；NoSkill 的跨模型差异区间仍跨零，不能声称 Pro 普遍弱于 Flash。可证明的是 Flat 的相对处理效应在 Pro 上显著高于 Flash，而不是模型能力存在一般性的反转。后续报告应同时给出 NoSkill 水位和 skill uplift，不能只按模型名推断经验学习能力。
+
+## 额外发现：Pro 的 High 收益依赖同源 Mid 上下文
+
+为定位 Pro 上 success-only cap 8 优势来自 Mid 还是 High，在相同 150 个 episode key 上增加了两组 Mid-only 消融。Mixed Mid-only reward 为 `0.6137`，相对 NoSkill `-0.0304`，CI `[-0.1233, +0.0601]`；success-only Mid-only reward 为 `0.6368`，相对 NoSkill `-0.0073`，CI `[-0.0921, +0.0724]`。因此单独增加八张直接 Mid 没有建立收益。
+
+在各自 Mid-only 基础上恢复 High 后，mixed 增加 `+0.0359` reward，CI `[-0.0217, +0.1022]`；success-only 增加 `+0.0798`，CI `[+0.0182, +0.1556]`，满分成功率增加 `+9.3%`，CI `[+2.0%, +18.0%]`。这修正了“mixed High 本身伤害 Pro”的初步解释：mixed High 相对自己的 Mid-only 方向为正，只是 success-only High 的增益更大。
+
+检索审计显示，两种 Full 条件的 150 个 episode 都命中同一个 `high_0fd729263b5f`，其结构均为 search、inspect、option selection、buy，支持轨迹、ordered Mid IDs 和结构分数完全一致。差异位于由各自证据池生成的 Mid 卡内容和独立渲染的 High 文本。为隔离两者，构造了两个通过完整 Tower 契约校验、具有独立内容 ID 和来源哈希的交叉快照，仅互换该 High 的卡片、向量和文本哈希：
+
+| Mid 来源 | High 来源 | Mean reward | 满分成功率 |
+|---|---|---:|---:|
+| Mixed | Mixed | 0.6496 | 44.7% |
+| Mixed | Success-only | 0.6538 | 46.7% |
+| Success-only | Mixed | 0.6527 | 42.7% |
+| Success-only | Success-only | 0.7166 | 50.7% |
+
+在 mixed Mid 上把 mixed High 换为 success-only High 只有 `+0.0042` reward，CI `[-0.0527, +0.0562]`；在 mixed High 下把 mixed Mid 换为 success-only Mid 只有 `+0.0031`，CI `[-0.0506, +0.0553]`。相反，在 success-only Mid 上使用同源 success-only High 带来 `+0.0639` reward，CI `[+0.0132, +0.1207]`，以及 `+8.0%` 满分成功率，CI `[+2.0%, +15.3%]`。Mid 来源与 High 来源的差分中的差分为 `+0.0597`，CI `[-0.0158, +0.1481]`，方向支持交互但区间仍跨零。
+
+因此当前最准确的机制结论是：Pro 的 success-only cap 8 优势不是来自可独立移植的一张通用 High 卡，而是来自 success-only Mid 与其同源 High 之间的语义兼容。Mixed 证据改变了 Mid 卡的边界和措辞，即使 High 的结构 ID 相同，单独替换 High 文本也不能恢复收益。对层级技能系统，父卡与子技能应作为联合契约评估；仅按 High 的结构支持或单卡质量筛选不足以预测执行收益。
