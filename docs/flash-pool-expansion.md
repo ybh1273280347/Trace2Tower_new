@@ -150,3 +150,16 @@ Mixed versus success-only is `+0.0079` reward with CI `[-0.0181, +0.0353]` and `
 全局配置仍选择 cap 3。对标准 success-only 控制，cap 3 比 cap 8 的满分成功率高 `4.3%`，95% CI `[0.7%, 9.0%]`，每个 episode 少约 7,053 个输入 token；mixed 从 cap 3 放宽到 cap 8 只增加 `1.7%` 满分成功率，区间下界为零，reward 区间仍跨零。为了 mixed 的局部趋势把所有方法统一放宽到 cap 8，会牺牲更稳定的 success-only 成功率和成本。因此 cap 3 是全局默认，mixed-cap8 保留为解释 mixed 潜力的专项消融，而不是默认执行配置。
 
 High 消融进一步表明，mixed 的正向趋势主要可能来自对比证据筛掉较弱 High：success-only 有 26 个 High，mixed 只有 17 个；加入 High 对 success-only 的 reward 方向为 `-0.0186`，对 mixed 为 `+0.0100`。两者区间仍跨零，所以当前不能声称 High 已被证明有效，只能说明 mixed 的潜在价值更可能位于“对高层路径做负证据过滤”，而不是简单增加更多 Mid。
+
+## 中文结论：Flat 对 NoSkill 的最终对照
+
+为了判断问题是否只来自 Tower 的层级构建算法，使用同一批 94 条满分成功经验构建的 Flat Skill staged-cap3，在未参与 Flat 参数选择的 WebShop test ID 150-199 上运行了三次重复。Flat 和已完成的 NoSkill 使用完全相同的 50 个任务与 150 个 episode key，均为完整覆盖且无未解决错误。
+
+| 方法 | 平均 reward | 满分成功率 | Completion | 平均步数 |
+|---|---:|---:|---:|---:|
+| NoSkill | 0.6927 | 48.0% | 92.0% | 7.11 |
+| Flat staged-cap3 | 0.6813 | 49.3% | 88.7% | 8.06 |
+
+Flat 相对 NoSkill 的 reward 差为 `-0.0113`，95% CI `[-0.0687, +0.0513]`；满分成功率差为 `+1.3%`，95% CI `[-6.0%, +8.7%]`。两种指标都不能证明 Flat 更强，同时 Flat 的 completion 更低、步数更多。
+
+因此，当前负结果不能只归因于 Tower 的聚类、High 路径或 mixed 证据算法：把相同成功经验改成更直接的 Flat 卡片后也没有稳定超过 NoSkill。更可能的共同瓶颈是 reset-time 一次性经验注入的迁移性、任务与经验的语义匹配精度，或经验文本干扰 DeepSeek 原本已较强的 WebShop 策略。Flat 满分成功率方向略正，说明经验并非被证明完全无效；准确结论是现有 Flat/Tower 都未在最终 holdout 上建立相对 NoSkill 的显著优势。
