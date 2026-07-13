@@ -95,8 +95,45 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
     assert result.skill_context_chars == len("retrieved context")
     assert result.input_tokens == 17
     assert result.output_tokens == 2
+    assert result.chat_input_tokens == 10
+    assert result.chat_output_tokens == 2
     assert "retrieved context" in runtime.messages[1]["content"]
     assert environment.closed
+
+
+def test_agent_chat_cost_does_not_include_retrieval_embedding_tokens(tmp_path: Path) -> None:
+    evaluator = AgentEvaluator(
+        FakeRuntime(),
+        TrajectoryWriter(tmp_path / "episodes"),
+        temperature=0,
+        max_output_tokens=128,
+    )
+    entry = ManifestEntry(
+        Benchmark.WEBSHOP,
+        ExperimentSplit.TRAIN,
+        "webshop:0",
+        0,
+        "goals",
+        0,
+    )
+
+    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
+        return SkillSelection(("mid_a",), "retrieved context", 7, 0)
+
+    result = asyncio.run(
+        evaluator.run_episode(
+            entry=entry,
+            environment=FakeEnvironment(),
+            run_id="chat-cost-smoke",
+            method=MethodName.TRACE2TOWER_STATIC,
+            skill_context=None,
+            shard_id=0,
+            max_steps=1,
+            skill_provider=select,
+        )
+    )
+    assert result.input_tokens == 17
+    assert result.chat_input_tokens + result.chat_output_tokens == 12
 
 
 def test_agent_can_use_explicit_renderer_endpoint_role(tmp_path: Path) -> None:

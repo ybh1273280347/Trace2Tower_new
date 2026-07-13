@@ -80,8 +80,12 @@ class AgentEvaluator:
             )
             input_tokens = selection.model_input_tokens or 0
             output_tokens = selection.model_output_tokens or 0
+            chat_input_tokens = 0
+            chat_output_tokens = 0
             input_usage_available = selection.model_input_tokens is not None
             output_usage_available = selection.model_output_tokens is not None
+            chat_input_usage_available = True
+            chat_output_usage_available = True
             messages = [
                 {
                     "role": "system",
@@ -110,12 +114,16 @@ class AgentEvaluator:
                 )
                 if llm_result.usage.input_tokens is None:
                     input_usage_available = False
+                    chat_input_usage_available = False
                 else:
                     input_tokens += llm_result.usage.input_tokens
+                    chat_input_tokens += llm_result.usage.input_tokens
                 if llm_result.usage.output_tokens is None:
                     output_usage_available = False
+                    chat_output_usage_available = False
                 else:
                     output_tokens += llm_result.usage.output_tokens
+                    chat_output_tokens += llm_result.usage.output_tokens
 
                 if len(llm_result.tool_calls) != 1:
                     invalid_actions += 1
@@ -222,6 +230,12 @@ class AgentEvaluator:
             latency_ms=round((time.perf_counter() - started) * 1000),
             skill_ids=selection.skill_ids,
             skill_context_chars=len(selection.context),
+            chat_input_tokens=(
+                chat_input_tokens if chat_input_usage_available else None
+            ),
+            chat_output_tokens=(
+                chat_output_tokens if chat_output_usage_available else None
+            ),
         )
         self.trajectory_writer.write(
             EpisodeTrajectory(

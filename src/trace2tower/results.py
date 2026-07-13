@@ -51,6 +51,8 @@ class EpisodeResult:
     latency_ms: int
     skill_ids: tuple[str, ...]
     skill_context_chars: int
+    chat_input_tokens: int | None = None
+    chat_output_tokens: int | None = None
     error: None = None
 
     def __post_init__(self) -> None:
@@ -58,7 +60,13 @@ class EpisodeResult:
             raise ValueError("invalid episode step counts")
         if self.latency_ms < 0 or self.skill_context_chars < 0:
             raise ValueError("latency and skill context size must be non-negative")
-        token_counts = (self.input_tokens, self.output_tokens, self.billable_tokens)
+        token_counts = (
+            self.input_tokens,
+            self.output_tokens,
+            self.billable_tokens,
+            self.chat_input_tokens,
+            self.chat_output_tokens,
+        )
         if any(value is not None and value < 0 for value in token_counts):
             raise ValueError("token counts must be non-negative")
         if not 0 <= self.primary_score <= 1:
@@ -122,6 +130,16 @@ class EpisodeResult:
             latency_ms=int(record["latency_ms"]),
             skill_ids=tuple(record.get("skill_ids", ())),
             skill_context_chars=int(record["skill_context_chars"]),
+            chat_input_tokens=(
+                int(record["chat_input_tokens"])
+                if record.get("chat_input_tokens") is not None
+                else None
+            ),
+            chat_output_tokens=(
+                int(record["chat_output_tokens"])
+                if record.get("chat_output_tokens") is not None
+                else None
+            ),
             error=record.get("error"),
         )
 

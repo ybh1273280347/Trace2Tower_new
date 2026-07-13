@@ -93,7 +93,7 @@ def test_guarded_savings_do_not_reward_faster_cheaper_regression() -> None:
     assert result.objective_vector.guarded_cost_saving == pytest.approx(-0.1)
 
 
-def test_missing_billable_cost_is_audited_and_blocks_ranking() -> None:
+def test_missing_chat_cost_is_audited_and_blocks_ranking() -> None:
     baseline = (episode("a", MethodName.NO_SKILL, 1.0, 10, None),)
     skill = (
         episode("a", MethodName.TRACE2TOWER_FULL, 1.0, 8, None, ("mid",)),
@@ -103,8 +103,8 @@ def test_missing_billable_cost_is_audited_and_blocks_ranking() -> None:
     )
     assert not audit.is_complete
     assert audit.skill_methods == (MethodName.TRACE2TOWER_FULL,)
-    assert audit.missing_baseline_billable_keys
-    assert audit.missing_skill_billable_keys
+    assert audit.missing_baseline_chat_token_keys
+    assert audit.missing_skill_chat_token_keys
     assert audit.to_record()["paired_episode_keys"] == [
         {"benchmark": "webshop", "sample_id": "a", "repeat_id": 0}
     ]

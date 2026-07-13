@@ -41,7 +41,7 @@ def main(options: argparse.Namespace) -> int:
     config = load_yaml(options.config)
     expected_config = {
         "refinement_round": 1,
-        "cost_field": "billable_tokens",
+        "cost_field": "chat_tokens",
         "missing_cost_policy": "reject_ranking",
         "physical_deletion": False,
     }

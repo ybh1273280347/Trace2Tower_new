@@ -10,12 +10,12 @@ For each exposed skill, the four maximized objectives are:
 performance_level = mean(skill score)
 paired_reward_gain = mean(skill score - paired No-Skill score)
 guarded_step_saving = mean(guard(no_skill_steps - skill_steps))
-guarded_cost_saving = mean(guard(no_skill_billable - skill_billable))
+guarded_cost_saving = mean(guard(no_skill_chat_tokens - skill_chat_tokens))
 ```
 
 Each saving is divided by the corresponding No-Skill value, with a denominator floor of one. When the skill score is lower than No-Skill, a positive raw saving is clamped to zero while a negative saving is preserved. Faster or cheaper regressions therefore receive no efficiency reward.
 
-The frozen refinement config permits one round, fixes cost to the provider-reported `billable_tokens` field, rejects ranking when that field is missing, and permits status downweighting but not physical deletion. Input plus output tokens are not substituted for missing billing evidence.
+The frozen refinement config permits one round and defines cost as agent-chat prompt plus completion tokens. Retrieval embedding usage is excluded. Both chat token fields must be recorded by the run; missing evidence blocks ranking. The first round permits status downweighting but not physical deletion.
 
 ## Non-Dominated Sorting
 
@@ -38,8 +38,8 @@ The WebShop pilot audit bound `tower_e1ef1ba84546d8b6` to the Flash No-Skill run
 |---|---:|---:|---:|
 | Official reward | 1.0 | 1.0 | gain 0.0 |
 | Steps | 4 | 9 | guarded saving -1.25 |
-| Billable tokens | unavailable | unavailable | unavailable |
+| Agent chat tokens | unavailable | unavailable | unavailable |
 
-The Static episode injected one High and two Mid IDs. Because neither result contains provider-reported billable tokens, the audit records the available reward and step evidence but emits `ranking_status: unavailable`, no Pareto ranks, and no downweight action. This is the intended failure mode: a three-dimensional partial record cannot silently become a four-dimensional lifecycle decision.
+The Static episode injected one High and two Mid IDs. Because the historical results predate separate agent-chat token fields, the audit records reward and step evidence but emits `ranking_status: unavailable`, no Pareto ranks, and no downweight action. Historical aggregate input tokens are not reused because they may include retrieval embeddings.
 
-The shared runtime now preserves an explicit `billable_tokens` field when a provider returns it directly or through the SDK's extra usage fields. It still leaves the field null when absent. A Tower v1 refinement artifact will only be produced after complete cost evidence exists under the frozen metric.
+New execution records preserve `chat_input_tokens` and `chat_output_tokens` separately from aggregate model usage. A Tower v1 refinement artifact is produced only from runs with complete chat-token evidence.

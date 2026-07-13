@@ -49,7 +49,7 @@ class RefinementEpisode:
     repeat_id: int
     primary_score: float
     steps: int
-    billable_tokens: int | None
+    chat_tokens: int | None
     skill_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
@@ -57,8 +57,8 @@ class RefinementEpisode:
             raise ValueError("refinement episode score must be in [0, 1]")
         if self.steps < 0 or self.repeat_id < 0:
             raise ValueError("refinement episode counts must be non-negative")
-        if self.billable_tokens is not None and self.billable_tokens < 0:
-            raise ValueError("refinement billable tokens must be non-negative")
+        if self.chat_tokens is not None and self.chat_tokens < 0:
+            raise ValueError("refinement chat tokens must be non-negative")
         if len(set(self.skill_ids)) != len(self.skill_ids):
             raise ValueError("refinement episode contains duplicate skill IDs")
 
@@ -77,9 +77,10 @@ class RefinementEpisode:
             repeat_id=int(record["repeat_id"]),
             primary_score=float(record["primary_score"]),
             steps=int(record["steps"]),
-            billable_tokens=(
-                int(record["billable_tokens"])
-                if record.get("billable_tokens") is not None
+            chat_tokens=(
+                int(record["chat_input_tokens"]) + int(record["chat_output_tokens"])
+                if record.get("chat_input_tokens") is not None
+                and record.get("chat_output_tokens") is not None
                 else None
             ),
             skill_ids=tuple(record.get("skill_ids", ())),
@@ -97,8 +98,8 @@ class RefinementEvidenceAudit:
     invalid_baseline_method_keys: tuple[EpisodePairKey, ...]
     invalid_skill_method_keys: tuple[EpisodePairKey, ...]
     empty_skill_selection_keys: tuple[EpisodePairKey, ...]
-    missing_baseline_billable_keys: tuple[EpisodePairKey, ...]
-    missing_skill_billable_keys: tuple[EpisodePairKey, ...]
+    missing_baseline_chat_token_keys: tuple[EpisodePairKey, ...]
+    missing_skill_chat_token_keys: tuple[EpisodePairKey, ...]
     unknown_skill_ids: tuple[str, ...]
 
     @property
@@ -111,8 +112,8 @@ class RefinementEvidenceAudit:
             self.invalid_baseline_method_keys,
             self.invalid_skill_method_keys,
             self.empty_skill_selection_keys,
-            self.missing_baseline_billable_keys,
-            self.missing_skill_billable_keys,
+            self.missing_baseline_chat_token_keys,
+            self.missing_skill_chat_token_keys,
             self.unknown_skill_ids,
         )
         return (
@@ -135,8 +136,8 @@ class RefinementEvidenceAudit:
             "invalid_baseline_method_keys",
             "invalid_skill_method_keys",
             "empty_skill_selection_keys",
-            "missing_baseline_billable_keys",
-            "missing_skill_billable_keys",
+            "missing_baseline_chat_token_keys",
+            "missing_skill_chat_token_keys",
         )
         record = {
             field: [key.to_record() for key in getattr(self, field)]
@@ -173,8 +174,8 @@ class PairedEpisodeEvidence:
     skill_steps: int
     raw_step_saving: float
     guarded_step_saving: float
-    baseline_billable_tokens: int | None
-    skill_billable_tokens: int | None
+    baseline_chat_tokens: int | None
+    skill_chat_tokens: int | None
     raw_cost_saving: float | None
     guarded_cost_saving: float | None
     injected_skill_ids: tuple[str, ...]
@@ -191,8 +192,8 @@ class PairedEpisodeEvidence:
             "skill_steps": self.skill_steps,
             "raw_step_saving": self.raw_step_saving,
             "guarded_step_saving": self.guarded_step_saving,
-            "baseline_billable_tokens": self.baseline_billable_tokens,
-            "skill_billable_tokens": self.skill_billable_tokens,
+            "baseline_chat_tokens": self.baseline_chat_tokens,
+            "skill_chat_tokens": self.skill_chat_tokens,
             "raw_cost_saving": self.raw_cost_saving,
             "guarded_cost_saving": self.guarded_cost_saving,
             "injected_skill_ids": self.injected_skill_ids,
@@ -394,16 +395,16 @@ def audit_refinement_evidence(
                 episode.pair_key for episode in skill_episodes if not episode.skill_ids
             )
         ),
-        missing_baseline_billable_keys=tuple(
+        missing_baseline_chat_token_keys=tuple(
             sorted(
                 key
                 for key in paired_keys
-                if baseline_by_key[key].billable_tokens is None
+                if baseline_by_key[key].chat_tokens is None
             )
         ),
-        missing_skill_billable_keys=tuple(
+        missing_skill_chat_token_keys=tuple(
             sorted(
-                key for key in paired_keys if skill_by_key[key].billable_tokens is None
+                key for key in paired_keys if skill_by_key[key].chat_tokens is None
             )
         ),
         unknown_skill_ids=tuple(
@@ -494,8 +495,8 @@ def build_skill_objectives(
                 baseline.steps, 1
             )
             raw_cost_saving = (
-                baseline.billable_tokens - skill_episode.billable_tokens
-            ) / max(baseline.billable_tokens, 1)
+                baseline.chat_tokens - skill_episode.chat_tokens
+            ) / max(baseline.chat_tokens, 1)
             score_decreased = skill_episode.primary_score < baseline.primary_score
             step_savings.append(
                 min(raw_step_saving, 0) if score_decreased else raw_step_saving
@@ -547,13 +548,13 @@ def build_paired_episode_evidence(
         guarded_step_saving = (
             min(raw_step_saving, 0) if reward_gain < 0 else raw_step_saving
         )
-        if baseline.billable_tokens is None or skill.billable_tokens is None:
+        if baseline.chat_tokens is None or skill.chat_tokens is None:
             raw_cost_saving = None
             guarded_cost_saving = None
         else:
             raw_cost_saving = (
-                baseline.billable_tokens - skill.billable_tokens
-            ) / max(baseline.billable_tokens, 1)
+                baseline.chat_tokens - skill.chat_tokens
+            ) / max(baseline.chat_tokens, 1)
             guarded_cost_saving = (
                 min(raw_cost_saving, 0) if reward_gain < 0 else raw_cost_saving
             )
@@ -569,8 +570,8 @@ def build_paired_episode_evidence(
                 skill_steps=skill.steps,
                 raw_step_saving=raw_step_saving,
                 guarded_step_saving=guarded_step_saving,
-                baseline_billable_tokens=baseline.billable_tokens,
-                skill_billable_tokens=skill.billable_tokens,
+                baseline_chat_tokens=baseline.chat_tokens,
+                skill_chat_tokens=skill.chat_tokens,
                 raw_cost_saving=raw_cost_saving,
                 guarded_cost_saving=guarded_cost_saving,
                 injected_skill_ids=skill.skill_ids,
