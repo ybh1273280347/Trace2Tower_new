@@ -59,7 +59,7 @@ Success-only Tower 在两个模型上都取得了当前主矩阵中最高的 mea
 
 Success-only Tower 相对 Flat 的 reward 差在两个模型上都是正值，但置信区间跨零，因此不能声称 reward 已显著优于 Flat。它的执行形态则一致更好：两个模型上 completion 都更高，平均步数都更少，输入 token 分别降低 18.4% 和 12.4%。
 
-这一结果说明 Tower 的潜在价值不只在最终分数。Flat 将一组全局摘要整体注入上下文，增加了输入长度，却没有帮助模型更快结束任务；Tower 按当前状态检索少量相关技能，在保持当前最高 mean reward 的同时，减少了交互步数和上下文成本。效率指标目前作为描述性结果报告，未对其另做显著性检验。
+这一结果说明 Tower 的潜在价值不只在最终分数。Flat 将一组全局摘要整体注入上下文，增加了输入长度，却没有帮助模型更快结束任务；Tower 按当前状态检索少量相关技能，在保持当前最高 mean reward 点估计的同时，减少了交互步数和上下文成本。效率指标目前作为描述性结果报告，未对其另做显著性检验。
 
 ## 官方 SkillX baseline
 
@@ -80,7 +80,7 @@ SkillX 相对 NoSkill 的 reward 增益具有显著模型交互：Pro 上为 `+0
 
 ## 结论
 
-1. **Success-only Tower 在全部 baseline 中取得最高 mean reward。** 它在 Flash 和 Pro 上都优于 NoSkill、Flat、SkillX 和 Mixed 的点估计，并且相对 Flat 有更高 completion、更少步骤和更低 token 成本。
+1. **Success-only Tower 在所有比较方法中取得最高 mean reward 点估计。** 它在 Flash 和 Pro 上的点估计都高于 NoSkill、Flat、SkillX 和 Mixed；相对 Flat 的 completion、步骤和 token 也呈现一致的描述性优势，但这些效率差异未单独计算置信区间。
 2. **Pro 上的有效性已经建立。** Success-only Tower 相对 NoSkill 的 mean reward 提高 0.0486，满分成功率提高 5.1 个百分点，两项 95% CI 均不跨零。
 3. **Flash 上保留谨慎表述。** Tower 的 reward、completion 和效率点估计更好，但 reward 与满分成功率区间跨零，尚不能宣称稳定性能提升。
 4. **Tower 尚未显著击败 Flat，但效率优势清楚。** 两个模型上的 reward 点估计均高于 Flat；直接差异未显著，同时平均少 1.00 至 1.42 步，并节省 12.4% 至 18.4% 输入 token。

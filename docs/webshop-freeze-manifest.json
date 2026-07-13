@@ -19,6 +19,13 @@
       "maintain reproducibility without changing behavior"
     ]
   },
+  "protocol_provenance": {
+    "high_top_k": 1,
+    "selection_mode": "fixed algorithm contract, not validation-selected",
+    "introduced_in_commit": "9b0c7069cd9597c23c88da8a9a9540afb18c48c7",
+    "random300_preregistered_in_commit": "17e2b054fbd2aef0a51ce706815ec94a99e6399b",
+    "contract_source": "src/trace2tower/methods/trace2tower/config.py"
+  },
   "run_groups": {
     "validation": [
       {
@@ -1758,6 +1765,14 @@
       "sha256": "07619a86d967768fb489d4950ba7f0170a662e59797ebcd96991f04a33bec9f5"
     },
     {
+      "path": "src/trace2tower/methods/trace2tower/config.py",
+      "sha256": "e6ea29fed1352fffbb3d446599c582bc5162eedac4cf30e19e548e0aeaf80930"
+    },
+    {
+      "path": "docs/retrieval.md",
+      "sha256": "59cdbdac60c217460116a7396515e50c48d76bd676ebe60cbe7f4f42d8034bfb"
+    },
+    {
       "path": "artifacts/manifests/webshop-final-random300-v1/webshop_test.jsonl",
       "sha256": "b055ef5458374c0b8e34935dd59d83f1a90d023bf93fb6a7d2c27c61bcd8fc3e"
     },
@@ -1803,15 +1818,15 @@
     },
     {
       "path": "scripts/experiments/freeze_webshop.py",
-      "sha256": "83a5cd649bee3e1a43b69f220d02aeb8280c177007589abfeebecaf388f44fce"
+      "sha256": "ee3a4919e1df36609a0a39aa098386f4f772dcdb3b132ac7ef97441676acf925"
     },
     {
       "path": "docs/webshop-validation-and-final-test-protocol.md",
-      "sha256": "7edc1ed5a76d67be903e1193a9c350d7927d2e1a7a838e6f0b57ffd62e099cee"
+      "sha256": "36a7a14c65975a1dd12539662873daa6dff8a8972fc62c407431559fdae3fba4"
     },
     {
       "path": "docs/webshop-final-random300-report.md",
-      "sha256": "4f533178c38c9d04dfae2b150edda26e3ac6a72aac62bea9620b455debebb07c"
+      "sha256": "180d0277c48712627477dcae06320b2134707cb6b9f86cadb4f1b014f2eeb748"
     },
     {
       "path": "docs/webshop-mid-only-ablation.md",
@@ -1823,7 +1838,7 @@
     },
     {
       "path": "docs/webshop-complete-experiment-report.md",
-      "sha256": "70a94c16f68fbc73aab2aed05a316e6d09d38cf31a06b920e87b58cdd0ef6fbb"
+      "sha256": "43d9e7ec45106220ee3a9adeb98f4f47ecdd2f574c84bcf00eea9cc9a8b6d0b7"
     }
   ]
 }

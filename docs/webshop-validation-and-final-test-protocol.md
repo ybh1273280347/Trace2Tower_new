@@ -75,6 +75,8 @@ Success-only 与 mixed 会形成不同的技能卡和向量分布。经过相似
 
 ## 冻结配置
 
+本节中的 Flat cap3 与 Tower cap3 由上述 11 条验证条件选择。High top-k 1 不是该矩阵比较出的超参数，而是层级检索从首次实现起固定的算法协议：`Trace2TowerConfig` 只接受 `high_top_k == 1`。该约束在初始层级检索 commit `9b0c706` 中引入，早于 Random-300 预注册 commit `17e2b05`，不使用任何未见测试结果进行选择。
+
 | 组件 | 正式配置 |
 |---|---|
 | Flat | staged/diverse retrieval，cap3 |
