@@ -32,7 +32,14 @@
 | Pro | Success-only | +0.0169 `[-0.0098, +0.0441]` | -0.3% `[-3.2%, +2.7%]` |
 | Pro | Mixed | +0.0301 `[-0.0019, +0.0617]` | +1.8% `[-1.8%, +5.3%]` |
 
-High 对 mixed 的 reward 增量在两个模型上都为正，而且 mixed Full 的 completion 更高、步数和 token 更低；但 reward 与满分率区间仍跨零，不能单独宣称 High 已稳定改善 mixed。
+Mixed 的完整补偿模式如下，差值均为 `Full - Mid-only`：
+
+| 模型 | Reward 差 | Completion 差 | 平均步数差 | 输入 token 差 |
+|---|---:|---:|---:|---:|
+| Flash | +0.0216 | +4.3% | -0.89 | -2,126 |
+| Pro | +0.0301 | +5.2% | -1.11 | -2,752 |
+
+四个指标在两个模型上的方向完全一致：High 为较弱的 mixed Mid 提供补偿，同时带来更高 reward、更高 completion、更少步骤和更少 token。执行效率上的一致模式是清楚的；reward 与满分率的单项置信区间仍跨零，因此不把它写成“High 的 reward 增益已经显著”。
 
 ## Mixed 差异定位
 
@@ -47,4 +54,4 @@ High 对 mixed 的 reward 增量在两个模型上都为正，而且 mixed Full 
 
 稳定信号出现在 Mid-only：Mixed 的 reward 在 Flash 和 Pro 上都显著低于 Success-only。恢复 High 后，两模型的 mixed-success reward 区间都跨零。High×evidence 的 reward 交互在 Flash 为 `+0.0221`、CI `[-0.0091, +0.0549]`，在 Pro 为 `+0.0132`、CI `[-0.0270, +0.0535]`，均未显著。
 
-因此，当前证据指向 mixed 的弱点主要出现在 Mid 层，而 High 呈现部分补偿的模式；它不支持“High 导致 mixed 失效”。由于交互项尚未显著，这仍是机制定位而非完整因果证明。已记录的后续 Tower 交叉验证应在新的验证 folds 上检验该模式，不能使用本 Random-300 反向选择配置。
+因此，当前证据指向 mixed 的弱点主要出现在 Mid 层，而 High 具有补偿 Mid 的功能；它不支持“High 导致 mixed 失效”。由于 High×evidence 交互项尚未显著，这仍是机制定位而非完整因果证明。已记录的后续 Tower 交叉验证应在新的验证 folds 上检验该模式，不能使用本 Random-300 反向选择配置。
