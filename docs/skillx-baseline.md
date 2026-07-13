@@ -2,9 +2,11 @@
 
 ## Upstream Boundary
 
-SkillX is executed from the unmodified checkout at commit `36747f424a17ea041e476adf2ff976a206ec9c30`. The upstream checker rejects a changed commit or diffs in 19 protected algorithm and prompt files and records their committed SHA-256 values.
+SkillX is executed from commit `36747f424a17ea041e476adf2ff976a206ec9c30` with one tracked local patch: `patches/skillx/transactional-merge.patch`. The other 18 protected algorithm and prompt files must remain byte-identical to the pinned commit. The checker records both the official base hash and approved patched hash for `pipeline.py` and rejects any other protected change.
 
-Trace2Tower owns only three adapters:
+The patch changes failure preservation, not extraction, filtering, clustering, prompts, or retrieval. Before merge, all filtered skills and cluster assignments are written under the run's `upstream/recovery/epoch-N` directory. Merge is an all-or-nothing transaction: all clusters must succeed before merged skills are committed; one failure rolls the whole epoch back to the complete pre-merge skill backup. Partial merge outputs and parser diagnostics remain in the recovery directory, so no extracted skill is silently discarded and merge can be investigated without repeating the expensive extraction stages.
+
+Trace2Tower owns three runtime adapters and the failure-preservation patch:
 
 - trajectories are converted to SkillX's `task_history` format while preserving the real ALFWorld and WebShop tool names and arguments;
 - official prompt messages are passed unchanged through the shared `gpt-5.4` renderer endpoint, with validation delegated to SkillX's own regex parser;

@@ -164,6 +164,7 @@ async def main(options: argparse.Namespace) -> int:
         "source_score_max": max(trajectory.primary_score for trajectory in trajectories),
         "skillx_commit": upstream["commit"],
         "skillx_protected_file_count": upstream["protected_file_count"],
+        "skillx_local_patches": upstream["local_patches"],
         "config_sha256": config_sha256,
         "config": config,
         "started_at": started_at.isoformat(),
@@ -171,6 +172,7 @@ async def main(options: argparse.Namespace) -> int:
         "statistics": results["statistics"],
         "epoch_statistics": epoch_statistics,
         "llm_usage": asdict(llm.usage),
+        "validation_diagnostics": llm.validation_diagnostics,
         "embedding_input_tokens": embedding.input_tokens,
         "library_sha256": canonical_sha256(library),
     }

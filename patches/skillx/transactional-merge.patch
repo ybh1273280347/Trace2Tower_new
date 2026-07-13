@@ -1,0 +1,126 @@
+diff --git a/pipeline.py b/pipeline.py
+index 699386b..3685909 100644
+--- a/pipeline.py
++++ b/pipeline.py
+@@ -98,6 +98,7 @@ class IterativeSkillPipeline:
+         self.existing_skills = existing_skills or {}
+         self.output_dir = Path(output_dir)
+         self.verbose = verbose
++        self.merge_transactions = []
+ 
+         # Auto-load tool_schemas based on benchmark if not provided
+         if tool_schemas:
+@@ -305,7 +306,8 @@ class IterativeSkillPipeline:
+             "functional_skills": len(skill_library.functional),
+             "atomic_skills": len(skill_library.atomic),
+             "planning_skills": len(skill_library.planning),
+-            "expansion_enabled": self.expansion is not None
++            "expansion_enabled": self.expansion is not None,
++            "merge_transactions": self.merge_transactions,
+         }
+ 
+         logger.info(f"Pipeline complete! Final statistics: {results['statistics']}")
+@@ -445,7 +447,7 @@ class IterativeSkillPipeline:
+         # Step 6: Cluster and merge (optional)
+         if enable_clustering and len(filtered) > 1:
+             logger.info(f"[Epoch {epoch}] Step 6: Clustering and merging skills...")
+-            merged = await self._cluster_and_merge(filtered)
++            merged = await self._cluster_and_merge(filtered, epoch=epoch)
+             epoch_result["merged_skills"] = merged
+             epoch_result["statistics"]["merged_skills"] = len(merged)
+         else:
+@@ -605,19 +607,41 @@ class IterativeSkillPipeline:
+ 
+         return prepared
+ 
+-    async def _cluster_and_merge(self, skills: List[Dict]) -> List[Dict]:
++    async def _cluster_and_merge(
++        self, skills: List[Dict], epoch: int = 1
++    ) -> List[Dict]:
+         """Cluster similar skills and merge them."""
+         if len(skills) <= 1:
+             return skills
+ 
++        recovery_dir = self.output_dir / "recovery" / f"epoch-{epoch}"
++        recovery_dir.mkdir(parents=True, exist_ok=True)
++        (recovery_dir / "pre-merge-skills.json").write_text(
++            json.dumps(
++                {
++                    "epoch": epoch,
++                    "filtered_skill_count": len(skills),
++                    "filtered_skills": skills,
++                },
++                ensure_ascii=False,
++                indent=2,
++            ),
++            encoding="utf-8",
++        )
++
+         # Prepare for clustering
+         skill_texts = prepare_skills_for_clustering(skills)
+ 
+         # Cluster
+         clusters = await self.clusterer.cluster_async(skill_texts)
++        (recovery_dir / "clusters.json").write_text(
++            json.dumps(clusters, ensure_ascii=False, indent=2),
++            encoding="utf-8",
++        )
+ 
+         # Merge each cluster
+         merged = []
++        failed_clusters = []
+         for cluster_id, skill_indices in clusters.items():
+             cluster_skills = [skills[i] for i in skill_indices]
+ 
+@@ -635,7 +659,49 @@ class IterativeSkillPipeline:
+                         merged_skill["skill_type"] = cluster_skill_type
+                     merged.append(merged_skill)
+                 else:
+-                    # If merge fails, keep the first skill
+-                    merged.append(cluster_skills[0])
++                    failed_clusters.append(
++                        {
++                            "cluster_id": cluster_id,
++                            "skill_indices": skill_indices,
++                            "skills": cluster_skills,
++                        }
++                    )
++
++        recovery = {
++            "epoch": epoch,
++            "filtered_skill_count": len(skills),
++            "cluster_count": len(clusters),
++            "merged_skill_count": len(merged),
++            "failed_cluster_count": len(failed_clusters),
++            "merged_skills": merged,
++            "failed_clusters": failed_clusters,
++            "validation_diagnostics": getattr(
++                self.llm, "validation_diagnostics", []
++            ),
++            "commit_mode": (
++                "pre_merge_backup" if failed_clusters else "merged"
++            ),
++        }
++        (recovery_dir / "merge-results.json").write_text(
++            json.dumps(recovery, ensure_ascii=False, indent=2),
++            encoding="utf-8",
++        )
++        self.merge_transactions.append(
++            {
++                "epoch": epoch,
++                "filtered_skill_count": len(skills),
++                "cluster_count": len(clusters),
++                "merged_skill_count": len(merged),
++                "failed_cluster_count": len(failed_clusters),
++                "commit_mode": recovery["commit_mode"],
++                "recovery_dir": str(recovery_dir),
++            }
++        )
++        if failed_clusters:
++            logger.warning(
++                f"{len(failed_clusters)} merge clusters failed; rolling back "
++                f"the whole merge transaction to {len(skills)} original skills"
++            )
++            return skills
+ 
+         return merged

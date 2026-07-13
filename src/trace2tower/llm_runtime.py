@@ -47,6 +47,7 @@ class ChatResult:
     tool_calls: tuple[ToolCall, ...]
     usage: LLMUsage
     latency_ms: int
+    finish_reason: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -157,6 +158,7 @@ class CommonLLMRuntime:
             tool_calls=tool_calls,
             usage=self._usage(response.usage),
             latency_ms=round((time.perf_counter() - started) * 1000),
+            finish_reason=response.choices[0].finish_reason,
         )
 
     async def embed(self, texts: Sequence[str]) -> EmbeddingResult:

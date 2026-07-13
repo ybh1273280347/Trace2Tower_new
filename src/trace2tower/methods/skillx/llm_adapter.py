@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -16,6 +17,7 @@ class SkillXAdapterUsage:
     input_tokens: int = 0
     output_tokens: int = 0
     cached_input_tokens: int = 0
+    validation_failures: int = 0
 
 
 class SkillXLLMAdapter:
@@ -38,6 +40,7 @@ class SkillXLLMAdapter:
         self.max_validation_attempts = max_validation_attempts
         self.retry_delay_seconds = retry_delay_seconds
         self.usage = SkillXAdapterUsage()
+        self.validation_diagnostics: list[dict[str, Any]] = []
 
     async def ainvoke(
         self,
@@ -66,6 +69,7 @@ class SkillXLLMAdapter:
                 output_tokens=self.usage.output_tokens + (result.usage.output_tokens or 0),
                 cached_input_tokens=self.usage.cached_input_tokens
                 + (result.usage.cached_input_tokens or 0),
+                validation_failures=self.usage.validation_failures,
             )
             content = result.content
             if content is None:
@@ -78,8 +82,45 @@ class SkillXLLMAdapter:
                 valid = True
             if valid:
                 return content
+            text = content or ""
+            self.validation_diagnostics.append(
+                {
+                    "prompt_sha256": hashlib.sha256(
+                        system_prompt.encode()
+                    ).hexdigest(),
+                    "messages_sha256": hashlib.sha256(
+                        json.dumps(
+                            converted,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ).encode()
+                    ).hexdigest(),
+                    "attempt": attempt + 1,
+                    "max_output_tokens": int(
+                        kwargs.get("max_tokens", self.max_output_tokens)
+                    ),
+                    "finish_reason": result.finish_reason,
+                    "output_tokens": result.usage.output_tokens,
+                    "content_chars": len(text),
+                    "content_sha256": hashlib.sha256(text.encode()).hexdigest(),
+                    "has_skill_open_tag": "<skill>" in text,
+                    "has_skill_close_tag": "</skill>" in text,
+                    "preview_start": text[:500],
+                    "preview_end": text[-500:],
+                    "messages": converted,
+                    "content": text,
+                }
+            )
             if attempt + 1 < self.max_validation_attempts:
                 await asyncio.sleep(self.retry_delay_seconds)
+        self.usage = SkillXAdapterUsage(
+            calls=self.usage.calls,
+            input_tokens=self.usage.input_tokens,
+            output_tokens=self.usage.output_tokens,
+            cached_input_tokens=self.usage.cached_input_tokens,
+            validation_failures=self.usage.validation_failures + 1,
+        )
         raise ValueError("SkillX output failed its official parser validation")
 
 

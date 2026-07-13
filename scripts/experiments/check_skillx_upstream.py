@@ -30,6 +30,9 @@ PROTECTED_FILES = (
     "inference/retriever.py",
     "inference/embedding_service.py",
 )
+LOCAL_PATCHES = {
+    "pipeline.py": "cf503c008700e04760dea561c2fffffd39ca1ed5b7952d96a72bba22391a6aa5",
+}
 
 
 def git(repository: Path, *arguments: str, text: bool = True):
@@ -46,19 +49,34 @@ def inspect_skillx(repository: Path) -> dict:
     commit = git(repository, "rev-parse", "HEAD")
     if commit != EXPECTED_COMMIT:
         raise ValueError(f"SkillX commit changed: {commit}")
-    changed = git(repository, "diff", "--name-only", "HEAD", "--", *PROTECTED_FILES)
-    if changed:
-        raise ValueError(f"protected SkillX files changed: {changed.splitlines()}")
-    hashes = {
+    changed = set(
+        git(repository, "diff", "--name-only", "HEAD", "--", *PROTECTED_FILES).splitlines()
+    )
+    if changed != set(LOCAL_PATCHES):
+        raise ValueError(f"unexpected protected SkillX changes: {sorted(changed)}")
+    base_hashes = {
         path: hashlib.sha256(
             git(repository, "show", f"HEAD:{path}", text=False)
         ).hexdigest()
         for path in PROTECTED_FILES
     }
+    hashes = {
+        path: hashlib.sha256((repository / path).read_bytes()).hexdigest()
+        for path in PROTECTED_FILES
+    }
+    if any(hashes[path] != expected for path, expected in LOCAL_PATCHES.items()):
+        raise ValueError("SkillX local patch hash differs from the approved patch")
     return {
         "commit": commit,
         "protected_file_count": len(PROTECTED_FILES),
         "protected_files": hashes,
+        "local_patches": {
+            path: {
+                "base_sha256": base_hashes[path],
+                "patched_sha256": hashes[path],
+            }
+            for path in LOCAL_PATCHES
+        },
     }
 
 
