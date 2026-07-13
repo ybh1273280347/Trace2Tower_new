@@ -47,3 +47,11 @@ The resulting complete Mid-only snapshot is `tower_1f063f3414b3f90f`, with six M
 Four new pool-external training samples (`1005` through `1008`) formed the next paired gate. Static had one win, three ties, and no losses against No-Skill: mean reward `0.7431` versus `0.6875`, paired difference `+0.0556`, and bootstrap interval `[0, 0.1667]`. Mean steps and invalid actions were equal. Static completed sample `1007` with reward `0.2222` where No-Skill reached the task limit with reward zero. It used 1,883.25 more reported input tokens per episode; billable-token coverage remained zero.
 
 This is the first non-negative pool-external gate for the rebuilt Tower, but four pairs are still diagnostic. All four tasks retrieved the same two substantially overlapping Mid cards, so the next bounded experiment tests Top-1 direct-Mid retrieval as a cost ablation before any larger rollout.
+
+## Direct-Mid Top-1 Ablation
+
+A content-addressed Top-1 variant, `tower_f2d5abf612995707`, reused the same 50 trajectories, six Mid cards, zero High cards, and retrieval index; only `direct_mid_top_k` changed from two to one. The retrieval contract now permits either one or two direct Mid cards while preserving Top-2 as the executable default.
+
+On calibration samples `1005` through `1008`, Top-1 cut injected context from 2,920 to 1,387 characters but reduced mean reward from Top-2's `0.7431` to `0.6875`. Sample `1007` regressed from completed reward `0.2222` to task-limit reward zero. Mean steps increased from 8 to 11, invalid actions from 0.25 to 0.75 per episode, and reported input tokens from 21,161.25 to 30,156.25 per episode because longer trajectories outweighed the shorter prefix.
+
+Top-1 therefore fails the calibration gate and is not run on fresh validation samples. Top-2 remains the selected retrieval setting: the second card is textually overlapping, but this experiment provides behavioral evidence that it still carries useful guidance.

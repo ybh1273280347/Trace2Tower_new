@@ -35,8 +35,8 @@ class Trace2TowerConfig:
             raise ValueError("High path support ratio must be in [0, 1]")
         if self.high_path_epsilon <= 0:
             raise ValueError("High path epsilon must be positive")
-        if self.high_top_k != 1 or self.direct_mid_top_k != 2:
-            raise ValueError("Trace2Tower retrieval uses fixed High Top-1 and Mid Top-2")
+        if self.high_top_k != 1 or self.direct_mid_top_k not in (1, 2):
+            raise ValueError("Trace2Tower retrieval uses High Top-1 and Mid Top-1 or Top-2")
 
     @classmethod
     def from_record(cls, record: dict) -> Trace2TowerConfig:

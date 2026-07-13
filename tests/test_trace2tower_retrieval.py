@@ -74,6 +74,22 @@ def test_retrieval_without_high_uses_direct_mid_only() -> None:
     assert result.skill_ids == ("mid_a", "mid_b")
 
 
+def test_retrieval_supports_direct_mid_top_one() -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
+    result = retrieve_tower(
+        (),
+        (1.0, 0.0),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex(("mid_a", "mid_b"), ((1.0, 0.0), (0.9, 0.1))),
+        {},
+        mids,
+        direct_mid_top_k=1,
+    )
+    assert tuple(match.skill_id for match in result.direct_mid_matches) == ("mid_a",)
+    assert result.skill_ids == ("mid_a",)
+    assert "Name mid_b" not in result.context
+
+
 def test_retrieval_preserves_rejected_high_candidate_as_evidence() -> None:
     mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
     high = HighSkillCard(
