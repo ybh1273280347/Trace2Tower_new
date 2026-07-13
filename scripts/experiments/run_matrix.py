@@ -17,7 +17,7 @@ from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
 from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.llm_runtime import CommonLLMRuntime
+from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
 from trace2tower.manifests import (
     Benchmark,
     ExperimentSplit,
@@ -278,6 +278,7 @@ async def run_matrix_shard(
         TrajectoryWriter(run_dir / "trajectories"),
         temperature=common["agent_temperature"],
         max_output_tokens=common["agent_max_output_tokens"],
+        endpoint_role=ModelRole(options.agent_endpoint_role),
     )
 
     async def execute(entry: ManifestEntry, current_shard_id: int):
@@ -327,6 +328,7 @@ async def run_matrix_shard(
         "split": split.value,
         "method": method.value,
         "agent_model": os.getenv("AGENT_MODEL"),
+        "agent_endpoint_role": options.agent_endpoint_role,
         "shard_id": shard_id,
         "num_shards": options.num_shards,
         "manifest_path": (
@@ -409,6 +411,8 @@ async def main(options: argparse.Namespace) -> int:
             for benchmark, artifact in artifacts.items()
         },
     }
+    if options.agent_endpoint_role != ModelRole.AGENT:
+        resolved_config["agent_endpoint_role"] = options.agent_endpoint_role
     if options.repeat_id:
         resolved_config["selection"] = {
             "repeat_ids": sorted(options.repeat_id),
@@ -425,6 +429,7 @@ async def main(options: argparse.Namespace) -> int:
         "dry_run": options.dry_run,
         "run_id": options.run_id,
         "agent_model": agent_model,
+        "agent_endpoint_role": options.agent_endpoint_role,
     }
     print(yaml.safe_dump({"resolved_config": resolved_config, "invocation": invocation}))
 
@@ -452,7 +457,11 @@ async def main(options: argparse.Namespace) -> int:
         return 0
 
     load_dotenv(options.env)
-    os.environ["AGENT_MODEL"] = agent_model
+    endpoint_role = ModelRole(options.agent_endpoint_role)
+    if endpoint_role is ModelRole.AGENT:
+        os.environ["AGENT_MODEL"] = agent_model
+    elif os.environ["RENDERER_MODEL"] != agent_model:
+        raise ValueError("agent model does not match the selected endpoint role")
     resolved_path = Path(common["runs_dir"]) / options.run_id / "resolved-config.yaml"
     if resolved_path.exists() and load_yaml(resolved_path) != resolved_config:
         raise ValueError("run ID already has a different resolved configuration")
@@ -500,6 +509,7 @@ async def main(options: argparse.Namespace) -> int:
         "split": split.value,
         "method": method.value,
         "agent_model": agent_model,
+        "agent_endpoint_role": options.agent_endpoint_role,
         "benchmarks": [benchmark.value for benchmark in benchmarks],
         "shard_ids": list(shard_ids),
         "num_shards": options.num_shards,
@@ -530,6 +540,11 @@ if __name__ == "__main__":
     parser.add_argument("--max-episodes", type=int)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--agent-model")
+    parser.add_argument(
+        "--agent-endpoint-role",
+        choices=(ModelRole.AGENT, ModelRole.RENDERER),
+        default=ModelRole.AGENT,
+    )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--method-config", type=Path)
     parser.add_argument("--env", type=Path, default=Path(".env"))

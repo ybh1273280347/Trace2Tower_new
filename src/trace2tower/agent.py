@@ -40,11 +40,15 @@ class AgentEvaluator:
         *,
         temperature: float,
         max_output_tokens: int,
+        endpoint_role: ModelRole = ModelRole.AGENT,
     ):
+        if endpoint_role is ModelRole.EMBEDDING:
+            raise ValueError("agent evaluation requires a chat endpoint role")
         self.runtime = runtime
         self.trajectory_writer = trajectory_writer
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
+        self.endpoint_role = endpoint_role
 
     async def run_episode(
         self,
@@ -97,7 +101,7 @@ class AgentEvaluator:
             ]
             for step_index in range(max_steps):
                 llm_result = await self.runtime.chat(
-                    ModelRole.AGENT,
+                    self.endpoint_role,
                     messages,
                     tools=environment.tool_schemas,
                     tool_choice="required",

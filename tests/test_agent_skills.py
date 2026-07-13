@@ -8,7 +8,7 @@ import pytest
 
 from trace2tower.agent import AgentEvaluator, SkillSelection
 from trace2tower.benchmarks.models import EnvironmentState, EpisodeStart
-from trace2tower.llm_runtime import ChatResult, LLMUsage, ToolCall
+from trace2tower.llm_runtime import ChatResult, LLMUsage, ModelRole, ToolCall
 from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
 from trace2tower.results import MethodName
 from trace2tower.trajectory import TrajectoryWriter
@@ -17,8 +17,10 @@ from trace2tower.trajectory import TrajectoryWriter
 class FakeRuntime:
     def __init__(self):
         self.messages = None
+        self.role = None
 
     async def chat(self, role, messages, **kwargs) -> ChatResult:
+        self.role = role
         self.messages = messages
         return ChatResult(
             content=None,
@@ -95,6 +97,37 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
     assert result.output_tokens == 2
     assert "retrieved context" in runtime.messages[1]["content"]
     assert environment.closed
+
+
+def test_agent_can_use_explicit_renderer_endpoint_role(tmp_path: Path) -> None:
+    runtime = FakeRuntime()
+    evaluator = AgentEvaluator(
+        runtime,
+        TrajectoryWriter(tmp_path / "episodes"),
+        temperature=0,
+        max_output_tokens=128,
+        endpoint_role=ModelRole.RENDERER,
+    )
+    entry = ManifestEntry(
+        Benchmark.WEBSHOP,
+        ExperimentSplit.TEST,
+        "webshop:0",
+        0,
+        "goals",
+        0,
+    )
+    asyncio.run(
+        evaluator.run_episode(
+            entry=entry,
+            environment=FakeEnvironment(),
+            run_id="renderer-agent-smoke",
+            method=MethodName.NO_SKILL,
+            skill_context=None,
+            shard_id=0,
+            max_steps=1,
+        )
+    )
+    assert runtime.role is ModelRole.RENDERER
 
 
 def test_agent_closes_environment_when_skill_selection_fails(tmp_path: Path) -> None:
