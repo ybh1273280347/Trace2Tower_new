@@ -49,11 +49,13 @@ After the P50 test exposed a validation/test gap, two post-hoc diagnostics were 
 
 The P100 Full scale follow-up is evaluated on both Flash and Pro with the same snapshot, cap 8, 100-task test manifest, and `repeat_id=0`. P200 remains Flash-only. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
 
-## Test-A repeat3 extension
+## Test-A repeat3 extensions
 
 The primary Flash comparison is extended post hoc to real repeat IDs `0`, `1`, and `2` for NoSkill, Manual, native P100 SkillX, and P100 Full. Existing repeat-0 results are reused without modification; two new executions per task are added. Final method means first average the three executions within each of the 100 tasks and then average across tasks. Task-cluster bootstrap resamples the 100 task-level means, so 300 episodes are never treated as 300 independent statistical units.
 
 Global E2E is not repeated. Its existing single-repeat result remains a diagnostic showing that direct corpus-level trajectory induction is not a competitive default, but it is excluded from the repeat3 primary matrix. Semantic-only and No-Mixed retain their separate mechanism-analysis roles.
+
+The same four-method repeat3 matrix is subsequently extended to `deepseek-v4-pro`. Existing repeat-0 NoSkill, Manual, and P100 Full results are reused without modification, and repeat IDs `1` and `2` are added. The existing Pro SkillX result uses the P50 library and is not reusable: native P100 SkillX is therefore executed at repeat IDs `0`, `1`, and `2`. Per-repeat metrics and the final three-repeat aggregate must both be reported. Aggregation and task-cluster bootstrap follow the Flash procedure above.
 
 The renderer control was run on the P100 structure. The native Trace2Tower renderer outperformed the SkillX-style adapter and is frozen for P200. P200 is a strict superset of P100, uses four Flash collection rollouts per training task, and is evaluated on the same 100-task Flash test with cap 8. Because the renderer was selected after observing this test set, the P200 result is a post-hoc scale diagnostic rather than new confirmatory test evidence. It must not be described as prompt tuning or as an independent held-out confirmation.
 
