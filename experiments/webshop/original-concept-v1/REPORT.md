@@ -122,6 +122,29 @@ The evidence does not show that Pro benefits more than Flash: P100 minus NoSkill
 
 Run: `webshop-original-concept-v1-test-pro-p100-full-cap8-r1`.
 
+## Test-A Pro repeat3
+
+The Pro repeat3 extension uses the same frozen Test-A manifest and P100 artifacts as the Flash repeat3 matrix. NoSkill, Manual, and P100 Full reuse their exact repeat-0 runs and add repeat IDs 1 and 2. The native P100 SkillX artifact is evaluated at repeat IDs 0, 1, and 2; the older P50 Pro SkillX run is excluded. Every method covers the same 100 task keys at all three real repeats. Results are first summarized per repeat, then averaged within task and across the 100 task keys. The 242 failed attempts were recoverable provider attempts; unresolved failure keys are zero.
+
+| Method | Repeat 0 reward | Repeat 1 reward | Repeat 2 reward | Repeat3 mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| NoSkill | 0.62000 | 0.58567 | 0.57083 | 0.59217 | 42.67% | 9.23 | 0.88 | 25,672 |
+| Manual | 0.69042 | 0.69075 | 0.69467 | **0.69194** | **51.00%** | **6.59** | **0.04** | **18,700** |
+| P100 SkillX | 0.67458 | **0.68142** | 0.66758 | 0.67453 | 48.33% | 7.68 | 0.19 | 28,444 |
+| P100 Full | 0.65733 | 0.62850 | 0.67792 | 0.65458 | 48.67% | 8.70 | 0.81 | 41,675 |
+
+| Paired comparison | Reward difference | 95% interval | Full-success difference | 95% interval |
+|---|---:|---:|---:|---:|
+| Full minus NoSkill | +0.06242 | [+0.01130, +0.11386] | +6.00 points | [-0.67, +13.00] |
+| Full minus P100 SkillX | -0.01994 | [-0.06294, +0.02350] | +0.33 points | [-6.33, +7.33] |
+| Full minus Manual | -0.03736 | [-0.08195, +0.00883] | -2.33 points | [-8.33, +3.67] |
+| P100 SkillX minus NoSkill | +0.08236 | **[+0.02983, +0.13828]** | +5.67 points | [-1.00, +12.67] |
+| Manual minus NoSkill | **+0.09978** | **[+0.05183, +0.15006]** | **+8.33 points** | **[+1.67, +15.33]** |
+
+Pro does not reproduce the Flash ordering. The total-mean ranking is `Manual > P100 SkillX > P100 Full > NoSkill`. Full improves reward over NoSkill, but its reward and full-success differences versus P100 SkillX and Manual include zero, while it injects substantially more context and takes more steps than both. The defensible model-dependent statement is therefore that structured experience can help Pro, but the current P100 Tower renderer/artifact is not the best Pro method on Test-A. This is compatible with SkillX's own model-adaptive narrative, not with a universal Tower-superiority claim.
+
+The result also motivates one planned weaker-model follow-up: reuse the same P100 artifacts, Test-A manifest, cap 8, and repeat3 aggregation, and report the model as a separate transfer condition. The model must be fixed before inspecting its result; it must not be selected because it gives a favorable ranking.
+
 ## P100 cross-split robustness
 
 Test-B was frozen with seed `20260720` before any Test-B rollout. It contains 100 tasks sampled from the 700 WebShop indices remaining after excluding validation, Test-A, and ablation. Test-A and Test-B use Flash, `repeat_id=0`, and the same P100 Tower and native P100 SkillX artifacts. P100 SkillX is built from all 186 successful P100 trajectories and contains 51 task plans plus 2 atomic skills.
