@@ -17,5 +17,46 @@
     "direct_mid_cap": 8,
     "high_top_k": 1,
     "dynamic_state_retrieval": true
+  },
+  "semantic_clustering": {
+    "direct_mid_cap": 8,
+    "cap_selection": "fixed_to_common_retrieval_budget",
+    "include_high": false
+  },
+  "test": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+    "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
+    "methods": [
+      "no_skill",
+      "manual_skill",
+      "global_e2e_gpt",
+      "skillx",
+      "semantic_clustering",
+      "trace2tower"
+    ],
+    "task_count": 100,
+    "repeat_ids": [0],
+    "episodes_per_condition": 100
+  },
+  "diagnostics": {
+    "seen_p50": {
+      "agent_model": "deepseek-v4-flash",
+      "task_source": "experiments/webshop/event-tower-v2/stage-1-pools/audit.json:pools.p50.sample_ids",
+      "task_count": 50,
+      "repeat_ids": [0],
+      "methods": ["no_skill", "skillx", "trace2tower"]
+    },
+    "p100_scale": {
+      "agent_model": "deepseek-v4-flash",
+      "snapshot_id": "tower_9094918372ee0a39",
+      "direct_mid_cap": 8,
+      "task_count": 100,
+      "repeat_ids": [0]
+    },
+    "renderer_control": {
+      "status": "planned",
+      "role": "diagnostic_only",
+      "fixed_components": ["graph", "clusters", "high_paths", "retrieval", "direct_mid_cap"]
+    }
   }
 }

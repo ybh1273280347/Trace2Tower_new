@@ -1,45 +1,119 @@
 {
   "protocol": "original-concept-v1",
   "authority": "Trace2Tower原始资料.md",
-  "snapshot_id": "tower_1714fcabca14668e",
-  "training": {
-    "pool": "p50_mixed",
-    "trajectory_count": 173,
-    "segment_count": 947,
-    "compact_signature_count": 34
-  },
-  "graph": {
-    "edge_count": 9018,
-    "observed_transition_edge_count": 774,
-    "cross_event_edge_count": 808,
-    "mid_cluster_count": 18,
-    "high_path_count": 13,
-    "weighted_event_purity": 0.880675818373812
-  },
-  "gate": {
-    "manifest": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
-    "task_count": 100,
+  "execution_policy": {
     "repeat_ids": [0],
+    "reporting_label": "single-repeat",
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 42
+  },
+  "artifacts": {
+    "p50_full": {
+      "snapshot_id": "tower_1714fcabca14668e",
+      "trajectory_count": 173,
+      "segment_count": 947,
+      "compact_signature_count": 34,
+      "edge_count": 9018,
+      "observed_transition_edge_count": 774,
+      "cross_event_edge_count": 808,
+      "mid_cluster_count": 18,
+      "high_path_count": 13
+    },
+    "p50_semantic": {
+      "snapshot_id": "tower_b3ba355c9164dd58",
+      "trajectory_count": 173,
+      "segment_count": 947,
+      "mid_cluster_count": 18,
+      "high_path_count": 0
+    },
+    "p100_full": {
+      "snapshot_id": "tower_9094918372ee0a39",
+      "trajectory_count": 351,
+      "segment_count": 1955,
+      "compact_signature_count": 47,
+      "edge_count": 21274,
+      "observed_transition_edge_count": 1604,
+      "cross_event_edge_count": 1673,
+      "mid_cluster_count": 9,
+      "high_path_count": 5
+    }
+  },
+  "validation": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
     "agent_model": "deepseek-v4-flash",
-    "direct_mid_cap": 8,
-    "tower_run_id": "webshop-original-concept-v1-validation-flash-cap8-r1",
-    "no_skill_run_id": "webshop-original-concept-v1-validation-flash-noskill-r1",
-    "tower_mean_reward": 0.7234333333333334,
-    "no_skill_mean_reward": 0.65235,
-    "paired_reward_difference": 0.07108333333333333,
-    "paired_reward_ci95": [0.016747916666666664, 0.12908541666666662],
-    "wins": 13,
-    "ties": 82,
-    "losses": 5,
-    "tower_full_success_rate": 0.51,
-    "no_skill_full_success_rate": 0.47,
-    "tower_mean_steps": 7.2,
-    "no_skill_mean_steps": 7.69,
-    "tower_mean_invalid_actions": 0.24,
-    "no_skill_mean_invalid_actions": 0.3,
-    "tower_mean_input_tokens": 30661.35,
-    "no_skill_mean_input_tokens": 19572.0,
+    "task_count": 100,
+    "full_cap_metrics": {
+      "3": {"mean_reward": 0.7000166666666665, "full_success_rate": 0.50},
+      "5": {"mean_reward": 0.6825999999999998, "full_success_rate": 0.49},
+      "8": {"mean_reward": 0.7234333333333334, "full_success_rate": 0.51}
+    },
+    "selected_full_cap": 8,
+    "semantic_cap": 8,
+    "semantic_cap_policy": "fixed_to_common_retrieval_budget"
+  },
+  "p50_test": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+    "task_count": 100,
     "error_count": 0,
-    "decision": "pass"
+    "flash": {
+      "no_skill": 0.6807500000000001,
+      "manual_skill": 0.68875,
+      "global_e2e_gpt": 0.59475,
+      "skillx": 0.7069166666666666,
+      "semantic_clustering": 0.6502500000000001,
+      "trace2tower": 0.67625,
+      "trace2tower_minus_no_skill": {
+        "difference": -0.0045,
+        "ci95": [-0.07200208333333331, 0.06258333333333332]
+      },
+      "trace2tower_minus_semantic": {
+        "difference": 0.026,
+        "ci95": [-0.01425, 0.06875]
+      }
+    },
+    "pro": {
+      "no_skill": 0.62,
+      "manual_skill": 0.6904166666666667,
+      "global_e2e_gpt": 0.5634166666666667,
+      "skillx": 0.685,
+      "semantic_clustering": 0.5416666666666666,
+      "trace2tower": 0.6408333333333333,
+      "trace2tower_minus_no_skill": {
+        "difference": 0.020833333333333325,
+        "ci95": [-0.03833333333333334, 0.08033749999999994]
+      },
+      "trace2tower_minus_semantic": {
+        "difference": 0.09916666666666668,
+        "ci95": [0.01383333333333333, 0.18633333333333332]
+      }
+    }
+  },
+  "seen_p50_diagnostic": {
+    "task_count": 50,
+    "agent_model": "deepseek-v4-flash",
+    "error_count": 0,
+    "no_skill_mean_reward": 0.6538333333333334,
+    "skillx_mean_reward": 0.6575,
+    "trace2tower_mean_reward": 0.6660000000000003,
+    "skillx_minus_no_skill": 0.003666666666666665,
+    "trace2tower_minus_no_skill": 0.012166666666666668
+  },
+  "p100_scale_diagnostic": {
+    "task_count": 100,
+    "agent_model": "deepseek-v4-flash",
+    "error_count": 0,
+    "mean_reward": 0.7209166666666667,
+    "full_success_rate": 0.56,
+    "mean_steps": 7.17,
+    "mean_invalid_actions": 0.19,
+    "mean_input_tokens": 32359.55,
+    "minus_no_skill": {
+      "difference": 0.04016666666666668,
+      "ci95": [-0.014252083333333315, 0.09775208333333331]
+    },
+    "minus_p50_full": {
+      "difference": 0.04466666666666667,
+      "ci95": [-0.0035, 0.097]
+    }
   }
 }

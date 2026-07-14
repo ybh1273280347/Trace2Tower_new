@@ -34,4 +34,17 @@
 
 All subsequent validation conditions use only `deepseek-v4-flash`, the same 100-task manifest, and one execution per task. Reports and tables must label this as `single-repeat` or `1 run/task`. The statistical unit is the task, and paired task bootstrap may quantify variation across tasks. A result must never be copied into synthetic repeat IDs or reported as three independent executions.
 
+Full Trace2Tower was compared at direct Mid caps 3, 5, and 8 with the rebuilt original-concept artifact. Cap 8 has the highest empirical validation reward and is frozen for all Tower runs. Semantic-only also uses cap 8 without a separate sweep so Full, Semantic, and SkillX share the same retrieval budget. NoSkill, Manual, Global E2E, and SkillX have no validation-selected setting.
+
+## Formal test policy
+
+The frozen 100-task test manifest is evaluated once per task. The P50 main table contains NoSkill, Manual, Global E2E, SkillX, Semantic-only, and Full on both Flash and Pro. These runs were started only after Full cap 8 was frozen. Semantic-only is a graph-structure baseline, not a one-variable ablation.
+
+After the P50 test exposed a validation/test gap, two post-hoc diagnostics were registered:
+
+1. A seen-task diagnostic reruns the 50 P50 training task IDs with fresh Flash executions and compares NoSkill, SkillX, and P50 Full. It measures task-specific memorization and is not held-out evidence.
+2. A scale diagnostic rebuilds Full from the nested P100 pool, keeps cap 8 and the same test manifest, and runs Flash only. It measures whether broader training coverage improves held-out performance.
+
+No new Pro conditions are launched after the completed P50 main table. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
+
 Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.
