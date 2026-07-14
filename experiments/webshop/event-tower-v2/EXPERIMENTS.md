@@ -11,13 +11,15 @@
 
 ## 阶段 2：构建 P50 技能
 
-- [ ] 构建或严格审计复用 P50 Global E2E artifact。
-- [ ] 构建或严格审计复用 P50 SkillX artifact；运行时固定原生 cap8。
-- [ ] 重建 P50 Full Event Tower mixed snapshot。
-- [ ] 重建 P50 Semantic Clustering mixed baseline snapshot。
-- [ ] 重建 P50 No-mixed event-aware success-only snapshot。
-- [ ] Mid-only 绑定 Full snapshot，不单独构建。
-- [ ] 冻结 Manual Skill 文本及全部 artifact hashes，单独 commit 并 push。
+- [x] 构建或严格审计复用 P50 Global E2E artifact。
+- [x] 构建或严格审计复用 P50 SkillX artifact；运行时固定原生 cap8。
+- [x] 重建 P50 Full Event Tower mixed snapshot。
+- [x] 重建 P50 Semantic Clustering mixed baseline snapshot。
+- [x] 重建 P50 No-mixed event-aware success-only snapshot。
+- [x] Mid-only 绑定 Full snapshot，不单独构建。
+- [x] 冻结 Manual Skill 文本及全部 artifact hashes，单独 commit 并 push。
+
+冻结证据：`stage-2-skills/audit.json`，审计 ID `skillaudit_62e9fd8bde33bb9f`。Full、Semantic、No-mixed snapshot IDs 分别为 `tower_c69572a30d550032`、`tower_82fb7eb6f8ece365`、`tower_09e1e3351cc8e7ce`。
 
 P100 的新 Tower 构建推迟到阶段 8。这样 cap 在 P50 上冻结之后才做规模扩展，且 Flash 门控失败时不浪费 Flash 侧规模实验成本。
 

@@ -1,0 +1,157 @@
+{
+  "protocol_id": "webshop-event-tower-v2",
+  "stage": 2,
+  "status": "complete",
+  "stage_1_audit_id": "poolaudit_f75de8c0869ded41",
+  "inputs": {
+    "p50_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p50.jsonl",
+    "p50_pool_sha256": "7d8ae154746c398b1084acb130d8d1a13760b3be43e2d71ff0aabf60de9068f9",
+    "mixed_evidence": "artifacts/trajectories/webshop/evidence/webshop-flash50-repeat4-mixed-v1.jsonl",
+    "mixed_evidence_sha256": "eec47cb4f1cae356d6843b1ed78f23492255e84230b0a5d7c748466e1711ac64",
+    "mixed_trajectory_count": 173,
+    "success_evidence": "artifacts/trajectories/webshop/evidence/webshop-flash50-repeat4-success-only-v1.jsonl",
+    "success_evidence_sha256": "57685c1c872e1a4f35ad5c19462d365948e67f3f7f98f291b65bb5aef1a07a93",
+    "success_trajectory_count": 94
+  },
+  "baselines": {
+    "global_e2e_gpt": {
+      "method": "global_e2e_gpt",
+      "reuse_policy": "stable_end_to_end_induction",
+      "library": "artifacts/global_e2e/event-tower-v2/p50/library.json",
+      "library_id": "flatcorpus_cba9470f206835ef",
+      "library_sha256": "64a02f6dea969e320becebb3d242b8e62f344ba7569a19e11f48eb6b0a38f85d",
+      "skill_count": 4,
+      "training_trajectory_count": 94,
+      "corpus_sha256": "a43bf1862a47622e9daa027ad57e7667bff7e7b176a491f23a2d0d9027ccff3b",
+      "legacy_prompt_revision": "db29a80",
+      "legacy_prompt_path": "src/trace2tower/methods/flat_skill_summary/end_to_end_prompt.py",
+      "legacy_prompt_sha256": "3319a1eea3f12176439cc7fab310742c399da8367432148a0f8a42c4c590b7a0",
+      "builder_chat_input_tokens": 312231,
+      "builder_chat_output_tokens": 2156
+    },
+    "skillx": {
+      "method": "skillx",
+      "reuse_policy": "stable_official_skillx_library",
+      "library": "artifacts/skillx/event-tower-v2/p50/execution/library.json",
+      "library_id": "skillxlib_409dd86005b242ca",
+      "library_sha256": "b33cace93000d9bd500e006de02c8213119395981e163a91c72d9edc760bf4cc",
+      "source_library": "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/library.json",
+      "source_library_sha256": "ec856af8b58b2c64007be9bf00bf774701361e006879b177d583e94745a85760",
+      "upstream_reported_library_sha256": "b096f484604e14c114c8ba41d6393c3a54568a8faf0b7e2100aae8c7ef77ac28",
+      "skillx_commit": "36747f424a17ea041e476adf2ff976a206ec9c30",
+      "training_trajectory_count": 94,
+      "plan_count": 26,
+      "skill_count": 2,
+      "runtime_max_skills": 8
+    }
+  },
+  "snapshots": {
+    "trace2tower": {
+      "name": "full",
+      "method": "trace2tower",
+      "snapshot": "artifacts/trace2tower/event-tower-v2/p50/full/tower.json",
+      "snapshot_id": "tower_c69572a30d550032",
+      "snapshot_sha256": "b7511ff43362e3cefbdbd392e70a10c8ce1c0070a8f005e85c078e52bc24c770",
+      "config": "configs/experiments/webshop_trace2tower.yaml",
+      "config_sha256": "bab63c944cdc56a587856e4f72fb613536269fd4d33f107738dd3b4ac55c274f",
+      "training_trajectory_count": 173,
+      "mid_count": 19,
+      "high_count": 17,
+      "event_type_stratification": true,
+      "component_paths": {
+        "preprocessed_trajectories": "artifacts/trace2tower/event-tower-v2/p50/mixed/preprocessed.jsonl",
+        "clusters": "artifacts/trace2tower/event-tower-v2/p50/full/graph/clusters.json",
+        "high_paths": "artifacts/trace2tower/event-tower-v2/p50/full/skills/high-paths.json",
+        "rendered_cards": "artifacts/trace2tower/event-tower-v2/p50/full/skills/rendered-cards.json",
+        "retrieval_index": "artifacts/trace2tower/event-tower-v2/p50/full/index.json"
+      },
+      "component_sha256": {
+        "preprocessed_trajectories": "bd73bb04fc2a66c6f59ac8ecf8b904f4f4e602d1c5fc2f2755ba0379360734a2",
+        "clusters": "20b4c0809bbf13136998f778a9028675d77f84c9a9b23c4e201af0b90b0e9326",
+        "high_paths": "83f9e2b5f6b66cde9139d51fcb44a200b5153ff2cab9dbfcd5821d4aa5d9e4fc",
+        "rendered_cards": "05c39001e08f4ac9159ff297b668251fd5999cc7ba394629b1953d4fafe8e89b",
+        "retrieval_index": "137539412d238ecd83f071ce6d3bd1e7360bf172dcac8151aba717f1cf51ab95"
+      },
+      "renderer_call_count": 36,
+      "renderer_input_tokens": 842120,
+      "renderer_output_tokens": 5574
+    },
+    "semantic_clustering": {
+      "name": "semantic-clustering",
+      "method": "semantic_clustering",
+      "snapshot": "artifacts/trace2tower/event-tower-v2/p50/semantic-only/tower.json",
+      "snapshot_id": "tower_82fb7eb6f8ece365",
+      "snapshot_sha256": "3995357a886369bc10e0d603d2bd53382916107f6b0c8a31f177743d66073fb1",
+      "config": "configs/experiments/webshop_semantic_clustering.yaml",
+      "config_sha256": "47268cecc6e301a49ef51d98f0c70f8be761bf5931e7cb61613f1ee8d7417aa3",
+      "training_trajectory_count": 173,
+      "mid_count": 19,
+      "high_count": 0,
+      "event_type_stratification": false,
+      "component_paths": {
+        "preprocessed_trajectories": "artifacts/trace2tower/event-tower-v2/p50/mixed/preprocessed.jsonl",
+        "clusters": "artifacts/trace2tower/event-tower-v2/p50/semantic-only/graph/clusters.json",
+        "high_paths": "artifacts/trace2tower/event-tower-v2/p50/semantic-only/skills/high-paths.json",
+        "rendered_cards": "artifacts/trace2tower/event-tower-v2/p50/semantic-only/skills/rendered-cards.json",
+        "retrieval_index": "artifacts/trace2tower/event-tower-v2/p50/semantic-only/index.json"
+      },
+      "component_sha256": {
+        "preprocessed_trajectories": "bd73bb04fc2a66c6f59ac8ecf8b904f4f4e602d1c5fc2f2755ba0379360734a2",
+        "clusters": "427df74783687acda7f6db288ee7079994bf8ed662bd08f1378eff59e5da4d42",
+        "high_paths": "063161662e5d40105de9e4c765b80b47d07fb82ef5359f6de58b418d8897917b",
+        "rendered_cards": "ebb95510aa6bf3e9ad0a5bb70da6b8981081c8cbbca404ab04d2d818cd0f5b97",
+        "retrieval_index": "24aa6b3999b5d1e4e7f6060b32d64a6a36b78f2cc7f6e6cac03ee4c253b652fb"
+      },
+      "renderer_call_count": 19,
+      "renderer_input_tokens": 622195,
+      "renderer_output_tokens": 4392
+    },
+    "trace2tower_no_mixed": {
+      "name": "no-mixed",
+      "method": "trace2tower_no_mixed",
+      "snapshot": "artifacts/trace2tower/event-tower-v2/p50/no-mixed/tower.json",
+      "snapshot_id": "tower_09e1e3351cc8e7ce",
+      "snapshot_sha256": "fb175e7e3d2eb75337feecdc7de5cb60685ceaa1369db5a65db9dac20840be2b",
+      "config": "configs/experiments/webshop_trace2tower_no_mixed.yaml",
+      "config_sha256": "65c1ffd3b669522935f7335d3ccee7de9a32b92ec4df9ce61f9697f883319673",
+      "training_trajectory_count": 94,
+      "mid_count": 16,
+      "high_count": 26,
+      "event_type_stratification": true,
+      "component_paths": {
+        "preprocessed_trajectories": "artifacts/trace2tower/event-tower-v2/p50/success-only/preprocessed.jsonl",
+        "clusters": "artifacts/trace2tower/event-tower-v2/p50/no-mixed/graph/clusters.json",
+        "high_paths": "artifacts/trace2tower/event-tower-v2/p50/no-mixed/skills/high-paths.json",
+        "rendered_cards": "artifacts/trace2tower/event-tower-v2/p50/no-mixed/skills/rendered-cards.json",
+        "retrieval_index": "artifacts/trace2tower/event-tower-v2/p50/no-mixed/index.json"
+      },
+      "component_sha256": {
+        "preprocessed_trajectories": "a2a9091c00a2f8913008f89fd21b1ccc3df6ba6a9960563327e7d398e54c31e3",
+        "clusters": "8d946d0a50d764b9f60c1c90a80a5bc6b17ebac4d6d29ffa9b9cddbc54d915b3",
+        "high_paths": "d38209aadbd3b018477d28e5a18cb1fdaa4a4cb7dffff7d92fbbf0792607ff08",
+        "rendered_cards": "23b793dd08b2f674d5415a92cafaf4fc6e7e0a70b61cffc230d8e9e431e4610b",
+        "retrieval_index": "710da70633f2b5e6c6657184023e345a9149282876aa4faa8b9d1027a2cf5aea"
+      },
+      "renderer_call_count": 42,
+      "renderer_input_tokens": 586318,
+      "renderer_output_tokens": 5995
+    }
+  },
+  "mid_only_binding": {
+    "snapshot_id": "tower_c69572a30d550032",
+    "include_high": false
+  },
+  "manual_skill": {
+    "path": "experiments/webshop/event-tower-v2/manual-skill.md",
+    "sha256": "5d901247b383634ae557aa08298a3244f32204c74a0a340c22b4d37a843d2dc4"
+  },
+  "builder_code": {
+    "src/trace2tower/methods/trace2tower/renderer.py": "b3d5caa07ece8c072ca9f72127dc46d843190f28571ceb79bb7708dfb5d0827b",
+    "scripts/experiments/build/preprocess_trajectories.py": "c263ec0f98172c5b170c6345aff18ce2da822f452b5491355f61812b782d1ca8",
+    "scripts/experiments/build/build_trace2tower_graph.py": "3ac5672fd05c33271a1296abf2d8019885e5247946cffe5db499a5a12f01332e",
+    "scripts/experiments/build/build_trace2tower_skills.py": "7c044a9640dc872ca78906cb680ae3c5f96ddac26ab6a69da94f351c69bcd1a2",
+    "scripts/experiments/build/build_trace2tower_index.py": "639e49e6985faa7c1b188123d0c605ae93fbd4f2d443c3e6ab42a6d426f3771f",
+    "scripts/experiments/build/build_tower_snapshot.py": "71d012d021a64994c83a1c7b1e6a7cf8efb62c1a93b46ee56f9b270d34f4a3aa"
+  },
+  "audit_id": "skillaudit_62e9fd8bde33bb9f"
+}

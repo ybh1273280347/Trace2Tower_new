@@ -18,6 +18,12 @@ uv run python -m scripts.experiments.data.prepare_webshop_event_tower_v2
 uv run python -m scripts.experiments.data.audit_webshop_training_pools
 ```
 
+阶段 2 artifact 冻结审计：
+
+```powershell
+uv run python -m scripts.experiments.build.audit_webshop_stage2_artifacts
+```
+
 - Global E2E：`scripts.experiments.build.build_global_e2e_skills`
 - SkillX：现有 SkillX 构建链，GPT 并发不超过 4
 - Trace2Tower：`preprocess_trajectories` → `build_trace2tower_graph` → `build_trace2tower_skills` → `build_trace2tower_index` → `build_tower_snapshot`

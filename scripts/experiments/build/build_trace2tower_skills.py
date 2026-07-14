@@ -107,6 +107,7 @@ def build_high_render_examples(
 async def main(options: argparse.Namespace) -> int:
     if options.render_high_limit < 0:
         raise ValueError("render High limit must be non-negative")
+    load_dotenv(options.env)
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
     records = [
@@ -239,7 +240,6 @@ async def main(options: argparse.Namespace) -> int:
     )
     missing_paths = tuple(path for path in selected_paths if path.path_id not in high_cards)
     if missing_mid_ids or missing_paths:
-        load_dotenv(options.env)
         common = load_yaml(options.config_root / "common.yaml")
         runtime = CommonLLMRuntime(
             max_concurrency=common["global_api_concurrency"],
