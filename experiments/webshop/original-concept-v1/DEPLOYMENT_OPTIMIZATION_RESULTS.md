@@ -1,0 +1,23 @@
+# Test-A Deployment Optimization Result
+
+Configuration: `deepseek-v4-flash`, WebShop Test-A, direct Mid cap 8, existing
+real repeat IDs 1 and 2. The 200 Tower episodes are paired with the 200
+NoSkill episodes by `(sample_id, repeat_id)`.
+
+| High bundle | Exposure | Performance | Paired reward gain | Guarded step saving | Mean steps | Mean chat tokens | Pareto front |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `high_efbf322a092b` | 180 | 0.7101 | +0.0082 | -0.0816 | 7.28 | 31,609 | 1 |
+| `high_f4ff56f0acaa` | 20 | 0.6483 | +0.0950 | +0.0314 | 5.80 | 21,325 | 1 |
+
+The primary Pareto axes are performance level, paired reward gain, and guarded
+step saving. Both bundles remain on Front 1, so there is no evidence-based
+downweight action. The cap-8 runtime is therefore unchanged. Chat tokens are
+reported as a secondary diagnostic only and do not change the front.
+
+The result is a valid deployment-optimization outcome, not a failed run: the
+current paired evidence does not justify a lifecycle mutation. Mid-level
+per-card pruning remains disabled because the bundles co-inject the High path,
+its child Mids, and direct Mids, so their individual marginal effects are not
+identified.
+
+Machine-readable evidence: `artifacts/experiments/webshop/original-concept-v1/deployment-pareto.json`.

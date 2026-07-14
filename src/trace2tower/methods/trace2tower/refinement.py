@@ -25,6 +25,32 @@ class LifecycleAction(StrEnum):
     DOWNWEIGHT = "downweight"
 
 
+class RefinementAction(StrEnum):
+    """原始资料定义的四类部署结构化动作。"""
+
+    SPLIT = "split"
+    MERGE = "merge"
+    PROMOTE = "promote"
+    DOWNWEIGHT = "downweight"
+
+
+class ParetoObjective(StrEnum):
+    """可用于部署排序的固定目标集合。"""
+
+    PERFORMANCE_LEVEL = "performance_level"
+    PAIRED_REWARD_GAIN = "paired_reward_gain"
+    GUARDED_STEP_SAVING = "guarded_step_saving"
+    GUARDED_COST_SAVING = "guarded_cost_saving"
+
+
+PRIMARY_PARETO_OBJECTIVES = (
+    ParetoObjective.PERFORMANCE_LEVEL,
+    ParetoObjective.PAIRED_REWARD_GAIN,
+    ParetoObjective.GUARDED_STEP_SAVING,
+)
+ALL_PARETO_OBJECTIVES = (*PRIMARY_PARETO_OBJECTIVES, ParetoObjective.GUARDED_COST_SAVING)
+
+
 @dataclass(frozen=True, slots=True, order=True)
 class EpisodePairKey:
     benchmark: Benchmark
@@ -380,6 +406,39 @@ class LifecycleUpdate:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class RefinementActionPlan:
+    """一轮 refinement 中四类原子动作的 typed 映射。"""
+
+    split: LegalSplitProposal | None
+    merge: LegalMergeProposal | None
+    promote: RankedPromoteProposal | None
+    downweight: LifecycleUpdate | None
+
+    def to_record(self) -> dict:
+        return {
+            RefinementAction.SPLIT.value: (
+                asdict(self.split) if self.split is not None else None
+            ),
+            RefinementAction.MERGE.value: (
+                asdict(self.merge) if self.merge is not None else None
+            ),
+            RefinementAction.PROMOTE.value: (
+                {
+                    "proposal": asdict(self.promote.proposal),
+                    "path_objective": asdict(self.promote.path_objective),
+                    "child_exposure_count": self.promote.child_exposure_count,
+                    "pareto_front_rank": self.promote.pareto_front_rank,
+                }
+                if self.promote is not None
+                else None
+            ),
+            RefinementAction.DOWNWEIGHT.value: (
+                self.downweight.to_record() if self.downweight is not None else None
+            ),
+        }
+
+
 def audit_refinement_evidence(
     baseline_episodes: Sequence[RefinementEpisode],
     skill_episodes: Sequence[RefinementEpisode],
@@ -627,7 +686,12 @@ def dominates(left: ObjectiveVector, right: ObjectiveVector) -> bool:
 
 def rank_skill_objectives(
     objectives: Sequence[SkillObjective],
+    *,
+    objective_fields: Sequence[ParetoObjective] = PRIMARY_PARETO_OBJECTIVES,
 ) -> tuple[RankedSkillObjective, ...]:
+    objective_fields = tuple(objective_fields)
+    if not objective_fields or len(set(objective_fields)) != len(objective_fields):
+        raise ValueError("Pareto ranking requires unique objective fields")
     groups = defaultdict(list)
     for objective in objectives:
         scope = (
@@ -644,14 +708,16 @@ def rank_skill_objectives(
         vectors = {
             objective.skill_id: objective.objective_vector for objective in group
         }
-        ranks = _front_ranks(vectors)
+        ranks = _front_ranks(vectors, objective_fields)
         for objective in group:
             dominated_by = tuple(
                 sorted(
                     skill_id
                     for skill_id, vector in vectors.items()
                     if skill_id != objective.skill_id
-                    and dominates(vector, objective.objective_vector)
+                    and dominates_selected(
+                        vector, objective.objective_vector, objective_fields
+                    )
                 )
             )
             dominates_ids = tuple(
@@ -659,7 +725,9 @@ def rank_skill_objectives(
                     skill_id
                     for skill_id, vector in vectors.items()
                     if skill_id != objective.skill_id
-                    and dominates(objective.objective_vector, vector)
+                    and dominates_selected(
+                        objective.objective_vector, vector, objective_fields
+                    )
                 )
             )
             ranked.append(
@@ -867,7 +935,10 @@ def select_downweight(
     )
 
 
-def _front_ranks(vectors: Mapping[str, ObjectiveVector]) -> dict[str, int]:
+def _front_ranks(
+    vectors: Mapping[str, ObjectiveVector],
+    objective_fields: Sequence[ParetoObjective] = PRIMARY_PARETO_OBJECTIVES,
+) -> dict[str, int]:
     remaining = set(vectors)
     ranks = {}
     rank = 1
@@ -876,7 +947,9 @@ def _front_ranks(vectors: Mapping[str, ObjectiveVector]) -> dict[str, int]:
             skill_id
             for skill_id in remaining
             if not any(
-                dominates(vectors[other_id], vectors[skill_id])
+                dominates_selected(
+                    vectors[other_id], vectors[skill_id], objective_fields
+                )
                 for other_id in remaining
                 if other_id != skill_id
             )
@@ -888,6 +961,31 @@ def _front_ranks(vectors: Mapping[str, ObjectiveVector]) -> dict[str, int]:
             remaining.remove(skill_id)
         rank += 1
     return ranks
+
+
+def dominates_selected(
+    left: ObjectiveVector,
+    right: ObjectiveVector,
+    objective_fields: Sequence[ParetoObjective],
+) -> bool:
+    values = {
+        ParetoObjective.PERFORMANCE_LEVEL: left.performance_level,
+        ParetoObjective.PAIRED_REWARD_GAIN: left.paired_reward_gain,
+        ParetoObjective.GUARDED_STEP_SAVING: left.guarded_step_saving,
+        ParetoObjective.GUARDED_COST_SAVING: left.guarded_cost_saving,
+    }
+    right_values = {
+        ParetoObjective.PERFORMANCE_LEVEL: right.performance_level,
+        ParetoObjective.PAIRED_REWARD_GAIN: right.paired_reward_gain,
+        ParetoObjective.GUARDED_STEP_SAVING: right.guarded_step_saving,
+        ParetoObjective.GUARDED_COST_SAVING: right.guarded_cost_saving,
+    }
+    comparisons = tuple(
+        values[field] - right_values[field] for field in objective_fields
+    )
+    return all(value >= 0 for value in comparisons) and any(
+        value > 0 for value in comparisons
+    )
 
 
 def _scope(

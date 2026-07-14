@@ -1,0 +1,16 @@
+benchmark: webshop
+split: test
+agent_model: deepseek-v4-flash
+retrieval_policy_scope: high_context_bundle
+direct_mid_top_k: 8
+primary_pareto_objectives:
+  - performance_level
+  - paired_reward_gain
+  - guarded_step_saving
+secondary_metrics:
+  - guarded_chat_token_saving
+  - mean_chat_input_tokens
+  - mean_chat_output_tokens
+min_exposure_count: 10
+status_tie_epsilon: 0.01
+card_level_lifecycle: disabled_due_to_bundle_confounding

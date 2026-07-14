@@ -11,6 +11,8 @@ from trace2tower.methods.trace2tower.refinement import (
     LegalPromoteProposal,
     LegalSplitProposal,
     ObjectiveVector,
+    RefinementActionPlan,
+    RefinementAction,
     RefinementEpisode,
     SkillLevel,
     SkillObjective,
@@ -278,3 +280,41 @@ def test_runtime_preserves_only_explicit_billable_usage() -> None:
     assert explicit.billable_tokens == 7
     assert extra.billable_tokens == 8
     assert absent.billable_tokens is None
+
+
+def test_refinement_action_plan_maps_original_four_actions() -> None:
+    from trace2tower.methods.trace2tower.refinement import (
+        LifecycleAction,
+        LifecycleUpdate,
+        LegalSplitProposal,
+        SkillStatus,
+    )
+
+    plan = RefinementActionPlan(
+        split=LegalSplitProposal("split:mid", "mid"),
+        merge=None,
+        promote=None,
+        downweight=LifecycleUpdate(
+            "mid", LifecycleAction.DOWNWEIGHT, SkillStatus.ACTIVE,
+            SkillStatus.DOWNWEIGHTED, 1, 2,
+        ),
+    )
+    record = plan.to_record()
+    assert set(record) == {
+        RefinementAction.SPLIT.value,
+        RefinementAction.MERGE.value,
+        RefinementAction.PROMOTE.value,
+        RefinementAction.DOWNWEIGHT.value,
+    }
+    assert record["split"]["proposal_id"] == "split:mid"
+    assert record["downweight"]["new_status"] == "downweighted"
+
+
+def test_primary_pareto_rank_ignores_chat_cost() -> None:
+    ranked = rank_skill_objectives(
+        (
+            objective("cheap", (0.8, 0.1, 0.1, 0.9)),
+            objective("expensive", (0.8, 0.1, 0.1, -0.9)),
+        )
+    )
+    assert {item.pareto_front_rank for item in ranked} == {1}
