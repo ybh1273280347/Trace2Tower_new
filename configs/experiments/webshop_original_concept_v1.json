@@ -95,7 +95,7 @@
       }
     },
     "p100_no_mixed_test_a": {
-      "status": "artifact_built",
+      "status": "completed",
       "role": "training_evidence_ablation",
       "agent_model": "deepseek-v4-flash",
       "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
@@ -106,7 +106,11 @@
       "training_trajectory_count": 186,
       "runtime_config": "configs/experiments/webshop_trace2tower_no_mixed_original_concept_runtime.yaml",
       "fixed_against_full": ["source_rollout_pool", "event_extraction", "graph_algorithm", "renderer", "retrieval", "direct_mid_cap"],
-      "changed_component": "exclude partial and failure trajectories"
+      "changed_component": "exclude partial and failure trajectories",
+      "mean_reward": 0.6919166666666667,
+      "full_success_rate": 0.52,
+      "minus_full_reward": -0.029,
+      "minus_full_reward_ci95": [-0.08333750000000001, 0.022166666666666668]
     }
   }
 }

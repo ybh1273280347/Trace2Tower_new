@@ -1,6 +1,7 @@
 # WebShop Event Tower V2 实验口径
 
 > **已废弃：** 本协议把事件类型错误地用作图和聚类的硬分区，不符合 `Trace2Tower原始资料.md`。不得继续用于新实验或算法结论；当前协议见 `../original-concept-v1/PROTOCOL.md`。
+> No-event 与独立 ablation-train/ablation-test 方案同时取消；当前以 Semantic-only 检验图结构，以 No-Mixed 检验训练证据，并直接复用冻结评测集。
 
 ## 1. 有效范围
 

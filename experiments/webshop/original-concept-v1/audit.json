@@ -390,5 +390,43 @@
         "full_success_ci95": [0.0, 0.09]
       }
     }
+  },
+  "p100_no_mixed_test_a": {
+    "role": "training_evidence_ablation",
+    "run_id": "webshop-original-concept-v1-test-flash-p100-no-mixed-cap8-r1",
+    "snapshot_id": "tower_e121333546770f8f",
+    "agent_model": "deepseek-v4-flash",
+    "task_count": 100,
+    "repeat_ids": [0],
+    "unique_result_key_count": 100,
+    "duplicate_result_key_count": 0,
+    "error_attempt_count": 14,
+    "unresolved_error_key_count": 0,
+    "mean_reward": 0.6919166666666667,
+    "full_success_rate": 0.52,
+    "mean_steps": 8.26,
+    "mean_invalid_actions": 0.44,
+    "mean_input_tokens": 35609.37,
+    "minus_full": {
+      "reward_difference": -0.029,
+      "reward_ci95": [-0.08333750000000001, 0.022166666666666668],
+      "full_success_difference": -0.04,
+      "full_success_ci95": [-0.1, 0.02],
+      "mean_steps_difference": 1.09,
+      "steps_ci95": [0.36, 1.84],
+      "mean_invalid_action_difference": 0.25,
+      "mean_input_token_difference": 3249.82,
+      "wins": 6,
+      "ties": 84,
+      "losses": 10
+    },
+    "minus_no_skill": {
+      "reward_difference": 0.011166666666666667,
+      "reward_ci95": [-0.052085416666666676, 0.07575]
+    },
+    "minus_skillx_p100": {
+      "reward_difference": -0.02032142857142857,
+      "reward_ci95": [-0.05533422619047619, 0.010666964285714283]
+    }
   }
 }

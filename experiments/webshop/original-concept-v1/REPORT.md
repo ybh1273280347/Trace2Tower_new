@@ -150,6 +150,23 @@ Pooling the two independently frozen test sets as 200 tasks, Full minus SkillX i
 
 All four newly executed matrices cover 100/100 unique task keys with zero unresolved errors. Test-B SkillX and Full required 12 and 16 recoverable connection-error attempts respectively; checkpoint retries filled every missing key without duplicate results.
 
+## P100 No-Mixed evidence ablation
+
+No-Mixed uses the same P100 rollout pool as Full but keeps only all 186 full-success trajectories, versus Full's 351 selected mixed trajectories. Event extraction, compact signatures, relational graph construction, spectral clustering, High induction, native renderer, legacy retrieval, cap 8, Test-A, Flash, and `repeat_id=0` are fixed. The artifact has 19 Mid and 25 High skills, compared with Full's 9 Mid and 5 High skills; removing partial and failure evidence eliminates all negative adjacency mass and admits many more positive-support High paths.
+
+| Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | **21,388** |
+| P100 SkillX | 0.71224 | 49% | **6.92** | 0.31 | 24,141 |
+| P100 No-Mixed | 0.69192 | 52% | 8.26 | 0.44 | 35,609 |
+| P100 Full | **0.72092** | **56%** | 7.17 | **0.19** | 32,360 |
+
+No-Mixed minus Full reward is `-0.02900`, interval `[-0.08334, +0.02217]`, with 6 wins, 84 ties, and 10 losses. Full-success difference is `-4` points, interval `[-10, +2]`. No-Mixed takes `+1.09` steps, interval `[+0.36, +1.84]`, adds 0.25 invalid actions, and adds 3,250 input tokens per episode.
+
+No-Mixed minus NoSkill is only `+0.01117`, interval `[-0.05209, +0.07575]`; No-Mixed minus P100 SkillX is `-0.02032`, interval `[-0.05533, +0.01067]`. The ablation does not support the hypothesis that mixed evidence weakens Tower. Reward trends in the opposite direction, and the step-efficiency degradation from removing mixed evidence excludes zero. The most defensible mechanism interpretation is that partial/failure evidence regularizes the graph and High library, reducing path proliferation and inefficient execution.
+
+Run: `webshop-original-concept-v1-test-flash-p100-no-mixed-cap8-r1`, 100/100 unique keys, zero unresolved errors, 14 resolved TPM retry attempts.
+
 ## P100 renderer control
 
 The graph, 9 Mid clusters, 5 High paths, retrieval policy, cap 8, model, and test keys were held fixed. Only the text renderer changed. The SkillX-style adapter used the upstream SkillX plan and functional-skill instructions but returned the existing Trace2Tower Mid/High schemas.

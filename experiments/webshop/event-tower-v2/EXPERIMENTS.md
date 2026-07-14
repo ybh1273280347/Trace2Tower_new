@@ -1,6 +1,7 @@
 # WebShop Event Tower V2 实验清单
 
 > **已废弃：** 本清单属于被否决的硬事件分层实现。当前进度与结果见 `../original-concept-v1/`。
+> 下方 No-event 和独立消融数据集任务不得继续执行；有效消融仅按当前 original-concept 协议运行。
 
 ## 阶段 1：审计两个轨迹池
 
