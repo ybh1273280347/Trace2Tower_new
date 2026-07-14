@@ -58,6 +58,25 @@
       "renderer_input_tokens": 2534338,
       "renderer_cached_input_tokens": 2337664,
       "renderer_output_tokens": 4762
+    },
+    "p100_skillx": {
+      "artifact": "artifacts/skillx/webshop-scale-v1/p100/execution/library.json",
+      "artifact_sha256": "93f9c8857321e68d1924ff7bd2c0fabb3841b783006b2376bb30a3e44d22276a",
+      "library_id": "skillxlib_5346d9c7cc996337",
+      "training_task_count": 100,
+      "training_trajectory_count": 400,
+      "source_success_trajectory_count": 186,
+      "source_task_count": 51,
+      "source_matches_all_p100_successes": true,
+      "plan_count": 51,
+      "functional_skill_count": 0,
+      "atomic_skill_count": 2,
+      "source_library_sha256": "8e4885f391b7ba6cec31d40d12ef73b8024a196e3a9b351a4e3eebe232b4b1e1",
+      "skillx_commit": "36747f424a17ea041e476adf2ff976a206ec9c30",
+      "builder_calls": 429,
+      "builder_input_tokens": 1686214,
+      "builder_cached_input_tokens": 1065592,
+      "builder_output_tokens": 197111
     }
   },
   "validation": {
@@ -228,5 +247,19 @@
       "ci95": [-0.07383333333333333, 0.016833333333333332]
     },
     "coverage_audit": "global_manifest_keys_after_interrupted_resume"
+  },
+  "test_b_selection": {
+    "status": "frozen_before_rollout",
+    "manifest": "experiments/webshop/original-concept-v1/manifests/test-b.jsonl",
+    "manifest_sha256": "e9e88175c7582baa69b4ea1dc73c511d4259e302f2234727023e0d023610f8d5",
+    "selection_seed": 20260720,
+    "candidate_count_after_exclusion": 700,
+    "task_count": 100,
+    "overlap_with_validation": 0,
+    "overlap_with_test_a": 0,
+    "overlap_with_ablation": 0,
+    "agent_model": "deepseek-v4-flash",
+    "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
+    "outcome_based_split_selection": false
   }
 }

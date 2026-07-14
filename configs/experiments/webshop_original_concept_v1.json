@@ -84,6 +84,8 @@
       "task_count": 100,
       "repeat_ids": [0],
       "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
+      "skillx_artifact_id": "skillxlib_5346d9c7cc996337",
+      "trace2tower_snapshot_id": "tower_9094918372ee0a39",
       "manual_skill": "optional_not_run",
       "outcome_based_split_selection": false
     }
