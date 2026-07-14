@@ -103,15 +103,20 @@ def parse_shard_ids(value: str, num_shards: int) -> tuple[int, ...]:
     return shard_ids
 
 
-def parse_artifact_paths(values: list[str]) -> dict[Benchmark, Path]:
+def parse_benchmark_paths(
+    values: list[str],
+    assignment_name: str,
+) -> dict[Benchmark, Path]:
     paths = {}
     for value in values:
         benchmark_name, separator, raw_path = value.partition("=")
         if not separator or not raw_path:
-            raise ValueError(f"expected BENCHMARK=PATH artifact assignment: {value}")
+            raise ValueError(
+                f"expected BENCHMARK=PATH {assignment_name} assignment: {value}"
+            )
         benchmark = Benchmark(benchmark_name)
         if benchmark in paths:
-            raise ValueError(f"duplicate artifact assignment for {benchmark}")
+            raise ValueError(f"duplicate {assignment_name} assignment for {benchmark}")
         paths[benchmark] = Path(raw_path)
     return paths
 
@@ -368,10 +373,15 @@ async def run_matrix_shard(
 async def main(options: argparse.Namespace) -> int:
     method = MethodName(options.method)
     split = ExperimentSplit(options.split)
+    benchmarks = (
+        tuple(Benchmark)
+        if options.benchmark == "all"
+        else (Benchmark(options.benchmark),)
+    )
     common = load_yaml(options.config_root / "common.yaml")
     benchmark_configs = {
         benchmark: load_yaml(options.config_root / f"{benchmark}.yaml")
-        for benchmark in Benchmark
+        for benchmark in benchmarks
     }
     method_config = load_yaml(
         getattr(options, "method_config", None)
@@ -388,13 +398,11 @@ async def main(options: argparse.Namespace) -> int:
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")
     agent_model = options.agent_model or no_skill_config["agent_model"]
-    benchmarks = (
-        tuple(Benchmark)
-        if options.benchmark == "all"
-        else (Benchmark(options.benchmark),)
-    )
     shard_ids = parse_shard_ids(options.shard_id, options.num_shards)
-    artifact_paths = parse_artifact_paths(options.artifact)
+    artifact_paths = parse_benchmark_paths(options.artifact, "artifact")
+    manifest_paths = parse_benchmark_paths(options.manifest, "manifest")
+    if manifest_paths and set(manifest_paths) != set(benchmarks):
+        raise ValueError("every selected benchmark requires one manifest assignment")
     manual_skill = None
     if method is MethodName.NO_SKILL:
         if artifact_paths:
@@ -422,7 +430,11 @@ async def main(options: argparse.Namespace) -> int:
     entries_by_benchmark = {
         benchmark: select_entries(
             read_manifest(
-                Path(common["manifests_dir"]) / f"{benchmark}_{split}.jsonl"
+                manifest_paths.get(
+                    benchmark,
+                    Path(common["manifests_dir"])
+                    / f"{benchmark}_{split}.jsonl",
+                )
             ),
             tuple(options.sample_id),
             tuple(options.repeat_id),
@@ -439,6 +451,20 @@ async def main(options: argparse.Namespace) -> int:
         "artifacts": {
             benchmark.value: artifact.to_record()
             for benchmark, artifact in artifacts.items()
+        },
+        "manifests": {
+            benchmark.value: {
+                "path": path.as_posix(),
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            }
+            for benchmark in benchmarks
+            for path in (
+                manifest_paths.get(
+                    benchmark,
+                    Path(common["manifests_dir"])
+                    / f"{benchmark}_{split}.jsonl",
+                ),
+            )
         },
     }
     if options.agent_endpoint_role != ModelRole.AGENT:
@@ -597,6 +623,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", choices=tuple(ExperimentSplit), default="train")
     parser.add_argument("--method", choices=EXECUTABLE_METHODS, required=True)
     parser.add_argument("--artifact", action="append", default=[])
+    parser.add_argument("--manifest", action="append", default=[])
     parser.add_argument("--sample-id", action="append", default=[])
     parser.add_argument("--repeat-id", action="append", type=int, default=[])
     parser.add_argument("--shard-id", default="all")

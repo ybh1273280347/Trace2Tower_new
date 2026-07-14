@@ -32,4 +32,10 @@ Full 和 No-mixed 的 WebShop Tower 必须通过 event stratification 契约。S
 
 Tower 的直接 Mid cap 是运行时参数。正式运行必须传入 `--direct-mid-top-k 3`、`5` 或 `8`；SkillX 的 `max_skills: 8` 是其原生能力，不复用这套 Tower 选择规则。
 
+阶段 3 validation 按机器协议顺序运行全部 12 个条件，并写入可恢复 ledger：
+
+```powershell
+uv run python -m scripts.experiments.run.run_webshop_stage3_validation
+```
+
 旧 scale-study、Flat、Static Tower 和 cap sweep 命令见 `experiments/webshop/deprecated/scripts-experiments-readme-v1.md`，不得用于 v2。
