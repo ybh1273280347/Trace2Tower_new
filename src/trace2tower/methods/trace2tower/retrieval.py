@@ -18,6 +18,7 @@ class TowerRetrieval:
     direct_mid_deduplicated: tuple[SkillMatch, ...]
     direct_mid_matches: tuple[SkillMatch, ...]
     skill_ids: tuple[str, ...]
+    context_skill_ids: tuple[str, ...]
     context: str
 
 
@@ -133,6 +134,9 @@ def retrieve_tower(
         direct_mid_deduplicated=direct_mid_deduplicated,
         direct_mid_matches=direct_mid_matches,
         skill_ids=skill_ids,
+        context_skill_ids=(
+            ((high_card.skill_id,) if high_card else ()) + context_mid_ids
+        ),
         context=format_tower_context(high_card, context_mid_cards),
     )
 

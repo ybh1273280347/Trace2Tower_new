@@ -50,11 +50,19 @@ def parse_source_library(
     skills = []
     for skill_type in ("functional", "atomic"):
         for record in source_skills.get(skill_type, []):
+            content = str(record.get("content", ""))
+            tools = list(record.get("tools", []))
+            if benchmark is Benchmark.ALFWORLD:
+                content = content.replace("apis.alfworld.take_action", "take_action")
+                tools = [
+                    "take_action" if tool == "apis.alfworld.take_action" else tool
+                    for tool in tools
+                ]
             semantic = {
                 "name": record.get("name"),
                 "document": record.get("document"),
-                "content": record.get("content"),
-                "tools": record.get("tools", []),
+                "content": content,
+                "tools": tools,
                 "skill_type": skill_type,
             }
             required_text = ("name", "document", "content")
@@ -124,6 +132,19 @@ async def main(options: argparse.Namespace) -> int:
     }
     output_path = options.output_dir / "library.json"
     reused = reusable_vectors(output_path, text_hash_by_id)
+    output_reused_count = len(reused)
+    checkpoint_path = options.output_dir / "embedding-checkpoint.json"
+    if checkpoint_path.exists():
+        checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        if checkpoint.get("source_library_sha256") == source_sha256:
+            reused.update(
+                {
+                    skill_id: tuple(item["vector"])
+                    for skill_id, item in checkpoint.get("vectors", {}).items()
+                    if text_hash_by_id.get(skill_id) == item.get("text_hash")
+                }
+            )
+    checkpoint_reused_count = len(reused) - output_reused_count
     missing_ids = tuple(sorted(set(text_by_id) - set(reused)))
 
     load_dotenv(options.env)
@@ -134,17 +155,32 @@ async def main(options: argparse.Namespace) -> int:
         timeout_seconds=common["provider_timeout_seconds"],
         retry_base_seconds=common["retry_base_seconds"],
     )
+    new_vectors = {}
+    embedding_results = []
+    batch_size = int(common["embedding_batch_size"])
     try:
-        embedding = (
-            await runtime.embed([text_by_id[skill_id] for skill_id in missing_ids])
-            if missing_ids
-            else None
-        )
+        for offset in range(0, len(missing_ids), batch_size):
+            batch_ids = missing_ids[offset : offset + batch_size]
+            result = await runtime.embed(
+                [text_by_id[skill_id] for skill_id in batch_ids]
+            )
+            embedding_results.append(result)
+            new_vectors.update(zip(batch_ids, result.vectors, strict=True))
+            write_json(
+                checkpoint_path,
+                {
+                    "source_library_sha256": source_sha256,
+                    "vectors": {
+                        skill_id: {
+                            "text_hash": text_hash_by_id[skill_id],
+                            "vector": vector,
+                        }
+                        for skill_id, vector in sorted((reused | new_vectors).items())
+                    },
+                },
+            )
     finally:
         await runtime.close()
-    new_vectors = dict(
-        zip(missing_ids, embedding.vectors if embedding else (), strict=True)
-    )
     vectors = reused | new_vectors
 
     def build_index(ids: tuple[str, ...]) -> SkillEmbeddingIndex:
@@ -174,8 +210,12 @@ async def main(options: argparse.Namespace) -> int:
         "plan_count": len(plans),
         "skill_count": len(skills),
         "reused_embedding_count": len(reused),
+        "reused_library_embedding_count": output_reused_count,
+        "reused_checkpoint_embedding_count": checkpoint_reused_count,
         "new_embedding_count": len(missing_ids),
-        "embedding_input_tokens": embedding.usage.input_tokens if embedding else None,
+        "embedding_input_tokens": sum(
+            result.usage.input_tokens or 0 for result in embedding_results
+        ),
     }
     write_json(options.output_dir / "report.json", report)
     print(yaml.safe_dump(report, sort_keys=False))

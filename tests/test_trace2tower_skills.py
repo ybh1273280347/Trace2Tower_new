@@ -217,7 +217,7 @@ def test_high_renderer_preserves_path_id_and_mid_order() -> None:
     assert card.skill_id == path.path_id
     assert card.ordered_mid_ids == path.ordered_mid_ids
     assert runtime.calls[0][2]["tool_choice"] == "required"
-    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:high:v1"
+    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:high:v4"
 
 
 def test_mid_renderer_keeps_a_stable_prefix_before_variable_evidence() -> None:

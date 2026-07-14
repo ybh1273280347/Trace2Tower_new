@@ -31,7 +31,7 @@ PROTECTED_FILES = (
     "inference/embedding_service.py",
 )
 LOCAL_PATCHES = {
-    "pipeline.py": "f0840d5cd2e63513c95ec28ea101fadc09d63cf918a760150b85428be7a42c57",
+    "pipeline.py": "a770a3826358e9fdc2bfc0d3199469aee2f56438acf0198c19b44319e4191864",
 }
 
 

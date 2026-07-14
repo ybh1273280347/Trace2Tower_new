@@ -1,0 +1,10 @@
+method: flat_skill_summary
+retrieval_strategy: diverse
+family_stratified: true
+flat_candidate_top_k: 100
+flat_similarity_threshold: 0.45
+flat_relative_margin: 0.08
+flat_dedup_similarity_threshold: 0.95
+flat_mmr_lambda: 0.75
+flat_top_k: 3
+success_threshold: 0.999

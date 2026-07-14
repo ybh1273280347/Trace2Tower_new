@@ -1,0 +1,6 @@
+method: skillx
+family_stratified: true
+similarity_threshold: 0.45
+plan_top_k: 3
+skills_per_step: 4
+max_skills: 10

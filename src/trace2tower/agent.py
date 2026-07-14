@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from collections.abc import Awaitable, Callable
@@ -7,7 +8,7 @@ from dataclasses import dataclass
 
 from trace2tower.benchmarks.models import BenchmarkEnvironment, EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-from trace2tower.manifests import Benchmark, ManifestEntry
+from trace2tower.manifests import AlfworldTaskFamily, Benchmark, ManifestEntry
 from trace2tower.results import EpisodeResult, FinishReason, MethodName
 from trace2tower.trajectory import EpisodeTrajectory, StepRecord, TrajectoryWriter
 
@@ -18,10 +19,17 @@ class SkillSelection:
     context: str
     model_input_tokens: int | None = 0
     model_output_tokens: int | None = 0
+    context_skill_ids: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         if len(set(self.skill_ids)) != len(self.skill_ids):
             raise ValueError("skill selection contains duplicate IDs")
+        if self.context_skill_ids is None:
+            object.__setattr__(self, "context_skill_ids", self.skill_ids)
+        if len(set(self.context_skill_ids)) != len(self.context_skill_ids):
+            raise ValueError("injected context contains duplicate skill IDs")
+        if not set(self.context_skill_ids) <= set(self.skill_ids):
+            raise ValueError("injected context references skills outside the selection")
         if self.skill_ids and not self.context:
             raise ValueError("a non-empty skill selection requires injected context")
         token_counts = (self.model_input_tokens, self.model_output_tokens)
@@ -29,7 +37,9 @@ class SkillSelection:
             raise ValueError("skill selection token counts must be non-negative")
 
 
-SkillProvider = Callable[[str, str], Awaitable[SkillSelection]]
+SkillProvider = Callable[
+    [str, str, AlfworldTaskFamily | None], Awaitable[SkillSelection]
+]
 
 
 class AgentEvaluator:
@@ -74,7 +84,11 @@ class AgentEvaluator:
 
         try:
             selection = (
-                await skill_provider(episode.task_goal, state.observation)
+                await skill_provider(
+                    episode.task_goal,
+                    state.observation,
+                    entry.task_family,
+                )
                 if skill_provider
                 else SkillSelection(skill_ids, skill_context or "")
             )
@@ -230,6 +244,10 @@ class AgentEvaluator:
             latency_ms=round((time.perf_counter() - started) * 1000),
             skill_ids=selection.skill_ids,
             skill_context_chars=len(selection.context),
+            context_skill_ids=selection.context_skill_ids,
+            skill_context_sha256=hashlib.sha256(
+                selection.context.encode("utf-8")
+            ).hexdigest(),
             chat_input_tokens=(
                 chat_input_tokens if chat_input_usage_available else None
             ),

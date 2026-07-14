@@ -25,8 +25,9 @@ from trace2tower.manifests import (
     expand_manifest_repeats,
     read_manifest,
 )
-from trace2tower.methods.flat_skill_summary.models import FlatSkillLibrary
+from trace2tower.methods.flat_skill_summary.models import load_flat_library
 from trace2tower.methods.flat_skill_summary.provider import FlatSkillProvider
+from trace2tower.methods.manual_skill.provider import ManualSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
@@ -37,15 +38,19 @@ from trace2tower.trajectory import TrajectoryWriter
 
 EXECUTABLE_METHODS = (
     MethodName.NO_SKILL,
+    MethodName.MANUAL_SKILL,
     MethodName.FLAT_SKILL_SUMMARY,
     MethodName.SKILLX,
     MethodName.TRACE2TOWER_STATIC,
+    MethodName.TRACE2TOWER_FULL,
 )
 METHOD_CONFIG_FILES = {
     MethodName.NO_SKILL: "no_skill.yaml",
+    MethodName.MANUAL_SKILL: "manual_skill.yaml",
     MethodName.FLAT_SKILL_SUMMARY: "flat_skill_summary.yaml",
     MethodName.SKILLX: "skillx.yaml",
     MethodName.TRACE2TOWER_STATIC: "trace2tower_static.yaml",
+    MethodName.TRACE2TOWER_FULL: "trace2tower_full_execution.yaml",
 }
 
 
@@ -104,14 +109,14 @@ def load_method_artifact(
 ) -> MethodArtifact:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if method is MethodName.FLAT_SKILL_SUMMARY:
-        library = FlatSkillLibrary.from_record(payload)
+        library = load_flat_library(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
     elif method is MethodName.SKILLX:
         library = SkillXExecutionLibrary.from_record(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
-    elif method is MethodName.TRACE2TOWER_STATIC:
+    elif method in (MethodName.TRACE2TOWER_STATIC, MethodName.TRACE2TOWER_FULL):
         snapshot = TowerSnapshot.from_record(payload)
         snapshot.require_complete()
         artifact_benchmark = snapshot.benchmark
@@ -152,6 +157,7 @@ def create_provider(
             mmr_lambda=float(method_config.get("flat_mmr_lambda", 0.75)),
             max_skills=int(method_config["flat_top_k"]),
             retrieval_strategy=retrieval_strategy,
+            family_stratified=bool(method_config.get("family_stratified", False)),
         )
     if artifact.method is MethodName.SKILLX:
         schemas = environment_type(artifact.benchmark).tool_schemas
@@ -164,8 +170,9 @@ def create_provider(
             plan_top_k=int(method_config["plan_top_k"]),
             skills_per_step=int(method_config["skills_per_step"]),
             max_skills=int(method_config["max_skills"]),
+            family_stratified=bool(method_config.get("family_stratified", False)),
         )
-    if artifact.method is MethodName.TRACE2TOWER_STATIC:
+    if artifact.method in (MethodName.TRACE2TOWER_STATIC, MethodName.TRACE2TOWER_FULL):
         diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
         provider = Trace2TowerSkillProvider.from_path(
             runtime,
@@ -201,13 +208,14 @@ def create_provider(
             status_tie_epsilon=float(
                 method_config.get("status_tie_epsilon", 0.0)
             ),
+            family_stratified=bool(method_config.get("family_stratified", False)),
         )
         if (
             provider.snapshot.config.high_top_k != int(method_config["high_top_k"])
             or provider.snapshot.config.direct_mid_top_k
             != int(method_config["direct_mid_top_k"])
         ):
-            raise ValueError("Static retrieval config differs from the Tower snapshot")
+            raise ValueError("Tower retrieval config differs from the snapshot")
         return provider
     raise ValueError(f"unsupported provider method: {artifact.method}")
 
@@ -384,9 +392,20 @@ async def main(options: argparse.Namespace) -> int:
     )
     shard_ids = parse_shard_ids(options.shard_id, options.num_shards)
     artifact_paths = parse_artifact_paths(options.artifact)
+    manual_skill = None
     if method is MethodName.NO_SKILL:
         if artifact_paths:
             raise ValueError("No-Skill does not accept method artifacts")
+        artifacts = {}
+    elif method is MethodName.MANUAL_SKILL:
+        if artifact_paths:
+            raise ValueError("Manual Skill does not accept method artifacts")
+        if options.fixed_skill_context_file is None:
+            raise ValueError("Manual Skill requires --fixed-skill-context-file")
+        manual_skill = ManualSkillProvider.from_path(
+            options.fixed_skill_id,
+            options.fixed_skill_context_file,
+        )
         artifacts = {}
     else:
         if set(artifact_paths) != set(benchmarks):
@@ -421,6 +440,14 @@ async def main(options: argparse.Namespace) -> int:
     }
     if options.agent_endpoint_role != ModelRole.AGENT:
         resolved_config["agent_endpoint_role"] = options.agent_endpoint_role
+    if manual_skill is not None:
+        resolved_config["manual_skill"] = {
+            "skill_id": manual_skill.skill_id,
+            "path": options.fixed_skill_context_file.as_posix(),
+            "sha256": hashlib.sha256(
+                options.fixed_skill_context_file.read_bytes()
+            ).hexdigest(),
+        }
     if options.repeat_id:
         resolved_config["selection"] = {
             "repeat_ids": sorted(options.repeat_id),
@@ -438,6 +465,9 @@ async def main(options: argparse.Namespace) -> int:
         "run_id": options.run_id,
         "agent_model": agent_model,
         "agent_endpoint_role": options.agent_endpoint_role,
+        "alfworld_server_url": options.alfworld_server_url,
+        "episode_concurrency": options.episode_concurrency,
+        "api_concurrency": options.api_concurrency,
     }
     print(yaml.safe_dump({"resolved_config": resolved_config, "invocation": invocation}))
 
@@ -464,6 +494,11 @@ async def main(options: argparse.Namespace) -> int:
         print(json_records(records))
         return 0
 
+    if options.alfworld_server_url:
+        benchmark_configs[Benchmark.ALFWORLD] = {
+            **benchmark_configs[Benchmark.ALFWORLD],
+            "server_url": options.alfworld_server_url,
+        }
     load_dotenv(options.env)
     endpoint_role = ModelRole(options.agent_endpoint_role)
     if endpoint_role is ModelRole.AGENT:
@@ -475,20 +510,26 @@ async def main(options: argparse.Namespace) -> int:
         raise ValueError("run ID already has a different resolved configuration")
     write_yaml(resolved_path, resolved_config)
     runtime = CommonLLMRuntime(
-        max_concurrency=common["global_api_concurrency"],
+        max_concurrency=options.api_concurrency or common["global_api_concurrency"],
         max_attempts=common["provider_max_attempts"],
         timeout_seconds=common["provider_timeout_seconds"],
         retry_base_seconds=common["retry_base_seconds"],
     )
-    providers = {
-        benchmark: create_provider(
-            runtime,
-            artifacts[benchmark],
-            method_config,
-        )
-        for benchmark in artifacts
-    }
-    episode_semaphore = asyncio.Semaphore(common["episode_concurrency"])
+    providers = (
+        {benchmark: manual_skill for benchmark in benchmarks}
+        if manual_skill is not None
+        else {
+            benchmark: create_provider(
+                runtime,
+                artifacts[benchmark],
+                method_config,
+            )
+            for benchmark in artifacts
+        }
+    )
+    episode_semaphore = asyncio.Semaphore(
+        options.episode_concurrency or common["episode_concurrency"]
+    )
     started_at = datetime.now(UTC)
     try:
         records = await asyncio.gather(
@@ -560,6 +601,11 @@ if __name__ == "__main__":
     parser.add_argument("--max-episodes", type=int)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--agent-model")
+    parser.add_argument("--alfworld-server-url")
+    parser.add_argument("--episode-concurrency", type=int)
+    parser.add_argument("--api-concurrency", type=int)
+    parser.add_argument("--fixed-skill-context-file", type=Path)
+    parser.add_argument("--fixed-skill-id", default="manual_webshop_constraint_v1")
     parser.add_argument(
         "--agent-endpoint-role",
         choices=(ModelRole.AGENT.value, ModelRole.RENDERER.value),

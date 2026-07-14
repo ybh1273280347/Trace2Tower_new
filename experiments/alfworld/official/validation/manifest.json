@@ -1,0 +1,10 @@
+{
+  "status": "not_run_for_cap_selection",
+  "protocol": "configs/experiments/alfworld_protocol_v1.json",
+  "manifest": "artifacts/manifests/alfworld_dev.jsonl",
+  "source_split": "valid_seen",
+  "sample_count": 139,
+  "repeat_ids": [0, 1, 2],
+  "decision": "No cap-n validation sweep is run. Tower and Flat use cap 3 by fixed experiment instruction.",
+  "formal_baseline": false
+}

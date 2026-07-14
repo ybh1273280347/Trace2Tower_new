@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from statistics import fmean
 from typing import Any
 
 from trace2tower.llm_runtime import ChatResult, CommonLLMRuntime, ModelRole
@@ -69,30 +70,45 @@ Output discipline:
 """
 
 
-HIGH_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower HighPath into concise strategy guidance. The builder has already mined and scored the path. Your task is to explain when and how to execute the existing ordered child Mid skills; you do not discover, edit, filter, reorder, merge, split, or score the path.
+MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS = """
+This target was created by one fixed structural Split or coordinated Split/Merge transaction. Sibling profiles are supplied only to express the target's observable boundary; they are not members of the target and must not be merged into it.
+
+- Make the target description and constraints distinguish it from siblings using differences supported by target evidence, such as query composition, observable page state, verification behavior, option handling, recovery condition, or action ordering.
+- Do not manufacture a distinction from product names or incidental categories when the operational behavior is the same.
+- Do not mention siblings, clusters, comparisons, scores, or evidence in the card.
+- If the stable behavior is shared, keep shared steps concise and use the applicability condition or constraints for the defensible boundary.
+"""
+
+
+HIGH_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower HighPath into concise strategy guidance. The builder has already mined and scored the path. Your task is to explain the reusable within-episode behavior represented by the fixed ordered path; you do not discover, edit, filter, reorder, merge, split, or score the path.
 
 Ownership contract:
 - The builder owns path_id, skill_id, ordered_mid_ids, child membership, positive_support, negative_support, contrastive_path_score, and supporting_trajectory_ids. Never return or propose these fields.
 - You own only name, description, and procedure. Return them through the single supplied function.
-- ordered_mid_ids is immutable. Every child must be represented exactly once and in the supplied order. Do not add a child, omit a child, reverse two children, or replace a child with a newly invented step sequence.
-- Child Mid cards are the executable source of truth. Support statistics describe training evidence strength but do not authorize stronger factual claims.
+- ordered_mid_ids is immutable. Preserve the supplied order of distinct path-local contributions, but do not create a separate procedure block merely to mention every child. When adjacent or repeated children overlap in the supporting actions, one concise procedure step may jointly represent them.
+- Supporting examples are the authoritative evidence for the overall task meaning and path-local action order. Child Mid cards are noisy local compressions that may describe more of a workflow than the child actually contributed in a supporting episode.
 
 Input interpretation:
 - path_id is only a stable builder identifier and must not appear in prose.
 - ordered_mid_ids specifies execution order and must not be copied into output.
 - child_mid_cards contain each behavior's applicability, procedure, constraints, and Low grounding. Use their operational content without mentioning hierarchy.
+- supporting_examples contain real episode goals, path_steps aligned to the ordered child Mid IDs, and the flattened raw actions covered by this path. The path-local actions are authoritative for what this High may recommend. Goals only disambiguate object and action roles; they do not authorize adding goal-completion operations absent from the path-local actions. Extract only the behavior shared across examples. Never serialize distinct example goals as consecutive objectives in one plan.
 - positive_support is the fraction of full-success training trajectories containing this path; negative_support is the corresponding fraction among other trajectories.
 - contrastive_path_score ranks mined candidates. It is not a probability, confidence score, reward, or guarantee.
 - supporting_trajectory_ids establish provenance only and must never appear in the card.
 
 Card requirements:
 - name: a short strategy label describing the end-to-end behavioral sequence. Do not include IDs, levels, benchmarks, support, scores, or words such as cluster and path.
-- description: one or two sentences specifying observable applicability conditions for the full sequence. It must not claim that unrelated child goals form one task merely because they co-occurred.
-- procedure: concise execution guidance that preserves child order. It may compress redundant wording between adjacent child cards, but it must retain each child's essential checks, transformations, and actions.
+- description: one or two sentences specifying observable applicability conditions for the full sequence. It must describe one episode objective pattern, not an aggregate of several supporting goals.
+- procedure: concise execution guidance that preserves the observed path-local action order. It may compress redundant wording between adjacent child cards. Do not add an operation solely because it appears in the episode goal or a broad child card when it is absent from the supporting path_steps.
 
 Composition rules:
 - Preserve dependencies across children only when supported by their cards. A later child may consume state established by an earlier child, but do not invent that dependency.
-- If adjacent child cards are variants or partially redundant, describe their ordered roles without silently deleting either one.
+- If a child card overstates its local role relative to its aligned path_step, use the narrower role shown by that path_step while preserving its position in the sequence.
+- If adjacent or repeated child cards are variants or partially redundant, compress their observed contribution without turning each card into a separate end-to-end task. Shared actions such as pickup, lamp use, heating, cooling, cleaning, or final placement should appear once unless the path-local raw actions consistently repeat them.
+- When examples differ only in where an object is found or which receptacle is used, express that difference as a conditional choice before the shared downstream steps. Never serialize mutually exclusive variants as if both happened in sequence.
+- Do not repeat a transformation or placement merely because more than one child card mentions the same end-to-end action. The path-local raw actions decide whether repetition is real.
+- Do not complete the rest of an episode objective when the mined path is only a prefix, suffix, or middle fragment. For example, a path containing search and pickup but no lamp toggle must not recommend toggling the lamp merely because the goal mentions a lamp.
 - If children appear weakly related, use neutral sequential language rather than inventing a causal story or shared objective.
 - Carry forward safety checks and applicability constraints that materially affect execution.
 - Do not introduce Low actions absent from child cards, new object types, new product attributes, new destinations, new tools, new prices, or hidden environment state.
@@ -114,7 +130,7 @@ Output discipline:
 - Use the supplied function exactly once and return no prose outside it.
 - Return only name, description, and procedure, with non-empty strings and a non-empty procedure list.
 - Keep the result compact for retrieval-time injection.
-- Before calling the function, silently verify that procedure coverage follows ordered_mid_ids exactly and that no builder-owned field is returned.
+- Before calling the function, silently verify that every recommended operation is grounded in supporting path_steps, repeated operations are supported by actual repetition, procedure order follows the path, and no builder-owned field is returned.
 """
 
 
@@ -151,6 +167,7 @@ async def render_mid_card(
     runtime: CommonLLMRuntime,
     benchmark: Benchmark,
     render_input: MidRenderInput,
+    sibling_inputs: Sequence[MidRenderInput] = (),
 ) -> tuple[MidSkillCard, ChatResult]:
     legal_actions = legal_grounding_actions(benchmark, render_input)
     official_actions = [skill.primitive_action.value for skill in LOW_SKILLS[benchmark]]
@@ -175,12 +192,24 @@ async def render_mid_card(
         [
             {
                 "role": "system",
-                "content": MID_RENDERER_INSTRUCTIONS,
+                "content": (
+                    MID_RENDERER_INSTRUCTIONS
+                    + (MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS if sibling_inputs else "")
+                ),
             },
             {
                 "role": "user",
                 "content": json.dumps(
-                    render_input.to_record(),
+                    (
+                        {
+                            "target": render_input.to_record(),
+                            "sibling_profiles": [
+                                _mid_render_profile(item) for item in sibling_inputs
+                            ],
+                        }
+                        if sibling_inputs
+                        else render_input.to_record()
+                    ),
                     ensure_ascii=False,
                     sort_keys=True,
                     separators=(",", ":"),
@@ -191,7 +220,11 @@ async def render_mid_card(
         tool_choice="required",
         temperature=0,
         max_output_tokens=1200,
-        prompt_cache_key=f"trace2tower:mid:{benchmark.value}:v1",
+        prompt_cache_key=(
+            f"trace2tower:mid:{benchmark.value}:contrastive-v2"
+            if sibling_inputs
+            else f"trace2tower:mid:{benchmark.value}:v1"
+        ),
     )
     payload = _tool_payload(
         result,
@@ -215,10 +248,35 @@ async def render_mid_card(
     )
 
 
+def _mid_render_profile(render_input: MidRenderInput) -> dict:
+    scores = [item.trajectory_score for item in render_input.segment_evidence]
+    examples = sorted(render_input.segment_evidence, key=lambda item: item.segment_id)[:8]
+    return {
+        "support_count": render_input.support_count,
+        "mean_trajectory_score": fmean(scores),
+        "full_score_ratio": sum(score >= 0.999 for score in scores) / len(scores),
+        "primitive_action_distribution": render_input.primitive_action_distribution,
+        "event_types": sorted(
+            {item.event_type for item in render_input.segment_evidence if item.event_type}
+        ),
+        "representative_examples": [
+            {
+                "goal": item.goal,
+                "raw_actions": item.raw_actions,
+                "observation_before": item.observation_before[:1200],
+                "observation_after": item.observation_after[:1200],
+                "trajectory_score": item.trajectory_score,
+            }
+            for item in examples
+        ],
+    }
+
+
 async def render_high_card(
     runtime: CommonLLMRuntime,
     path: HighPath,
     child_mid_cards: Mapping[str, MidSkillCard],
+    supporting_examples: Sequence[Mapping[str, object]] = (),
 ) -> tuple[HighSkillCard, ChatResult]:
     missing = set(path.ordered_mid_ids) - set(child_mid_cards)
     if missing:
@@ -233,6 +291,7 @@ async def render_high_card(
         "negative_support": path.negative_support,
         "contrastive_path_score": path.contrastive_score,
         "supporting_trajectory_ids": path.supporting_trajectory_ids,
+        "supporting_examples": list(supporting_examples),
     }
     tool = _tool(
         "render_high_skill",
@@ -265,7 +324,7 @@ async def render_high_card(
         tool_choice="required",
         temperature=0,
         max_output_tokens=1000,
-        prompt_cache_key="trace2tower:high:v1",
+        prompt_cache_key="trace2tower:high:v4",
     )
     payload = _tool_payload(
         result, "render_high_skill", {"name", "description", "procedure"}

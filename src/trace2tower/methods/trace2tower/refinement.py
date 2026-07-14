@@ -38,6 +38,14 @@ class EpisodePairKey:
             "repeat_id": self.repeat_id,
         }
 
+    @classmethod
+    def from_record(cls, record: Mapping) -> EpisodePairKey:
+        return cls(
+            benchmark=Benchmark(record["benchmark"]),
+            sample_id=str(record["sample_id"]),
+            repeat_id=int(record["repeat_id"]),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class RefinementEpisode:
@@ -220,6 +228,15 @@ class ObjectiveVector:
             self.guarded_cost_saving,
         )
 
+    @classmethod
+    def from_record(cls, record: Mapping) -> ObjectiveVector:
+        return cls(
+            performance_level=float(record["performance_level"]),
+            paired_reward_gain=float(record["paired_reward_gain"]),
+            guarded_step_saving=float(record["guarded_step_saving"]),
+            guarded_cost_saving=float(record["guarded_cost_saving"]),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class SkillObjective:
@@ -268,6 +285,24 @@ class RankedSkillObjective:
             "dominated_by": self.dominated_by,
             "dominates": self.dominates,
         }
+
+    @classmethod
+    def from_record(cls, record: Mapping) -> RankedSkillObjective:
+        return cls(
+            skill_id=str(record["skill_id"]),
+            benchmark=Benchmark(record["benchmark"]),
+            skill_level=SkillLevel(record["skill_level"]),
+            refinement_round=int(record["refinement_round"]),
+            objective_vector=ObjectiveVector.from_record(record["objective_vector"]),
+            exposure_count=int(record["exposure_count"]),
+            paired_episode_keys=tuple(
+                EpisodePairKey.from_record(item)
+                for item in record["paired_episode_keys"]
+            ),
+            pareto_front_rank=int(record["pareto_front_rank"]),
+            dominated_by=tuple(record["dominated_by"]),
+            dominates=tuple(record["dominates"]),
+        )
 
 
 @dataclass(frozen=True, slots=True)

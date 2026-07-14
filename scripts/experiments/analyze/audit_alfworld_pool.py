@@ -14,19 +14,35 @@ def main(options: argparse.Namespace) -> int:
     protocol = json.loads(options.protocol.read_text(encoding="utf-8"))
     expected_ids = set(protocol["trajectory_pool"]["sample_ids"])
     expected_repeats = set(protocol["trajectory_pool"]["repeat_ids"])
+    expected_keys = {
+        (sample_id, repeat_id)
+        for sample_id in expected_ids
+        for repeat_id in expected_repeats
+    }
+    expansion_records = [
+        json.loads(path.read_text(encoding="utf-8")) for path in options.expansion
+    ]
+    for expansion in expansion_records:
+        expected_ids.update(expansion["sample_ids"])
+        expected_keys.update(
+            (sample_id, repeat_id)
+            for sample_id in expansion["sample_ids"]
+            for repeat_id in expansion["repeat_ids"]
+        )
     family_by_id = {
         f"alfworld:train:{item['task_id']}": item["task_family"]
         for item in parquet.read_table(
             options.dataset_root / "train.parquet", columns=["extra_info"]
         ).column(0).combine_chunks().to_pylist()
     }
+    run_roots = (options.run_root, *options.additional_run_root)
     trajectories = tuple(
         trajectory
-        for episode_dir in sorted(options.run_root.glob("shard-*/trajectories"))
+        for run_root in run_roots
+        for episode_dir in sorted(run_root.glob("shard-*/trajectories"))
         for trajectory in TrajectoryReader.read_episode_files(episode_dir)
     )
     keys = {(trajectory.sample_id, trajectory.repeat_id) for trajectory in trajectories}
-    expected_keys = {(sample_id, repeat_id) for sample_id in expected_ids for repeat_id in expected_repeats}
     if keys != expected_keys or len(keys) != len(trajectories):
         raise ValueError(
             f"trajectory coverage mismatch: missing={len(expected_keys - keys)}, "
@@ -53,6 +69,8 @@ def main(options: argparse.Namespace) -> int:
     passed = len(successful) >= required_successes and not deficient
     count = write_trajectory_jsonl(trajectories, options.output)
     report = {
+        "run_roots": [path.as_posix() for path in run_roots],
+        "expansions": [path.as_posix() for path in options.expansion],
         "trajectory_count": count,
         "success_count": len(successful),
         "success_rate": len(successful) / len(trajectories),
@@ -73,6 +91,8 @@ def main(options: argparse.Namespace) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument("--additional-run-root", type=Path, action="append", default=[])
+    parser.add_argument("--expansion", type=Path, action="append", default=[])
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--protocol", type=Path, default=Path("configs/experiments/alfworld_protocol_v1.json"))
     parser.add_argument("--dataset-root", type=Path, default=Path("Datasets/alfworld"))

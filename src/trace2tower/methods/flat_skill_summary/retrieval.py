@@ -3,13 +3,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from trace2tower.methods.flat_skill_summary.models import FlatSkillCard
+from trace2tower.methods.flat_skill_summary.models import FlatCard
 from trace2tower.semantic_index import SkillEmbeddingIndex, SkillMatch, diverse_search
 
 
 @dataclass(frozen=True, slots=True)
 class FlatRetrieval:
-    cards: tuple[FlatSkillCard, ...]
+    cards: tuple[FlatCard, ...]
     candidate_matches: tuple[SkillMatch, ...]
     filtered_matches: tuple[SkillMatch, ...]
     deduplicated_matches: tuple[SkillMatch, ...]
@@ -24,7 +24,7 @@ class FlatRetrieval:
 def retrieve_flat_skills(
     query_vector: tuple[float, ...],
     index: SkillEmbeddingIndex,
-    cards: Mapping[str, FlatSkillCard],
+    cards: Mapping[str, FlatCard],
     *,
     candidate_top_k: int = 100,
     similarity_threshold: float = 0.45,
@@ -63,7 +63,7 @@ def retrieve_flat_skills(
 def retrieve_flat_skills_legacy(
     query_vector: tuple[float, ...],
     index: SkillEmbeddingIndex,
-    cards: Mapping[str, FlatSkillCard],
+    cards: Mapping[str, FlatCard],
     top_k: int = 3,
 ) -> FlatRetrieval:
     if set(index.skill_ids) != set(cards):
@@ -80,7 +80,7 @@ def retrieve_flat_skills_legacy(
     )
 
 
-def format_flat_card(card: FlatSkillCard) -> str:
+def format_flat_card(card: FlatCard) -> str:
     lines = [f"## Skill: {card.name}", f"Use when: {card.description}", "Procedure:"]
     lines.extend(f"{index}. {step}" for index, step in enumerate(card.procedure, 1))
     lines.append("Constraints:")

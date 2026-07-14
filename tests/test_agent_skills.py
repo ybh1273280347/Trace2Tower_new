@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 from pathlib import Path
 
@@ -74,10 +75,19 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
         0,
     )
 
-    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def select(
+        task_goal: str, initial_observation: str, task_family
+    ) -> SkillSelection:
         assert task_goal == "buy the matching item"
         assert initial_observation == "initial page"
-        return SkillSelection(("high_a", "mid_a"), "retrieved context", 7, 0)
+        assert task_family is None
+        return SkillSelection(
+            ("high_a", "mid_a"),
+            "retrieved context",
+            7,
+            0,
+            ("high_a",),
+        )
 
     result = asyncio.run(
         evaluator.run_episode(
@@ -92,7 +102,11 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
         )
     )
     assert result.skill_ids == ("high_a", "mid_a")
+    assert result.context_skill_ids == ("high_a",)
     assert result.skill_context_chars == len("retrieved context")
+    assert result.skill_context_sha256 == hashlib.sha256(
+        b"retrieved context"
+    ).hexdigest()
     assert result.input_tokens == 17
     assert result.output_tokens == 2
     assert result.chat_input_tokens == 10
@@ -117,7 +131,10 @@ def test_agent_chat_cost_does_not_include_retrieval_embedding_tokens(tmp_path: P
         0,
     )
 
-    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def select(
+        task_goal: str, initial_observation: str, task_family
+    ) -> SkillSelection:
+        assert task_family is None
         return SkillSelection(("mid_a",), "retrieved context", 7, 0)
 
     result = asyncio.run(
@@ -184,7 +201,10 @@ def test_agent_closes_environment_when_skill_selection_fails(tmp_path: Path) -> 
         0,
     )
 
-    async def fail_selection(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def fail_selection(
+        task_goal: str, initial_observation: str, task_family
+    ) -> SkillSelection:
+        assert task_family is None
         raise RuntimeError("selection failed")
 
     with pytest.raises(RuntimeError, match="selection failed"):

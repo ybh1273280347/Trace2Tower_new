@@ -24,6 +24,26 @@ class ExperimentSplit(StrEnum):
     TEST = "test"
 
 
+class AlfworldTaskFamily(StrEnum):
+    LOOK_AT_OBJ_IN_LIGHT = "look_at_obj_in_light"
+    PICK_AND_PLACE = "pick_and_place"
+    PICK_CLEAN_THEN_PLACE = "pick_clean_then_place"
+    PICK_COOL_THEN_PLACE = "pick_cool_then_place"
+    PICK_HEAT_THEN_PLACE = "pick_heat_then_place"
+    PICK_TWO_OBJ_AND_PLACE = "pick_two_obj_and_place"
+
+    @property
+    def retrieval_description(self) -> str:
+        return {
+            self.LOOK_AT_OBJ_IN_LIGHT: "inspect an object under a light",
+            self.PICK_AND_PLACE: "move one object to a destination",
+            self.PICK_CLEAN_THEN_PLACE: "clean an object before placement",
+            self.PICK_COOL_THEN_PLACE: "cool an object before placement",
+            self.PICK_HEAT_THEN_PLACE: "heat an object before placement",
+            self.PICK_TWO_OBJ_AND_PLACE: "move two matching objects to one destination",
+        }[self]
+
+
 @dataclass(frozen=True, slots=True)
 class ManifestEntry:
     benchmark: Benchmark
@@ -32,6 +52,7 @@ class ManifestEntry:
     dataset_index: int
     source_split: str
     repeat_id: int
+    task_family: AlfworldTaskFamily | None = None
 
     @classmethod
     def from_record(cls, record: dict) -> ManifestEntry:
@@ -42,6 +63,11 @@ class ManifestEntry:
             dataset_index=int(record["dataset_index"]),
             source_split=str(record["source_split"]),
             repeat_id=int(record["repeat_id"]),
+            task_family=(
+                AlfworldTaskFamily(record["task_family"])
+                if record.get("task_family")
+                else None
+            ),
         )
 
     @property
@@ -70,6 +96,7 @@ def build_alfworld_manifests(
                         dataset_index=dataset_index,
                         source_split=source_split,
                         repeat_id=repeat_id,
+                        task_family=AlfworldTaskFamily(item["task_family"]),
                     )
                 )
         validate_manifest(entries)
@@ -95,6 +122,7 @@ def build_webshop_manifests(
                 dataset_index=goal_index,
                 source_split="goals",
                 repeat_id=repeat_id,
+                task_family=None,
             )
             for goal_index in range(start, end)
             for repeat_id in repeat_ids
@@ -126,7 +154,7 @@ def expand_manifest_repeats(
     signatures = {}
     for entry in selected:
         key = (entry.benchmark, entry.split, entry.sample_id)
-        signature = (entry.dataset_index, entry.source_split)
+        signature = (entry.dataset_index, entry.source_split, entry.task_family)
         if key in signatures and signatures[key] != signature:
             raise ValueError("sample repeat entries disagree on dataset provenance")
         templates.setdefault(key, entry)

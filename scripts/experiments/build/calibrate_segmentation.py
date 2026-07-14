@@ -23,6 +23,8 @@ from trace2tower.trajectory import TrajectoryReader
 
 
 async def main(options: argparse.Namespace) -> None:
+    if options.embedding_concurrency <= 0:
+        raise ValueError("embedding concurrency must be positive")
     common = load_yaml(options.config_root / "common.yaml")
     paths = tuple(Path(path) for path in sorted(glob.glob(options.trajectory_glob)))
     if not paths:
@@ -44,6 +46,7 @@ async def main(options: argparse.Namespace) -> None:
         "target_segment_length": options.target_segment_length,
         "max_segment_length": options.max_segment_length,
         "output": options.output.as_posix(),
+        "embedding_concurrency": options.embedding_concurrency,
         "dry_run": options.dry_run,
     }
     print(yaml.safe_dump({"common": common, "invocation": invocation}))
@@ -53,7 +56,7 @@ async def main(options: argparse.Namespace) -> None:
     load_dotenv(options.env)
     model = os.environ["EMBEDDING_MODEL"]
     runtime = CommonLLMRuntime(
-        max_concurrency=common["global_api_concurrency"],
+        max_concurrency=options.embedding_concurrency,
         max_attempts=common["provider_max_attempts"],
         timeout_seconds=common["provider_timeout_seconds"],
         retry_base_seconds=common["retry_base_seconds"],
@@ -122,5 +125,6 @@ if __name__ == "__main__":
     parser.add_argument("--max-segment-length", type=int, default=6)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
+    parser.add_argument("--embedding-concurrency", type=int, default=1)
     parser.add_argument("--dry-run", action="store_true")
     asyncio.run(main(parser.parse_args()))

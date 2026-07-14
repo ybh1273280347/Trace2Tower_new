@@ -109,9 +109,7 @@ def main(options: argparse.Namespace) -> int:
         "refinement_round": config["refinement_round"],
         "execution_contract": {
             **execution_contract.to_record(),
-            "baseline_metadata_hashes": file_hashes(
-                options.baseline_run_metadata
-            ),
+            "baseline_metadata_hashes": file_hashes(baseline_metadata_paths),
             "skill_report_sha256": hashlib.sha256(
                 options.skill_run_report.read_bytes()
             ).hexdigest(),
@@ -155,7 +153,16 @@ def main(options: argparse.Namespace) -> int:
                     select_downweight(items, eligible).to_record()
                 )
     write_json(options.output, report)
-    print(yaml.safe_dump(report, sort_keys=False, allow_unicode=True))
+    summary = {
+        "tower_snapshot_id": report["tower_snapshot_id"],
+        "ranking_status": report["ranking_status"],
+        "paired_episode_count": len(audit.paired_episode_keys),
+        "evidence_complete": audit.is_complete,
+        "ranked_skill_count": len(report["ranked_skills"]),
+        "downweight": report["downweight"],
+        "output": options.output.as_posix(),
+    }
+    print(yaml.safe_dump(summary, sort_keys=False, allow_unicode=True))
     if options.require_complete and not audit.is_complete:
         return 2
     return 0

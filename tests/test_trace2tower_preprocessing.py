@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from trace2tower.benchmarks.models import ClickableKind
+from trace2tower.llm_runtime import LLMUsage
 from trace2tower.manifests import Benchmark, ExperimentSplit
 from trace2tower.methods.trace2tower.action_parser import (
     parse_alfworld_action,
@@ -208,7 +209,8 @@ def test_transition_encoder_reuses_content_hash_cache(tmp_path: Path) -> None:
         async def embed(self, texts):
             self.calls.append(tuple(texts))
             return SimpleNamespace(
-                vectors=tuple((float(len(text)), 1.0) for text in texts)
+                vectors=tuple((float(len(text)), 1.0) for text in texts),
+                usage=LLMUsage(0, 0, 0),
             )
 
     async def run() -> None:
@@ -250,7 +252,10 @@ def test_transition_encoder_keeps_successful_batches_after_peer_failure(tmp_path
             self.calls.append(tuple(texts))
             if self.fail_text in texts:
                 raise RuntimeError("simulated provider failure")
-            return SimpleNamespace(vectors=tuple((float(len(text)), 1.0) for text in texts))
+            return SimpleNamespace(
+                vectors=tuple((float(len(text)), 1.0) for text in texts),
+                usage=LLMUsage(0, 0, 0),
+            )
 
     async def run() -> None:
         cache_path = tmp_path / "embeddings.sqlite"

@@ -53,6 +53,22 @@ class SkillEmbeddingIndex:
     def top_k(self, query_vector: Sequence[float], count: int) -> tuple[str, ...]:
         return tuple(match.skill_id for match in self.search(query_vector, count))
 
+    def subset(self, allowed_ids: set[str]) -> SkillEmbeddingIndex:
+        selected = [
+            index
+            for index, skill_id in enumerate(self.skill_ids)
+            if skill_id in allowed_ids
+        ]
+        return SkillEmbeddingIndex(
+            tuple(self.skill_ids[index] for index in selected),
+            tuple(self.vectors[index] for index in selected),
+            (
+                tuple(self.text_hashes[index] for index in selected)
+                if self.text_hashes
+                else ()
+            ),
+        )
+
     def search(
         self,
         query_vector: Sequence[float],

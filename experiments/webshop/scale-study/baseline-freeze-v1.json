@@ -1,0 +1,197 @@
+{
+  "freeze_id": "webshop-strong-skill-baseline-v1",
+  "frozen_at": "2026-07-14",
+  "benchmark": "webshop",
+  "protocol_id": "webshop-scale-v1",
+  "scope": "Pro diagnostic cohort used to establish the strong skill baseline",
+  "evaluation": {
+    "model": "deepseek-v4-pro",
+    "task_count": 100,
+    "repeat_ids": [0, 1, 2],
+    "episode_count_per_condition": 300,
+    "max_steps": 20,
+    "selection_seed": 20260715,
+    "sample_ids_source": "configs/experiments/webshop_scale_v1.json",
+    "pairing_unit": "sample_id and repeat_id",
+    "bootstrap_unit": "sample_id after averaging repeats",
+    "bootstrap_resamples": 10000,
+    "primary_metric": "mean_reward",
+    "reported_metrics": [
+      "mean_reward",
+      "full_success_rate",
+      "completion_rate",
+      "mean_steps",
+      "invalid_action_rate",
+      "mean_chat_input_tokens",
+      "mean_skill_context_chars"
+    ],
+    "full_success_definition": "primary_score >= 0.999"
+  },
+  "baseline_contract": {
+    "null_control": {
+      "condition_id": "noskill",
+      "meaning": "No retrieved or manually supplied skill context"
+    },
+    "strong_skill_baseline": {
+      "condition_id": "manual_v2",
+      "label": "Manual V2",
+      "meaning": "A deliberately hand-designed, task-knowledge-rich WebShop policy used to measure whether the agent can benefit from a mature skill",
+      "injection": "The complete Markdown file is injected verbatim into # Retrieved Experience; embedding retrieval and hierarchical expansion are bypassed",
+      "skill_id": "manual_webshop_v2",
+      "source": "experiments/webshop/scale-study/diagnostics/manual-skill-v2.md",
+      "source_sha256": "b20b58e9121fc8fc129d4aac0f702df93ee290d9d50abdc2c083cc307bc8d645",
+      "source_characters": 2554,
+      "status": "frozen"
+    },
+    "interpretation": "Manual V2 is a strong upper-reference baseline, not an automatically induced method and not evidence that Trace2Tower learned the policy. NoSkill remains the causal zero-information control."
+  },
+  "completed_conditions": {
+    "noskill": {
+      "run_id": "webshop-scale-v1-pro-noskill",
+      "episode_count": 300,
+      "mean_reward": 0.6270277777777777,
+      "full_success_rate": 0.4266666666666667,
+      "completion_rate": 0.81,
+      "mean_steps": 8.906666666666666,
+      "invalid_action_rate": 0.09693113772455089,
+      "mean_chat_input_tokens": 23441.24,
+      "mean_skill_context_chars": 0.0
+    },
+    "manual_v2": {
+      "run_id": "webshop-scale-v1-pro-manual-skill-v2",
+      "episode_count": 300,
+      "mean_reward": 0.7216388888888889,
+      "full_success_rate": 0.49,
+      "completion_rate": 0.9366666666666666,
+      "mean_steps": 5.966666666666667,
+      "invalid_action_rate": 0.006145251396648044,
+      "mean_chat_input_tokens": 15246.74,
+      "mean_skill_context_chars": 2552.0
+    },
+    "p50_skillx": {
+      "run_id": "webshop-scale-v1-pro-p50-skillx",
+      "episode_count": 300,
+      "mean_reward": 0.7049722222222222,
+      "full_success_rate": 0.48333333333333334,
+      "completion_rate": 0.9166666666666666,
+      "mean_steps": 6.62,
+      "invalid_action_rate": 0.0377643504531722,
+      "mean_chat_input_tokens": 22468.023333333334,
+      "mean_skill_context_chars": 5356.84
+    },
+    "p50_success_tower": {
+      "run_id": "webshop-scale-v1-pro-p50-success",
+      "episode_count": 300,
+      "mean_reward": 0.678,
+      "full_success_rate": 0.4766666666666667,
+      "completion_rate": 0.88,
+      "mean_steps": 7.58,
+      "invalid_action_rate": 0.06376429199648197,
+      "mean_chat_input_tokens": 23947.136666666665,
+      "mean_skill_context_chars": 3817.95
+    },
+    "direct_induction_v1": {
+      "run_id": "webshop-scale-v1-pro-p50-flat-global-gpt54",
+      "episode_count": 300,
+      "mean_reward": 0.4990555555555556,
+      "full_success_rate": 0.39,
+      "completion_rate": 0.59,
+      "mean_steps": 12.85,
+      "invalid_action_rate": 0.09208819714656291,
+      "mean_chat_input_tokens": 49952.736666666664,
+      "mean_skill_context_chars": 3668.56,
+      "diagnosis": "The corpus was induced into atomic decision cards; top-k retrieval usually omitted the purchase closure."
+    },
+    "direct_induction_v2": {
+      "run_id": "webshop-scale-v1-pro-p50-flat-e2e-gpt54-top1",
+      "episode_count": 300,
+      "mean_reward": 0.5221111111111111,
+      "full_success_rate": 0.37,
+      "completion_rate": 0.6933333333333334,
+      "mean_steps": 11.886666666666667,
+      "invalid_action_rate": 0.0535614133482894,
+      "mean_chat_input_tokens": 44884.99333333333,
+      "mean_skill_context_chars": 2534.7,
+      "diagnosis": "Four complete skills were produced, but initial-goal top-1 routing collapsed to the search-recovery skill in 294 of 300 episodes."
+    }
+  },
+  "paired_effects": {
+    "manual_v2_minus_noskill": {
+      "mean_reward": {
+        "difference": 0.09461111111111112,
+        "ci95": [0.04416666666666667, 0.14711249999999998]
+      },
+      "full_success_rate": {
+        "difference": 0.06333333333333334,
+        "ci95": [0.013333333333333334, 0.12]
+      },
+      "mean_steps": {
+        "difference": -2.94,
+        "ci95": [-4.053333333333333, -1.913333333333333]
+      },
+      "mean_chat_input_tokens": {
+        "difference": -8194.5,
+        "ci95": [-12872.69675, -3762.2430833333365]
+      }
+    },
+    "manual_v2_minus_p50_skillx": {
+      "mean_reward": {
+        "difference": 0.01666666666666667,
+        "ci95": [-0.024999999999999994, 0.058277777777777776]
+      },
+      "full_success_rate": {
+        "difference": 0.006666666666666665,
+        "ci95": [-0.04666666666666667, 0.06333333333333334]
+      }
+    },
+    "manual_v2_minus_p50_success_tower": {
+      "mean_reward": {
+        "difference": 0.04363888888888889,
+        "ci95": [-0.003226388888888877, 0.09336111111111112]
+      },
+      "full_success_rate": {
+        "difference": 0.013333333333333334,
+        "ci95": [-0.03333333333333333, 0.06000000000000001]
+      }
+    }
+  },
+  "clustered_induction": {
+    "status": "build-only",
+    "evaluation_run_id": null,
+    "source_trajectory_count": 200,
+    "successful_trajectory_count": 94,
+    "successful_task_count": 26,
+    "task_profile_unit": "sample_id with successful repeats kept together",
+    "cluster_selection": "maximum cosine silhouette over k=2..6 with at least 3 tasks per cluster",
+    "selected_cluster_count": 5,
+    "cluster_sizes": [4, 6, 7, 5, 4],
+    "skill_count": 5,
+    "renderer_model": "gpt-5.4",
+    "runtime_retrieval": "legacy top-1 by initial goal",
+    "library_id": "flatcorpus_397fe4be38bfe617",
+    "artifacts": {
+      "clusters": {
+        "path": "artifacts/flat_skill_summary/webshop-p50-clustered-gpt54-v1/clusters.json",
+        "sha256": "0c04672d88f678bfa9a50c9d2b186568d04ae31fb8f529d832a7d3787feab80f"
+      },
+      "library": {
+        "path": "artifacts/flat_skill_summary/webshop-p50-clustered-gpt54-v1/library.json",
+        "sha256": "151d48e54064fa785e70fe5d8eaae0ff846c44c6d8298714372dc427947ea5eb"
+      },
+      "report": {
+        "path": "artifacts/flat_skill_summary/webshop-p50-clustered-gpt54-v1/report.json",
+        "sha256": "481a12f3cc0a206fa0222f57dc4ea866b8922a355f37cdbb84d5b349fa910232"
+      }
+    }
+  },
+  "source_summaries": {
+    "manual": {
+      "path": "artifacts/experiments/webshop-scale-v1/manual-skill-diagnostic-summary.json",
+      "sha256": "0c9c41da08b772f0030905df815210bd3bae9bd9d1e7387665fcfc5c616c852f"
+    },
+    "direct_induction": {
+      "path": "artifacts/experiments/webshop-scale-v1/global-flat-gpt54-summary.json",
+      "sha256": "07e6f4a86f7e909202a1594731eaec0c1abf050f36ed352504b32dee66b20984"
+    }
+  }
+}

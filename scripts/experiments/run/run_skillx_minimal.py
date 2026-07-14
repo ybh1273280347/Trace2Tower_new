@@ -195,8 +195,6 @@ async def main(options: argparse.Namespace) -> int:
         )
         raise RuntimeError("SkillX model transport failed")
     skills = library["skills"]
-    if not skills["functional"] and not skills["atomic"]:
-        raise RuntimeError("SkillX produced no executable skills")
     write_json(options.output_dir / "library.json", library)
     epoch_statistics = [epoch["statistics"] for epoch in results["epochs"]]
     source_records = [trajectory.to_record() for trajectory in trajectories]
@@ -216,6 +214,7 @@ async def main(options: argparse.Namespace) -> int:
         "started_at": started_at.isoformat(),
         "finished_at": finished_at.isoformat(),
         "statistics": results["statistics"],
+        "planning_only": not skills["functional"] and not skills["atomic"],
         "epoch_statistics": epoch_statistics,
         "llm_usage": asdict(llm.usage),
         "validation_diagnostics": llm.validation_diagnostics,

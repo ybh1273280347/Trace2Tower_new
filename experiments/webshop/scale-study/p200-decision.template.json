@@ -1,0 +1,11 @@
+{
+  "continue": false,
+  "p100_summary": null,
+  "signals": {
+    "tower_vs_flat_gap_improves": false,
+    "mixed_negative_effect_shrinks": false,
+    "graph_support_or_cluster_stability_improves": false,
+    "construction_cost_curve_beats_flat_or_skillx": false
+  },
+  "evidence": []
+}

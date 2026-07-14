@@ -27,6 +27,10 @@ class TransitionEncoder:
         self.model = model
         self.dimension = dimension
         self.batch_size = batch_size
+        self.cached_unique_text_count = 0
+        self.embedded_unique_text_count = 0
+        self.embedding_request_count = 0
+        self.embedding_input_tokens = 0
 
     async def embed(self, texts: Sequence[str]) -> tuple[tuple[float, ...], ...]:
         if not texts:
@@ -35,6 +39,8 @@ class TransitionEncoder:
         unique_texts = dict(zip(hashes, texts))
         cached = self._read_cache(tuple(unique_texts))
         missing_hashes = [content_hash for content_hash in unique_texts if content_hash not in cached]
+        self.cached_unique_text_count = len(cached)
+        self.embedded_unique_text_count = len(missing_hashes)
 
         batches = [
             missing_hashes[index : index + self.batch_size]
@@ -46,6 +52,8 @@ class TransitionEncoder:
             )
             if len(result.vectors) != len(batch):
                 raise ValueError("embedding provider returned the wrong batch size")
+            self.embedding_request_count += 1
+            self.embedding_input_tokens += result.usage.input_tokens or 0
             new_vectors = {}
             for content_hash, vector in zip(batch, result.vectors):
                 if len(vector) != self.dimension:

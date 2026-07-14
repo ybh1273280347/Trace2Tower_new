@@ -114,5 +114,13 @@ def mine_high_paths(
             )
         )
     return tuple(
-        sorted(paths, key=lambda item: (-item.contrastive_score, item.path_id))
+        sorted(
+            paths,
+            key=lambda item: (
+                -item.contrastive_score,
+                len(item.ordered_mid_ids),
+                len(item.ordered_mid_ids) - len(set(item.ordered_mid_ids)),
+                item.path_id,
+            ),
+        )
     )

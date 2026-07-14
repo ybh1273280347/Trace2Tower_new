@@ -12,6 +12,7 @@ from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
 
 class MethodName(StrEnum):
     NO_SKILL = "no_skill"
+    MANUAL_SKILL = "manual_skill"
     SEMANTIC_CLUSTERING = "semantic_clustering"
     FLAT_SKILL_SUMMARY = "flat_skill_summary"
     SKILLX = "skillx"
@@ -51,6 +52,8 @@ class EpisodeResult:
     latency_ms: int
     skill_ids: tuple[str, ...]
     skill_context_chars: int
+    context_skill_ids: tuple[str, ...] = ()
+    skill_context_sha256: str | None = None
     chat_input_tokens: int | None = None
     chat_output_tokens: int | None = None
     error: None = None
@@ -60,6 +63,12 @@ class EpisodeResult:
             raise ValueError("invalid episode step counts")
         if self.latency_ms < 0 or self.skill_context_chars < 0:
             raise ValueError("latency and skill context size must be non-negative")
+        if len(set(self.context_skill_ids)) != len(self.context_skill_ids):
+            raise ValueError("injected context contains duplicate skill IDs")
+        if not set(self.context_skill_ids) <= set(self.skill_ids):
+            raise ValueError("injected context references skills outside the selection")
+        if self.skill_context_sha256 is not None and len(self.skill_context_sha256) != 64:
+            raise ValueError("skill context hash must be SHA-256")
         token_counts = (
             self.input_tokens,
             self.output_tokens,
@@ -94,6 +103,7 @@ class EpisodeResult:
     def to_record(self) -> dict:
         record = asdict(self)
         record["skill_ids"] = list(self.skill_ids)
+        record["context_skill_ids"] = list(self.context_skill_ids)
         return record
 
     @classmethod
@@ -130,6 +140,8 @@ class EpisodeResult:
             latency_ms=int(record["latency_ms"]),
             skill_ids=tuple(record.get("skill_ids", ())),
             skill_context_chars=int(record["skill_context_chars"]),
+            context_skill_ids=tuple(record.get("context_skill_ids", ())),
+            skill_context_sha256=record.get("skill_context_sha256"),
             chat_input_tokens=(
                 int(record["chat_input_tokens"])
                 if record.get("chat_input_tokens") is not None

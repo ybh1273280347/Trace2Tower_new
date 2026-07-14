@@ -23,6 +23,8 @@ from trace2tower.trajectory import TrajectoryReader
 
 
 async def main(options: argparse.Namespace) -> None:
+    if options.embedding_concurrency is not None and options.embedding_concurrency <= 0:
+        raise ValueError("embedding concurrency must be positive")
     common = load_yaml(options.config_root / "common.yaml")
     benchmark = Benchmark(options.benchmark)
     paths = tuple(Path(path) for path in sorted(glob.glob(options.trajectory_glob)))
@@ -43,6 +45,7 @@ async def main(options: argparse.Namespace) -> None:
         "transition_count": sum(len(group) for group in transition_groups),
         "output": options.output.as_posix(),
         "calibration": options.calibration.as_posix(),
+        "embedding_concurrency": options.embedding_concurrency,
         "dry_run": options.dry_run,
     }
     print(yaml.safe_dump({"common": common, "invocation": invocation}))
@@ -58,7 +61,11 @@ async def main(options: argparse.Namespace) -> None:
 
     load_dotenv(options.env)
     runtime = CommonLLMRuntime(
-        max_concurrency=common["global_api_concurrency"],
+        max_concurrency=(
+            options.embedding_concurrency
+            if options.embedding_concurrency is not None
+            else common["global_api_concurrency"]
+        ),
         max_attempts=common["provider_max_attempts"],
         timeout_seconds=common["provider_timeout_seconds"],
         retry_base_seconds=common["retry_base_seconds"],
@@ -144,6 +151,10 @@ async def main(options: argparse.Namespace) -> None:
         **invocation,
         "embedding_model": os.environ["EMBEDDING_MODEL"],
         "embedding_dimension": common["embedding_dimension"],
+        "embedding_request_count": encoder.embedding_request_count,
+        "embedding_input_tokens": encoder.embedding_input_tokens,
+        "cached_unique_text_count": encoder.cached_unique_text_count,
+        "embedded_unique_text_count": encoder.embedded_unique_text_count,
         "segment_count": sum(segment_lengths.values()),
         "segment_length_distribution": dict(sorted(segment_lengths.items())),
         "primitive_action_distribution": {
@@ -169,5 +180,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
+    parser.add_argument("--embedding-concurrency", type=int)
     parser.add_argument("--dry-run", action="store_true")
     asyncio.run(main(parser.parse_args()))

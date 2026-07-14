@@ -43,6 +43,67 @@ def write_rendered_cards(
     )
 
 
+def build_high_render_examples(
+    records: list[dict],
+    clusters: tuple[MidCluster, ...],
+    path,
+    *,
+    limit: int = 8,
+) -> tuple[dict, ...]:
+    segment_to_mid = {
+        segment_id: cluster.cluster_id
+        for cluster in clusters
+        for segment_id in cluster.member_segment_ids
+    }
+    records_by_id = {record["trajectory_id"]: record for record in records}
+    examples = []
+    seen_samples = set()
+    for trajectory_id in path.supporting_trajectory_ids:
+        record = records_by_id[trajectory_id]
+        sample_id = record["sample_id"]
+        if sample_id in seen_samples:
+            continue
+        groups = []
+        for segment in sorted(record["segments"], key=lambda item: item["start_step"]):
+            mid_id = segment_to_mid[segment["segment_id"]]
+            if groups and groups[-1][0] == mid_id:
+                groups[-1][1].extend(segment["raw_actions"])
+            else:
+                groups.append([mid_id, list(segment["raw_actions"])])
+        ordered_mid_ids = tuple(group[0] for group in groups)
+        start = next(
+            index
+            for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
+            if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
+            == path.ordered_mid_ids
+        )
+        path_groups = groups[start : start + len(path.ordered_mid_ids)]
+        actions = [
+            action
+            for _, group_actions in path_groups
+            for action in group_actions
+        ]
+        goal = next(
+            transition["goal"]
+            for transition in record["transitions"]
+            if transition.get("goal")
+        )
+        examples.append(
+            {
+                "goal": goal,
+                "path_steps": [
+                    {"mid_id": mid_id, "raw_actions": group_actions}
+                    for mid_id, group_actions in path_groups
+                ],
+                "raw_actions": actions,
+            }
+        )
+        seen_samples.add(sample_id)
+        if len(examples) >= limit:
+            break
+    return tuple(examples)
+
+
 async def main(options: argparse.Namespace) -> int:
     if options.render_high_limit < 0:
         raise ValueError("render High limit must be non-negative")
@@ -71,6 +132,17 @@ async def main(options: argparse.Namespace) -> int:
         epsilon=config.high_path_epsilon,
         success_threshold=options.success_threshold,
     )
+    used_high_fallback = False
+    if not high_paths and options.ensure_high_path:
+        high_paths = mine_high_paths(
+            records,
+            clusters,
+            max_path_length=config.max_high_path_length,
+            min_support_ratio=0.0,
+            epsilon=config.high_path_epsilon,
+            success_threshold=options.success_threshold,
+        )[:1]
+        used_high_fallback = bool(high_paths)
     invocation = {
         "benchmark": options.benchmark.value,
         "input": options.input.as_posix(),
@@ -80,6 +152,7 @@ async def main(options: argparse.Namespace) -> int:
         "render_high_limit": options.render_high_limit,
         "render_all_mid": options.render_all_mid,
         "success_threshold": options.success_threshold,
+        "ensure_high_path": options.ensure_high_path,
     }
     print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
     options.output_dir.mkdir(parents=True, exist_ok=True)
@@ -115,6 +188,22 @@ async def main(options: argparse.Namespace) -> int:
             )
         }
         usages = list(existing.get("usage", ()))
+    elif options.reuse_mid_cards_from:
+        existing = json.loads(
+            options.reuse_mid_cards_from.read_text(encoding="utf-8")
+        )
+        mid_cards = {
+            card.skill_id: card
+            for card in (
+                MidSkillCard.from_record(item) for item in existing["mid_cards"]
+            )
+        }
+        source_mid_ids = set(mid_cards)
+        usages = [
+            item
+            for item in existing.get("usage", ())
+            if item["skill_id"] in source_mid_ids
+        ]
 
     inputs_by_id = {item.cluster_id: item for item in mid_inputs}
     paths_by_id = {path.path_id: path for path in high_paths}
@@ -129,7 +218,11 @@ async def main(options: argparse.Namespace) -> int:
 
     reused_mid_count = len(mid_cards)
     reused_high_count = len(high_cards)
-    selected_paths = high_paths[: options.render_high_limit]
+    selected_paths = (
+        high_paths
+        if options.render_high_limit == 0
+        else high_paths[: options.render_high_limit]
+    )
     required_mid_ids = tuple(
         inputs_by_id
         if options.render_all_mid
@@ -167,7 +260,12 @@ async def main(options: argparse.Namespace) -> int:
                     rendered_cards_path, mid_cards, high_cards, usages
                 )
             for path in missing_paths:
-                card, result = await render_high_card(runtime, path, mid_cards)
+                card, result = await render_high_card(
+                    runtime,
+                    path,
+                    mid_cards,
+                    build_high_render_examples(records, clusters, path),
+                )
                 high_cards[path.path_id] = card
                 usages.append(
                     {
@@ -190,6 +288,7 @@ async def main(options: argparse.Namespace) -> int:
         "trajectory_count": len(records),
         "mid_cluster_count": len(mid_inputs),
         "high_path_count": len(high_paths),
+        "used_high_fallback": used_high_fallback,
         "rendered_mid_count": len(mid_cards),
         "rendered_high_count": len(high_cards),
         "reused_mid_count": reused_mid_count,
@@ -214,6 +313,8 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--render-high-limit", type=int, default=0)
     parser.add_argument("--render-all-mid", action="store_true")
+    parser.add_argument("--ensure-high-path", action="store_true")
+    parser.add_argument("--reuse-mid-cards-from", type=Path)
     parser.add_argument("--success-threshold", type=float, default=0.999)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))

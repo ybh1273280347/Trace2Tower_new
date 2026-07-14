@@ -1,0 +1,25 @@
+{
+  "status": "running",
+  "protocol": "configs/experiments/alfworld_protocol_v1.json",
+  "manifest": "artifacts/manifests/alfworld_test.jsonl",
+  "source_split": "valid_unseen",
+  "sample_count": 133,
+  "repeat_ids": [0, 1, 2],
+  "models": {
+    "flash": "deepseek-v4-flash",
+    "pro": "deepseek-v4-pro"
+  },
+  "conditions": [
+    "noskill",
+    "flat",
+    "skillx",
+    "success",
+    "mixed",
+    "success_mid",
+    "mixed_mid"
+  ],
+  "run_id_template": "alfworld-final-v1-{model}-{condition}",
+  "launcher": "scripts/experiments/run/run_alfworld_final.py",
+  "num_shards": 10,
+  "max_agent_steps": 20
+}
