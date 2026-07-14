@@ -132,6 +132,7 @@ def main() -> int:
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--tower", type=Path, required=True)
     parser.add_argument("--snapshot-id", required=True)
+    parser.add_argument("--split", choices=("train", "test"), default="train")
     parser.add_argument("--output", type=Path, required=True)
     options = parser.parse_args()
 
@@ -162,7 +163,7 @@ def main() -> int:
         )
     payload = {
         "benchmark": "webshop",
-        "split": "test",
+        "split": options.split,
         "agent_model": "deepseek-v4-flash",
         "tower_snapshot_id": options.snapshot_id,
         "direct_mid_top_k": 8,
