@@ -77,6 +77,30 @@
       "builder_input_tokens": 1686214,
       "builder_cached_input_tokens": 1065592,
       "builder_output_tokens": 197111
+    },
+    "p100_no_mixed": {
+      "snapshot_id": "tower_e121333546770f8f",
+      "snapshot_sha256": "5b7f3d594279a35ac1f5b4bc3bac7db0ac1a6d5cc30068543dd46526ea5d4769",
+      "source_rollout_pool_trajectory_count": 400,
+      "training_trajectory_count": 186,
+      "training_task_count": 51,
+      "success_only_evidence_sha256": "4feb4cb511f0ca6435bc6dc98b52bc6bc3270d34dcb49b15d8a891282a20f33d",
+      "segment_count": 1000,
+      "compact_signature_count": 39,
+      "edge_count": 9615,
+      "observed_transition_edge_count": 814,
+      "cross_event_edge_count": 889,
+      "negative_adjacency_entry_count": 0,
+      "mid_cluster_count": 19,
+      "high_path_count": 25,
+      "used_high_fallback": false,
+      "renderer_style": "trace2tower",
+      "renderer_calls": 44,
+      "renderer_input_tokens": 892144,
+      "renderer_cached_input_tokens": 120192,
+      "renderer_output_tokens": 6809,
+      "runtime_retrieval_matches_p100_full": true,
+      "direct_mid_cap": 8
     }
   },
   "validation": {

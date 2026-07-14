@@ -20,6 +20,8 @@
 
 `semantic_clustering` is the graph-structure ablation: it uses the same segments and compact embeddings but skips `S/T/O`, contrastive graph construction, spectral decomposition, and High induction, then directly applies K-means.
 
+`trace2tower_no_mixed` is the training-evidence ablation. It keeps event extraction, relational graph construction, spectral clustering, High induction, native rendering, dynamic retrieval, and cap 8 fixed, but replaces the P100 mixed evidence with all 186 full-success trajectories from the same P100 rollout pool. It is evaluated on frozen Test-A with Flash and `repeat_id=0`. Semantic-only and No-Mixed use the existing evaluation manifests directly; no separate ablation training pool or test set is required. The earlier No-event design is retired because event labels do not constrain the original-concept graph.
+
 ## Fast mechanism gate
 
 - Training evidence: P50 mixed pool, 173 trajectories from 50 tasks.

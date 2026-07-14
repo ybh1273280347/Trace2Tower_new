@@ -93,6 +93,20 @@
         "skillx_p100": 0.6957309523809524,
         "trace2tower_p100": 0.7146476190476191
       }
+    },
+    "p100_no_mixed_test_a": {
+      "status": "artifact_built",
+      "role": "training_evidence_ablation",
+      "agent_model": "deepseek-v4-flash",
+      "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+      "task_count": 100,
+      "repeat_ids": [0],
+      "direct_mid_cap": 8,
+      "snapshot_id": "tower_e121333546770f8f",
+      "training_trajectory_count": 186,
+      "runtime_config": "configs/experiments/webshop_trace2tower_no_mixed_original_concept_runtime.yaml",
+      "fixed_against_full": ["source_rollout_pool", "event_extraction", "graph_algorithm", "renderer", "retrieval", "direct_mid_cap"],
+      "changed_component": "exclude partial and failure trajectories"
     }
   }
 }
