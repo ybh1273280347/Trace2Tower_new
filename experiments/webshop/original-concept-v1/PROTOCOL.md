@@ -47,4 +47,8 @@ After the P50 test exposed a validation/test gap, two post-hoc diagnostics were 
 
 No new Pro conditions are launched after the completed P50 main table. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
 
+The renderer control was run on the P100 structure. The native Trace2Tower renderer outperformed the SkillX-style adapter and is frozen for P200. P200 is a strict superset of P100, uses four Flash collection rollouts per training task, and is evaluated on the same 100-task Flash test with cap 8. Because the renderer was selected after observing this test set, the P200 result is a post-hoc scale diagnostic rather than new confirmatory test evidence. It must not be described as prompt tuning or as an independent held-out confirmation.
+
+Scale is not assumed to be monotonic. P50, P100, and P200 differ in the evidence pool and in graph-induced Mid/High structure; a larger pool can improve behavioral coverage while worsening structural compression. The scale diagnostic therefore reports the realized artifact and execution result rather than treating pool size alone as the causal variable.
+
 Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.

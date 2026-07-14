@@ -16,7 +16,11 @@ from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.high_paths import mine_high_paths
 from trace2tower.methods.trace2tower.models import MidCluster
-from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
+from trace2tower.methods.trace2tower.renderer import (
+    RendererStyle,
+    render_high_card,
+    render_mid_card,
+)
 from trace2tower.methods.trace2tower.skills import (
     LOW_SKILLS,
     HighSkillCard,
@@ -150,6 +154,7 @@ async def main(options: argparse.Namespace) -> int:
         "structure_only": options.structure_only,
         "success_threshold": config.success_threshold,
         "ensure_high_path": options.ensure_high_path,
+        "renderer_style": options.renderer_style.value,
     }
     print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
     options.output_dir.mkdir(parents=True, exist_ok=True)
@@ -228,7 +233,12 @@ async def main(options: argparse.Namespace) -> int:
         try:
             rendered_mids = await asyncio.gather(
                 *(
-                    render_mid_card(runtime, options.benchmark, inputs_by_id[mid_id])
+                    render_mid_card(
+                        runtime,
+                        options.benchmark,
+                        inputs_by_id[mid_id],
+                        renderer_style=options.renderer_style,
+                    )
                     for mid_id in missing_mid_ids
                 )
             )
@@ -249,6 +259,7 @@ async def main(options: argparse.Namespace) -> int:
                         path,
                         mid_cards,
                         build_high_render_examples(records, clusters, path),
+                        renderer_style=options.renderer_style,
                     )
                     for path in missing_paths
                 )
@@ -302,6 +313,12 @@ if __name__ == "__main__":
     parser.add_argument("--structure-only", action="store_true")
     parser.add_argument("--ensure-high-path", action="store_true")
     parser.add_argument("--reuse-mid-cards-from", type=Path)
+    parser.add_argument(
+        "--renderer-style",
+        type=RendererStyle,
+        choices=tuple(RendererStyle),
+        default=RendererStyle.TRACE2TOWER,
+    )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))

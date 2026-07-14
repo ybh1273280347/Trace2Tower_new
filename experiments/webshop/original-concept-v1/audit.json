@@ -36,6 +36,28 @@
       "cross_event_edge_count": 1673,
       "mid_cluster_count": 9,
       "high_path_count": 5
+    },
+    "p200_full": {
+      "snapshot_id": "tower_abe0cf9c83bf1a1d",
+      "training_task_count": 200,
+      "collected_trajectory_count": 800,
+      "collected_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p200.jsonl",
+      "collected_pool_sha256": "acb9751660dfd5b5ae96f0b98a80d84fc8d3f103b3c9a9b219f490a6d5d9d3e3",
+      "trajectory_count": 710,
+      "mixed_pool": "artifacts/trajectories/webshop/evidence/webshop-flash200-repeat4-mixed-v1.jsonl",
+      "mixed_pool_sha256": "69979cde3111a4aa375150551fada1b2f241a26431707caeb0c4a0d271f4881a",
+      "segment_count": 3962,
+      "compact_signature_count": 51,
+      "edge_count": 48265,
+      "observed_transition_edge_count": 3252,
+      "cross_event_edge_count": 3306,
+      "mid_cluster_count": 19,
+      "high_path_count": 7,
+      "renderer_style": "trace2tower",
+      "renderer_calls": 26,
+      "renderer_input_tokens": 2534338,
+      "renderer_cached_input_tokens": 2337664,
+      "renderer_output_tokens": 4762
     }
   },
   "validation": {
@@ -115,5 +137,42 @@
       "difference": 0.04466666666666667,
       "ci95": [-0.0035, 0.097]
     }
+  },
+  "p100_renderer_control": {
+    "task_count": 100,
+    "agent_model": "deepseek-v4-flash",
+    "fixed_snapshot_structure": "tower_9094918372ee0a39",
+    "native_mean_reward": 0.7209166666666667,
+    "native_full_success_rate": 0.56,
+    "skillx_style_mean_reward": 0.6898333333333333,
+    "skillx_style_full_success_rate": 0.53,
+    "skillx_style_minus_native": -0.031083333333333334,
+    "selected_renderer": "trace2tower"
+  },
+  "p200_scale_diagnostic": {
+    "role": "post_hoc_diagnostic_only",
+    "run_id": "webshop-original-concept-v1-test-flash-p200-full-cap8-r1",
+    "task_count": 100,
+    "repeat_ids": [0],
+    "global_unique_result_key_count": 100,
+    "unresolved_error_key_count": 0,
+    "agent_model": "deepseek-v4-flash",
+    "mean_reward": 0.69325,
+    "full_success_rate": 0.52,
+    "mean_steps": 7.12,
+    "mean_invalid_actions": 0.34,
+    "mean_input_tokens": 32471.4,
+    "minus_no_skill": {
+      "difference": 0.0125,
+      "ci95": [-0.048252083333333334, 0.07408541666666664],
+      "wins": 15,
+      "ties": 74,
+      "losses": 11
+    },
+    "minus_p100_full": {
+      "difference": -0.027666666666666666,
+      "ci95": [-0.07383333333333333, 0.016833333333333332]
+    },
+    "coverage_audit": "global_manifest_keys_after_interrupted_resume"
   }
 }

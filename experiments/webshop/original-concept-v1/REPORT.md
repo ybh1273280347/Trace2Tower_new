@@ -100,3 +100,31 @@ P100 contains 100 tasks and four rollouts per task. The mixed selector retained 
 | P100 Full | **0.72092** | **56%** | **7.17** | **0.19** | 32,360 |
 
 P100 minus NoSkill is `+0.04017`, interval `[-0.01425, +0.09775]`. P100 minus P50 Full is `+0.04467`, interval `[-0.00350, +0.09700]`. The single-repeat intervals include zero, so this is a strong positive scale trend rather than a significance claim. Broader training coverage improves every reported execution metric and is the leading explanation for the P50 validation/test gap.
+
+## P100 renderer control
+
+The graph, 9 Mid clusters, 5 High paths, retrieval policy, cap 8, model, and test keys were held fixed. Only the text renderer changed. The SkillX-style adapter used the upstream SkillX plan and functional-skill instructions but returned the existing Trace2Tower Mid/High schemas.
+
+| Renderer | Mean reward | Full success | Steps | Invalid actions | Input tokens | Skill context chars |
+|---|---:|---:|---:|---:|---:|---:|
+| Native Trace2Tower | **0.72092** | **56%** | **7.17** | **0.19** | **32,360** | **76,989** |
+| SkillX-style adapter | 0.68983 | 53% | 7.95 | 0.57 | 52,011 | 165,395 |
+
+SkillX-style minus native reward is `-0.03108`. It more than doubles injected context and increases invalid actions, so the native renderer is frozen for P200. This is a renderer diagnostic, not a redefinition of either Trace2Tower or native SkillX.
+
+## P200 scale diagnostic
+
+P200 is a strict superset of P100. Collection produced 800 trajectories from 200 tasks; the mixed selector retained 710 trajectories: 378 full successes, 324 partial-reward trajectories, and 8 same-task contrasts. Preprocessing produced 3,962 event segments and 51 unique compact signatures. The signed graph contains 48,265 edges, including 3,252 observed transition edges and 3,306 cross-event edges. It selected 19 Mid clusters and induced 7 High paths without fallback. Snapshot: `tower_abe0cf9c83bf1a1d`.
+
+| Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| P50 Full | 0.67625 | 51% | 7.58 | 0.22 | 33,384 |
+| P100 Full | **0.72092** | **56%** | 7.17 | **0.19** | 32,360 |
+| P200 Full | 0.69325 | 52% | **7.12** | 0.34 | 32,471 |
+
+P200 minus NoSkill is `+0.01250`, interval `[-0.04825, +0.07409]`, with 15 wins, 74 ties, and 11 losses. P200 minus P100 is `-0.02767`, interval `[-0.07383, +0.01683]`. P200 therefore remains above NoSkill in point estimate but does not continue the P100 gain. The evidence supports a material, non-monotonic training-coverage effect; it does not support the stronger claim that reward increases monotonically with pool size.
+
+P200 rendering required 26 construction calls, 2,534,338 input tokens (2,337,664 cached), and 4,762 output tokens. Runtime input remains close to P100 because cap 8 is fixed. Construction cost and deployment-time token cost are reported separately.
+
+The P200 run covers all 100 manifest task keys at real `repeat_id=0`, with zero unresolved errors. Interrupted Windows parent processes caused duplicate attempts and one sample-only resume to land outside its normal shard; duplicate rows were removed by task key while retaining the first completed execution. Coverage and metrics are therefore audited over the global manifest-key set, not inferred from the overwritten shard invocation metadata.

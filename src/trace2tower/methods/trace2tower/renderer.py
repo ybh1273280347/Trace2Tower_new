@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
+from enum import StrEnum
 from statistics import fmean
 from typing import Any
 
@@ -15,6 +16,11 @@ from trace2tower.methods.trace2tower.skills import (
     MidSkillCard,
     legal_grounding_actions,
 )
+
+
+class RendererStyle(StrEnum):
+    TRACE2TOWER = "trace2tower"
+    SKILLX = "skillx"
 
 MID_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower MidCluster into a concise reusable skill card. The cluster structure and evidence are authoritative. Your task is textual compression, not discovery, clustering, correction, scoring, planning across clusters, or evaluation.
 
@@ -79,6 +85,18 @@ This target was created by one fixed structural Split or coordinated Split/Merge
 """
 
 
+SKILLX_MID_ADAPTER_INSTRUCTIONS = """
+
+Diagnostic adapter contract:
+- The input is one fixed Trace2Tower Mid cluster. Its membership and mixed outcome evidence are immutable; do not discover, split, merge, filter, or relabel the cluster.
+- Treat the cluster evidence as the trajectory and extract exactly one reusable skill for the recurring subtask shared by its segments.
+- Preserve SkillX's generalization rules: use a generic action-oriented name, parameterize incidental values, keep the skill self-contained, exclude exploration and incorrect actions from the recommended procedure, and retain observed failure modes only as guards.
+- WebShop has only `search_action` and `click_action`; express executable behavior with these environment operations rather than Python code.
+- Return the result through the supplied function instead of `<skill>` tags. Map SkillX `document` to description and constraints, `content` to an imperative procedure, and `tools` to grounding_actions.
+- Return no IDs, scores, evidence metadata, or prose outside the function call.
+"""
+
+
 HIGH_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower HighPath into concise strategy guidance. The builder has already mined and scored the path. Your task is to explain the reusable within-episode behavior represented by the fixed ordered path; you do not discover, edit, filter, reorder, merge, split, or score the path.
 
 Ownership contract:
@@ -133,6 +151,34 @@ Output discipline:
 """
 
 
+SKILLX_HIGH_ADAPTER_INSTRUCTIONS = """
+
+Diagnostic adapter contract:
+- The input is one fixed Trace2Tower High path with immutable ordered Mid children and supporting examples. Do not discover, reorder, merge, split, filter, or score the path.
+- Apply SkillX plan-writing rules to the fixed path: describe natural reusable sub-goals, remove incidental exploration or failed actions, preserve necessary order, list only demonstrated WebShop operations, and keep the plan concise.
+- Return the plan through the supplied function instead of `<plan>` tags. Use name for a short plan label, description for applicability, and procedure for the ordered plan steps.
+- Return no IDs, scores, evidence metadata, or prose outside the function call.
+"""
+
+
+def _mid_renderer_instructions(style: RendererStyle) -> str:
+    if style is RendererStyle.TRACE2TOWER:
+        return MID_RENDERER_INSTRUCTIONS
+
+    from third_party.SkillX.prompts.skill_prompts import FUNCTIONAL_SKILL_PROMPT
+
+    return FUNCTIONAL_SKILL_PROMPT + SKILLX_MID_ADAPTER_INSTRUCTIONS
+
+
+def _high_renderer_instructions(style: RendererStyle) -> str:
+    if style is RendererStyle.TRACE2TOWER:
+        return HIGH_RENDERER_INSTRUCTIONS
+
+    from third_party.SkillX.prompts.plan_prompts import PLAN_EXTRACTION_PROMPTS
+
+    return PLAN_EXTRACTION_PROMPTS["default"] + SKILLX_HIGH_ADAPTER_INSTRUCTIONS
+
+
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
     return {
         "type": "function",
@@ -167,6 +213,8 @@ async def render_mid_card(
     benchmark: Benchmark,
     render_input: MidRenderInput,
     sibling_inputs: Sequence[MidRenderInput] = (),
+    *,
+    renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[MidSkillCard, ChatResult]:
     legal_actions = legal_grounding_actions(benchmark, render_input)
     legal_action_values = sorted(action.value for action in legal_actions)
@@ -192,7 +240,7 @@ async def render_mid_card(
             {
                 "role": "system",
                 "content": (
-                    MID_RENDERER_INSTRUCTIONS
+                    _mid_renderer_instructions(renderer_style)
                     + (MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS if sibling_inputs else "")
                 ),
             },
@@ -220,9 +268,9 @@ async def render_mid_card(
         temperature=0,
         max_output_tokens=1200,
         prompt_cache_key=(
-            f"trace2tower:mid:{benchmark.value}:contrastive-v2"
+            f"trace2tower:mid:{benchmark.value}:{renderer_style}:contrastive-v2"
             if sibling_inputs
-            else f"trace2tower:mid:{benchmark.value}:v1"
+            else f"trace2tower:mid:{benchmark.value}:{renderer_style}:v1"
         ),
     )
     payload = _tool_payload(
@@ -276,6 +324,8 @@ async def render_high_card(
     path: HighPath,
     child_mid_cards: Mapping[str, MidSkillCard],
     supporting_examples: Sequence[Mapping[str, object]] = (),
+    *,
+    renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[HighSkillCard, ChatResult]:
     missing = set(path.ordered_mid_ids) - set(child_mid_cards)
     if missing:
@@ -307,7 +357,7 @@ async def render_high_card(
         [
             {
                 "role": "system",
-                "content": HIGH_RENDERER_INSTRUCTIONS,
+                "content": _high_renderer_instructions(renderer_style),
             },
             {
                 "role": "user",
@@ -323,7 +373,7 @@ async def render_high_card(
         tool_choice="required",
         temperature=0,
         max_output_tokens=1000,
-        prompt_cache_key="trace2tower:high:v4",
+        prompt_cache_key=f"trace2tower:high:{renderer_style}:v4",
     )
     payload = _tool_payload(
         result, "render_high_skill", {"name", "description", "procedure"}

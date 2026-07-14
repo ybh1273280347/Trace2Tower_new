@@ -54,9 +54,23 @@
       "repeat_ids": [0]
     },
     "renderer_control": {
-      "status": "planned",
+      "status": "completed",
       "role": "diagnostic_only",
-      "fixed_components": ["graph", "clusters", "high_paths", "retrieval", "direct_mid_cap"]
+      "fixed_components": ["graph", "clusters", "high_paths", "retrieval", "direct_mid_cap"],
+      "selected_renderer": "trace2tower",
+      "native_mean_reward": 0.7209166666666667,
+      "skillx_style_mean_reward": 0.6898333333333333
+    },
+    "p200_scale": {
+      "status": "completed",
+      "role": "post_hoc_diagnostic_only",
+      "agent_model": "deepseek-v4-flash",
+      "snapshot_id": "tower_abe0cf9c83bf1a1d",
+      "direct_mid_cap": 8,
+      "task_count": 100,
+      "repeat_ids": [0],
+      "mean_reward": 0.69325,
+      "full_success_rate": 0.52
     }
   }
 }
