@@ -75,12 +75,9 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
         0,
     )
 
-    async def select(
-        task_goal: str, initial_observation: str, task_family
-    ) -> SkillSelection:
+    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
         assert task_goal == "buy the matching item"
         assert initial_observation == "initial page"
-        assert task_family is None
         return SkillSelection(
             ("high_a", "mid_a"),
             "retrieved context",
@@ -131,10 +128,7 @@ def test_agent_chat_cost_does_not_include_retrieval_embedding_tokens(tmp_path: P
         0,
     )
 
-    async def select(
-        task_goal: str, initial_observation: str, task_family
-    ) -> SkillSelection:
-        assert task_family is None
+    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
         return SkillSelection(("mid_a",), "retrieved context", 7, 0)
 
     result = asyncio.run(
@@ -201,10 +195,7 @@ def test_agent_closes_environment_when_skill_selection_fails(tmp_path: Path) -> 
         0,
     )
 
-    async def fail_selection(
-        task_goal: str, initial_observation: str, task_family
-    ) -> SkillSelection:
-        assert task_family is None
+    async def fail_selection(task_goal: str, initial_observation: str) -> SkillSelection:
         raise RuntimeError("selection failed")
 
     with pytest.raises(RuntimeError, match="selection failed"):

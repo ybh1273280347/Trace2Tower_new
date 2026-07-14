@@ -175,7 +175,6 @@ def create_provider(
             plan_top_k=int(method_config["plan_top_k"]),
             skills_per_step=int(method_config["skills_per_step"]),
             max_skills=int(method_config["max_skills"]),
-            family_stratified=bool(method_config.get("family_stratified", False)),
         )
     if artifact.method in TOWER_ARTIFACT_METHODS:
         diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
@@ -215,7 +214,6 @@ def create_provider(
             status_tie_epsilon=float(
                 method_config.get("status_tie_epsilon", 0.0)
             ),
-            family_stratified=bool(method_config.get("family_stratified", False)),
         )
         return provider
     raise ValueError(f"unsupported provider method: {artifact.method}")

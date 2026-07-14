@@ -5,7 +5,6 @@ from pathlib import Path
 
 from trace2tower.agent import SkillSelection
 from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import AlfworldTaskFamily, Benchmark
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.retrieval import (
     SkillXRetrieval,
@@ -27,7 +26,6 @@ class SkillXProvider:
         plan_top_k: int,
         skills_per_step: int,
         max_skills: int,
-        family_stratified: bool = False,
     ):
         if not 0 <= similarity_threshold <= 1:
             raise ValueError("SkillX similarity threshold must be between zero and one")
@@ -44,7 +42,6 @@ class SkillXProvider:
         self.plan_top_k = plan_top_k
         self.skills_per_step = skills_per_step
         self.max_skills = max_skills
-        self.family_stratified = family_stratified
         self.plans = {plan.plan_id: plan for plan in library.plans}
         self.skills = {skill.skill_id: skill for skill in library.skills}
 
@@ -61,30 +58,11 @@ class SkillXProvider:
     async def retrieve(
         self,
         task_goal: str,
-        task_family: AlfworldTaskFamily | None = None,
     ) -> tuple[SkillXRetrieval, int | None]:
         plans = self.plans
         skills = self.skills
         plan_index = self.library.plan_index
         skill_index = self.library.skill_index
-        if self.family_stratified:
-            if self.library.benchmark is not Benchmark.ALFWORLD or task_family is None:
-                raise ValueError("family-stratified SkillX retrieval requires ALFWorld family metadata")
-            label = task_family.retrieval_description
-            plans = {
-                plan_id: plan
-                for plan_id, plan in plans.items()
-                if plan.task.startswith(f"Task family: {label}.")
-            }
-            skills = {
-                skill_id: skill
-                for skill_id, skill in skills.items()
-                if skill.name.startswith(f"{label}:")
-            }
-            if not plans:
-                raise ValueError("SkillX family sub-library is incomplete")
-            plan_index = plan_index.subset(set(plans))
-            skill_index = skill_index.subset(set(skills))
         task_embedding = await self.runtime.embed([task_goal])
         plan, plan_match = retrieve_plan(
             task_embedding.vectors[0],
@@ -125,9 +103,8 @@ class SkillXProvider:
         self,
         task_goal: str,
         initial_observation: str,
-        task_family: AlfworldTaskFamily | None = None,
     ) -> SkillSelection:
-        retrieval, input_tokens = await self.retrieve(task_goal, task_family)
+        retrieval, input_tokens = await self.retrieve(task_goal)
         return SkillSelection(
             retrieval.skill_ids,
             retrieval.context,

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from trace2tower.benchmarks.models import BenchmarkEnvironment, EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-from trace2tower.manifests import AlfworldTaskFamily, Benchmark, ManifestEntry
+from trace2tower.manifests import Benchmark, ManifestEntry
 from trace2tower.results import EpisodeResult, FinishReason, MethodName
 from trace2tower.trajectory import EpisodeTrajectory, StepRecord, TrajectoryWriter
 
@@ -37,9 +37,7 @@ class SkillSelection:
             raise ValueError("skill selection token counts must be non-negative")
 
 
-SkillProvider = Callable[
-    [str, str, AlfworldTaskFamily | None], Awaitable[SkillSelection]
-]
+SkillProvider = Callable[[str, str], Awaitable[SkillSelection]]
 
 
 class AgentEvaluator:
@@ -90,7 +88,6 @@ class AgentEvaluator:
                 await skill_provider(
                     episode.task_goal,
                     state.observation,
-                    entry.task_family,
                 )
                 if skill_provider and not refresh_skill_each_step
                 else SkillSelection(skill_ids, skill_context or "")
@@ -128,7 +125,6 @@ class AgentEvaluator:
                     selection = await skill_provider(
                         episode.task_goal,
                         state.observation,
-                        entry.task_family,
                     )
                     if selection.model_input_tokens is None:
                         input_usage_available = False

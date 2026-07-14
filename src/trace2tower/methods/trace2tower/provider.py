@@ -5,7 +5,6 @@ from pathlib import Path
 
 from trace2tower.agent import SkillSelection
 from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import AlfworldTaskFamily, Benchmark
 from trace2tower.methods.trace2tower.retrieval import retrieve_tower
 from trace2tower.methods.trace2tower.refinement import SkillStatus
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
@@ -28,7 +27,6 @@ class Trace2TowerSkillProvider:
         direct_mid_mmr_lambda: float = 0.75,
         downweighted_skill_ids: frozenset[str] = frozenset(),
         status_tie_epsilon: float = 0.0,
-        family_stratified: bool = False,
     ):
         snapshot.require_complete()
         if not -1 <= high_similarity_threshold <= 1:
@@ -52,7 +50,6 @@ class Trace2TowerSkillProvider:
         self.direct_mid_mmr_lambda = direct_mid_mmr_lambda
         self.downweighted_skill_ids = downweighted_skill_ids
         self.status_tie_epsilon = status_tie_epsilon
-        self.family_stratified = family_stratified
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
@@ -94,7 +91,6 @@ class Trace2TowerSkillProvider:
         self,
         task_goal: str,
         initial_observation: str,
-        task_family: AlfworldTaskFamily | None = None,
     ) -> SkillSelection:
         query_result = await self.runtime.embed(
             [task_goal, f"{task_goal}\n{initial_observation}"]
@@ -103,25 +99,6 @@ class Trace2TowerSkillProvider:
         mid_index = self.snapshot.mid_index
         high_cards = self.high_cards
         mid_cards = self.mid_cards
-        if self.family_stratified:
-            if self.snapshot.benchmark is not Benchmark.ALFWORLD or task_family is None:
-                raise ValueError("family-stratified Tower retrieval requires ALFWorld family metadata")
-            high_prefix = f"high_{task_family.value}_"
-            mid_prefix = f"mid_{task_family.value}_"
-            high_cards = {
-                skill_id: card
-                for skill_id, card in high_cards.items()
-                if skill_id.startswith(high_prefix)
-            }
-            mid_cards = {
-                skill_id: card
-                for skill_id, card in mid_cards.items()
-                if skill_id.startswith(mid_prefix)
-            }
-            if not high_cards or not mid_cards:
-                raise ValueError("Tower family sub-library is incomplete")
-            high_index = high_index.subset(set(high_cards))
-            mid_index = mid_index.subset(set(mid_cards))
         retrieval = retrieve_tower(
             query_result.vectors[0],
             query_result.vectors[1],

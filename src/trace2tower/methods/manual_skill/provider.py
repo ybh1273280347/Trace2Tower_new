@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from trace2tower.agent import SkillSelection
-from trace2tower.manifests import AlfworldTaskFamily
 
 
 class ManualSkillProvider:
@@ -21,6 +20,5 @@ class ManualSkillProvider:
         self,
         task_goal: str,
         initial_observation: str,
-        task_family: AlfworldTaskFamily | None = None,
     ) -> SkillSelection:
         return SkillSelection((self.skill_id,), self.context)

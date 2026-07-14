@@ -5,7 +5,6 @@ from pathlib import Path
 
 from trace2tower.agent import SkillSelection
 from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import AlfworldTaskFamily
 from trace2tower.methods.global_e2e.models import GlobalE2ESkillLibrary
 from trace2tower.methods.global_e2e.retrieval import retrieve_global_e2e_skill
 
@@ -29,7 +28,6 @@ class GlobalE2ESkillProvider:
         self,
         task_goal: str,
         initial_observation: str,
-        task_family: AlfworldTaskFamily | None = None,
     ) -> SkillSelection:
         embedding = await self.runtime.embed([f"{task_goal}\n{initial_observation}"])
         retrieval = retrieve_global_e2e_skill(
