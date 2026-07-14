@@ -138,6 +138,60 @@
       "ci95": [-0.0035, 0.097]
     }
   },
+  "p100_pro_scale_diagnostic": {
+    "run_id": "webshop-original-concept-v1-test-pro-p100-full-cap8-r1",
+    "snapshot_id": "tower_9094918372ee0a39",
+    "task_count": 100,
+    "repeat_ids": [0],
+    "shard_count": 10,
+    "unique_result_key_count": 100,
+    "error_attempt_count": 0,
+    "agent_model": "deepseek-v4-pro",
+    "mean_reward": 0.6573333333333333,
+    "full_success_rate": 0.5,
+    "mean_steps": 8.58,
+    "mean_invalid_actions": 0.76,
+    "mean_input_tokens": 41186.9,
+    "minus_no_skill": {
+      "difference": 0.037333333333333336,
+      "ci95": [-0.024333333333333332, 0.09966666666666665],
+      "full_success_difference": 0.05,
+      "full_success_ci95": [-0.02, 0.13],
+      "wins": 14,
+      "ties": 79,
+      "losses": 7,
+      "mean_steps_difference": -0.76,
+      "mean_input_token_difference": 15369.15
+    },
+    "minus_p50_full": {
+      "difference": 0.0165,
+      "ci95": [-0.03866666666666666, 0.0745],
+      "full_success_difference": 0.02,
+      "full_success_ci95": [-0.05, 0.09],
+      "wins": 11,
+      "ties": 80,
+      "losses": 9
+    },
+    "minus_semantic": {
+      "difference": 0.11566666666666667,
+      "ci95": [0.042166666666666665, 0.19116666666666668],
+      "full_success_difference": 0.14,
+      "full_success_ci95": [0.05, 0.23],
+      "wins": 24,
+      "ties": 68,
+      "losses": 8,
+      "mean_steps_difference": -4.13,
+      "mean_input_token_difference": -17406.51
+    },
+    "minus_manual": {
+      "difference": -0.03308333333333333,
+      "ci95": [-0.0875, 0.022756249999999912]
+    },
+    "minus_skillx": {
+      "difference": -0.027666666666666666,
+      "ci95": [-0.08017083333333334, 0.024166666666666666]
+    }
+  },
   "p100_renderer_control": {
     "task_count": 100,
     "agent_model": "deepseek-v4-flash",

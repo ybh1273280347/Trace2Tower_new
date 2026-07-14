@@ -47,11 +47,13 @@
       "methods": ["no_skill", "skillx", "trace2tower"]
     },
     "p100_scale": {
-      "agent_model": "deepseek-v4-flash",
+      "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
       "snapshot_id": "tower_9094918372ee0a39",
       "direct_mid_cap": 8,
       "task_count": 100,
-      "repeat_ids": [0]
+      "repeat_ids": [0],
+      "flash_mean_reward": 0.7209166666666667,
+      "pro_mean_reward": 0.6573333333333333
     },
     "renderer_control": {
       "status": "completed",

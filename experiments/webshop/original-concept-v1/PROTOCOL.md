@@ -45,7 +45,7 @@ After the P50 test exposed a validation/test gap, two post-hoc diagnostics were 
 1. A seen-task diagnostic reruns the 50 P50 training task IDs with fresh Flash executions and compares NoSkill, SkillX, and P50 Full. It measures task-specific memorization and is not held-out evidence.
 2. A scale diagnostic rebuilds Full from the nested P100 pool, keeps cap 8 and the same test manifest, and runs Flash only. It measures whether broader training coverage improves held-out performance.
 
-No new Pro conditions are launched after the completed P50 main table. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
+The P100 Full scale follow-up is evaluated on both Flash and Pro with the same snapshot, cap 8, 100-task test manifest, and `repeat_id=0`. P200 remains Flash-only. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
 
 The renderer control was run on the P100 structure. The native Trace2Tower renderer outperformed the SkillX-style adapter and is frozen for P200. P200 is a strict superset of P100, uses four Flash collection rollouts per training task, and is evaluated on the same 100-task Flash test with cap 8. Because the renderer was selected after observing this test set, the P200 result is a post-hoc scale diagnostic rather than new confirmatory test evidence. It must not be described as prompt tuning or as an independent held-out confirmation.
 

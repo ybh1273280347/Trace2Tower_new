@@ -101,6 +101,27 @@ P100 contains 100 tasks and four rollouts per task. The mixed selector retained 
 
 P100 minus NoSkill is `+0.04017`, interval `[-0.01425, +0.09775]`. P100 minus P50 Full is `+0.04467`, interval `[-0.00350, +0.09700]`. The single-repeat intervals include zero, so this is a strong positive scale trend rather than a significance claim. Broader training coverage improves every reported execution metric and is the leading explanation for the P50 validation/test gap.
 
+## P100 on Pro
+
+P100 Full was also run on Pro using the same snapshot, cap 8, test manifest, and real `repeat_id=0`. All conditions below cover the same 100 task keys with zero unresolved errors.
+
+| Model | Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---|---:|---:|---:|---:|---:|
+| Flash | NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| Flash | P50 Full | 0.67625 | 51% | 7.58 | 0.22 | 33,384 |
+| Flash | P100 Full | **0.72092** | **56%** | **7.17** | **0.19** | 32,360 |
+| Pro | NoSkill | 0.62000 | 45% | 9.34 | 0.93 | 25,818 |
+| Pro | P50 Full | 0.64083 | 48% | 9.19 | 1.06 | 42,738 |
+| Pro | P100 Full | **0.65733** | **50%** | **8.58** | **0.76** | 41,187 |
+
+On Pro, P100 minus NoSkill is `+0.03733`, interval `[-0.02433, +0.09967]`, with 14 wins, 79 ties, and 7 losses. Full success improves by 5 points, average steps fall by `0.76`, and input cost increases by 15,369 tokens per episode. P100 minus P50 Full is `+0.01650`, interval `[-0.03867, +0.07450]`, with 11 wins, 80 ties, and 9 losses.
+
+The strongest mechanism comparison is against Semantic-only: P100 Full gains `+0.11567`, interval `[+0.04217, +0.19117]`, and 14 full-success points, interval `[+5, +23]` points. It also uses 17,407 fewer input tokens and 4.13 fewer steps. This strengthens the conclusion that relational graph structure and High induction help a stronger agent relative to pure clustering.
+
+The evidence does not show that Pro benefits more than Flash: P100 minus NoSkill is `+0.03733` on Pro versus `+0.04017` on Flash, and both intervals include zero. P100 Pro also remains below native Manual (`0.69042`) and SkillX (`0.68500`) in reward point estimate. The defensible conclusion is that Full Trace2Tower can help the stronger model and clearly improves over semantic clustering, not that it dominates strong baselines or provides a larger model-strength interaction.
+
+Run: `webshop-original-concept-v1-test-pro-p100-full-cap8-r1`.
+
 ## P100 renderer control
 
 The graph, 9 Mid clusters, 5 High paths, retrieval policy, cap 8, model, and test keys were held fixed. Only the text renderer changed. The SkillX-style adapter used the upstream SkillX plan and functional-skill instructions but returned the existing Trace2Tower Mid/High schemas.

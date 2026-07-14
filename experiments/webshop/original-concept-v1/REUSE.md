@@ -10,6 +10,7 @@ Results are reusable only when the validation manifest, task key, repeat ID, Fla
 | Old Semantic repeat3 | Reject | Old full-content segment embeddings and reset-time retrieval |
 | P50 formal test, six methods x two models | Reuse | All 12 conditions cover 100/100 test keys at real `repeat_id=0`, zero unresolved errors |
 | P100 Full Flash test | Reuse | `webshop-original-concept-v1-test-flash-p100-full-cap8-r1`, 100/100 keys, zero unresolved errors |
+| P100 Full Pro test | Reuse | `webshop-original-concept-v1-test-pro-p100-full-cap8-r1`, 100/100 keys across 10 complete shards, zero errors |
 | P100 SkillX-style renderer diagnostic | Reuse only as renderer evidence | `webshop-original-concept-v1-test-flash-p100-full-skillx-style-cap8-r1`, same P100 structure and 100/100 test keys |
 | P200 Full Flash scale diagnostic | Reuse only as post-hoc scale evidence | `webshop-original-concept-v1-test-flash-p200-full-cap8-r1`, 100/100 global manifest keys, zero unresolved errors; use global key audit rather than overwritten shard invocation metadata |
 | P50 seen diagnostic | Reuse only as seen evidence | NoSkill, SkillX, and Full each cover the same 50 train task IDs with fresh executions |
