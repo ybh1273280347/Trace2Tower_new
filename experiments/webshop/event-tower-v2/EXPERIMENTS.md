@@ -2,10 +2,12 @@
 
 ## 阶段 1：审计两个轨迹池
 
-- [ ] 验证 P50 为 50 tasks x 4 repeats = 200 条轨迹。
-- [ ] 验证 P100 为 100 tasks x 4 repeats = 400 条轨迹，且 P50 严格包含于 P100。
-- [ ] 记录 source run、任务 ID、repeat、轨迹哈希、reward 分布和错误覆盖。
-- [ ] 单独 commit 并 push 池审计清单；不重新采样 validation/test。
+- [x] 验证 P50 为 50 tasks x 4 repeats = 200 条轨迹。
+- [x] 验证 P100 为 100 tasks x 4 repeats = 400 条轨迹，且 P50 严格包含于 P100。
+- [x] 记录 source run、任务 ID、repeat、轨迹哈希、reward 分布和错误覆盖。
+- [x] 单独 commit 并 push 池审计清单；不重新采样 validation/test。
+
+冻结证据：`stage-1-pools/audit.json`，审计 ID `poolaudit_be49e6014bb1aacb`。P50/P100 mean reward 分别为 `0.673292`/`0.682771`，满分轨迹为 `94`/`186`，source run error attempts 均为 0。
 
 ## 阶段 2：构建 P50 技能
 
