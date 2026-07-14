@@ -72,9 +72,12 @@ class AgentEvaluator:
         max_steps: int,
         skill_ids: tuple[str, ...] = (),
         skill_provider: SkillProvider | None = None,
+        refresh_skill_each_step: bool = False,
     ) -> EpisodeResult:
         if skill_provider is not None and (skill_context or skill_ids):
             raise ValueError("skill_provider cannot be combined with precomputed skills")
+        if refresh_skill_each_step and skill_provider is None:
+            raise ValueError("dynamic skill retrieval requires a provider")
         started = time.perf_counter()
         episode = await environment.reset(entry)
         state = episode.state
@@ -89,7 +92,7 @@ class AgentEvaluator:
                     state.observation,
                     entry.task_family,
                 )
-                if skill_provider
+                if skill_provider and not refresh_skill_each_step
                 else SkillSelection(skill_ids, skill_context or "")
             )
             input_tokens = selection.model_input_tokens or 0
@@ -100,6 +103,9 @@ class AgentEvaluator:
             output_usage_available = selection.model_output_tokens is not None
             chat_input_usage_available = True
             chat_output_usage_available = True
+            selected_skill_ids = list(selection.skill_ids)
+            context_skill_ids = list(selection.context_skill_ids)
+            injected_contexts = [selection.context] if selection.context else []
             messages = [
                 {
                     "role": "system",
@@ -118,9 +124,47 @@ class AgentEvaluator:
                 },
             ]
             for step_index in range(max_steps):
+                if refresh_skill_each_step:
+                    selection = await skill_provider(
+                        episode.task_goal,
+                        state.observation,
+                        entry.task_family,
+                    )
+                    if selection.model_input_tokens is None:
+                        input_usage_available = False
+                    else:
+                        input_tokens += selection.model_input_tokens
+                    if selection.model_output_tokens is None:
+                        output_usage_available = False
+                    else:
+                        output_tokens += selection.model_output_tokens
+                    selected_skill_ids.extend(
+                        skill_id
+                        for skill_id in selection.skill_ids
+                        if skill_id not in selected_skill_ids
+                    )
+                    context_skill_ids.extend(
+                        skill_id
+                        for skill_id in selection.context_skill_ids
+                        if skill_id not in context_skill_ids
+                    )
+                    if selection.context:
+                        injected_contexts.append(selection.context)
+                call_messages = messages
+                if refresh_skill_each_step and selection.context:
+                    call_messages = [
+                        *messages,
+                        {
+                            "role": "user",
+                            "content": (
+                                "# Retrieved Experience for the Current State\n\n"
+                                f"{selection.context}"
+                            ),
+                        },
+                    ]
                 llm_result = await self.runtime.chat(
                     self.endpoint_role,
-                    messages,
+                    call_messages,
                     tools=environment.tool_schemas,
                     tool_choice="required",
                     temperature=self.temperature,
@@ -225,6 +269,7 @@ class AgentEvaluator:
 
         primary_score = state.reward if state.done else 0.0
         success = bool(primary_score) if entry.benchmark is Benchmark.ALFWORLD else None
+        injected_context = "\x1e".join(injected_contexts)
         result = EpisodeResult(
             run_id=run_id,
             benchmark=entry.benchmark,
@@ -242,11 +287,11 @@ class AgentEvaluator:
             output_tokens=output_tokens if output_usage_available else None,
             billable_tokens=None,
             latency_ms=round((time.perf_counter() - started) * 1000),
-            skill_ids=selection.skill_ids,
-            skill_context_chars=len(selection.context),
-            context_skill_ids=selection.context_skill_ids,
+            skill_ids=tuple(selected_skill_ids),
+            skill_context_chars=sum(len(context) for context in injected_contexts),
+            context_skill_ids=tuple(context_skill_ids),
             skill_context_sha256=hashlib.sha256(
-                selection.context.encode("utf-8")
+                injected_context.encode("utf-8")
             ).hexdigest(),
             chat_input_tokens=(
                 chat_input_tokens if chat_input_usage_available else None

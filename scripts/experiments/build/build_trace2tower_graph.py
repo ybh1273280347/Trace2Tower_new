@@ -23,9 +23,7 @@ def main(options: argparse.Namespace) -> int:
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
     records = [
-        json.loads(line)
-        for line in options.input.read_text(encoding="utf-8").splitlines()
-        if line
+        json.loads(line) for line in options.input.read_text(encoding="utf-8").splitlines() if line
     ]
     groups = tuple(
         tuple(SegmentInstance.from_record(segment) for segment in record["segments"])
@@ -53,9 +51,7 @@ def main(options: argparse.Namespace) -> int:
         full_report = json.loads(options.full_report.read_text(encoding="utf-8"))
         cluster_count = int(full_report["cluster_count"])
         segment_ids = tuple(segment.segment_id for segment in segments)
-        embeddings = np.asarray(
-            [segment.embedding for segment in segments], dtype=np.float64
-        )
+        embeddings = np.asarray([segment.embedding for segment in segments], dtype=np.float64)
         clustering = semantic_only_clustering(
             segment_ids,
             embeddings,
@@ -71,6 +67,8 @@ def main(options: argparse.Namespace) -> int:
             "transition",
             "outcome",
             "base",
+            "positive",
+            "negative",
             "adjacency",
             "laplacian",
         ):
@@ -97,6 +95,8 @@ def main(options: argparse.Namespace) -> int:
         "eigenvalues": list(clustering.eigenvalues),
         "neighbor_count": graph.neighbor_count if graph else None,
         "edge_count": graph.edge_count if graph else None,
+        "transition_edge_count": graph.transition_edge_count if graph else None,
+        "cross_event_edge_count": graph.cross_event_edge_count if graph else None,
         "rho_min": float(graph.rho.min()) if graph else None,
         "rho_max": float(graph.rho.max()) if graph else None,
         "positive_adjacency_entries": int((graph.adjacency.data > 0).sum()) if graph else None,

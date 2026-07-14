@@ -35,9 +35,7 @@ def write_rendered_cards(
         output,
         {
             "mid_cards": [mid_cards[skill_id].to_record() for skill_id in sorted(mid_cards)],
-            "high_cards": [
-                high_cards[skill_id].to_record() for skill_id in sorted(high_cards)
-            ],
+            "high_cards": [high_cards[skill_id].to_record() for skill_id in sorted(high_cards)],
             "usage": usages,
         },
     )
@@ -74,19 +72,12 @@ def build_high_render_examples(
         start = next(
             index
             for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
-            if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
-            == path.ordered_mid_ids
+            if ordered_mid_ids[index : index + len(path.ordered_mid_ids)] == path.ordered_mid_ids
         )
         path_groups = groups[start : start + len(path.ordered_mid_ids)]
-        actions = [
-            action
-            for _, group_actions in path_groups
-            for action in group_actions
-        ]
+        actions = [action for _, group_actions in path_groups for action in group_actions]
         goal = next(
-            transition["goal"]
-            for transition in record["transitions"]
-            if transition.get("goal")
+            transition["goal"] for transition in record["transitions"] if transition.get("goal")
         )
         examples.append(
             {
@@ -107,13 +98,13 @@ def build_high_render_examples(
 async def main(options: argparse.Namespace) -> int:
     if options.render_high_limit < 0:
         raise ValueError("render High limit must be non-negative")
+    if options.structure_only and options.render_all_mid:
+        raise ValueError("structure-only build cannot render Mid cards")
     load_dotenv(options.env)
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
     records = [
-        json.loads(line)
-        for line in options.input.read_text(encoding="utf-8").splitlines()
-        if line
+        json.loads(line) for line in options.input.read_text(encoding="utf-8").splitlines() if line
     ]
     cluster_records = json.loads(options.clusters.read_text(encoding="utf-8"))["clusters"]
     clusters = tuple(
@@ -134,7 +125,7 @@ async def main(options: argparse.Namespace) -> int:
             max_path_length=config.max_high_path_length,
             min_support_ratio=config.high_min_support_ratio,
             epsilon=config.high_path_epsilon,
-            success_threshold=options.success_threshold,
+            success_threshold=config.success_threshold,
         )
     )
     used_high_fallback = False
@@ -145,7 +136,7 @@ async def main(options: argparse.Namespace) -> int:
             max_path_length=config.max_high_path_length,
             min_support_ratio=0.0,
             epsilon=config.high_path_epsilon,
-            success_threshold=options.success_threshold,
+            success_threshold=config.success_threshold,
         )[:1]
         used_high_fallback = bool(high_paths)
     invocation = {
@@ -156,7 +147,8 @@ async def main(options: argparse.Namespace) -> int:
         "output_dir": options.output_dir.as_posix(),
         "render_high_limit": options.render_high_limit,
         "render_all_mid": options.render_all_mid,
-        "success_threshold": options.success_threshold,
+        "structure_only": options.structure_only,
+        "success_threshold": config.success_threshold,
         "ensure_high_path": options.ensure_high_path,
     }
     print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
@@ -182,33 +174,21 @@ async def main(options: argparse.Namespace) -> int:
         existing = json.loads(rendered_cards_path.read_text(encoding="utf-8"))
         mid_cards = {
             card.skill_id: card
-            for card in (
-                MidSkillCard.from_record(item) for item in existing["mid_cards"]
-            )
+            for card in (MidSkillCard.from_record(item) for item in existing["mid_cards"])
         }
         high_cards = {
             card.skill_id: card
-            for card in (
-                HighSkillCard.from_record(item) for item in existing["high_cards"]
-            )
+            for card in (HighSkillCard.from_record(item) for item in existing["high_cards"])
         }
         usages = list(existing.get("usage", ()))
     elif options.reuse_mid_cards_from:
-        existing = json.loads(
-            options.reuse_mid_cards_from.read_text(encoding="utf-8")
-        )
+        existing = json.loads(options.reuse_mid_cards_from.read_text(encoding="utf-8"))
         mid_cards = {
             card.skill_id: card
-            for card in (
-                MidSkillCard.from_record(item) for item in existing["mid_cards"]
-            )
+            for card in (MidSkillCard.from_record(item) for item in existing["mid_cards"])
         }
         source_mid_ids = set(mid_cards)
-        usages = [
-            item
-            for item in existing.get("usage", ())
-            if item["skill_id"] in source_mid_ids
-        ]
+        usages = [item for item in existing.get("usage", ()) if item["skill_id"] in source_mid_ids]
 
     inputs_by_id = {item.cluster_id: item for item in mid_inputs}
     paths_by_id = {path.path_id: path for path in high_paths}
@@ -224,20 +204,18 @@ async def main(options: argparse.Namespace) -> int:
     reused_mid_count = len(mid_cards)
     reused_high_count = len(high_cards)
     selected_paths = (
-        high_paths
+        ()
+        if options.structure_only
+        else high_paths
         if options.render_high_limit == 0
         else high_paths[: options.render_high_limit]
     )
     required_mid_ids = tuple(
         inputs_by_id
         if options.render_all_mid
-        else dict.fromkeys(
-            mid_id for path in selected_paths for mid_id in path.ordered_mid_ids
-        )
+        else dict.fromkeys(mid_id for path in selected_paths for mid_id in path.ordered_mid_ids)
     )
-    missing_mid_ids = tuple(
-        skill_id for skill_id in required_mid_ids if skill_id not in mid_cards
-    )
+    missing_mid_ids = tuple(skill_id for skill_id in required_mid_ids if skill_id not in mid_cards)
     missing_paths = tuple(path for path in selected_paths if path.path_id not in high_cards)
     if missing_mid_ids or missing_paths:
         common = load_yaml(options.config_root / "common.yaml")
@@ -248,10 +226,13 @@ async def main(options: argparse.Namespace) -> int:
             retry_base_seconds=common["retry_base_seconds"],
         )
         try:
-            for mid_id in missing_mid_ids:
-                card, result = await render_mid_card(
-                    runtime, options.benchmark, inputs_by_id[mid_id]
+            rendered_mids = await asyncio.gather(
+                *(
+                    render_mid_card(runtime, options.benchmark, inputs_by_id[mid_id])
+                    for mid_id in missing_mid_ids
                 )
+            )
+            for mid_id, (card, result) in zip(missing_mid_ids, rendered_mids):
                 mid_cards[mid_id] = card
                 usages.append(
                     {
@@ -260,16 +241,19 @@ async def main(options: argparse.Namespace) -> int:
                         "latency_ms": result.latency_ms,
                     }
                 )
-                write_rendered_cards(
-                    rendered_cards_path, mid_cards, high_cards, usages
+                write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
+            rendered_highs = await asyncio.gather(
+                *(
+                    render_high_card(
+                        runtime,
+                        path,
+                        mid_cards,
+                        build_high_render_examples(records, clusters, path),
+                    )
+                    for path in missing_paths
                 )
-            for path in missing_paths:
-                card, result = await render_high_card(
-                    runtime,
-                    path,
-                    mid_cards,
-                    build_high_render_examples(records, clusters, path),
-                )
+            )
+            for path, (card, result) in zip(missing_paths, rendered_highs):
                 high_cards[path.path_id] = card
                 usages.append(
                     {
@@ -278,16 +262,14 @@ async def main(options: argparse.Namespace) -> int:
                         "latency_ms": result.latency_ms,
                     }
                 )
-                write_rendered_cards(
-                    rendered_cards_path, mid_cards, high_cards, usages
-                )
+                write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
         finally:
             await runtime.close()
     if mid_cards or high_cards:
         write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
 
     report = {
-        "renderer_model": os.environ["RENDERER_MODEL"],
+        "renderer_model": os.environ.get("RENDERER_MODEL"),
         **invocation,
         "trajectory_count": len(records),
         "mid_cluster_count": len(mid_inputs),
@@ -317,9 +299,9 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--render-high-limit", type=int, default=0)
     parser.add_argument("--render-all-mid", action="store_true")
+    parser.add_argument("--structure-only", action="store_true")
     parser.add_argument("--ensure-high-path", action="store_true")
     parser.add_argument("--reuse-mid-cards-from", type=Path)
-    parser.add_argument("--success-threshold", type=float, default=0.999)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))

@@ -1,8 +1,9 @@
 # WebShop Experiments
 
-当前唯一有效的实验协议是 `event-tower-v2/`。它重新冻结方法身份、事件聚类契约、P50/P100 规模比较以及 validation/test 划分。
+当前唯一有效的算法协议是 `original-concept-v1/`，以仓库根目录的 `Trace2Tower原始资料.md` 为唯一权威来源。
 
-- `event-tower-v2/`: 当前实验，尚未 rollout。
-- `deprecated/`: 2026-07-14 之前的配置、报告和诊断。旧 Tower 没有在 Mid 聚类阶段强制事件分层，不能作为完整 Trace2Tower 结果。
+- `original-concept-v1/`: 当前原始概念稿实现、artifact 审计和 Flash 快速机制门。
+- `event-tower-v2/`: 已废弃的硬事件分层实验线，只保留历史 manifest 和结果追溯。
+- `deprecated/`: 更早的配置、报告和诊断，不参与当前结论。
 
-旧 artifacts 和训练轨迹没有删除。P50/P100 No-Skill 训练池继续使用；旧 Tower snapshot 禁止作为 v2 Full artifact。
+P50/P100 No-Skill 训练池继续使用；旧 Tower snapshot 不得作为 original-concept Full artifact。

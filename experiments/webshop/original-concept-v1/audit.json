@@ -1,0 +1,45 @@
+{
+  "protocol": "original-concept-v1",
+  "authority": "Trace2Tower原始资料.md",
+  "snapshot_id": "tower_1714fcabca14668e",
+  "training": {
+    "pool": "p50_mixed",
+    "trajectory_count": 173,
+    "segment_count": 947,
+    "compact_signature_count": 34
+  },
+  "graph": {
+    "edge_count": 9018,
+    "observed_transition_edge_count": 774,
+    "cross_event_edge_count": 808,
+    "mid_cluster_count": 18,
+    "high_path_count": 13,
+    "weighted_event_purity": 0.880675818373812
+  },
+  "gate": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+    "task_count": 100,
+    "repeat_ids": [0],
+    "agent_model": "deepseek-v4-flash",
+    "direct_mid_cap": 8,
+    "tower_run_id": "webshop-original-concept-v1-validation-flash-cap8-r1",
+    "no_skill_run_id": "webshop-original-concept-v1-validation-flash-noskill-r1",
+    "tower_mean_reward": 0.7234333333333334,
+    "no_skill_mean_reward": 0.65235,
+    "paired_reward_difference": 0.07108333333333333,
+    "paired_reward_ci95": [0.016747916666666664, 0.12908541666666662],
+    "wins": 13,
+    "ties": 82,
+    "losses": 5,
+    "tower_full_success_rate": 0.51,
+    "no_skill_full_success_rate": 0.47,
+    "tower_mean_steps": 7.2,
+    "no_skill_mean_steps": 7.69,
+    "tower_mean_invalid_actions": 0.24,
+    "no_skill_mean_invalid_actions": 0.3,
+    "tower_mean_input_tokens": 30661.35,
+    "no_skill_mean_input_tokens": 19572.0,
+    "error_count": 0,
+    "decision": "pass"
+  }
+}

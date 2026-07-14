@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 import re
-from typing import Sequence
+from collections.abc import Sequence
 
 from trace2tower.benchmarks.models import ClickableKind
 from trace2tower.methods.trace2tower.models import (
@@ -12,7 +13,6 @@ from trace2tower.methods.trace2tower.models import (
 )
 from trace2tower.methods.trace2tower.transitions import build_transitions
 from trace2tower.trajectory import EpisodeTrajectory, StepRecord
-
 
 DETAIL_VALUES = {"description", "features", "reviews", "attributes"}
 ASIN_PATTERN = re.compile(r"^[A-Za-z0-9]{8,16}$")
@@ -69,12 +69,12 @@ class WebShopEventClassifier:
             )
             if self.page is WebShopPageType.RESULTS and (
                 clickable_kind is ClickableKind.PRODUCT_LINK
-                or (not step.clickable_types and value not in {"next >", "< prev", "back to search"})
+                or (
+                    not step.clickable_types and value not in {"next >", "< prev", "back to search"}
+                )
             ):
                 event = WebShopEventType.CANDIDATE_SELECTION
-            elif self.page is WebShopPageType.UNKNOWN and ASIN_PATTERN.fullmatch(
-                raw_value.strip()
-            ):
+            elif self.page is WebShopPageType.UNKNOWN and ASIN_PATTERN.fullmatch(raw_value.strip()):
                 event = WebShopEventType.CANDIDATE_SELECTION
             elif self.page is WebShopPageType.ITEM and (
                 clickable_kind is ClickableKind.OPTION
@@ -140,23 +140,75 @@ def segment_webshop_trajectory(
                 sum(vector[index] for vector in segment_vectors) / len(segment_vectors)
                 for index in range(len(segment_vectors[0]))
             )
-        segments.append(SegmentInstance(
-            segment_id=f"{trajectory.trajectory_id}:segment:{start}-{end}",
-            trajectory_id=trajectory.trajectory_id,
-            start_step=start,
-            end_step=end,
-            transition_ids=tuple(
-                transition.transition_id
-                for transition in aligned_transitions[start : end + 1]
-            ),
-            embedding=embedding,
-            trajectory_score=trajectory.primary_score,
-            event_type=event,
-            raw_actions=tuple(
-                transition.raw_action
-                for transition in aligned_transitions[start : end + 1]
-            ),
-            observation_before=aligned_transitions[start].observation_before,
-            observation_after=aligned_transitions[end].observation_after,
-        ))
+        segments.append(
+            SegmentInstance(
+                segment_id=f"{trajectory.trajectory_id}:segment:{start}-{end}",
+                trajectory_id=trajectory.trajectory_id,
+                start_step=start,
+                end_step=end,
+                transition_ids=tuple(
+                    transition.transition_id for transition in aligned_transitions[start : end + 1]
+                ),
+                embedding=embedding,
+                trajectory_score=trajectory.primary_score,
+                event_type=event,
+                raw_actions=tuple(
+                    transition.raw_action for transition in aligned_transitions[start : end + 1]
+                ),
+                observation_before=aligned_transitions[start].observation_before,
+                observation_after=aligned_transitions[end].observation_after,
+            )
+        )
     return tuple(segments)
+
+
+def webshop_segment_signature(segment: SegmentInstance) -> str:
+    if segment.event_type is None:
+        raise ValueError("WebShop segment signature requires an event type")
+
+    action_templates = []
+    for raw_action in segment.raw_actions:
+        try:
+            action = json.loads(raw_action)
+        except json.JSONDecodeError:
+            action_templates.append("UNKNOWN_ACTION")
+            continue
+        name = action.get("name")
+        arguments = action.get("arguments") or {}
+        if name == "search_action":
+            keywords = arguments.get("keywords")
+            keyword_count = len(keywords.split()) if isinstance(keywords, str) else 0
+            action_templates.append(f"SEARCH(keywords={keyword_count})")
+            continue
+        if name != "click_action":
+            action_templates.append(str(name or "UNKNOWN_ACTION").upper())
+            continue
+
+        value = arguments.get("value")
+        normalized_value = value.strip().casefold() if isinstance(value, str) else ""
+        if segment.event_type is WebShopEventType.ATTRIBUTE_INSPECTION:
+            detail = normalized_value if normalized_value in DETAIL_VALUES else "detail"
+            action_templates.append(f"OPEN_DETAIL({detail})")
+        elif segment.event_type is WebShopEventType.RESULT_NAVIGATION:
+            direction = "next" if normalized_value == "next >" else "previous"
+            action_templates.append(f"PAGE({direction})")
+        elif segment.event_type is WebShopEventType.CANDIDATE_SELECTION:
+            action_templates.append("OPEN_PRODUCT")
+        elif segment.event_type is WebShopEventType.OPTION_SELECTION:
+            action_templates.append("SELECT_OPTION")
+        elif segment.event_type is WebShopEventType.DETAIL_BACKTRACKING:
+            action_templates.append("BACK_TO_PRODUCT")
+        elif segment.event_type is WebShopEventType.SEARCH_BACKTRACKING:
+            action_templates.append("BACK_TO_SEARCH")
+        elif segment.event_type is WebShopEventType.PURCHASE_DECISION:
+            action_templates.append("BUY_NOW")
+        else:
+            action_templates.append("CLICK")
+
+    return "\n".join(
+        (
+            f"Event: {segment.event_type.value}",
+            f"Length: {segment.end_step - segment.start_step + 1}",
+            f"Actions: {' -> '.join(action_templates)}",
+        )
+    )

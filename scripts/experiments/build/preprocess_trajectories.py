@@ -7,18 +7,22 @@ import json
 import os
 import tempfile
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.segmentation import segment_alfworld_trajectory
 from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
 from trace2tower.methods.trace2tower.transitions import build_transitions, transition_text
-from trace2tower.methods.trace2tower.webshop_events import segment_webshop_trajectory
+from trace2tower.methods.trace2tower.webshop_events import (
+    segment_webshop_trajectory,
+    webshop_segment_signature,
+)
 from trace2tower.trajectory import TrajectoryReader
 
 
@@ -37,6 +41,14 @@ async def main(options: argparse.Namespace) -> None:
         if trajectory.benchmark is benchmark
     )
     transition_groups = tuple(build_transitions(trajectory) for trajectory in trajectories)
+    webshop_segment_groups = (
+        tuple(
+            segment_webshop_trajectory(trajectory, transitions)
+            for trajectory, transitions in zip(trajectories, transition_groups)
+        )
+        if benchmark is Benchmark.WEBSHOP
+        else ()
+    )
     invocation = {
         "benchmark": benchmark.value,
         "trajectory_glob": options.trajectory_glob,
@@ -77,11 +89,15 @@ async def main(options: argparse.Namespace) -> None:
         dimension=common["embedding_dimension"],
         batch_size=common["embedding_batch_size"],
     )
-    texts = [
-        transition_text(transition)
-        for group in transition_groups
-        for transition in group
-    ]
+    texts = (
+        [transition_text(transition) for group in transition_groups for transition in group]
+        if benchmark is Benchmark.ALFWORLD
+        else [
+            webshop_segment_signature(segment)
+            for group in webshop_segment_groups
+            for segment in group
+        ]
+    )
     try:
         vectors = await encoder.embed(texts)
     finally:
@@ -92,10 +108,12 @@ async def main(options: argparse.Namespace) -> None:
     event_counts = Counter()
     segment_lengths = Counter()
     offset = 0
-    for trajectory, transitions in zip(trajectories, transition_groups):
-        embeddings = vectors[offset : offset + len(transitions)]
-        offset += len(transitions)
+    for trajectory_index, (trajectory, transitions) in enumerate(
+        zip(trajectories, transition_groups)
+    ):
         if benchmark is Benchmark.ALFWORLD:
+            embeddings = vectors[offset : offset + len(transitions)]
+            offset += len(transitions)
             segments = segment_alfworld_trajectory(
                 trajectory,
                 transitions,
@@ -104,18 +122,18 @@ async def main(options: argparse.Namespace) -> None:
                 max_segment_length=max_segment_length,
             )
         else:
-            segments = segment_webshop_trajectory(
-                trajectory,
-                transitions,
-                embeddings,
+            raw_segments = webshop_segment_groups[trajectory_index]
+            segment_vectors = vectors[offset : offset + len(raw_segments)]
+            offset += len(raw_segments)
+            segments = tuple(
+                replace(segment, embedding=tuple(vector))
+                for segment, vector in zip(raw_segments, segment_vectors)
             )
         primitive_counts.update(transition.primitive_action for transition in transitions)
         event_counts.update(
             segment.event_type for segment in segments if segment.event_type is not None
         )
-        segment_lengths.update(
-            segment.end_step - segment.start_step + 1 for segment in segments
-        )
+        segment_lengths.update(segment.end_step - segment.start_step + 1 for segment in segments)
         records.append(
             {
                 "run_id": trajectory.run_id,
@@ -151,6 +169,11 @@ async def main(options: argparse.Namespace) -> None:
         **invocation,
         "embedding_model": os.environ["EMBEDDING_MODEL"],
         "embedding_dimension": common["embedding_dimension"],
+        "embedding_input": (
+            "step_transition_text"
+            if benchmark is Benchmark.ALFWORLD
+            else "compact_event_segment_signature"
+        ),
         "embedding_request_count": encoder.embedding_request_count,
         "embedding_input_tokens": encoder.embedding_input_tokens,
         "cached_unique_text_count": encoder.cached_unique_text_count,
@@ -160,9 +183,7 @@ async def main(options: argparse.Namespace) -> None:
         "primitive_action_distribution": {
             action.value: count for action, count in sorted(primitive_counts.items())
         },
-        "event_distribution": {
-            event.value: count for event, count in sorted(event_counts.items())
-        },
+        "event_distribution": {event.value: count for event, count in sorted(event_counts.items())},
     }
     write_json(options.output.with_suffix(".metadata.json"), report)
     print(yaml.safe_dump(report, sort_keys=False))

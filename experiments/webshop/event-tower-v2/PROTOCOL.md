@@ -1,5 +1,7 @@
 # WebShop Event Tower V2 实验口径
 
+> **已废弃：** 本协议把事件类型错误地用作图和聚类的硬分区，不符合 `Trace2Tower原始资料.md`。不得继续用于新实验或算法结论；当前协议见 `../original-concept-v1/PROTOCOL.md`。
+
 ## 1. 有效范围
 
 本协议取代 2026-07-14 之前的 WebShop Flat、Static Tower、Random-300、旧规模实验和旧消融口径。历史结果不进入新主表，也不参与配置选择。

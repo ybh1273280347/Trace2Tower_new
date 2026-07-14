@@ -63,7 +63,6 @@ class TowerSnapshot:
     high_coverage_complete: bool
 
     def __post_init__(self) -> None:
-        self.config.validate_for_benchmark(self.benchmark)
         if not self.training_trajectory_ids or len(set(self.training_trajectory_ids)) != len(
             self.training_trajectory_ids
         ):
@@ -91,10 +90,7 @@ class TowerSnapshot:
             for segment_id in cluster.member_segment_ids
         ):
             raise ValueError("Mid clusters contain segments outside training provenance")
-        if any(
-            not set(path.supporting_trajectory_ids) <= training_ids
-            for path in self.high_paths
-        ):
+        if any(not set(path.supporting_trajectory_ids) <= training_ids for path in self.high_paths):
             raise ValueError("High paths contain support outside training provenance")
         if any(
             len(path.ordered_mid_ids) < 2
@@ -115,9 +111,7 @@ class TowerSnapshot:
             raise ValueError("Mid index and cards differ")
         if set(self.high_index.skill_ids) != set(high_cards):
             raise ValueError("High index and cards differ")
-        if not self.mid_index.text_hashes or (
-            self.high_cards and not self.high_index.text_hashes
-        ):
+        if not self.mid_index.text_hashes or (self.high_cards and not self.high_index.text_hashes):
             raise ValueError("formal tower indexes require card text hashes")
         expected_mid_coverage = set(mid_cards) == set(clusters)
         expected_high_coverage = set(high_cards) == set(paths)
@@ -169,14 +163,10 @@ class TowerSnapshot:
             training_trajectory_ids=tuple(record["training_trajectory_ids"]),
             source_hashes=TowerSourceHashes.from_record(record["source_hashes"]),
             low_skills=tuple(LowSkill.from_record(item) for item in record["low_skills"]),
-            mid_clusters=tuple(
-                MidCluster.from_record(item) for item in record["mid_clusters"]
-            ),
+            mid_clusters=tuple(MidCluster.from_record(item) for item in record["mid_clusters"]),
             high_paths=tuple(HighPath.from_record(item) for item in record["high_paths"]),
             mid_cards=tuple(MidSkillCard.from_record(item) for item in record["mid_cards"]),
-            high_cards=tuple(
-                HighSkillCard.from_record(item) for item in record["high_cards"]
-            ),
+            high_cards=tuple(HighSkillCard.from_record(item) for item in record["high_cards"]),
             mid_index=SkillEmbeddingIndex.from_record(record["mid_index"]),
             high_index=SkillEmbeddingIndex.from_record(record["high_index"]),
             mid_coverage_complete=bool(record["mid_coverage_complete"]),

@@ -319,6 +319,7 @@ async def run_matrix_shard(
             shard_id=current_shard_id,
             max_steps=benchmark_config["max_steps"],
             skill_provider=provider.select if provider else None,
+            refresh_skill_each_step=method in TOWER_ARTIFACT_METHODS,
         )
 
     summary = await run_shard(

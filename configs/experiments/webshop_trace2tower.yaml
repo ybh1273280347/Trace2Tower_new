@@ -10,4 +10,4 @@ random_state: 42
 max_high_path_length: 4
 high_min_support_ratio: 0.10
 high_path_epsilon: 0.000001
-event_type_stratification: true
+success_threshold: 0.999

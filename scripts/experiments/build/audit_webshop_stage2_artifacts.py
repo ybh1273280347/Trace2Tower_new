@@ -56,9 +56,7 @@ def audit_global_e2e(
     corpus = format_trajectory_corpus(successful_trajectories)
     corpus_sha256 = hashlib.sha256(corpus.encode("utf-8")).hexdigest()
     legacy_prompt_revision = "db29a80"
-    legacy_prompt_path = (
-        "src/trace2tower/methods/flat_skill_summary/end_to_end_prompt.py"
-    )
+    legacy_prompt_path = "src/trace2tower/methods/flat_skill_summary/end_to_end_prompt.py"
     legacy_prompt_sha256 = hashlib.sha256(
         git_blob(legacy_prompt_revision, legacy_prompt_path)
     ).hexdigest()
@@ -118,10 +116,8 @@ def audit_skillx(
     ).stdout.strip()
     if (
         library.benchmark is not Benchmark.WEBSHOP
-        or tuple(upstream_report["source_trajectory_ids"])
-        != successful_trajectory_ids
-        or upstream_report["source_trajectory_count"]
-        != len(successful_trajectory_ids)
+        or tuple(upstream_report["source_trajectory_ids"]) != successful_trajectory_ids
+        or upstream_report["source_trajectory_count"] != len(successful_trajectory_ids)
         or library.source_library_sha256 != source_library_sha256
         or library.skillx_commit != skillx_head
         or report["skillx_commit"] != skillx_head
@@ -173,12 +169,8 @@ def audit_tower(
         for line in preprocessed_path.read_text(encoding="utf-8").splitlines()
         if line
     )
-    component_hashes = {
-        field: sha256_file(path) for field, path in component_paths.items()
-    }
-    snapshot_hashes = {
-        field: getattr(snapshot.source_hashes, field) for field in component_paths
-    }
+    component_hashes = {field: sha256_file(path) for field, path in component_paths.items()}
+    snapshot_hashes = {field: getattr(snapshot.source_hashes, field) for field in component_paths}
     if (
         snapshot.benchmark is not Benchmark.WEBSHOP
         or snapshot.config != config
@@ -187,8 +179,6 @@ def audit_tower(
         or snapshot_hashes != component_hashes
     ):
         raise ValueError(f"{name} snapshot does not match its frozen components")
-    if method in {MethodName.TRACE2TOWER, MethodName.TRACE2TOWER_NO_MIXED}:
-        snapshot.config.validate_for_benchmark(Benchmark.WEBSHOP)
     if method is MethodName.SEMANTIC_CLUSTERING and snapshot.high_cards:
         raise ValueError("Semantic Clustering baseline must not contain High cards")
 
@@ -205,10 +195,7 @@ def audit_tower(
         "training_trajectory_count": len(snapshot.training_trajectory_ids),
         "mid_count": len(snapshot.mid_cards),
         "high_count": len(snapshot.high_cards),
-        "event_type_stratification": snapshot.config.event_type_stratification,
-        "component_paths": {
-            field: path.as_posix() for field, path in component_paths.items()
-        },
+        "component_paths": {field: path.as_posix() for field, path in component_paths.items()},
         "component_sha256": component_hashes,
         "renderer_call_count": len(usages),
         "renderer_input_tokens": sum(item["input_tokens"] or 0 for item in usages),
@@ -271,7 +258,7 @@ def render_report(audit: dict) -> str:
     return f"""# Stage 2: P50 技能 Artifact 冻结
 
 状态：`complete`
-审计 ID：`{audit['audit_id']}`
+审计 ID：`{audit["audit_id"]}`
 
 ## Baseline artifacts
 
@@ -320,10 +307,7 @@ def main(options: argparse.Namespace) -> int:
         len(mixed) != 173
         or len(success_only) != 94
         or not {trajectory.trajectory_id for trajectory in mixed} <= p50_ids
-        or tuple(
-            sorted(trajectory.trajectory_id for trajectory in success_only)
-        )
-        != successful_ids
+        or tuple(sorted(trajectory.trajectory_id for trajectory in success_only)) != successful_ids
     ):
         raise ValueError("P50 evidence pools do not match the stage 1 trajectory pool")
 
@@ -410,9 +394,7 @@ def main(options: argparse.Namespace) -> int:
                 "audit_id": audit["audit_id"],
                 "global_e2e": baselines["global_e2e_gpt"]["library_id"],
                 "skillx": baselines["skillx"]["library_id"],
-                "snapshots": {
-                    name: item["snapshot_id"] for name, item in snapshots.items()
-                },
+                "snapshots": {name: item["snapshot_id"] for name, item in snapshots.items()},
             },
             indent=2,
         )
@@ -425,24 +407,20 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pool-audit",
         type=Path,
-        default=Path(
-            "experiments/webshop/event-tower-v2/stage-1-pools/audit.json"
-        ),
+        default=Path("experiments/webshop/event-tower-v2/stage-1-pools/audit.json"),
     )
     parser.add_argument(
         "--mixed-evidence",
         type=Path,
         default=Path(
-            "artifacts/trajectories/webshop/evidence/"
-            "webshop-flash50-repeat4-mixed-v1.jsonl"
+            "artifacts/trajectories/webshop/evidence/webshop-flash50-repeat4-mixed-v1.jsonl"
         ),
     )
     parser.add_argument(
         "--success-evidence",
         type=Path,
         default=Path(
-            "artifacts/trajectories/webshop/evidence/"
-            "webshop-flash50-repeat4-success-only-v1.jsonl"
+            "artifacts/trajectories/webshop/evidence/webshop-flash50-repeat4-success-only-v1.jsonl"
         ),
     )
     parser.add_argument(
@@ -459,16 +437,14 @@ if __name__ == "__main__":
         "--skillx-source-library",
         type=Path,
         default=Path(
-            "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/"
-            "library.json"
+            "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/library.json"
         ),
     )
     parser.add_argument(
         "--skillx-upstream-report",
         type=Path,
         default=Path(
-            "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/"
-            "report.json"
+            "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/report.json"
         ),
     )
     parser.add_argument(
@@ -489,15 +465,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path(
-            "experiments/webshop/event-tower-v2/stage-2-skills/audit.json"
-        ),
+        default=Path("experiments/webshop/event-tower-v2/stage-2-skills/audit.json"),
     )
     parser.add_argument(
         "--report",
         type=Path,
-        default=Path(
-            "experiments/webshop/event-tower-v2/stage-2-skills/REPORT.md"
-        ),
+        default=Path("experiments/webshop/event-tower-v2/stage-2-skills/REPORT.md"),
     )
     raise SystemExit(main(parser.parse_args()))

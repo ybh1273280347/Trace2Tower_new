@@ -100,85 +100,36 @@ def test_graph_components_and_signed_formula() -> None:
     assert full.adjacency[2, 3] < 0
 
 
-def test_event_stratification_excludes_cross_event_edges() -> None:
+def test_observed_transitions_connect_different_event_types() -> None:
     query = WebShopEventType.QUERY_FORMULATION
+    candidate = WebShopEventType.CANDIDATE_SELECTION
     purchase = WebShopEventType.PURCHASE_DECISION
     groups = (
-        (segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),
-        (segment("q1", "t1", 0, (1.0, 0.0), 1.0, query),),
-        (segment("p0", "t2", 0, (1.0, 0.0), 1.0, purchase),),
-    )
-    compatible = build_graph(groups, config(event_type_stratification=True))
-    assert compatible.semantic[0, 1] > 0
-    assert compatible.semantic[0, 2] == 0
-    assert compatible.semantic[1, 2] == 0
-
-
-def test_formal_webshop_tower_requires_event_stratification() -> None:
-    query = WebShopEventType.QUERY_FORMULATION
-    groups = ((segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),)
-    with pytest.raises(ValueError, match="requires event-type stratification"):
-        build_graph(groups, config())
-
-
-def test_no_event_ablation_preserves_graph_edges_across_events() -> None:
-    query = WebShopEventType.QUERY_FORMULATION
-    purchase = WebShopEventType.PURCHASE_DECISION
-    groups = (
-        (segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),
-        (segment("p0", "t1", 0, (1.0, 0.0), 0.0, purchase),),
-    )
-    graph = build_graph(
-        groups,
-        config(method=MethodName.TRACE2TOWER_NO_EVENT),
-    )
-
-    assert graph.semantic[0, 1] > 0
-
-
-def test_no_event_ablation_rejects_event_stratification() -> None:
-    with pytest.raises(ValueError, match="must disable event-type stratification"):
-        config(
-            method=MethodName.TRACE2TOWER_NO_EVENT,
-            event_type_stratification=True,
-        )
-
-
-def test_event_stratification_selects_neighbors_and_clusters_within_event() -> None:
-    query = WebShopEventType.QUERY_FORMULATION
-    purchase = WebShopEventType.PURCHASE_DECISION
-    groups = tuple(
-        (segment(f"q{index}", f"t{index}", 0, (1.0, 0.0), 1.0, query),)
-        for index in range(2)
-    ) + tuple(
         (
-            segment(
-                f"p{index}",
-                f"t{index + 2}",
-                0,
-                (1.0, 0.0),
-                1.0,
-                purchase,
-            ),
-        )
-        for index in range(12)
+            segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),
+            segment("c0", "t0", 1, (0.0, 1.0), 1.0, candidate),
+        ),
+        (
+            segment("q1", "t1", 0, (1.0, 0.0), 0.0, query),
+            segment("p1", "t1", 1, (-1.0, 0.0), 0.0, purchase),
+        ),
     )
-    graph = build_graph(groups, config(event_type_stratification=True))
-    assert graph.semantic[0, 1] > 0
-    assert graph.semantic[0, 2] == 0
-    clustering = spectral_clustering(
-        graph,
-        config(event_type_stratification=True),
-    )
-    query_labels = set(clustering.labels[:2])
-    purchase_labels = set(clustering.labels[2:])
-    assert query_labels.isdisjoint(purchase_labels)
+    graph = build_graph(groups, config())
+
+    assert graph.transition[0, 1] == pytest.approx(0.5)
+    assert graph.transition[2, 3] == pytest.approx(0.5)
+    assert graph.cross_event_edge_count > 0
+    assert graph.transition_edge_count == 2
+    assert graph.positive[0, 1] > graph.negative[0, 1]
+    assert graph.negative[2, 3] > graph.positive[2, 3]
+    assert graph.adjacency[0, 1] > 0
+    assert graph.adjacency[2, 3] < 0
 
 
-def test_config_rejects_non_boolean_event_stratification_switch() -> None:
+def test_config_rejects_event_stratification_as_non_algorithmic() -> None:
     record = config().to_record()
-    record["event_type_stratification"] = "true"
-    with pytest.raises(ValueError, match="event-type stratification switch"):
+    record["event_type_stratification"] = True
+    with pytest.raises(ValueError, match="not part of the Trace2Tower algorithm"):
         Trace2TowerConfig.from_record(record)
 
 
@@ -212,10 +163,14 @@ def two_block_graph() -> GraphComponents:
         transition=zeros,
         outcome=adjacency,
         base=adjacency,
+        positive=adjacency,
+        negative=zeros,
         adjacency=adjacency,
         laplacian=laplacian.tocsr(),
         neighbor_count=3,
         edge_count=12,
+        transition_edge_count=0,
+        cross_event_edge_count=0,
     )
 
 

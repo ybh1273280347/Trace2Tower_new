@@ -1,5 +1,7 @@
 # WebShop Event Tower V2 实验清单
 
+> **已废弃：** 本清单属于被否决的硬事件分层实现。当前进度与结果见 `../original-concept-v1/`。
+
 ## 阶段 1：审计两个轨迹池
 
 - [x] 验证 P50 为 50 tasks x 4 repeats = 200 条轨迹。
