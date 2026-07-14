@@ -1,6 +1,6 @@
 # Validation Result Reuse
 
-Results are reusable only when the validation manifest, task key, repeat ID, Flash model, method artifact, retrieval behavior, and execution configuration match exactly.
+Results are reusable only when the validation manifest, task key, repeat ID, agent model, method artifact, retrieval behavior, and execution configuration match exactly.
 
 | Condition | Reuse status | Evidence |
 |---|---|---|

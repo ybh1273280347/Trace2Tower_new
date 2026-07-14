@@ -43,7 +43,7 @@ The frozen 100-task test manifest is evaluated once per task. The P50 main table
 After the P50 test exposed a validation/test gap, two post-hoc diagnostics were registered:
 
 1. A seen-task diagnostic reruns the 50 P50 training task IDs with fresh Flash executions and compares NoSkill, SkillX, and P50 Full. It measures task-specific memorization and is not held-out evidence.
-2. A scale diagnostic rebuilds Full from the nested P100 pool, keeps cap 8 and the same test manifest, and runs Flash only. It measures whether broader training coverage improves held-out performance.
+2. A scale diagnostic rebuilds Full from the nested P100 pool, keeps cap 8 and the same test manifest, and runs Flash followed by an authorized Pro follow-up. It measures whether broader training coverage improves held-out performance and whether the effect transfers to the stronger agent.
 
 The P100 Full scale follow-up is evaluated on both Flash and Pro with the same snapshot, cap 8, 100-task test manifest, and `repeat_id=0`. P200 remains Flash-only. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
 
