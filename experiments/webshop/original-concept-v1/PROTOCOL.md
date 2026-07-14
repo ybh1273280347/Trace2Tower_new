@@ -51,4 +51,10 @@ The renderer control was run on the P100 structure. The native Trace2Tower rende
 
 Scale is not assumed to be monotonic. P50, P100, and P200 differ in the evidence pool and in graph-induced Mid/High structure; a larger pool can improve behavioral coverage while worsening structural compression. The scale diagnostic therefore reports the realized artifact and execution result rather than treating pool size alone as the causal variable.
 
+## Test-B robustness protocol
+
+Test-B is frozen before any Test-B rollout with seed `20260720`. It samples 100 tasks without replacement from WebShop indices `[0, 1000)` after excluding the frozen validation, Test-A, and ablation manifests. The selection algorithm, excluded-manifest hashes, selected IDs, and output hash are persisted in `manifests/test-b-selection.json`.
+
+Test-B uses `deepseek-v4-flash`, cap 8, and one real execution per task. The required methods are NoSkill, the P100 native SkillX artifact, and P100 Full Trace2Tower. Manual remains an optional baseline and is not required for this robustness matrix. Test-B measures cross-split heterogeneity; it does not replace Test-A. Every required Test-B result must be reported regardless of direction, and no candidate split may be retained or discarded based on reward.
+
 Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.

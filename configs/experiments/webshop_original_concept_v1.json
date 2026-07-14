@@ -73,6 +73,19 @@
       "repeat_ids": [0],
       "mean_reward": 0.69325,
       "full_success_rate": 0.52
+    },
+    "test_b_robustness": {
+      "status": "selection_registered",
+      "role": "cross_split_robustness",
+      "manifest": "experiments/webshop/original-concept-v1/manifests/test-b.jsonl",
+      "selection_audit": "experiments/webshop/original-concept-v1/manifests/test-b-selection.json",
+      "selection_seed": 20260720,
+      "agent_model": "deepseek-v4-flash",
+      "task_count": 100,
+      "repeat_ids": [0],
+      "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
+      "manual_skill": "optional_not_run",
+      "outcome_based_split_selection": false
     }
   }
 }
