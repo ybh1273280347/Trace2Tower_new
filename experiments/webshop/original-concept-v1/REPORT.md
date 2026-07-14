@@ -150,6 +150,31 @@ Pooling the two independently frozen test sets as 200 tasks, Full minus SkillX i
 
 All four newly executed matrices cover 100/100 unique task keys with zero unresolved errors. Test-B SkillX and Full required 12 and 16 recoverable connection-error attempts respectively; checkpoint retries filled every missing key without duplicate results.
 
+## Test-A primary repeat3
+
+The primary Test-A Flash matrix reuses the existing repeat 0 and adds real repeat IDs 1 and 2 for NoSkill, Manual, native P100 SkillX, and P100 Full. Each method covers 100 tasks x 3 repeats. Means and bootstrap intervals use the 100 task-level three-repeat means; the 300 episodes are not treated as independent units. Global E2E remains a single-repeat diagnostic and is not included here.
+
+| Method | Repeat 0 reward | Repeat 1 reward | Repeat 2 reward | Repeat3 reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 0.68375 | 0.69025 | 0.68492 | 50.33% | 7.89 | 0.38 | 20,610 |
+| Manual | 0.68875 | 0.69292 | 0.69308 | 0.69158 | 50.67% | **6.53** | **0.06** | **19,259** |
+| P100 SkillX | 0.71224 | **0.71332** | 0.69324 | 0.70627 | 49.33% | 7.04 | 0.31 | 25,009 |
+| P100 Full | **0.72092** | 0.69592 | **0.71192** | **0.70958** | **54.67%** | 7.14 | 0.17 | 32,334 |
+
+| Paired comparison | Repeat3 reward difference | 95% interval | Full-success difference | 95% interval |
+|---|---:|---:|---:|---:|
+| Full minus NoSkill | +0.02467 | [-0.02442, +0.07550] | +4.33 points | [-1.67, +10.67] |
+| Full minus P100 SkillX | +0.00332 | [-0.03645, +0.04227] | **+5.33 points** | **[+0.33, +10.67]** |
+| Full minus Manual | +0.01800 | [-0.02611, +0.06345] | +4.00 points | [-1.67, +9.67] |
+| P100 SkillX minus NoSkill | +0.02135 | [-0.02263, +0.06724] | -1.00 point | [-7.33, +5.33] |
+| Manual minus NoSkill | +0.00667 | [-0.03614, +0.05203] | +0.33 points | [-5.00, +6.00] |
+
+Full minus NoSkill reward is positive in every repeat: `+0.04017`, `+0.01217`, and `+0.02167`. The three-repeat mean remains positive but is smaller than the original repeat-0 estimate and its task-bootstrap interval includes zero. Repeat3 therefore does not establish a statistically significant reward gain over NoSkill. It does establish that Full has the highest mean reward and full-success rate in the four-method matrix, and its `+5.33` point full-success advantage over P100 SkillX has a positive task-bootstrap interval.
+
+Manual is the most efficient condition but does not improve reward significantly over NoSkill. P100 SkillX improves mean reward by `+0.02135` but slightly reduces full success. The evidence supports a success-rate advantage for Full over the primary SkillX comparator; reward superiority remains directional rather than significant.
+
+Additional-repeat runs: `webshop-original-concept-v1-test-a-flash-noskill-repeat12`, `webshop-original-concept-v1-test-a-flash-manual-repeat12`, `webshop-original-concept-v1-test-a-flash-p100-skillx-repeat12`, and `webshop-original-concept-v1-test-a-flash-p100-full-cap8-repeat12`. All contain 200/200 unique repeat-1/2 keys with zero unresolved errors.
+
 ## P100 No-Mixed evidence ablation
 
 No-Mixed uses the same P100 rollout pool as Full but keeps only all 186 full-success trajectories, versus Full's 351 selected mixed trajectories. Event extraction, compact signatures, relational graph construction, spectral clustering, High induction, native renderer, legacy retrieval, cap 8, Test-A, Flash, and `repeat_id=0` are fixed. The artifact has 19 Mid and 25 High skills, compared with Full's 9 Mid and 5 High skills; removing partial and failure evidence eliminates all negative adjacency mass and admits many more positive-support High paths.

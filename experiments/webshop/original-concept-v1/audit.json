@@ -428,5 +428,95 @@
       "reward_difference": -0.02032142857142857,
       "reward_ci95": [-0.05533422619047619, 0.010666964285714283]
     }
+  },
+  "test_a_repeat3": {
+    "role": "primary_flash_variance_extension",
+    "agent_model": "deepseek-v4-flash",
+    "task_count": 100,
+    "repeat_ids": [0, 1, 2],
+    "episodes_per_method": 300,
+    "statistical_unit": "task_mean_across_three_repeats",
+    "additional_repeat_runs": {
+      "no_skill": "webshop-original-concept-v1-test-a-flash-noskill-repeat12",
+      "manual_skill": "webshop-original-concept-v1-test-a-flash-manual-repeat12",
+      "skillx_p100": "webshop-original-concept-v1-test-a-flash-p100-skillx-repeat12",
+      "trace2tower_p100": "webshop-original-concept-v1-test-a-flash-p100-full-cap8-repeat12"
+    },
+    "additional_repeat_result_count": {
+      "no_skill": 200,
+      "manual_skill": 200,
+      "skillx_p100": 200,
+      "trace2tower_p100": 200
+    },
+    "additional_repeat_error_attempt_count": {
+      "no_skill": 0,
+      "manual_skill": 0,
+      "skillx_p100": 52,
+      "trace2tower_p100": 73
+    },
+    "unresolved_error_key_count": 0,
+    "aggregate": {
+      "no_skill": {
+        "mean_reward": 0.6849166666666666,
+        "full_success_rate": 0.5033333333333333,
+        "mean_steps": 7.89,
+        "mean_invalid_actions": 0.37666666666666665,
+        "mean_input_tokens": 20610.26,
+        "reward_by_repeat": [0.6807500000000001, 0.68375, 0.69025]
+      },
+      "manual_skill": {
+        "mean_reward": 0.6915833333333333,
+        "full_success_rate": 0.5066666666666667,
+        "mean_steps": 6.526666666666666,
+        "mean_invalid_actions": 0.056666666666666664,
+        "mean_input_tokens": 19259.27666666667,
+        "reward_by_repeat": [0.68875, 0.6929166666666667, 0.6930833333333334]
+      },
+      "skillx_p100": {
+        "mean_reward": 0.706265873015873,
+        "full_success_rate": 0.49333333333333335,
+        "mean_steps": 7.043333333333333,
+        "mean_invalid_actions": 0.31,
+        "mean_input_tokens": 25009.013333333332,
+        "reward_by_repeat": [0.7122380952380952, 0.7133214285714286, 0.6932380952380953]
+      },
+      "trace2tower_p100": {
+        "mean_reward": 0.7095833333333333,
+        "full_success_rate": 0.5466666666666666,
+        "mean_steps": 7.1433333333333335,
+        "mean_invalid_actions": 0.17333333333333334,
+        "mean_input_tokens": 32333.98,
+        "reward_by_repeat": [0.7209166666666667, 0.6959166666666667, 0.7119166666666666]
+      }
+    },
+    "paired": {
+      "trace2tower_minus_no_skill": {
+        "reward_difference": 0.024666666666666667,
+        "reward_ci95": [-0.02441666666666666, 0.0755],
+        "full_success_difference": 0.04333333333333333,
+        "full_success_ci95": [-0.016666666666666673, 0.10666666666666666],
+        "reward_difference_by_repeat": [0.04016666666666666, 0.012166666666666668, 0.02166666666666667]
+      },
+      "trace2tower_minus_skillx": {
+        "reward_difference": 0.0033174603174603184,
+        "reward_ci95": [-0.036449107142857144, 0.042274107142857134],
+        "full_success_difference": 0.05333333333333333,
+        "full_success_ci95": [0.0033333333333333305, 0.10666666666666666]
+      },
+      "trace2tower_minus_manual": {
+        "reward_difference": 0.018000000000000002,
+        "reward_ci95": [-0.026112500000000004, 0.06344583333333333],
+        "full_success_difference": 0.04,
+        "full_success_ci95": [-0.01666666666666667, 0.09666666666666668]
+      },
+      "skillx_minus_no_skill": {
+        "reward_difference": 0.02134920634920635,
+        "reward_ci95": [-0.022634920634920633, 0.06723948412698412]
+      },
+      "manual_minus_no_skill": {
+        "reward_difference": 0.006666666666666666,
+        "reward_ci95": [-0.03613958333333333, 0.05202916666666665]
+      }
+    }
   }
 }
