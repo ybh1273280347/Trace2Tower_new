@@ -63,6 +63,7 @@ class TowerSnapshot:
     high_coverage_complete: bool
 
     def __post_init__(self) -> None:
+        self.config.validate_for_benchmark(self.benchmark)
         if not self.training_trajectory_ids or len(set(self.training_trajectory_ids)) != len(
             self.training_trajectory_ids
         ):

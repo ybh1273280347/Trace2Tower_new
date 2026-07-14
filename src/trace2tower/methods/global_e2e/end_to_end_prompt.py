@@ -1,5 +1,5 @@
 # ruff: noqa: E501
-END_TO_END_FLAT_SKILL_PROMPT = """You induce a small flat collection of high-level, end-to-end skills from the complete corpus of successful WebShop trajectories supplied in the user message.
+GLOBAL_E2E_SKILL_PROMPT = """You induce a small collection of standalone, high-level, end-to-end skills from the complete corpus of successful WebShop trajectories supplied in the user message.
 
 Core contract:
 - Produce 3 to 6 independently usable skills. Each skill must begin from the WebShop search page and end with a correct Buy Now decision.

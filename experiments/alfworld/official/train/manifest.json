@@ -21,7 +21,7 @@
     "combined_library": "artifacts/flat/alfworld-success-family-v1/combined/library.json",
     "library_id": "flatlib_a067643cdd33e219",
     "card_count": 850,
-    "config": "configs/experiments/flat_skill_summary_alfworld_family3.yaml"
+    "config": "configs/experiments/deprecated/legacy-v1/flat_skill_summary_alfworld_family3.yaml"
   },
   "skillx": {
     "status": "complete",
@@ -30,8 +30,8 @@
     "library_id": "skillxlib_db34048b9903d82a",
     "planning_count": 200,
     "executable_skill_count": 13,
-    "config": "configs/experiments/skillx_alfworld_family.yaml",
-    "pipeline_config": "configs/experiments/skillx_parallel2_strict.yaml",
+    "config": "configs/experiments/deprecated/legacy-v1/skillx_alfworld_family.yaml",
+    "pipeline_config": "configs/experiments/deprecated/legacy-v1/skillx_parallel2_strict.yaml",
     "upstream_commit": "36747f424a17ea041e476adf2ff976a206ec9c30"
   }
 }

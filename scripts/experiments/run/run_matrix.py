@@ -25,8 +25,8 @@ from trace2tower.manifests import (
     expand_manifest_repeats,
     read_manifest,
 )
-from trace2tower.methods.flat_skill_summary.models import load_flat_library
-from trace2tower.methods.flat_skill_summary.provider import FlatSkillProvider
+from trace2tower.methods.global_e2e.models import GlobalE2ESkillLibrary
+from trace2tower.methods.global_e2e.provider import GlobalE2ESkillProvider
 from trace2tower.methods.manual_skill.provider import ManualSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
@@ -39,18 +39,31 @@ from trace2tower.trajectory import TrajectoryWriter
 EXECUTABLE_METHODS = (
     MethodName.NO_SKILL,
     MethodName.MANUAL_SKILL,
-    MethodName.FLAT_SKILL_SUMMARY,
+    MethodName.GLOBAL_E2E_GPT,
     MethodName.SKILLX,
-    MethodName.TRACE2TOWER_STATIC,
-    MethodName.TRACE2TOWER_FULL,
+    MethodName.TRACE2TOWER,
+    MethodName.TRACE2TOWER_SEMANTIC_ONLY,
+    MethodName.TRACE2TOWER_MID_ONLY,
+    MethodName.TRACE2TOWER_NO_MIXED,
 )
 METHOD_CONFIG_FILES = {
-    MethodName.NO_SKILL: "no_skill.yaml",
-    MethodName.MANUAL_SKILL: "manual_skill.yaml",
-    MethodName.FLAT_SKILL_SUMMARY: "flat_skill_summary.yaml",
-    MethodName.SKILLX: "skillx.yaml",
-    MethodName.TRACE2TOWER_STATIC: "trace2tower_static.yaml",
-    MethodName.TRACE2TOWER_FULL: "trace2tower_full_execution.yaml",
+    MethodName.NO_SKILL: "webshop_no_skill.yaml",
+    MethodName.MANUAL_SKILL: "webshop_manual_skill.yaml",
+    MethodName.GLOBAL_E2E_GPT: "webshop_global_e2e.yaml",
+    MethodName.SKILLX: "webshop_skillx.yaml",
+    MethodName.TRACE2TOWER: "webshop_trace2tower_runtime.yaml",
+    MethodName.TRACE2TOWER_SEMANTIC_ONLY: (
+        "webshop_trace2tower_semantic_only_runtime.yaml"
+    ),
+    MethodName.TRACE2TOWER_MID_ONLY: "webshop_trace2tower_mid_only.yaml",
+    MethodName.TRACE2TOWER_NO_MIXED: "webshop_trace2tower_no_mixed_runtime.yaml",
+}
+
+TOWER_METHODS = {
+    MethodName.TRACE2TOWER,
+    MethodName.TRACE2TOWER_SEMANTIC_ONLY,
+    MethodName.TRACE2TOWER_MID_ONLY,
+    MethodName.TRACE2TOWER_NO_MIXED,
 }
 
 
@@ -108,15 +121,15 @@ def load_method_artifact(
     path: Path,
 ) -> MethodArtifact:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if method is MethodName.FLAT_SKILL_SUMMARY:
-        library = load_flat_library(payload)
+    if method is MethodName.GLOBAL_E2E_GPT:
+        library = GlobalE2ESkillLibrary.from_record(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
     elif method is MethodName.SKILLX:
         library = SkillXExecutionLibrary.from_record(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
-    elif method in (MethodName.TRACE2TOWER_STATIC, MethodName.TRACE2TOWER_FULL):
+    elif method in TOWER_METHODS:
         snapshot = TowerSnapshot.from_record(payload)
         snapshot.require_complete()
         artifact_benchmark = snapshot.benchmark
@@ -143,22 +156,8 @@ def create_provider(
     artifact: MethodArtifact,
     method_config: dict,
 ):
-    if artifact.method is MethodName.FLAT_SKILL_SUMMARY:
-        retrieval_strategy = method_config.get("retrieval_strategy", "diverse")
-        return FlatSkillProvider.from_path(
-            runtime,
-            artifact.path,
-            candidate_top_k=int(method_config.get("flat_candidate_top_k", 100)),
-            similarity_threshold=float(method_config.get("flat_similarity_threshold", 0.45)),
-            relative_margin=float(method_config.get("flat_relative_margin", 0.08)),
-            dedup_similarity_threshold=float(
-                method_config.get("flat_dedup_similarity_threshold", 0.95)
-            ),
-            mmr_lambda=float(method_config.get("flat_mmr_lambda", 0.75)),
-            max_skills=int(method_config["flat_top_k"]),
-            retrieval_strategy=retrieval_strategy,
-            family_stratified=bool(method_config.get("family_stratified", False)),
-        )
+    if artifact.method is MethodName.GLOBAL_E2E_GPT:
+        return GlobalE2ESkillProvider.from_path(runtime, artifact.path)
     if artifact.method is MethodName.SKILLX:
         schemas = environment_type(artifact.benchmark).tool_schemas
         allowed_tools = {schema["function"]["name"] for schema in schemas}
@@ -172,11 +171,13 @@ def create_provider(
             max_skills=int(method_config["max_skills"]),
             family_stratified=bool(method_config.get("family_stratified", False)),
         )
-    if artifact.method in (MethodName.TRACE2TOWER_STATIC, MethodName.TRACE2TOWER_FULL):
+    if artifact.method in TOWER_METHODS:
         diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
         provider = Trace2TowerSkillProvider.from_path(
             runtime,
             artifact.path,
+            include_high=bool(method_config["include_high"]),
+            direct_mid_top_k=int(method_config["direct_mid_top_k"]),
             high_similarity_threshold=float(
                 method_config["high_similarity_threshold"]
             ),
@@ -210,12 +211,6 @@ def create_provider(
             ),
             family_stratified=bool(method_config.get("family_stratified", False)),
         )
-        if (
-            provider.snapshot.config.high_top_k != int(method_config["high_top_k"])
-            or provider.snapshot.config.direct_mid_top_k
-            != int(method_config["direct_mid_top_k"])
-        ):
-            raise ValueError("Tower retrieval config differs from the snapshot")
         return provider
     raise ValueError(f"unsupported provider method: {artifact.method}")
 
@@ -381,7 +376,14 @@ async def main(options: argparse.Namespace) -> int:
         getattr(options, "method_config", None)
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
-    no_skill_config = load_yaml(options.config_root / "no_skill.yaml")
+    if method in TOWER_METHODS:
+        if options.direct_mid_top_k not in (3, 5, 8):
+            raise ValueError("Tower runs require an explicit direct Mid cap: 3, 5, or 8")
+        method_config = {
+            **method_config,
+            "direct_mid_top_k": options.direct_mid_top_k,
+        }
+    no_skill_config = load_yaml(options.config_root / "webshop_no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")
     agent_model = options.agent_model or no_skill_config["agent_model"]
@@ -569,7 +571,7 @@ async def main(options: argparse.Namespace) -> int:
         "snapshot_id": (
             next(iter(artifacts.values())).artifact_id
             if len(artifacts) == 1
-            and method is MethodName.TRACE2TOWER_STATIC
+            and method is MethodName.TRACE2TOWER
             else None
         ),
         "shard_ids": list(shard_ids),
@@ -613,6 +615,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--method-config", type=Path)
+    parser.add_argument("--direct-mid-top-k", type=int, choices=(3, 5, 8))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     parser.add_argument("--dry-run", action="store_true")
     raise SystemExit(asyncio.run(main(parser.parse_args())))

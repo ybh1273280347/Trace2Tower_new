@@ -28,7 +28,7 @@ def schema_names(schemas: tuple[dict, ...]) -> set[str]:
 async def main(options: argparse.Namespace) -> int:
     load_dotenv(options.env)
     common = load_yaml(options.config_root / "common.yaml")
-    method_config = load_yaml(options.config_root / "skillx.yaml")
+    method_config = load_yaml(options.config_root / "webshop_skillx.yaml")
     benchmark_config = load_yaml(options.config_root / f"{options.benchmark}.yaml")
     entries = tuple(
         entry

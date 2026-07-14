@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 
 from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
-from trace2tower.methods.flat_skill_summary.models import (
-    FlatSkillCard,
-    build_flat_library,
+from trace2tower.methods.global_e2e.models import (
+    GlobalE2ESkillCard,
+    build_global_e2e_library,
 )
 from trace2tower.results import MethodName
 from trace2tower.semantic_index import SkillEmbeddingIndex
@@ -21,20 +21,23 @@ def matrix_module():
     return run_matrix
 
 
-def flat_library(benchmark: Benchmark):
-    card = FlatSkillCard(
-        "flat_one",
-        f"{benchmark}:train:no_skill:sample:0",
+def global_e2e_library(benchmark: Benchmark):
+    trajectory_id = f"{benchmark}:train:no_skill:sample:0"
+    card = GlobalE2ESkillCard(
+        "global_one",
+        (trajectory_id,),
         "Skill",
         "Use when relevant.",
         ("Act.",),
         ("Check.",),
     )
-    return build_flat_library(
+    return build_global_e2e_library(
         benchmark,
         "a" * 64,
+        "b" * 64,
+        (trajectory_id,),
         (card,),
-        SkillEmbeddingIndex((card.skill_id,), ((1.0, 0.0),), ("b" * 64,)),
+        SkillEmbeddingIndex((card.skill_id,), ((1.0, 0.0),), ("c" * 64,)),
     )
 
 
@@ -48,12 +51,12 @@ def test_shard_parser_is_deterministic_and_validated() -> None:
 
 def test_method_artifact_binds_content_id_hash_and_benchmark(tmp_path: Path) -> None:
     load_method_artifact = matrix_module().load_method_artifact
-    library = flat_library(Benchmark.WEBSHOP)
+    library = global_e2e_library(Benchmark.WEBSHOP)
     path = tmp_path / "library.json"
     path.write_text(json.dumps(library.to_record()), encoding="utf-8")
     artifact = load_method_artifact(
         Benchmark.WEBSHOP,
-        MethodName.FLAT_SKILL_SUMMARY,
+        MethodName.GLOBAL_E2E_GPT,
         path,
     )
     assert artifact.artifact_id == library.library_id
@@ -61,7 +64,7 @@ def test_method_artifact_binds_content_id_hash_and_benchmark(tmp_path: Path) -> 
     with pytest.raises(ValueError, match="benchmark"):
         load_method_artifact(
             Benchmark.ALFWORLD,
-            MethodName.FLAT_SKILL_SUMMARY,
+            MethodName.GLOBAL_E2E_GPT,
             path,
         )
 

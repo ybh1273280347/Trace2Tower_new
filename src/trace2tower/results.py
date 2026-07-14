@@ -13,14 +13,12 @@ from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
 class MethodName(StrEnum):
     NO_SKILL = "no_skill"
     MANUAL_SKILL = "manual_skill"
-    SEMANTIC_CLUSTERING = "semantic_clustering"
-    FLAT_SKILL_SUMMARY = "flat_skill_summary"
+    GLOBAL_E2E_GPT = "global_e2e_gpt"
     SKILLX = "skillx"
-    TRACE2TOWER_STATIC = "trace2tower_static"
-    TRACE2TOWER_FULL = "trace2tower_full"
-    TRACE2TOWER_NO_TRANSITION = "trace2tower_no_transition"
-    TRACE2TOWER_NO_OUTCOME = "trace2tower_no_outcome"
-    TRACE2TOWER_NO_CONTRASTIVE = "trace2tower_no_contrastive"
+    TRACE2TOWER = "trace2tower"
+    TRACE2TOWER_SEMANTIC_ONLY = "trace2tower_semantic_only"
+    TRACE2TOWER_MID_ONLY = "trace2tower_mid_only"
+    TRACE2TOWER_NO_MIXED = "trace2tower_no_mixed"
 
 
 class FinishReason(StrEnum):

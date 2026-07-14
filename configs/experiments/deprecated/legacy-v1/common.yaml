@@ -3,12 +3,10 @@ runs_dir: artifacts/runs
 trajectories_dir: artifacts/trajectories
 repeat_ids:
   - 0
-  - 1
-  - 2
 num_shards: 10
-global_api_concurrency: 50
-episode_concurrency: 50
-provider_max_attempts: 3
+global_api_concurrency: 10
+episode_concurrency: 10
+provider_max_attempts: 5
 provider_timeout_seconds: 120
 retry_base_seconds: 1
 agent_temperature: 0

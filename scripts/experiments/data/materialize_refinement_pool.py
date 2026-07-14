@@ -41,7 +41,7 @@ def main(options: argparse.Namespace) -> int:
     if not conditioned or any(
         trajectory.benchmark is not benchmark
         or trajectory.split is not ExperimentSplit.TRAIN
-        or trajectory.method is not MethodName.TRACE2TOWER_STATIC
+        or trajectory.method is not MethodName.TRACE2TOWER
         for trajectory in conditioned
     ):
         raise ValueError(

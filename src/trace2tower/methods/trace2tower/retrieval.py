@@ -42,6 +42,10 @@ def retrieve_tower(
     downweighted_skill_ids: frozenset[str] = frozenset(),
     status_tie_epsilon: float = 0.0,
 ) -> TowerRetrieval:
+    if high_top_k not in (0, 1):
+        raise ValueError("Tower retrieval supports High Top-1 or explicit Mid-only")
+    if not 1 <= direct_mid_top_k <= 12:
+        raise ValueError("direct Mid cap must be in [1, 12]")
     if not -1 <= high_similarity_threshold <= 1:
         raise ValueError("High similarity threshold must be in [-1, 1]")
     if not isinstance(include_high_child_context, bool):
@@ -58,14 +62,18 @@ def retrieve_tower(
     score_penalties = {
         skill_id: status_tie_epsilon for skill_id in downweighted_skill_ids
     }
-    high_matches = high_index.search(
-        high_query_vector,
-        high_top_k,
-        score_penalties={
-            skill_id: penalty
-            for skill_id, penalty in score_penalties.items()
-            if skill_id in high_cards
-        },
+    high_matches = (
+        high_index.search(
+            high_query_vector,
+            high_top_k,
+            score_penalties={
+                skill_id: penalty
+                for skill_id, penalty in score_penalties.items()
+                if skill_id in high_cards
+            },
+        )
+        if high_top_k
+        else ()
     )
     high_candidate = high_matches[0] if high_matches else None
     high_match = (

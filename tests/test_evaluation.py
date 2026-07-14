@@ -130,8 +130,8 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
         result(1, MethodName.NO_SKILL, 1.0, billable_tokens=None),
     )
     candidate = (
-        result(0, MethodName.TRACE2TOWER_STATIC, 1.0, billable_tokens=10),
-        result(1, MethodName.TRACE2TOWER_STATIC, 1.0, billable_tokens=None),
+        result(0, MethodName.TRACE2TOWER, 1.0, billable_tokens=10),
+        result(1, MethodName.TRACE2TOWER, 1.0, billable_tokens=None),
     )
     first = paired_bootstrap(
         baseline,
@@ -139,7 +139,7 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
         benchmark=Benchmark.WEBSHOP,
         split=ExperimentSplit.TEST,
         baseline_method=MethodName.NO_SKILL,
-        candidate_method=MethodName.TRACE2TOWER_STATIC,
+        candidate_method=MethodName.TRACE2TOWER,
         bootstrap_samples=10000,
         bootstrap_seed=42,
         confidence_level=0.95,
@@ -150,7 +150,7 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
         benchmark=Benchmark.WEBSHOP,
         split=ExperimentSplit.TEST,
         baseline_method=MethodName.NO_SKILL,
-        candidate_method=MethodName.TRACE2TOWER_STATIC,
+        candidate_method=MethodName.TRACE2TOWER,
         bootstrap_samples=10000,
         bootstrap_seed=42,
         confidence_level=0.95,
@@ -174,16 +174,16 @@ def test_paired_bootstrap_clusters_repeats_by_sample() -> None:
         for repeat_id in range(3)
     ) + (result(1, MethodName.NO_SKILL, 1.0),)
     candidate = tuple(
-        result(0, MethodName.TRACE2TOWER_STATIC, 1.0, repeat_id=repeat_id)
+        result(0, MethodName.TRACE2TOWER, 1.0, repeat_id=repeat_id)
         for repeat_id in range(3)
-    ) + (result(1, MethodName.TRACE2TOWER_STATIC, 0.0),)
+    ) + (result(1, MethodName.TRACE2TOWER, 0.0),)
     comparison = paired_bootstrap(
         baseline,
         candidate,
         benchmark=Benchmark.WEBSHOP,
         split=ExperimentSplit.TEST,
         baseline_method=MethodName.NO_SKILL,
-        candidate_method=MethodName.TRACE2TOWER_STATIC,
+        candidate_method=MethodName.TRACE2TOWER,
         bootstrap_samples=10000,
         bootstrap_seed=42,
         confidence_level=0.95,

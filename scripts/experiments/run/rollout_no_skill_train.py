@@ -168,7 +168,7 @@ async def main(options: argparse.Namespace) -> None:
         "benchmarks": {
             benchmark.value: config for benchmark, config in configs.items()
         },
-        "methods": {"no_skill": load_yaml(config_root / "no_skill.yaml")},
+        "methods": {"no_skill": load_yaml(config_root / "webshop_no_skill.yaml")},
     }
     agent_model = options.agent_model or resolved_config["methods"]["no_skill"]["agent_model"]
     invocation = {

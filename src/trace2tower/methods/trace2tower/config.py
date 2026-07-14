@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from trace2tower.manifests import Benchmark
 from trace2tower.results import MethodName
 
 
@@ -19,8 +20,6 @@ class Trace2TowerConfig:
     max_high_path_length: int = 4
     high_min_support_ratio: float = 0.02
     high_path_epsilon: float = 1e-6
-    high_top_k: int = 1
-    direct_mid_top_k: int = 2
     event_type_stratification: bool = False
 
     def __post_init__(self) -> None:
@@ -28,16 +27,36 @@ class Trace2TowerConfig:
             raise ValueError("failure penalty must be non-negative")
         if not 1 <= self.min_mid_clusters <= self.max_mid_clusters:
             raise ValueError("invalid Mid cluster range")
-        if self.semantic_only and self.method is not MethodName.SEMANTIC_CLUSTERING:
-            raise ValueError("semantic_only requires the semantic clustering method")
+        if self.semantic_only != (
+            self.method is MethodName.TRACE2TOWER_SEMANTIC_ONLY
+        ):
+            raise ValueError("semantic-only switch and method must agree")
+        if self.semantic_only and (
+            self.use_transition_edge
+            or self.use_outcome_edge
+            or self.use_contrastive_decomposition
+            or self.event_type_stratification
+        ):
+            raise ValueError("semantic-only ablation cannot use graph or event structure")
         if self.max_high_path_length < 2:
             raise ValueError("max High path length must be at least two")
         if not 0 <= self.high_min_support_ratio <= 1:
             raise ValueError("High path support ratio must be in [0, 1]")
         if self.high_path_epsilon <= 0:
             raise ValueError("High path epsilon must be positive")
-        if self.high_top_k != 1 or not 1 <= self.direct_mid_top_k <= 12:
-            raise ValueError("Trace2Tower retrieval uses High Top-1 and at most twelve Mid skills")
+
+    def validate_for_benchmark(self, benchmark: Benchmark) -> None:
+        if benchmark is not Benchmark.WEBSHOP:
+            return
+        event_aware_methods = {
+            MethodName.TRACE2TOWER,
+            MethodName.TRACE2TOWER_MID_ONLY,
+            MethodName.TRACE2TOWER_NO_MIXED,
+        }
+        if self.method in event_aware_methods and not self.event_type_stratification:
+            raise ValueError(
+                "formal WebShop Trace2Tower requires event-type stratification"
+            )
 
     def to_record(self) -> dict:
         record = asdict(self)
@@ -72,8 +91,6 @@ class Trace2TowerConfig:
             max_high_path_length=int(record.get("max_high_path_length", 4)),
             high_min_support_ratio=float(record.get("high_min_support_ratio", 0.02)),
             high_path_epsilon=float(record.get("high_path_epsilon", 1e-6)),
-            high_top_k=int(record.get("high_top_k", 1)),
-            direct_mid_top_k=int(record.get("direct_mid_top_k", 2)),
             event_type_stratification=record.get(
                 "event_type_stratification", False
             ),

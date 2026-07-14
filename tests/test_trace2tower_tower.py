@@ -23,7 +23,7 @@ from trace2tower.results import MethodName
 
 def config() -> Trace2TowerConfig:
     return Trace2TowerConfig(
-        method=MethodName.TRACE2TOWER_FULL,
+        method=MethodName.TRACE2TOWER,
         semantic_only=False,
         use_transition_edge=True,
         use_outcome_edge=True,
@@ -163,6 +163,25 @@ def test_provider_applies_configured_high_similarity_threshold() -> None:
         FakeRuntime(),
         complete_snapshot(),
         high_similarity_threshold=0.8,
+    )
+    selection = asyncio.run(provider.select("goal", "initial observation"))
+    assert selection.skill_ids == ("mid_a", "mid_b")
+    assert "Combined" not in selection.context
+
+
+def test_provider_can_disable_high_explicitly() -> None:
+    class FakeRuntime:
+        async def embed(self, texts) -> EmbeddingResult:
+            return EmbeddingResult(
+                ((1.0, 0.0), (1.0, 0.0)),
+                LLMUsage(23, None, None),
+                1,
+            )
+
+    provider = Trace2TowerSkillProvider(
+        FakeRuntime(),
+        complete_snapshot(),
+        include_high=False,
     )
     selection = asyncio.run(provider.select("goal", "initial observation"))
     assert selection.skill_ids == ("mid_a", "mid_b")

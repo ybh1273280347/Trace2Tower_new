@@ -78,8 +78,8 @@ def test_guarded_savings_do_not_reward_faster_cheaper_regression() -> None:
         episode("b", MethodName.NO_SKILL, 0.5, 10, 100),
     )
     skill = (
-        episode("a", MethodName.TRACE2TOWER_FULL, 0.5, 5, 50, ("mid",)),
-        episode("b", MethodName.TRACE2TOWER_FULL, 0.5, 12, 120, ("mid",)),
+        episode("a", MethodName.TRACE2TOWER, 0.5, 5, 50, ("mid",)),
+        episode("b", MethodName.TRACE2TOWER, 0.5, 12, 120, ("mid",)),
     )
     result = build_skill_objectives(
         baseline,
@@ -96,13 +96,13 @@ def test_guarded_savings_do_not_reward_faster_cheaper_regression() -> None:
 def test_missing_chat_cost_is_audited_and_blocks_ranking() -> None:
     baseline = (episode("a", MethodName.NO_SKILL, 1.0, 10, None),)
     skill = (
-        episode("a", MethodName.TRACE2TOWER_FULL, 1.0, 8, None, ("mid",)),
+        episode("a", MethodName.TRACE2TOWER, 1.0, 8, None, ("mid",)),
     )
     audit = audit_refinement_evidence(
         baseline, skill, {"mid": SkillLevel.MID}
     )
     assert not audit.is_complete
-    assert audit.skill_methods == (MethodName.TRACE2TOWER_FULL,)
+    assert audit.skill_methods == (MethodName.TRACE2TOWER,)
     assert audit.missing_baseline_chat_token_keys
     assert audit.missing_skill_chat_token_keys
     assert audit.to_record()["paired_episode_keys"] == [
@@ -120,7 +120,7 @@ def test_missing_chat_cost_is_audited_and_blocks_ranking() -> None:
 def test_paired_evidence_preserves_partial_metrics_without_inventing_cost() -> None:
     baseline = (episode("a", MethodName.NO_SKILL, 1.0, 4, None),)
     skill = (
-        episode("a", MethodName.TRACE2TOWER_FULL, 1.0, 9, None, ("mid",)),
+        episode("a", MethodName.TRACE2TOWER, 1.0, 9, None, ("mid",)),
     )
     evidence = build_paired_episode_evidence(baseline, skill)[0]
     assert evidence.paired_reward_gain == 0
@@ -132,7 +132,7 @@ def test_paired_evidence_preserves_partial_metrics_without_inventing_cost() -> N
 def test_execution_contract_rejects_snapshot_or_agent_model_mismatch() -> None:
     baseline = (episode("a", MethodName.NO_SKILL, 1.0, 4, None),)
     skill = (
-        episode("a", MethodName.TRACE2TOWER_STATIC, 1.0, 9, None, ("mid",)),
+        episode("a", MethodName.TRACE2TOWER, 1.0, 9, None, ("mid",)),
     )
     metadata = (
         {
@@ -145,7 +145,7 @@ def test_execution_contract_rejects_snapshot_or_agent_model_mismatch() -> None:
     report = {
         "run_id": "run",
         "benchmark": "webshop",
-        "method": "trace2tower_static",
+        "method": "trace2tower",
         "agent_model": "flash",
         "snapshot_id": "tower_one",
     }

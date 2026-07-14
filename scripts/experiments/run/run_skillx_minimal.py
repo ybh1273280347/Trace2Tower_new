@@ -245,7 +245,7 @@ if __name__ == "__main__":
     parser.add_argument("--all-successful", action="store_true")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
-        "--config", type=Path, default=Path("configs/experiments/skillx.yaml")
+        "--config", type=Path, default=Path("configs/experiments/webshop_skillx.yaml")
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--skillx-root", type=Path, default=Path("third_party/SkillX"))

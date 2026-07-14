@@ -17,6 +17,8 @@ class Trace2TowerSkillProvider:
         runtime: CommonLLMRuntime,
         snapshot: TowerSnapshot,
         *,
+        include_high: bool = True,
+        direct_mid_top_k: int = 3,
         high_similarity_threshold: float = -1.0,
         include_high_child_context: bool = True,
         direct_mid_candidate_top_k: int | None = None,
@@ -31,10 +33,16 @@ class Trace2TowerSkillProvider:
         snapshot.require_complete()
         if not -1 <= high_similarity_threshold <= 1:
             raise ValueError("High similarity threshold must be in [-1, 1]")
+        if not isinstance(include_high, bool):
+            raise ValueError("High inclusion switch must be boolean")
+        if not 1 <= direct_mid_top_k <= 12:
+            raise ValueError("direct Mid cap must be in [1, 12]")
         if not isinstance(include_high_child_context, bool):
             raise ValueError("High child context switch must be boolean")
         self.runtime = runtime
         self.snapshot = snapshot
+        self.include_high = include_high
+        self.direct_mid_top_k = direct_mid_top_k
         self.high_similarity_threshold = high_similarity_threshold
         self.include_high_child_context = include_high_child_context
         self.direct_mid_candidate_top_k = direct_mid_candidate_top_k
@@ -121,8 +129,8 @@ class Trace2TowerSkillProvider:
             mid_index,
             high_cards,
             mid_cards,
-            high_top_k=self.snapshot.config.high_top_k,
-            direct_mid_top_k=self.snapshot.config.direct_mid_top_k,
+            high_top_k=1 if self.include_high else 0,
+            direct_mid_top_k=self.direct_mid_top_k,
             high_similarity_threshold=self.high_similarity_threshold,
             include_high_child_context=self.include_high_child_context,
             direct_mid_candidate_top_k=self.direct_mid_candidate_top_k,

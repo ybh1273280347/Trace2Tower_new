@@ -6,8 +6,8 @@ import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from trace2tower.methods.flat_skill_summary.models import load_flat_library
-from trace2tower.methods.flat_skill_summary.retrieval import format_flat_card
+from trace2tower.methods.global_e2e.models import GlobalE2ESkillLibrary
+from trace2tower.methods.global_e2e.retrieval import format_global_e2e_card
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.retrieval import format_retrieval
 from trace2tower.methods.trace2tower.retrieval import format_tower_context
@@ -41,17 +41,19 @@ def expand_tower(
     )
 
 
-def expand_flat(
+def expand_global_e2e(
     payload: Mapping, skill_ids: Sequence[str]
 ) -> tuple[str, tuple[str, ...], tuple[str, ...]]:
-    library = load_flat_library(payload)
+    library = GlobalE2ESkillLibrary.from_record(payload)
     cards = {card.skill_id: card for card in library.cards}
     unknown_ids = sorted(set(skill_ids) - set(cards))
     if unknown_ids:
-        raise ValueError(f"unknown Flat skill IDs: {unknown_ids}")
+        raise ValueError(f"unknown Global E2E skill IDs: {unknown_ids}")
 
     return (
-        "\n\n".join(format_flat_card(cards[skill_id]) for skill_id in skill_ids),
+        "\n\n".join(
+            format_global_e2e_card(cards[skill_id]) for skill_id in skill_ids
+        ),
         tuple(skill_ids),
         (),
     )
@@ -82,8 +84,8 @@ def artifact_kind(payload: Mapping) -> str:
     if {"library_id", "plans", "skills", "plan_index"} <= payload.keys():
         return "skillx"
     if {"library_id", "cards", "prompt_sha256"} <= payload.keys():
-        return "flat"
-    raise ValueError("artifact is not a recognized Tower, Flat, or SkillX library")
+        return "global_e2e"
+    raise ValueError("artifact is not a recognized Tower, Global E2E, or SkillX library")
 
 
 def render_markdown(
@@ -128,7 +130,7 @@ def main() -> None:
     kind = artifact_kind(payload)
     expand = {
         "tower": expand_tower,
-        "flat": expand_flat,
+        "global_e2e": expand_global_e2e,
         "skillx": expand_skillx,
     }[kind]
     context, expanded_ids, referenced_child_ids = expand(payload, options.skill_ids)

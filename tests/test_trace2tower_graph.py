@@ -18,7 +18,7 @@ from trace2tower.results import MethodName
 
 def config(**overrides) -> Trace2TowerConfig:
     values = {
-        "method": MethodName.TRACE2TOWER_FULL,
+        "method": MethodName.TRACE2TOWER,
         "semantic_only": False,
         "use_transition_edge": True,
         "use_outcome_edge": True,
@@ -67,7 +67,7 @@ def test_rho_uses_own_score_with_unit_smoothing_prior() -> None:
 def test_config_rejects_string_boolean() -> None:
     record = yaml.safe_load(
         """
-method: trace2tower_full
+method: trace2tower
 semantic_only: "false"
 use_transition_edge: true
 use_outcome_edge: true
@@ -82,7 +82,7 @@ random_state: 42
         Trace2TowerConfig.from_record(record)
 
 
-def test_graph_components_and_ablation_formulas() -> None:
+def test_graph_components_and_signed_formula() -> None:
     groups = (
         (segment("s0", "a0", 0, (1.0, 0.0), 1.0),),
         (segment("s1", "a1", 0, (1.0, 0.0), 1.0),),
@@ -99,27 +99,6 @@ def test_graph_components_and_ablation_formulas() -> None:
     assert full.adjacency[0, 1] > 0
     assert full.adjacency[2, 3] < 0
 
-    no_outcome = build_graph(
-        groups,
-        config(
-            method=MethodName.TRACE2TOWER_NO_OUTCOME,
-            use_outcome_edge=False,
-        ),
-    )
-    expected_no_outcome = (no_outcome.semantic + no_outcome.transition) * 0.5
-    assert np.allclose(no_outcome.base.toarray(), expected_no_outcome.toarray())
-
-    no_contrastive = build_graph(
-        groups,
-        config(
-            method=MethodName.TRACE2TOWER_NO_CONTRASTIVE,
-            use_contrastive_decomposition=False,
-        ),
-    )
-    assert np.allclose(
-        no_contrastive.adjacency.toarray(), no_contrastive.base.toarray()
-    )
-
 
 def test_event_stratification_excludes_cross_event_edges() -> None:
     query = WebShopEventType.QUERY_FORMULATION
@@ -129,12 +108,17 @@ def test_event_stratification_excludes_cross_event_edges() -> None:
         (segment("q1", "t1", 0, (1.0, 0.0), 1.0, query),),
         (segment("p0", "t2", 0, (1.0, 0.0), 1.0, purchase),),
     )
-    unrestricted = build_graph(groups, config())
     compatible = build_graph(groups, config(event_type_stratification=True))
-    assert unrestricted.semantic[0, 2] > 0
     assert compatible.semantic[0, 1] > 0
     assert compatible.semantic[0, 2] == 0
     assert compatible.semantic[1, 2] == 0
+
+
+def test_formal_webshop_tower_requires_event_stratification() -> None:
+    query = WebShopEventType.QUERY_FORMULATION
+    groups = ((segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),)
+    with pytest.raises(ValueError, match="requires event-type stratification"):
+        build_graph(groups, config())
 
 
 def test_event_stratification_selects_neighbors_and_clusters_within_event() -> None:

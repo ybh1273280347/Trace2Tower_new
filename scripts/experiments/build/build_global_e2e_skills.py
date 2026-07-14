@@ -15,16 +15,15 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.methods.flat_skill_summary import corpus_prompt, end_to_end_prompt
-from trace2tower.methods.flat_skill_summary.corpus_renderer import (
-    corpus_flat_card_text,
-    format_trajectory_corpus,
-    induce_end_to_end_flat_skill_collection,
-    induce_flat_skill_collection,
+from trace2tower.methods.global_e2e import end_to_end_prompt
+from trace2tower.methods.global_e2e.models import (
+    GlobalE2ESkillCard,
+    build_global_e2e_library,
 )
-from trace2tower.methods.flat_skill_summary.models import (
-    CorpusFlatSkillCard,
-    build_corpus_flat_library,
+from trace2tower.methods.global_e2e.renderer import (
+    format_trajectory_corpus,
+    global_e2e_card_text,
+    induce_global_e2e_skills,
 )
 from trace2tower.results import MethodName
 from trace2tower.semantic_index import SkillEmbeddingIndex
@@ -33,8 +32,9 @@ from trace2tower.trajectory import TrajectoryReader
 
 async def main(options: argparse.Namespace) -> int:
     config = load_yaml(options.config)
-    if config["method"] != MethodName.FLAT_SKILL_SUMMARY:
-        raise ValueError("global Flat builder requires the Flat execution config")
+    method = MethodName(config["method"])
+    if method is not MethodName.GLOBAL_E2E_GPT:
+        raise ValueError("corpus induction requires global_e2e_gpt")
     paths = tuple(Path(path) for path in sorted(glob.glob(options.trajectory_glob)))
     if not paths:
         raise FileNotFoundError(f"no trajectories match: {options.trajectory_glob}")
@@ -49,7 +49,7 @@ async def main(options: argparse.Namespace) -> int:
         or trajectory.method is not MethodName.NO_SKILL
         for trajectory in trajectories
     ):
-        raise ValueError("global Flat requires shared No-Skill training trajectories")
+        raise ValueError("Global E2E requires shared No-Skill training trajectories")
     successful = tuple(
         sorted(
             (
@@ -61,14 +61,9 @@ async def main(options: argparse.Namespace) -> int:
         )
     )
     if not successful:
-        raise ValueError("global Flat requires at least one fully successful trajectory")
+        raise ValueError("Global E2E requires at least one fully successful trajectory")
 
-    if options.induction_mode == "decision_units":
-        prompt_path = Path(corpus_prompt.__file__)
-        induce = induce_flat_skill_collection
-    else:
-        prompt_path = Path(end_to_end_prompt.__file__)
-        induce = induce_end_to_end_flat_skill_collection
+    prompt_path = Path(end_to_end_prompt.__file__)
     prompt_sha256 = hashlib.sha256(prompt_path.read_bytes()).hexdigest()
     corpus = format_trajectory_corpus(successful)
     corpus_sha256 = hashlib.sha256(corpus.encode("utf-8")).hexdigest()
@@ -77,7 +72,7 @@ async def main(options: argparse.Namespace) -> int:
 
     load_dotenv(options.env)
     if os.environ.get("RENDERER_MODEL") != "gpt-5.4":
-        raise ValueError("global Flat induction is frozen to RENDERER_MODEL=gpt-5.4")
+        raise ValueError("Global E2E induction is frozen to RENDERER_MODEL=gpt-5.4")
     common = load_yaml(options.config_root / "common.yaml")
     runtime = CommonLLMRuntime(
         max_concurrency=1,
@@ -93,21 +88,19 @@ async def main(options: argparse.Namespace) -> int:
             checkpoint["prompt_sha256"] != prompt_sha256
             or checkpoint["corpus_sha256"] != corpus_sha256
             or checkpoint["renderer_model"] != os.environ["RENDERER_MODEL"]
-            or checkpoint.get("induction_mode", "decision_units")
-            != options.induction_mode
         ):
-            raise ValueError("global Flat checkpoint belongs to different inputs")
+            raise ValueError("Global E2E checkpoint belongs to different inputs")
         cards = tuple(
-            CorpusFlatSkillCard.from_record(item) for item in checkpoint["cards"]
+            GlobalE2ESkillCard.from_record(item) for item in checkpoint["cards"]
         )
         result_usage = checkpoint["builder_chat_usage"]
     else:
-        cards, rendered_corpus, result = await induce(
+        cards, rendered_corpus, result = await induce_global_e2e_skills(
             runtime,
             successful,
         )
         if rendered_corpus != corpus:
-            raise ValueError("global Flat renderer did not receive the frozen corpus")
+            raise ValueError("Global E2E renderer did not receive the frozen corpus")
         result_usage = asdict(result.usage)
         write_json(
             checkpoint_path,
@@ -115,14 +108,13 @@ async def main(options: argparse.Namespace) -> int:
                 "prompt_sha256": prompt_sha256,
                 "corpus_sha256": corpus_sha256,
                 "renderer_model": os.environ["RENDERER_MODEL"],
-                "induction_mode": options.induction_mode,
                 "builder_chat_usage": result_usage,
                 "cards": [card.to_record() for card in cards],
             },
         )
 
     ordered_cards = tuple(sorted(cards, key=lambda card: card.skill_id))
-    texts = tuple(corpus_flat_card_text(card) for card in ordered_cards)
+    texts = tuple(global_e2e_card_text(card) for card in ordered_cards)
     text_hashes = tuple(
         hashlib.sha256(text.encode("utf-8")).hexdigest() for text in texts
     )
@@ -135,7 +127,7 @@ async def main(options: argparse.Namespace) -> int:
         embedding.vectors,
         text_hashes,
     )
-    library = build_corpus_flat_library(
+    library = build_global_e2e_library(
         options.benchmark,
         prompt_sha256,
         corpus_sha256,
@@ -152,7 +144,6 @@ async def main(options: argparse.Namespace) -> int:
         "corpus_sha256": corpus_sha256,
         "prompt_sha256": prompt_sha256,
         "renderer_model": os.environ["RENDERER_MODEL"],
-        "induction_mode": options.induction_mode,
         "builder_chat_input_tokens": result_usage["input_tokens"],
         "builder_chat_output_tokens": result_usage["output_tokens"],
         "cached_chat_input_tokens": result_usage.get("cached_input_tokens"),
@@ -170,14 +161,9 @@ if __name__ == "__main__":
     parser.add_argument("--trajectory-glob", required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
-        "--induction-mode",
-        choices=("decision_units", "end_to_end"),
-        default="decision_units",
-    )
-    parser.add_argument(
         "--config",
         type=Path,
-        default=Path("configs/experiments/flat_skill_summary.yaml"),
+        default=Path("configs/experiments/webshop_global_e2e.yaml"),
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))

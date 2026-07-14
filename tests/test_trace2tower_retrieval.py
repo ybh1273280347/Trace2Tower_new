@@ -112,6 +112,28 @@ def test_retrieval_without_high_uses_direct_mid_only() -> None:
     assert result.skill_ids == ("mid_a", "mid_b")
 
 
+def test_retrieval_explicit_mid_only_ignores_available_high() -> None:
+    mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
+    high = HighSkillCard(
+        "high_a",
+        ("mid_a", "mid_b"),
+        "Combined strategy",
+        "Use for the combined task.",
+        ("Execute children in order.",),
+    )
+    result = retrieve_tower(
+        (1.0, 0.0),
+        (1.0, 0.0),
+        SkillEmbeddingIndex(("high_a",), ((1.0, 0.0),)),
+        SkillEmbeddingIndex(("mid_a", "mid_b"), ((1.0, 0.0), (0.0, 1.0))),
+        {"high_a": high},
+        mids,
+        high_top_k=0,
+    )
+    assert result.high_candidate is None
+    assert result.skill_ids == ("mid_a", "mid_b")
+
+
 def test_retrieval_supports_direct_mid_top_one() -> None:
     mids = {skill_id: mid_card(skill_id) for skill_id in ("mid_a", "mid_b")}
     result = retrieve_tower(

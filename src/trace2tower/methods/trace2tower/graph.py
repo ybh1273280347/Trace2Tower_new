@@ -8,6 +8,7 @@ import numpy as np
 from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
 
+from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.models import SegmentInstance, WebShopEventType
 
@@ -38,6 +39,8 @@ def build_graph(
     segments = tuple(segment for group in groups for segment in group)
     if not segments:
         raise ValueError("graph construction requires segments")
+    if any(segment.event_type is not None for segment in segments):
+        config.validate_for_benchmark(Benchmark.WEBSHOP)
     dimension = len(segments[0].embedding)
     if dimension == 0 or any(len(segment.embedding) != dimension for segment in segments):
         raise ValueError("all segment embeddings must have one fixed nonzero dimension")
