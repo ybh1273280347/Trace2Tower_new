@@ -75,7 +75,7 @@
       "full_success_rate": 0.52
     },
     "test_b_robustness": {
-      "status": "selection_registered",
+      "status": "completed",
       "role": "cross_split_robustness",
       "manifest": "experiments/webshop/original-concept-v1/manifests/test-b.jsonl",
       "selection_audit": "experiments/webshop/original-concept-v1/manifests/test-b-selection.json",
@@ -87,7 +87,12 @@
       "skillx_artifact_id": "skillxlib_5346d9c7cc996337",
       "trace2tower_snapshot_id": "tower_9094918372ee0a39",
       "manual_skill": "optional_not_run",
-      "outcome_based_split_selection": false
+      "outcome_based_split_selection": false,
+      "mean_reward": {
+        "no_skill": 0.7332309523809524,
+        "skillx_p100": 0.6957309523809524,
+        "trace2tower_p100": 0.7146476190476191
+      }
     }
   }
 }

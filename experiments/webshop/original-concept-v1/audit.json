@@ -261,5 +261,110 @@
     "agent_model": "deepseek-v4-flash",
     "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
     "outcome_based_split_selection": false
+  },
+  "p100_cross_split_robustness": {
+    "agent_model": "deepseek-v4-flash",
+    "repeat_ids": [0],
+    "test_a": {
+      "task_count": 100,
+      "runs": {
+        "no_skill": "webshop-original-concept-v1-test-flash-noskill-r1",
+        "skillx_p100": "webshop-original-concept-v1-test-flash-p100-skillx-r1",
+        "trace2tower_p100": "webshop-original-concept-v1-test-flash-p100-full-cap8-r1"
+      },
+      "mean_reward": {
+        "no_skill": 0.68075,
+        "skillx_p100": 0.7122380952380952,
+        "trace2tower_p100": 0.7209166666666667
+      },
+      "full_success_rate": {
+        "no_skill": 0.51,
+        "skillx_p100": 0.49,
+        "trace2tower_p100": 0.56
+      },
+      "trace2tower_minus_no_skill": {
+        "difference": 0.04016666666666666,
+        "ci95": [-0.014252083333333332, 0.09775208333333331]
+      },
+      "skillx_minus_no_skill": {
+        "difference": 0.03148809523809524,
+        "ci95": [-0.02317886904761905, 0.08923809523809524]
+      },
+      "trace2tower_minus_skillx": {
+        "difference": 0.00867857142857143,
+        "ci95": [-0.03730982142857142, 0.053597321428571404],
+        "full_success_difference": 0.07,
+        "full_success_ci95": [0.01, 0.14]
+      }
+    },
+    "test_b": {
+      "task_count": 100,
+      "manifest_sha256": "e9e88175c7582baa69b4ea1dc73c511d4259e302f2234727023e0d023610f8d5",
+      "runs": {
+        "no_skill": "webshop-original-concept-v1-test-b-flash-noskill-r1",
+        "skillx_p100": "webshop-original-concept-v1-test-b-flash-p100-skillx-r1",
+        "trace2tower_p100": "webshop-original-concept-v1-test-b-flash-p100-full-cap8-r1"
+      },
+      "error_attempt_count": {
+        "no_skill": 0,
+        "skillx_p100": 12,
+        "trace2tower_p100": 16
+      },
+      "unresolved_error_key_count": 0,
+      "mean_reward": {
+        "no_skill": 0.7332309523809524,
+        "skillx_p100": 0.6957309523809524,
+        "trace2tower_p100": 0.7146476190476191
+      },
+      "full_success_rate": {
+        "no_skill": 0.48,
+        "skillx_p100": 0.47,
+        "trace2tower_p100": 0.49
+      },
+      "trace2tower_minus_no_skill": {
+        "difference": -0.018583333333333334,
+        "ci95": [-0.058499999999999996, 0.021166666666666663]
+      },
+      "skillx_minus_no_skill": {
+        "difference": -0.0375,
+        "ci95": [-0.08999999999999998, 0.011002083333333305]
+      },
+      "trace2tower_minus_skillx": {
+        "difference": 0.018916666666666665,
+        "ci95": [-0.03333333333333334, 0.0722541666666666]
+      }
+    },
+    "split_interaction_test_b_minus_test_a": {
+      "trace2tower_minus_no_skill": {
+        "difference": -0.05875000000000001,
+        "ci95": [-0.1287520833333333, 0.010833333333333332]
+      },
+      "skillx_minus_no_skill": {
+        "difference": -0.06898809523809524,
+        "ci95": [-0.14508541666666666, 0.004000595238095228]
+      },
+      "trace2tower_minus_skillx": {
+        "difference": 0.010238095238095235,
+        "ci95": [-0.05826220238095239, 0.08072827380952378]
+      }
+    },
+    "pooled_200_tasks": {
+      "trace2tower_minus_no_skill": {
+        "difference": 0.010791666666666668,
+        "ci95": [-0.024251041666666664, 0.04620937499999999],
+        "full_success_difference": 0.03,
+        "full_success_ci95": [-0.01, 0.07]
+      },
+      "skillx_minus_no_skill": {
+        "difference": -0.003005952380952381,
+        "ci95": [-0.041749999999999995, 0.034961309523809485]
+      },
+      "trace2tower_minus_skillx": {
+        "difference": 0.013797619047619048,
+        "ci95": [-0.020619047619047617, 0.04868526785714284],
+        "full_success_difference": 0.045,
+        "full_success_ci95": [0.0, 0.09]
+      }
+    }
   }
 }

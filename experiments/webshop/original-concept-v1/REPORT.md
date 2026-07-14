@@ -1,4 +1,4 @@
-# Original-Concept Trace2Tower Fast Gate
+# Original-Concept Trace2Tower Evidence Report
 
 ## Rebuilt artifact
 
@@ -121,6 +121,34 @@ The strongest mechanism comparison is against Semantic-only: P100 Full gains `+0
 The evidence does not show that Pro benefits more than Flash: P100 minus NoSkill is `+0.03733` on Pro versus `+0.04017` on Flash, and both intervals include zero. P100 Pro also remains below native Manual (`0.69042`) and SkillX (`0.68500`) in reward point estimate. The defensible conclusion is that Full Trace2Tower can help the stronger model and clearly improves over semantic clustering, not that it dominates strong baselines or provides a larger model-strength interaction.
 
 Run: `webshop-original-concept-v1-test-pro-p100-full-cap8-r1`.
+
+## P100 cross-split robustness
+
+Test-B was frozen with seed `20260720` before any Test-B rollout. It contains 100 tasks sampled from the 700 WebShop indices remaining after excluding validation, Test-A, and ablation. Test-A and Test-B use Flash, `repeat_id=0`, and the same P100 Tower and native P100 SkillX artifacts. P100 SkillX is built from all 186 successful P100 trajectories and contains 51 task plans plus 2 atomic skills.
+
+| Test set | Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---|---:|---:|---:|---:|---:|
+| Test-A | NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| Test-A | P100 SkillX | 0.71224 | 49% | **6.92** | 0.31 | 24,141 |
+| Test-A | P100 Full | **0.72092** | **56%** | 7.17 | **0.19** | 32,360 |
+| Test-B | NoSkill | **0.73323** | 48% | 7.32 | 0.32 | **16,571** |
+| Test-B | P100 SkillX | 0.69573 | 47% | 7.50 | 0.34 | 27,330 |
+| Test-B | P100 Full | 0.71465 | **49%** | **7.13** | **0.18** | 31,236 |
+
+| Test set | Paired comparison | Reward difference | 95% interval | Full-success difference |
+|---|---|---:|---:|---:|
+| Test-A | Full minus NoSkill | +0.04017 | [-0.01425, +0.09775] | +5 points |
+| Test-B | Full minus NoSkill | -0.01858 | [-0.05850, +0.02117] | +1 point |
+| Test-A | SkillX minus NoSkill | +0.03149 | [-0.02318, +0.08924] | -2 points |
+| Test-B | SkillX minus NoSkill | -0.03750 | [-0.09000, +0.01100] | -1 point |
+| Test-A | Full minus SkillX | +0.00868 | [-0.03731, +0.05360] | +7 points, interval [+1, +14] |
+| Test-B | Full minus SkillX | +0.01892 | [-0.03333, +0.07225] | +2 points |
+
+Both skill methods change direction relative to NoSkill across the two test sets. The Test-B-minus-Test-A interaction is `-0.05875` for Full minus NoSkill, interval `[-0.12875, +0.01083]`, and `-0.06899` for SkillX minus NoSkill, interval `[-0.14509, +0.00400]`. These are substantial directional shifts but are not statistically significant at 95%. Full minus SkillX is directionally positive on both splits; its interaction is only `+0.01024`, interval `[-0.05826, +0.08073]`.
+
+Pooling the two independently frozen test sets as 200 tasks, Full minus SkillX is `+0.01380`, interval `[-0.02062, +0.04869]`, with a `+4.5` point full-success difference, interval `[0, +9]`. Full minus NoSkill is `+0.01079`, interval `[-0.02425, +0.04621]`. The defensible conclusion is that benefit over NoSkill is split-sensitive, while Full has a more stable directional advantage over the primary P100 SkillX comparator; neither pooled reward difference excludes zero.
+
+All four newly executed matrices cover 100/100 unique task keys with zero unresolved errors. Test-B SkillX and Full required 12 and 16 recoverable connection-error attempts respectively; checkpoint retries filled every missing key without duplicate results.
 
 ## P100 renderer control
 
