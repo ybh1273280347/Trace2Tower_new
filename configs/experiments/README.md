@@ -13,5 +13,6 @@
 - `webshop_trace2tower_mid_only.yaml`: 显式关闭 High 的消融。
 - `webshop_trace2tower_no_mixed.yaml`、`webshop_trace2tower_no_mixed_runtime.yaml`: success-only 证据消融的构建与执行配置。
 - `webshop_event_tower_v2.json`: 保留既有数据划分；其中旧硬分层条件矩阵已废弃。
+- `webshop_original_concept_v1.json`: 当前有效的 Flash-only、100 tasks、single-repeat validation 机器契约。
 
 `deprecated/legacy-v1/` 保存全部旧 YAML/JSON，不得用于新实验。

@@ -25,8 +25,11 @@
 - Training evidence: P50 mixed pool, 173 trajectories from 50 tasks.
 - Evaluation: the frozen 100-task validation manifest.
 - Agent: `deepseek-v4-flash`.
-- Repeats: repeat 0 only.
+- Repeats: one execution per task, represented by `repeat_id=0` only.
 - Tower direct Mid cap: 8.
 - Comparator: identical-key NoSkill.
 - Gate: Full Trace2Tower mean reward must not be below NoSkill.
 
+## Validation execution policy
+
+All subsequent validation conditions use only `deepseek-v4-flash`, the same 100-task manifest, and one execution per task. Reports and tables must label this as `single-repeat` or `1 run/task`. The statistical unit is the task, and paired task bootstrap may quantify variation across tasks. A result must never be copied into synthetic repeat IDs or reported as three independent executions.

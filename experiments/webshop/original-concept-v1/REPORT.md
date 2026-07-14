@@ -28,6 +28,8 @@ Retrieval uses the current observation on every step. Skill context is transient
 
 Both conditions cover the same 100 task keys with zero errors.
 
+This is a time-constrained single-repeat validation (`1 run/task`), not a repeat-3 estimate. Its interval measures variation across the 100 tasks and does not estimate run-to-run model variance.
+
 | Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
 |---|---:|---:|---:|---:|---:|
 | NoSkill | 0.65235 | 47% | 7.69 | 0.30 | 19,572 |
@@ -43,4 +45,3 @@ Runs:
 
 - `webshop-original-concept-v1-validation-flash-cap8-r1`
 - `webshop-original-concept-v1-validation-flash-noskill-r1`
-

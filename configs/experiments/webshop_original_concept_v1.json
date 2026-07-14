@@ -1,0 +1,21 @@
+{
+  "protocol_id": "webshop-original-concept-v1",
+  "status": "active",
+  "authority": "Trace2Tower原始资料.md",
+  "validation": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+    "agent_models": ["deepseek-v4-flash"],
+    "task_count": 100,
+    "repeat_ids": [0],
+    "episodes_per_condition": 100,
+    "reporting_label": "single-repeat",
+    "statistical_unit": "task",
+    "comparison": "paired task bootstrap",
+    "bootstrap_samples": 10000
+  },
+  "tower": {
+    "direct_mid_cap": 8,
+    "high_top_k": 1,
+    "dynamic_state_retrieval": true
+  }
+}
