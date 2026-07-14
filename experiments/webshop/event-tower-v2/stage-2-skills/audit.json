@@ -2,7 +2,7 @@
   "protocol_id": "webshop-event-tower-v2",
   "stage": 2,
   "status": "complete",
-  "stage_1_audit_id": "poolaudit_f75de8c0869ded41",
+  "stage_1_audit_id": "poolaudit_e4b43e1d73e97aad",
   "inputs": {
     "p50_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p50.jsonl",
     "p50_pool_sha256": "7d8ae154746c398b1084acb130d8d1a13760b3be43e2d71ff0aabf60de9068f9",
@@ -153,5 +153,5 @@
     "scripts/experiments/build/build_trace2tower_index.py": "639e49e6985faa7c1b188123d0c605ae93fbd4f2d443c3e6ab42a6d426f3771f",
     "scripts/experiments/build/build_tower_snapshot.py": "71d012d021a64994c83a1c7b1e6a7cf8efb62c1a93b46ee56f9b270d34f4a3aa"
   },
-  "audit_id": "skillaudit_62e9fd8bde33bb9f"
+  "audit_id": "skillaudit_fbbf5a8fb72b2ee6"
 }

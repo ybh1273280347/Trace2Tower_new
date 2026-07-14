@@ -38,4 +38,10 @@ Tower 的直接 Mid cap 是运行时参数。正式运行必须传入 `--direct-
 uv run python -m scripts.experiments.run.run_webshop_stage3_validation
 ```
 
+阶段 3 覆盖审计、bootstrap 和 cap 冻结：
+
+```powershell
+uv run python -m scripts.experiments.analyze.analyze_webshop_stage3_validation
+```
+
 旧 scale-study、Flat、Static Tower 和 cap sweep 命令见 `experiments/webshop/deprecated/scripts-experiments-readme-v1.md`，不得用于 v2。

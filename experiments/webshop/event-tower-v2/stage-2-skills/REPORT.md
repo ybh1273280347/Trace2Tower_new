@@ -1,7 +1,7 @@
 # Stage 2: P50 技能 Artifact 冻结
 
 状态：`complete`
-审计 ID：`skillaudit_62e9fd8bde33bb9f`
+审计 ID：`skillaudit_fbbf5a8fb72b2ee6`
 
 ## Baseline artifacts
 

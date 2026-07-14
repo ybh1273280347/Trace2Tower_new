@@ -1,7 +1,7 @@
 # Stage 1: WebShop 训练轨迹池审计
 
 状态：`complete`
-审计 ID：`poolaudit_f75de8c0869ded41`
+审计 ID：`poolaudit_e4b43e1d73e97aad`
 
 ## 结论
 
@@ -20,6 +20,7 @@ P50 和 P100 均满足 Event Tower V2 训练池契约。P50 的 200 条轨迹在
 - P100 additional source run：`webshop-scale-v1-flash-p100-add50`
 - Validation/Test selection：`selection_fa882612a3fbe29f`
 - Ablation selection：`selection_50a063e627f4cd79`
+- Ablation-train selection：`selection_6594d51ebe102927`
 
 ## 不变量
 
@@ -28,6 +29,7 @@ P50 和 P100 均满足 Event Tower V2 训练池契约。P50 的 200 条轨迹在
 - P50 task set 是 P100 task set 的严格子集。
 - P50 对应 trajectory records 在 P100 中完全相同。
 - 训练任务与 validation/test/ablation indices `0..999` 零重叠。
+- 独立 ablation-train tasks 与主实验 P100 tasks 零重叠。
 - 本阶段只读取并审计已有轨迹，没有重新 rollout，也没有修改 validation/test manifests。
 
 完整 sample IDs、reward histogram、finish reasons、source metadata hashes 和机器可验证不变量

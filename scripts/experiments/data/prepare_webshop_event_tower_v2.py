@@ -40,8 +40,13 @@ def main(options: argparse.Namespace) -> int:
     goals = json.loads(options.goals.read_text(encoding="utf-8"))
     if len(goals) < options.candidate_end:
         raise ValueError("candidate range exceeds the WebShop goal set")
-    if min(options.validation_tasks, options.test_tasks, options.ablation_tasks) <= 0:
-        raise ValueError("validation, test, and ablation sizes must be positive")
+    if min(
+        options.validation_tasks,
+        options.test_tasks,
+        options.ablation_tasks,
+        options.ablation_train_tasks,
+    ) <= 0:
+        raise ValueError("all evaluation and training selections must be positive")
 
     selected = random.Random(options.seed).sample(
         range(options.candidate_start, options.candidate_end),
@@ -65,6 +70,27 @@ def main(options: argparse.Namespace) -> int:
         )
     )
     ablation_samples = [f"webshop:{index}" for index in ablation_ids]
+    pool_audit = json.loads(options.pool_audit.read_text(encoding="utf-8"))
+    main_training_ids = {
+        int(sample_id.split(":")[1])
+        for sample_id in pool_audit["pools"]["p100"]["sample_ids"]
+    }
+    ablation_train_ids = sorted(
+        random.Random(options.ablation_train_seed).sample(
+            [
+                index
+                for index in range(
+                    options.ablation_train_start,
+                    options.ablation_train_end,
+                )
+                if index not in main_training_ids
+            ],
+            options.ablation_train_tasks,
+        )
+    )
+    ablation_train_samples = [
+        f"webshop:{index}" for index in ablation_train_ids
+    ]
 
     write_manifest(
         options.validation_manifest,
@@ -77,6 +103,10 @@ def main(options: argparse.Namespace) -> int:
     write_manifest(
         options.ablation_manifest,
         manifest_entries(ablation_samples, ExperimentSplit.ABLATION),
+    )
+    write_manifest(
+        options.ablation_train_manifest,
+        manifest_entries(ablation_train_samples, ExperimentSplit.TRAIN),
     )
 
     validation_conditions = [
@@ -114,9 +144,9 @@ def main(options: argparse.Namespace) -> int:
     ]
     ablation_conditions = [
         {
-            "condition_id": f"ablation_p50_{method}_{model}",
+            "condition_id": f"ablation_{method}_{model}",
             "method": method,
-            "pool": "p50",
+            "pool": "ablation_train",
             "agent_model": model,
             "direct_mid_top_k": "frozen_from_stage_3",
             "run_policy": "required"
@@ -170,6 +200,23 @@ def main(options: argparse.Namespace) -> int:
             "sample_ids": ablation_samples,
             "overlap_with_validation_or_test": 0,
         },
+        "ablation_training_selection": {
+            "algorithm": (
+                "random.Random(ablation_train_seed).sample from train indices "
+                "after excluding main P100 tasks"
+            ),
+            "seed": options.ablation_train_seed,
+            "candidate_index_range": [
+                options.ablation_train_start,
+                options.ablation_train_end,
+            ],
+            "main_pool_filtering": True,
+            "high_output_filtering": False,
+            "sample_ids": ablation_train_samples,
+            "overlap_with_main_p100": 0,
+            "repeat_ids": [0, 1, 2, 3],
+            "trajectory_count": len(ablation_train_samples) * 4,
+        },
         "execution": {
             "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
             "renderer_model": "gpt-5.4",
@@ -184,6 +231,7 @@ def main(options: argparse.Namespace) -> int:
             "validation": options.validation_manifest.as_posix(),
             "test": options.test_manifest.as_posix(),
             "ablation": options.ablation_manifest.as_posix(),
+            "ablation_train": options.ablation_train_manifest.as_posix(),
         },
         "training_pools": {
             "p50": {
@@ -256,8 +304,10 @@ def main(options: argparse.Namespace) -> int:
             },
             {
                 "stage": 6,
-                "name": "p50_ablations",
+                "name": "independent_train_test_ablations",
                 "split": "ablation",
+                "training_selection": "ablation_training_selection",
+                "training_rollout_episodes": 400,
                 "conditions": ablation_conditions,
                 "rollout_episodes_min": 1200,
                 "rollout_episodes_max": 2400,
@@ -283,8 +333,9 @@ def main(options: argparse.Namespace) -> int:
             "ablation_max": 2400,
             "scale_min": 900,
             "scale_max": 1800,
-            "total_min": 9300,
-            "total_max": 11400,
+            "ablation_training": 400,
+            "total_min": 9700,
+            "total_max": 11800,
         },
         "cap_selection": {
             "scope": (
@@ -321,6 +372,9 @@ def main(options: argparse.Namespace) -> int:
                 "P50 semantic-clustering baseline snapshot",
                 "P50 no-event signed-graph ablation snapshot",
                 "P50 no-mixed event-stratified snapshot",
+                "independent-ablation Full event-stratified snapshot",
+                "independent-ablation no-event signed-graph snapshot",
+                "independent-ablation no-mixed event-stratified snapshot",
             ],
             "forbidden_as_full": "every pre-v2 Tower snapshot",
         },
@@ -328,6 +382,10 @@ def main(options: argparse.Namespace) -> int:
     protocol["selection_id"] = f"selection_{canonical_hash(protocol['selection'])[:16]}"
     protocol["ablation_selection_id"] = (
         f"selection_{canonical_hash(protocol['ablation_selection'])[:16]}"
+    )
+    protocol["ablation_training_selection_id"] = (
+        "selection_"
+        f"{canonical_hash(protocol['ablation_training_selection'])[:16]}"
     )
     write_json(options.output, protocol)
     print(
@@ -337,6 +395,7 @@ def main(options: argparse.Namespace) -> int:
                 "validation_tasks": len(validation_samples),
                 "test_tasks": len(test_samples),
                 "ablation_tasks": len(ablation_samples),
+                "ablation_train_tasks": len(ablation_train_samples),
                 "validation_conditions": len(validation_conditions),
                 "total_episodes_min": protocol["episode_budget"]["total_min"],
                 "total_episodes_max": protocol["episode_budget"]["total_max"],
@@ -354,9 +413,20 @@ if __name__ == "__main__":
     parser.add_argument("--candidate-end", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=20260716)
     parser.add_argument("--ablation-seed", type=int, default=20260717)
+    parser.add_argument("--ablation-train-seed", type=int, default=20260718)
     parser.add_argument("--validation-tasks", type=int, default=100)
     parser.add_argument("--test-tasks", type=int, default=100)
     parser.add_argument("--ablation-tasks", type=int, default=100)
+    parser.add_argument("--ablation-train-tasks", type=int, default=100)
+    parser.add_argument("--ablation-train-start", type=int, default=1000)
+    parser.add_argument("--ablation-train-end", type=int, default=12000)
+    parser.add_argument(
+        "--pool-audit",
+        type=Path,
+        default=Path(
+            "experiments/webshop/event-tower-v2/stage-1-pools/audit.json"
+        ),
+    )
     parser.add_argument(
         "--validation-manifest",
         type=Path,
@@ -373,6 +443,13 @@ if __name__ == "__main__":
         "--ablation-manifest",
         type=Path,
         default=Path("experiments/webshop/event-tower-v2/manifests/ablation.jsonl"),
+    )
+    parser.add_argument(
+        "--ablation-train-manifest",
+        type=Path,
+        default=Path(
+            "experiments/webshop/event-tower-v2/manifests/ablation-train.jsonl"
+        ),
     )
     parser.add_argument(
         "--output",

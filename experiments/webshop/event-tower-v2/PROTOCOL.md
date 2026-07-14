@@ -41,10 +41,13 @@ Trace2Tower 不是“把整条轨迹聚类后再让 GPT 总结”。它是一条
 - Validation/Test 候选仅为 WebShop indices `0..999`，不按历史是否见过过滤。
 - 使用 `random.Random(20260716).sample` 无放回抽取 200 个任务：前 100 个为 validation，后 100 个为 test。
 - 再用 `random.Random(20260717).sample` 从剩余 800 个任务抽取 100 个 ablation tasks；三组两两零重叠。
+- 正式消融另外使用 `random.Random(20260718).sample`，从 train indices `1000..11999` 中排除主实验 P100 tasks 后随机冻结 100 个 ablation-train tasks。每个任务运行 4 个 Flash No-Skill repeats，共 400 条新训练轨迹。
 - 每个条件固定 repeat IDs `0/1/2`，即每个模型、方法、split 条件 300 episodes。
 - Validation 只为 Full Tower 和 Semantic Clustering 分别选择直接 Mid cap；test 与 ablation 不再调参。
 
 样本清单和 selection hash 以 `configs/experiments/webshop_event_tower_v2.json` 为准。
+
+消融训练池和消融测试集必须在任何消融结果产生前同时冻结。Full、No-event 和 No-mixed 都从这套独立训练池重建，Mid-only 复用对应的 Full snapshot。不得根据是否成功诱导 High、High 数量、簇数或预跑 reward 更换 seed、扩大候选池或重新抽样。如果预注册训练池仍无法为 No-event 诱导 High，该结果本身作为机制失败报告，而不能通过挑选更合适的数据修复。这样消融检验的是算法结构，不是对主实验 P50/P100 或某组特定任务的拟合。
 
 ## 4. 模型与执行
 
@@ -70,5 +73,7 @@ Flash 门控比较 Manual、Global E2E、SkillX、Semantic Clustering、Full Tow
 P50/P100 原始训练轨迹保留。Manual 文本固定为本目录的 `manual-skill.md`。Global E2E 和 SkillX 只有在训练轨迹集合、prompt、构建配置和内容哈希完全匹配时才能复用。
 
 所有 v2 Tower 都必须重新构建。WebShop `trace2tower` 和 `trace2tower_no_mixed` 快照若未开启 `event_type_stratification=true`，代码直接拒绝构建或加载为正式方法。`semantic_clustering` 必须同时关闭事件分层、transition、outcome、contrastive graph 和 High；`trace2tower_no_event` 只允许关闭事件分层。Mid-only 不产生新快照，复用 Full snapshot 并只改变运行时 `include_high`。
+
+阶段 2 构建的 P50 No-mixed snapshot 只验证新契约和构建链，不进入正式消融结论。正式 Full/No-event/Mid-only/No-mixed 比较全部绑定独立 ablation-train pool 和独立 ablation test，四种方法共享阶段 3 冻结的 Full Tower cap。
 
 每个阶段冻结输入轨迹哈希、配置哈希、prompt 哈希、artifact ID、artifact SHA-256、模型 endpoint、run IDs 和结果哈希，然后独立提交并推送。
