@@ -1,0 +1,577 @@
+{
+  "protocol_id": "webshop-event-tower-v2",
+  "benchmark": "webshop",
+  "status": "frozen_before_rollout",
+  "candidate_index_range": [
+    0,
+    1000
+  ],
+  "selection": {
+    "algorithm": "random.Random(seed).sample without replacement",
+    "seed": 20260716,
+    "history_filtering": false,
+    "validation_sample_ids": [
+      "webshop:1",
+      "webshop:13",
+      "webshop:16",
+      "webshop:22",
+      "webshop:29",
+      "webshop:39",
+      "webshop:63",
+      "webshop:64",
+      "webshop:66",
+      "webshop:67",
+      "webshop:71",
+      "webshop:80",
+      "webshop:82",
+      "webshop:85",
+      "webshop:116",
+      "webshop:129",
+      "webshop:147",
+      "webshop:151",
+      "webshop:158",
+      "webshop:160",
+      "webshop:205",
+      "webshop:213",
+      "webshop:221",
+      "webshop:233",
+      "webshop:246",
+      "webshop:251",
+      "webshop:255",
+      "webshop:260",
+      "webshop:275",
+      "webshop:277",
+      "webshop:280",
+      "webshop:292",
+      "webshop:293",
+      "webshop:296",
+      "webshop:312",
+      "webshop:314",
+      "webshop:330",
+      "webshop:340",
+      "webshop:383",
+      "webshop:388",
+      "webshop:389",
+      "webshop:410",
+      "webshop:412",
+      "webshop:423",
+      "webshop:424",
+      "webshop:430",
+      "webshop:471",
+      "webshop:472",
+      "webshop:477",
+      "webshop:478",
+      "webshop:488",
+      "webshop:510",
+      "webshop:512",
+      "webshop:520",
+      "webshop:521",
+      "webshop:523",
+      "webshop:534",
+      "webshop:554",
+      "webshop:555",
+      "webshop:566",
+      "webshop:568",
+      "webshop:571",
+      "webshop:574",
+      "webshop:595",
+      "webshop:597",
+      "webshop:611",
+      "webshop:623",
+      "webshop:637",
+      "webshop:641",
+      "webshop:642",
+      "webshop:647",
+      "webshop:653",
+      "webshop:654",
+      "webshop:655",
+      "webshop:661",
+      "webshop:682",
+      "webshop:698",
+      "webshop:722",
+      "webshop:726",
+      "webshop:731",
+      "webshop:751",
+      "webshop:753",
+      "webshop:770",
+      "webshop:775",
+      "webshop:809",
+      "webshop:826",
+      "webshop:831",
+      "webshop:832",
+      "webshop:862",
+      "webshop:863",
+      "webshop:864",
+      "webshop:881",
+      "webshop:888",
+      "webshop:896",
+      "webshop:940",
+      "webshop:962",
+      "webshop:973",
+      "webshop:974",
+      "webshop:992",
+      "webshop:994"
+    ],
+    "test_sample_ids": [
+      "webshop:3",
+      "webshop:6",
+      "webshop:7",
+      "webshop:8",
+      "webshop:12",
+      "webshop:17",
+      "webshop:32",
+      "webshop:46",
+      "webshop:65",
+      "webshop:75",
+      "webshop:87",
+      "webshop:89",
+      "webshop:90",
+      "webshop:100",
+      "webshop:107",
+      "webshop:109",
+      "webshop:120",
+      "webshop:122",
+      "webshop:126",
+      "webshop:145",
+      "webshop:156",
+      "webshop:170",
+      "webshop:174",
+      "webshop:178",
+      "webshop:184",
+      "webshop:185",
+      "webshop:201",
+      "webshop:232",
+      "webshop:235",
+      "webshop:247",
+      "webshop:249",
+      "webshop:261",
+      "webshop:274",
+      "webshop:282",
+      "webshop:284",
+      "webshop:298",
+      "webshop:308",
+      "webshop:328",
+      "webshop:335",
+      "webshop:339",
+      "webshop:342",
+      "webshop:345",
+      "webshop:350",
+      "webshop:359",
+      "webshop:363",
+      "webshop:367",
+      "webshop:369",
+      "webshop:380",
+      "webshop:396",
+      "webshop:397",
+      "webshop:405",
+      "webshop:407",
+      "webshop:435",
+      "webshop:468",
+      "webshop:470",
+      "webshop:476",
+      "webshop:481",
+      "webshop:482",
+      "webshop:484",
+      "webshop:486",
+      "webshop:492",
+      "webshop:499",
+      "webshop:505",
+      "webshop:519",
+      "webshop:538",
+      "webshop:557",
+      "webshop:583",
+      "webshop:586",
+      "webshop:604",
+      "webshop:658",
+      "webshop:663",
+      "webshop:664",
+      "webshop:721",
+      "webshop:756",
+      "webshop:762",
+      "webshop:788",
+      "webshop:797",
+      "webshop:806",
+      "webshop:816",
+      "webshop:828",
+      "webshop:837",
+      "webshop:852",
+      "webshop:873",
+      "webshop:875",
+      "webshop:899",
+      "webshop:903",
+      "webshop:920",
+      "webshop:922",
+      "webshop:924",
+      "webshop:931",
+      "webshop:951",
+      "webshop:965",
+      "webshop:969",
+      "webshop:975",
+      "webshop:977",
+      "webshop:981",
+      "webshop:982",
+      "webshop:984",
+      "webshop:986",
+      "webshop:990"
+    ],
+    "overlap_count": 0
+  },
+  "execution": {
+    "agent_models": [
+      "deepseek-v4-flash",
+      "deepseek-v4-pro"
+    ],
+    "renderer_model": "gpt-5.4",
+    "repeat_ids": [
+      0,
+      1,
+      2
+    ],
+    "tasks_per_split": 100,
+    "episodes_per_condition_per_split": 300,
+    "tower_cap_candidates": [
+      3,
+      5,
+      8
+    ],
+    "skillx_max_skills": 8,
+    "max_steps": 20
+  },
+  "manifests": {
+    "validation": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+    "test": "experiments/webshop/event-tower-v2/manifests/test.jsonl"
+  },
+  "training_pools": {
+    "p50": {
+      "task_count": 50,
+      "repeat_count": 4,
+      "trajectory_count": 200,
+      "path": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p50.jsonl"
+    },
+    "p100": {
+      "task_count": 100,
+      "repeat_count": 4,
+      "trajectory_count": 400,
+      "path": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p100.jsonl"
+    }
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "audit_training_pools",
+      "pools": [
+        "p50",
+        "p100"
+      ],
+      "rollout_episodes": 0
+    },
+    {
+      "stage": 2,
+      "name": "build_p50_skills",
+      "methods": [
+        "global_e2e_gpt",
+        "skillx",
+        "trace2tower",
+        "trace2tower_semantic_only",
+        "trace2tower_no_mixed"
+      ],
+      "rollout_episodes": 0
+    },
+    {
+      "stage": 3,
+      "name": "select_tower_cap",
+      "split": "dev",
+      "conditions": [
+        {
+          "condition_id": "p50_trace2tower_cap3_deepseek-v4-flash",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 3,
+          "agent_model": "deepseek-v4-flash"
+        },
+        {
+          "condition_id": "p50_trace2tower_cap5_deepseek-v4-flash",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 5,
+          "agent_model": "deepseek-v4-flash"
+        },
+        {
+          "condition_id": "p50_trace2tower_cap8_deepseek-v4-flash",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 8,
+          "agent_model": "deepseek-v4-flash"
+        },
+        {
+          "condition_id": "p50_trace2tower_cap3_deepseek-v4-pro",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 3,
+          "agent_model": "deepseek-v4-pro"
+        },
+        {
+          "condition_id": "p50_trace2tower_cap5_deepseek-v4-pro",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 5,
+          "agent_model": "deepseek-v4-pro"
+        },
+        {
+          "condition_id": "p50_trace2tower_cap8_deepseek-v4-pro",
+          "method": "trace2tower",
+          "pool": "p50",
+          "direct_mid_top_k": 8,
+          "agent_model": "deepseek-v4-pro"
+        }
+      ],
+      "rollout_episodes": 1800
+    },
+    {
+      "stage": 4,
+      "name": "p50_baselines_and_full_tower",
+      "split": "test",
+      "conditions": [
+        {
+          "condition_id": "p50_no_skill_deepseek-v4-flash",
+          "method": "no_skill",
+          "pool": null,
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_manual_skill_deepseek-v4-flash",
+          "method": "manual_skill",
+          "pool": null,
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_global_e2e_gpt_deepseek-v4-flash",
+          "method": "global_e2e_gpt",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_skillx_deepseek-v4-flash",
+          "method": "skillx",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_trace2tower_deepseek-v4-flash",
+          "method": "trace2tower",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": "frozen_from_stage_3"
+        },
+        {
+          "condition_id": "p50_no_skill_deepseek-v4-pro",
+          "method": "no_skill",
+          "pool": null,
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_manual_skill_deepseek-v4-pro",
+          "method": "manual_skill",
+          "pool": null,
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_global_e2e_gpt_deepseek-v4-pro",
+          "method": "global_e2e_gpt",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_skillx_deepseek-v4-pro",
+          "method": "skillx",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null
+        },
+        {
+          "condition_id": "p50_trace2tower_deepseek-v4-pro",
+          "method": "trace2tower",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": "frozen_from_stage_3"
+        }
+      ],
+      "rollout_episodes": 3000
+    },
+    {
+      "stage": 5,
+      "name": "flash_significance_gate",
+      "comparisons": [
+        "manual_skill - no_skill",
+        "global_e2e_gpt - no_skill",
+        "skillx - no_skill",
+        "trace2tower - no_skill"
+      ],
+      "multiplicity_control": "Holm, family-wise alpha 0.05",
+      "rollout_episodes": 0
+    },
+    {
+      "stage": 6,
+      "name": "p50_ablations",
+      "split": "test",
+      "conditions": [
+        {
+          "condition_id": "p50_trace2tower_semantic_only_deepseek-v4-pro",
+          "method": "trace2tower_semantic_only",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p50_trace2tower_mid_only_deepseek-v4-pro",
+          "method": "trace2tower_mid_only",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p50_trace2tower_no_mixed_deepseek-v4-pro",
+          "method": "trace2tower_no_mixed",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p50_trace2tower_semantic_only_deepseek-v4-flash",
+          "method": "trace2tower_semantic_only",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "only_if_flash_gate_passes"
+        },
+        {
+          "condition_id": "p50_trace2tower_mid_only_deepseek-v4-flash",
+          "method": "trace2tower_mid_only",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "only_if_flash_gate_passes"
+        },
+        {
+          "condition_id": "p50_trace2tower_no_mixed_deepseek-v4-flash",
+          "method": "trace2tower_no_mixed",
+          "pool": "p50",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "only_if_flash_gate_passes"
+        }
+      ],
+      "rollout_episodes_min": 900,
+      "rollout_episodes_max": 1800
+    },
+    {
+      "stage": 7,
+      "name": "freeze_p50_results",
+      "rollout_episodes": 0
+    },
+    {
+      "stage": 8,
+      "name": "p100_scale",
+      "split": "test",
+      "conditions": [
+        {
+          "condition_id": "p100_global_e2e_gpt_deepseek-v4-pro",
+          "method": "global_e2e_gpt",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null,
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p100_skillx_deepseek-v4-pro",
+          "method": "skillx",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": null,
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p100_trace2tower_deepseek-v4-pro",
+          "method": "trace2tower",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-pro",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "required"
+        },
+        {
+          "condition_id": "p100_global_e2e_gpt_deepseek-v4-flash",
+          "method": "global_e2e_gpt",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null,
+          "run_policy": "only_if_flash_gate_passes"
+        },
+        {
+          "condition_id": "p100_skillx_deepseek-v4-flash",
+          "method": "skillx",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": null,
+          "run_policy": "only_if_flash_gate_passes"
+        },
+        {
+          "condition_id": "p100_trace2tower_deepseek-v4-flash",
+          "method": "trace2tower",
+          "pool": "p100",
+          "agent_model": "deepseek-v4-flash",
+          "direct_mid_top_k": "frozen_from_stage_3",
+          "run_policy": "only_if_flash_gate_passes"
+        }
+      ],
+      "rollout_episodes_min": 900,
+      "rollout_episodes_max": 1800
+    }
+  ],
+  "episode_budget": {
+    "validation": 1800,
+    "test_min": 4800,
+    "test_max": 6600,
+    "total_min": 6600,
+    "total_max": 8400
+  },
+  "cap_selection": {
+    "scope": "P50 Full Trace2Tower only, both agent models",
+    "rule": "choose the smallest cap whose paired task-bootstrap reward difference from the empirical best includes zero at 95%",
+    "excluded": [
+      "skillx",
+      "trace2tower_no_mixed",
+      "all other methods"
+    ]
+  },
+  "primary_comparisons": [
+    "P50 trace2tower - each P50 baseline within agent model",
+    "P50 trace2tower - each P50 ablation within agent model",
+    "P100 - P50 within global_e2e_gpt, skillx, and trace2tower"
+  ],
+  "artifact_policy": {
+    "reusable": [
+      "audited P50/P100 No-Skill training trajectories",
+      "Global E2E artifacts built from the exact pool and frozen contract",
+      "SkillX artifacts built from the exact pool and frozen contract",
+      "the frozen Manual Skill text"
+    ],
+    "must_rebuild": [
+      "Trace2Tower P50 event-stratified mixed snapshot",
+      "Trace2Tower P100 event-stratified mixed snapshot",
+      "P50 semantic-only ablation snapshot",
+      "P50 no-mixed event-stratified snapshot"
+    ],
+    "forbidden_as_full": "every pre-v2 Tower snapshot"
+  },
+  "selection_id": "selection_fa882612a3fbe29f"
+}

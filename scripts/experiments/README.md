@@ -18,4 +18,6 @@ uv run python -m scripts.experiments.data.prepare_webshop_event_tower_v2
 
 Full 和 No-mixed 的 WebShop Tower 必须通过 event stratification 契约。Semantic-only 不构建 signed graph。Mid-only 复用 Full snapshot并显式关闭 High。
 
+Tower 的直接 Mid cap 是运行时参数。正式运行必须传入 `--direct-mid-top-k 3`、`5` 或 `8`；SkillX 的 `max_skills: 8` 是其原生能力，不复用这套 Tower 选择规则。
+
 旧 scale-study、Flat、Static Tower 和 cap sweep 命令见 `experiments/webshop/deprecated/scripts-experiments-readme-v1.md`，不得用于 v2。
