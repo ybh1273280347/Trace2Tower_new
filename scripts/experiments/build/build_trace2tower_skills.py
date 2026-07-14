@@ -9,8 +9,8 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
@@ -124,16 +124,20 @@ async def main(options: argparse.Namespace) -> int:
         for item in cluster_records
     )
     mid_inputs = build_mid_render_inputs(records, clusters)
-    high_paths = mine_high_paths(
-        records,
-        clusters,
-        max_path_length=config.max_high_path_length,
-        min_support_ratio=config.high_min_support_ratio,
-        epsilon=config.high_path_epsilon,
-        success_threshold=options.success_threshold,
+    high_paths = (
+        ()
+        if config.semantic_only
+        else mine_high_paths(
+            records,
+            clusters,
+            max_path_length=config.max_high_path_length,
+            min_support_ratio=config.high_min_support_ratio,
+            epsilon=config.high_path_epsilon,
+            success_threshold=options.success_threshold,
+        )
     )
     used_high_fallback = False
-    if not high_paths and options.ensure_high_path:
+    if not high_paths and options.ensure_high_path and not config.semantic_only:
         high_paths = mine_high_paths(
             records,
             clusters,

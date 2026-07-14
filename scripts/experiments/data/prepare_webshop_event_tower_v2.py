@@ -40,8 +40,8 @@ def main(options: argparse.Namespace) -> int:
     goals = json.loads(options.goals.read_text(encoding="utf-8"))
     if len(goals) < options.candidate_end:
         raise ValueError("candidate range exceeds the WebShop goal set")
-    if options.validation_tasks <= 0 or options.test_tasks <= 0:
-        raise ValueError("validation and test sizes must be positive")
+    if min(options.validation_tasks, options.test_tasks, options.ablation_tasks) <= 0:
+        raise ValueError("validation, test, and ablation sizes must be positive")
 
     selected = random.Random(options.seed).sample(
         range(options.candidate_start, options.candidate_end),
@@ -53,6 +53,18 @@ def main(options: argparse.Namespace) -> int:
     test_samples = [f"webshop:{index}" for index in test_ids]
     if set(validation_samples) & set(test_samples):
         raise RuntimeError("validation and test selections overlap")
+    evaluation_ids = set(validation_ids) | set(test_ids)
+    ablation_ids = sorted(
+        random.Random(options.ablation_seed).sample(
+            [
+                index
+                for index in range(options.candidate_start, options.candidate_end)
+                if index not in evaluation_ids
+            ],
+            options.ablation_tasks,
+        )
+    )
+    ablation_samples = [f"webshop:{index}" for index in ablation_ids]
 
     write_manifest(
         options.validation_manifest,
@@ -62,16 +74,21 @@ def main(options: argparse.Namespace) -> int:
         options.test_manifest,
         manifest_entries(test_samples, ExperimentSplit.TEST),
     )
+    write_manifest(
+        options.ablation_manifest,
+        manifest_entries(ablation_samples, ExperimentSplit.ABLATION),
+    )
 
     validation_conditions = [
         {
-            "condition_id": f"p50_trace2tower_cap{cap}_{model}",
-            "method": "trace2tower",
+            "condition_id": f"p50_{method}_cap{cap}_{model}",
+            "method": method,
             "pool": "p50",
             "direct_mid_top_k": cap,
             "agent_model": model,
         }
         for model in ("deepseek-v4-flash", "deepseek-v4-pro")
+        for method in ("semantic_clustering", "trace2tower")
         for cap in (3, 5, 8)
     ]
     primary_methods = [
@@ -79,6 +96,7 @@ def main(options: argparse.Namespace) -> int:
         "manual_skill",
         "global_e2e_gpt",
         "skillx",
+        "semantic_clustering",
         "trace2tower",
     ]
     primary_conditions = [
@@ -88,7 +106,7 @@ def main(options: argparse.Namespace) -> int:
             "pool": "p50" if method not in ("no_skill", "manual_skill") else None,
             "agent_model": model,
             "direct_mid_top_k": "frozen_from_stage_3"
-            if method == "trace2tower"
+            if method in ("semantic_clustering", "trace2tower")
             else None,
         }
         for model in ("deepseek-v4-flash", "deepseek-v4-pro")
@@ -96,7 +114,7 @@ def main(options: argparse.Namespace) -> int:
     ]
     ablation_conditions = [
         {
-            "condition_id": f"p50_{method}_{model}",
+            "condition_id": f"ablation_p50_{method}_{model}",
             "method": method,
             "pool": "p50",
             "agent_model": model,
@@ -107,7 +125,8 @@ def main(options: argparse.Namespace) -> int:
         }
         for model in ("deepseek-v4-pro", "deepseek-v4-flash")
         for method in (
-            "trace2tower_semantic_only",
+            "trace2tower",
+            "trace2tower_no_event",
             "trace2tower_mid_only",
             "trace2tower_no_mixed",
         )
@@ -141,6 +160,16 @@ def main(options: argparse.Namespace) -> int:
             "test_sample_ids": test_samples,
             "overlap_count": 0,
         },
+        "ablation_selection": {
+            "algorithm": (
+                "random.Random(ablation_seed).sample from indices not in "
+                "validation or test"
+            ),
+            "seed": options.ablation_seed,
+            "history_filtering": False,
+            "sample_ids": ablation_samples,
+            "overlap_with_validation_or_test": 0,
+        },
         "execution": {
             "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
             "renderer_model": "gpt-5.4",
@@ -154,6 +183,7 @@ def main(options: argparse.Namespace) -> int:
         "manifests": {
             "validation": options.validation_manifest.as_posix(),
             "test": options.test_manifest.as_posix(),
+            "ablation": options.ablation_manifest.as_posix(),
         },
         "training_pools": {
             "p50": {
@@ -188,15 +218,15 @@ def main(options: argparse.Namespace) -> int:
                 "methods": [
                     "global_e2e_gpt",
                     "skillx",
+                    "semantic_clustering",
                     "trace2tower",
-                    "trace2tower_semantic_only",
                     "trace2tower_no_mixed",
                 ],
                 "rollout_episodes": 0,
             },
             {
                 "stage": 3,
-                "name": "select_tower_cap",
+                "name": "select_retrieval_caps",
                 "split": "dev",
                 "conditions": validation_conditions,
                 "rollout_episodes": len(validation_conditions) * 300,
@@ -217,6 +247,7 @@ def main(options: argparse.Namespace) -> int:
                         "manual_skill",
                         "global_e2e_gpt",
                         "skillx",
+                        "semantic_clustering",
                         "trace2tower",
                     )
                 ],
@@ -226,10 +257,10 @@ def main(options: argparse.Namespace) -> int:
             {
                 "stage": 6,
                 "name": "p50_ablations",
-                "split": "test",
+                "split": "ablation",
                 "conditions": ablation_conditions,
-                "rollout_episodes_min": 900,
-                "rollout_episodes_max": 1800,
+                "rollout_episodes_min": 1200,
+                "rollout_episodes_max": 2400,
             },
             {
                 "stage": 7,
@@ -246,23 +277,35 @@ def main(options: argparse.Namespace) -> int:
             },
         ],
         "episode_budget": {
-            "validation": 1800,
-            "test_min": 4800,
-            "test_max": 6600,
-            "total_min": 6600,
-            "total_max": 8400,
+            "validation": 3600,
+            "main_test": 3600,
+            "ablation_min": 1200,
+            "ablation_max": 2400,
+            "scale_min": 900,
+            "scale_max": 1800,
+            "total_min": 9300,
+            "total_max": 11400,
         },
         "cap_selection": {
-            "scope": "P50 Full Trace2Tower only, both agent models",
+            "scope": (
+                "P50 Full Trace2Tower and Semantic Clustering independently, "
+                "both agent models"
+            ),
             "rule": (
                 "choose the smallest cap whose paired task-bootstrap reward "
                 "difference from the empirical best includes zero at 95%"
             ),
-            "excluded": ["skillx", "trace2tower_no_mixed", "all other methods"],
+            "excluded": [
+                "skillx",
+                "trace2tower_no_event",
+                "trace2tower_mid_only",
+                "trace2tower_no_mixed",
+                "all other methods",
+            ],
         },
         "primary_comparisons": [
             "P50 trace2tower - each P50 baseline within agent model",
-            "P50 trace2tower - each P50 ablation within agent model",
+            "P50 trace2tower - each P50 ablation on the independent ablation set",
             "P100 - P50 within global_e2e_gpt, skillx, and trace2tower",
         ],
         "artifact_policy": {
@@ -275,13 +318,17 @@ def main(options: argparse.Namespace) -> int:
             "must_rebuild": [
                 "Trace2Tower P50 event-stratified mixed snapshot",
                 "Trace2Tower P100 event-stratified mixed snapshot",
-                "P50 semantic-only ablation snapshot",
+                "P50 semantic-clustering baseline snapshot",
+                "P50 no-event signed-graph ablation snapshot",
                 "P50 no-mixed event-stratified snapshot",
             ],
             "forbidden_as_full": "every pre-v2 Tower snapshot",
         },
     }
     protocol["selection_id"] = f"selection_{canonical_hash(protocol['selection'])[:16]}"
+    protocol["ablation_selection_id"] = (
+        f"selection_{canonical_hash(protocol['ablation_selection'])[:16]}"
+    )
     write_json(options.output, protocol)
     print(
         json.dumps(
@@ -289,6 +336,7 @@ def main(options: argparse.Namespace) -> int:
                 "selection_id": protocol["selection_id"],
                 "validation_tasks": len(validation_samples),
                 "test_tasks": len(test_samples),
+                "ablation_tasks": len(ablation_samples),
                 "validation_conditions": len(validation_conditions),
                 "total_episodes_min": protocol["episode_budget"]["total_min"],
                 "total_episodes_max": protocol["episode_budget"]["total_max"],
@@ -305,8 +353,10 @@ if __name__ == "__main__":
     parser.add_argument("--candidate-start", type=int, default=0)
     parser.add_argument("--candidate-end", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=20260716)
+    parser.add_argument("--ablation-seed", type=int, default=20260717)
     parser.add_argument("--validation-tasks", type=int, default=100)
     parser.add_argument("--test-tasks", type=int, default=100)
+    parser.add_argument("--ablation-tasks", type=int, default=100)
     parser.add_argument(
         "--validation-manifest",
         type=Path,
@@ -318,6 +368,11 @@ if __name__ == "__main__":
         "--test-manifest",
         type=Path,
         default=Path("experiments/webshop/event-tower-v2/manifests/test.jsonl"),
+    )
+    parser.add_argument(
+        "--ablation-manifest",
+        type=Path,
+        default=Path("experiments/webshop/event-tower-v2/manifests/ablation.jsonl"),
     )
     parser.add_argument(
         "--output",

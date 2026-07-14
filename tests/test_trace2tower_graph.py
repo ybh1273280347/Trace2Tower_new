@@ -121,6 +121,29 @@ def test_formal_webshop_tower_requires_event_stratification() -> None:
         build_graph(groups, config())
 
 
+def test_no_event_ablation_preserves_graph_edges_across_events() -> None:
+    query = WebShopEventType.QUERY_FORMULATION
+    purchase = WebShopEventType.PURCHASE_DECISION
+    groups = (
+        (segment("q0", "t0", 0, (1.0, 0.0), 1.0, query),),
+        (segment("p0", "t1", 0, (1.0, 0.0), 0.0, purchase),),
+    )
+    graph = build_graph(
+        groups,
+        config(method=MethodName.TRACE2TOWER_NO_EVENT),
+    )
+
+    assert graph.semantic[0, 1] > 0
+
+
+def test_no_event_ablation_rejects_event_stratification() -> None:
+    with pytest.raises(ValueError, match="must disable event-type stratification"):
+        config(
+            method=MethodName.TRACE2TOWER_NO_EVENT,
+            event_type_stratification=True,
+        )
+
+
 def test_event_stratification_selects_neighbors_and_clusters_within_event() -> None:
     query = WebShopEventType.QUERY_FORMULATION
     purchase = WebShopEventType.PURCHASE_DECISION

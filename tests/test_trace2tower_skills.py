@@ -243,7 +243,14 @@ def test_mid_renderer_keeps_a_stable_prefix_before_variable_evidence() -> None:
     first_messages = first.calls[0][1]
     second_messages = second.calls[0][1]
     assert first_messages[0] == second_messages[0]
-    assert first.calls[0][2]["tools"] == second.calls[0][2]["tools"]
+    first_actions = first.calls[0][2]["tools"][0]["function"]["parameters"][
+        "properties"
+    ]["grounding_actions"]["items"]["enum"]
+    second_actions = second.calls[0][2]["tools"][0]["function"]["parameters"][
+        "properties"
+    ]["grounding_actions"]["items"]["enum"]
+    assert first_actions == ["GOTO"]
+    assert second_actions == ["GOTO", "PICK"]
     assert first.calls[0][2]["prompt_cache_key"] == second.calls[0][2]["prompt_cache_key"]
     assert first_messages[-1] != second_messages[-1]
 

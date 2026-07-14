@@ -292,10 +292,12 @@
   },
   "evaluation_selection": {
     "path": "configs/experiments/webshop_event_tower_v2.json",
-    "sha256": "189c2033691bca21cf14e10ad46315076d4c4c93abb20d09295f098fbcbf4677",
+    "sha256": "6e1d3d4874056667f007c4b2431475dffda4549ae54b931e2b532e4bd8930b95",
     "selection_id": "selection_fa882612a3fbe29f",
+    "ablation_selection_id": "selection_50a063e627f4cd79",
     "validation_task_count": 100,
     "test_task_count": 100,
+    "ablation_task_count": 100,
     "training_overlap_count": 0
   },
   "invariants": {
@@ -308,7 +310,8 @@
     "p50_records_unchanged": true,
     "source_runs_error_free": true,
     "validation_test_disjoint": true,
+    "ablation_disjoint": true,
     "training_evaluation_disjoint": true
   },
-  "audit_id": "poolaudit_be49e6014bb1aacb"
+  "audit_id": "poolaudit_f75de8c0869ded41"
 }

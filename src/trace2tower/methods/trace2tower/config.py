@@ -28,7 +28,7 @@ class Trace2TowerConfig:
         if not 1 <= self.min_mid_clusters <= self.max_mid_clusters:
             raise ValueError("invalid Mid cluster range")
         if self.semantic_only != (
-            self.method is MethodName.TRACE2TOWER_SEMANTIC_ONLY
+            self.method is MethodName.SEMANTIC_CLUSTERING
         ):
             raise ValueError("semantic-only switch and method must agree")
         if self.semantic_only and (
@@ -37,13 +37,18 @@ class Trace2TowerConfig:
             or self.use_contrastive_decomposition
             or self.event_type_stratification
         ):
-            raise ValueError("semantic-only ablation cannot use graph or event structure")
+            raise ValueError("semantic clustering cannot use graph or event structure")
         if self.max_high_path_length < 2:
             raise ValueError("max High path length must be at least two")
         if not 0 <= self.high_min_support_ratio <= 1:
             raise ValueError("High path support ratio must be in [0, 1]")
         if self.high_path_epsilon <= 0:
             raise ValueError("High path epsilon must be positive")
+        if (
+            self.method is MethodName.TRACE2TOWER_NO_EVENT
+            and self.event_type_stratification
+        ):
+            raise ValueError("no-event ablation must disable event-type stratification")
 
     def validate_for_benchmark(self, benchmark: Benchmark) -> None:
         if benchmark is not Benchmark.WEBSHOP:

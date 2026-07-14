@@ -1,4 +1,4 @@
-method: trace2tower_semantic_only
+method: trace2tower_no_event
 retrieval_strategy: diverse
 include_high: true
 high_similarity_threshold: 0.45

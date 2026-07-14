@@ -10,7 +10,6 @@ from trace2tower.llm_runtime import ChatResult, CommonLLMRuntime, ModelRole
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.models import HighPath, PrimitiveAction
 from trace2tower.methods.trace2tower.skills import (
-    LOW_SKILLS,
     HighSkillCard,
     MidRenderInput,
     MidSkillCard,
@@ -170,7 +169,7 @@ async def render_mid_card(
     sibling_inputs: Sequence[MidRenderInput] = (),
 ) -> tuple[MidSkillCard, ChatResult]:
     legal_actions = legal_grounding_actions(benchmark, render_input)
-    official_actions = [skill.primitive_action.value for skill in LOW_SKILLS[benchmark]]
+    legal_action_values = sorted(action.value for action in legal_actions)
     tool = _tool(
         "render_mid_skill",
         "Render a reusable executable skill from the supplied fixed evidence.",
@@ -181,7 +180,7 @@ async def render_mid_card(
             "constraints": _string_array("Evidence-grounded cautions or preconditions."),
             "grounding_actions": {
                 "type": "array",
-                "items": {"type": "string", "enum": official_actions},
+                "items": {"type": "string", "enum": legal_action_values},
                 "uniqueItems": True,
             },
         },

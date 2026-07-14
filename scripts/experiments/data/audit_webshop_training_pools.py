@@ -223,6 +223,7 @@ def render_report(audit: dict) -> str:
 - P50 source run：`{p50['source_runs'][0]['run_id']}`
 - P100 additional source run：`{p100['source_runs'][-1]['run_id']}`
 - Validation/Test selection：`{audit['evaluation_selection']['selection_id']}`
+- Ablation selection：`{audit['evaluation_selection']['ablation_selection_id']}`
 
 ## 不变量
 
@@ -230,7 +231,7 @@ def render_report(audit: dict) -> str:
 - P100 task/repeat coverage：完整的 100 x 4 笛卡尔积。
 - P50 task set 是 P100 task set 的严格子集。
 - P50 对应 trajectory records 在 P100 中完全相同。
-- 训练任务与 validation/test indices `0..999` 零重叠。
+- 训练任务与 validation/test/ablation indices `0..999` 零重叠。
 - 本阶段只读取并审计已有轨迹，没有重新 rollout，也没有修改 validation/test manifests。
 
 完整 sample IDs、reward histogram、finish reasons、source metadata hashes 和机器可验证不变量
@@ -256,7 +257,9 @@ def main(options: argparse.Namespace) -> int:
     )
     validation_ids = set(evaluation_protocol["selection"]["validation_sample_ids"])
     test_ids = set(evaluation_protocol["selection"]["test_sample_ids"])
+    ablation_ids = set(evaluation_protocol["ablation_selection"]["sample_ids"])
     training_ids = set(p100["sample_ids"])
+    evaluation_ids = validation_ids | test_ids | ablation_ids
 
     invariants = {
         "p50_task_count": p50["task_count"] == 50,
@@ -276,8 +279,8 @@ def main(options: argparse.Namespace) -> int:
             for source in pool["source_runs"]
         ),
         "validation_test_disjoint": not validation_ids & test_ids,
-        "training_evaluation_disjoint": not training_ids
-        & (validation_ids | test_ids),
+        "ablation_disjoint": not ablation_ids & (validation_ids | test_ids),
+        "training_evaluation_disjoint": not training_ids & evaluation_ids,
     }
     if not all(invariants.values()):
         failures = [name for name, passed in invariants.items() if not passed]
@@ -302,11 +305,13 @@ def main(options: argparse.Namespace) -> int:
             "path": options.evaluation_protocol.as_posix(),
             "sha256": sha256_file(options.evaluation_protocol),
             "selection_id": evaluation_protocol["selection_id"],
+            "ablation_selection_id": evaluation_protocol[
+                "ablation_selection_id"
+            ],
             "validation_task_count": len(validation_ids),
             "test_task_count": len(test_ids),
-            "training_overlap_count": len(
-                training_ids & (validation_ids | test_ids)
-            ),
+            "ablation_task_count": len(ablation_ids),
+            "training_overlap_count": len(training_ids & evaluation_ids),
         },
         "invariants": invariants,
     }

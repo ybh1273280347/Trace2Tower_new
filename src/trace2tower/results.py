@@ -15,8 +15,9 @@ class MethodName(StrEnum):
     MANUAL_SKILL = "manual_skill"
     GLOBAL_E2E_GPT = "global_e2e_gpt"
     SKILLX = "skillx"
+    SEMANTIC_CLUSTERING = "semantic_clustering"
     TRACE2TOWER = "trace2tower"
-    TRACE2TOWER_SEMANTIC_ONLY = "trace2tower_semantic_only"
+    TRACE2TOWER_NO_EVENT = "trace2tower_no_event"
     TRACE2TOWER_MID_ONLY = "trace2tower_mid_only"
     TRACE2TOWER_NO_MIXED = "trace2tower_no_mixed"
 

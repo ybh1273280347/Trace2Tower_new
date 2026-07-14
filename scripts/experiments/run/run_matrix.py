@@ -11,8 +11,8 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json, write_yaml
 
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json, write_yaml
 from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
@@ -41,8 +41,9 @@ EXECUTABLE_METHODS = (
     MethodName.MANUAL_SKILL,
     MethodName.GLOBAL_E2E_GPT,
     MethodName.SKILLX,
+    MethodName.SEMANTIC_CLUSTERING,
     MethodName.TRACE2TOWER,
-    MethodName.TRACE2TOWER_SEMANTIC_ONLY,
+    MethodName.TRACE2TOWER_NO_EVENT,
     MethodName.TRACE2TOWER_MID_ONLY,
     MethodName.TRACE2TOWER_NO_MIXED,
 )
@@ -51,17 +52,17 @@ METHOD_CONFIG_FILES = {
     MethodName.MANUAL_SKILL: "webshop_manual_skill.yaml",
     MethodName.GLOBAL_E2E_GPT: "webshop_global_e2e.yaml",
     MethodName.SKILLX: "webshop_skillx.yaml",
+    MethodName.SEMANTIC_CLUSTERING: "webshop_semantic_clustering_runtime.yaml",
     MethodName.TRACE2TOWER: "webshop_trace2tower_runtime.yaml",
-    MethodName.TRACE2TOWER_SEMANTIC_ONLY: (
-        "webshop_trace2tower_semantic_only_runtime.yaml"
-    ),
+    MethodName.TRACE2TOWER_NO_EVENT: "webshop_trace2tower_no_event_runtime.yaml",
     MethodName.TRACE2TOWER_MID_ONLY: "webshop_trace2tower_mid_only.yaml",
     MethodName.TRACE2TOWER_NO_MIXED: "webshop_trace2tower_no_mixed_runtime.yaml",
 }
 
-TOWER_METHODS = {
+TOWER_ARTIFACT_METHODS = {
+    MethodName.SEMANTIC_CLUSTERING,
     MethodName.TRACE2TOWER,
-    MethodName.TRACE2TOWER_SEMANTIC_ONLY,
+    MethodName.TRACE2TOWER_NO_EVENT,
     MethodName.TRACE2TOWER_MID_ONLY,
     MethodName.TRACE2TOWER_NO_MIXED,
 }
@@ -129,7 +130,7 @@ def load_method_artifact(
         library = SkillXExecutionLibrary.from_record(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
-    elif method in TOWER_METHODS:
+    elif method in TOWER_ARTIFACT_METHODS:
         snapshot = TowerSnapshot.from_record(payload)
         snapshot.require_complete()
         artifact_benchmark = snapshot.benchmark
@@ -171,7 +172,7 @@ def create_provider(
             max_skills=int(method_config["max_skills"]),
             family_stratified=bool(method_config.get("family_stratified", False)),
         )
-    if artifact.method in TOWER_METHODS:
+    if artifact.method in TOWER_ARTIFACT_METHODS:
         diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
         provider = Trace2TowerSkillProvider.from_path(
             runtime,
@@ -376,7 +377,7 @@ async def main(options: argparse.Namespace) -> int:
         getattr(options, "method_config", None)
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
-    if method in TOWER_METHODS:
+    if method in TOWER_ARTIFACT_METHODS:
         if options.direct_mid_top_k not in (3, 5, 8):
             raise ValueError("Tower runs require an explicit direct Mid cap: 3, 5, or 8")
         method_config = {
@@ -571,7 +572,7 @@ async def main(options: argparse.Namespace) -> int:
         "snapshot_id": (
             next(iter(artifacts.values())).artifact_id
             if len(artifacts) == 1
-            and method is MethodName.TRACE2TOWER
+            and method in TOWER_ARTIFACT_METHODS
             else None
         ),
         "shard_ids": list(shard_ids),

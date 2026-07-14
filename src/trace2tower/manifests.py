@@ -22,6 +22,7 @@ class ExperimentSplit(StrEnum):
     TRAIN = "train"
     DEV = "dev"
     TEST = "test"
+    ABLATION = "ablation"
 
 
 class AlfworldTaskFamily(StrEnum):
