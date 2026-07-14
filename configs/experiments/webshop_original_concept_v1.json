@@ -111,6 +111,21 @@
       "full_success_rate": 0.52,
       "minus_full_reward": -0.029,
       "minus_full_reward_ci95": [-0.08333750000000001, 0.022166666666666668]
+    },
+    "test_a_repeat3": {
+      "status": "registered_before_additional_repeats",
+      "role": "primary_flash_variance_extension",
+      "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+      "agent_model": "deepseek-v4-flash",
+      "task_count": 100,
+      "repeat_ids": [0, 1, 2],
+      "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
+      "existing_repeat_id": 0,
+      "additional_repeat_ids": [1, 2],
+      "global_e2e_gpt": "single_repeat_diagnostic_only",
+      "manual_skill": "optional_not_run",
+      "statistical_unit": "task_mean_across_three_repeats",
+      "bootstrap_samples": 10000
     }
   }
 }
