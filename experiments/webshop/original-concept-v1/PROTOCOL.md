@@ -33,3 +33,5 @@
 ## Validation execution policy
 
 All subsequent validation conditions use only `deepseek-v4-flash`, the same 100-task manifest, and one execution per task. Reports and tables must label this as `single-repeat` or `1 run/task`. The statistical unit is the task, and paired task bootstrap may quantify variation across tasks. A result must never be copied into synthetic repeat IDs or reported as three independent executions.
+
+Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.
