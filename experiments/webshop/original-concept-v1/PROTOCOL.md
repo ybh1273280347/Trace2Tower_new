@@ -32,7 +32,7 @@ runtime; they are not relabeled as final-algorithm results.
 
 `semantic_clustering` is the graph-structure ablation: it uses the same segments and compact embeddings but skips `S/T/O`, contrastive graph construction, spectral decomposition, and High induction, then directly applies K-means.
 
-`trace2tower_no_mixed` is the training-evidence ablation. It keeps event extraction, relational graph construction, spectral clustering, High induction, native rendering, dynamic retrieval, and cap 8 fixed, but replaces the P100 mixed evidence with all 186 full-success trajectories from the same P100 rollout pool. It is evaluated on frozen Test-A with Flash and `repeat_id=0`. Semantic-only and No-Mixed use the existing evaluation manifests directly; no separate ablation training pool or test set is required. The earlier No-event design is retired because event labels do not constrain the original-concept graph.
+`trace2tower_no_mixed` is the training-evidence ablation. It keeps event extraction, relational graph construction, spectral clustering, High induction, native rendering, graph-aware retrieval, and total cap3 fixed, but replaces the P100 mixed evidence with all 186 full-success trajectories from the same P100 rollout pool. It is compared with P100 V0 Mixed rather than refined T1 so the feedback pool and Pareto lifecycle do not change. The earlier No-event design is retired because event labels do not constrain the original-concept graph.
 
 ## Fast mechanism gate
 
@@ -48,11 +48,11 @@ runtime; they are not relabeled as final-algorithm results.
 
 All subsequent validation conditions use only `deepseek-v4-flash`, the same 100-task manifest, and one execution per task. Reports and tables must label this as `single-repeat` or `1 run/task`. The statistical unit is the task, and paired task bootstrap may quantify variation across tasks. A result must never be copied into synthetic repeat IDs or reported as three independent executions.
 
-Full Trace2Tower was compared at direct Mid caps 3, 5, and 8 with the rebuilt original-concept artifact. Cap 8 has the highest empirical validation reward and is frozen for all Tower runs. Semantic-only also uses cap 8 without a separate sweep so Full, Semantic, and SkillX share the same retrieval budget. NoSkill, Manual, Global E2E, and SkillX have no validation-selected setting.
+The historical generic-retrieval study records direct Mid caps 3, 5, and 8 as retrieval-sensitivity evidence. Its cap8 runs remain valid matched comparisons with SkillX and Semantic-only, but they do not define the final deployment retriever. The final Tower uses graph-aware retrieval and a total Mid budget of 3.
 
 ## Formal test policy
 
-The frozen 100-task test manifest is evaluated once per task. The P50 main table contains NoSkill, Manual, Global E2E, SkillX, Semantic-only, and Full on both Flash and Pro. These runs were started only after Full cap 8 was frozen. Semantic-only is a graph-structure baseline, not a one-variable ablation.
+The frozen 100-task test manifest is evaluated once per task. The P50 historical table contains NoSkill, Manual, Global E2E, SkillX, Semantic-only, and Full on both Flash and Pro. Semantic-only is a graph-structure baseline rather than a final deployment condition.
 
 After the P50 test exposed a validation/test gap, two post-hoc diagnostics were registered:
 

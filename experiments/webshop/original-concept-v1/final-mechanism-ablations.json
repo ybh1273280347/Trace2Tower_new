@@ -1,0 +1,131 @@
+{
+  "protocol_id": "webshop-final-mechanism-ablations-v1",
+  "agent_model": "deepseek-v4-flash",
+  "repeat_id": 0,
+  "runs": {
+    "mixed_graph_cap3": "artifacts/runs/webshop-original-concept-v1-test-a-flash-v0-graph-cap3-r1",
+    "no_mixed_graph_cap3": "artifacts/runs/webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1",
+    "legacy_full_cap8": "artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1",
+    "semantic_cap8": "artifacts/runs/webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1"
+  },
+  "summary": {
+    "mixed_graph_cap3": {
+      "task_count": 100,
+      "mean_reward": 0.7089166666666666,
+      "full_success_rate": 0.52,
+      "mean_steps": 7.17,
+      "mean_invalid_actions": 0.13,
+      "mean_input_tokens": 22067.2
+    },
+    "no_mixed_graph_cap3": {
+      "task_count": 100,
+      "mean_reward": 0.6982499999999999,
+      "full_success_rate": 0.52,
+      "mean_steps": 7.75,
+      "mean_invalid_actions": 0.1,
+      "mean_input_tokens": 23380.87
+    },
+    "legacy_full_cap8": {
+      "task_count": 100,
+      "mean_reward": 0.7209166666666665,
+      "full_success_rate": 0.56,
+      "mean_steps": 7.17,
+      "mean_invalid_actions": 0.19,
+      "mean_input_tokens": 32359.55
+    },
+    "semantic_cap8": {
+      "task_count": 100,
+      "mean_reward": 0.7015714285714286,
+      "full_success_rate": 0.5,
+      "mean_steps": 8.3,
+      "mean_invalid_actions": 0.18,
+      "mean_input_tokens": 32469.09
+    }
+  },
+  "comparisons": {
+    "no_mixed_minus_mixed": {
+      "reward": {
+        "mean": -0.010666666666666668,
+        "bootstrap_ci95": [
+          -0.05250000000000001,
+          0.029166666666666664
+        ]
+      },
+      "steps": {
+        "mean": 0.58,
+        "bootstrap_ci95": [
+          -0.11,
+          1.3
+        ]
+      },
+      "invalid_actions": {
+        "mean": -0.03,
+        "bootstrap_ci95": [
+          -0.12,
+          0.05
+        ]
+      },
+      "input_tokens": {
+        "mean": 1313.67,
+        "bootstrap_ci95": [
+          -2307.8824999999997,
+          5153.852749999999
+        ]
+      },
+      "full_success_rate": {
+        "mean": 0.0,
+        "bootstrap_ci95": [
+          -0.05,
+          0.05
+        ]
+      }
+    },
+    "legacy_full_minus_semantic": {
+      "reward": {
+        "mean": 0.019345238095238103,
+        "bootstrap_ci95": [
+          -0.029476190476190475,
+          0.06701220238095239
+        ]
+      },
+      "steps": {
+        "mean": -1.13,
+        "bootstrap_ci95": [
+          -1.93,
+          -0.34
+        ]
+      },
+      "invalid_actions": {
+        "mean": 0.01,
+        "bootstrap_ci95": [
+          -0.1,
+          0.11
+        ]
+      },
+      "input_tokens": {
+        "mean": -109.54,
+        "bootstrap_ci95": [
+          -4906.2465,
+          4988.143
+        ]
+      },
+      "full_success_rate": {
+        "mean": 0.06,
+        "bootstrap_ci95": [
+          0.0,
+          0.13
+        ]
+      }
+    }
+  },
+  "comparison_contracts": {
+    "no_mixed_minus_mixed": {
+      "shared": "P100 rollout pool, graph-aware retrieval, total Mid cap3",
+      "variable": "mixed partial/failure evidence"
+    },
+    "legacy_full_minus_semantic": {
+      "shared": "P100 mixed pool, nine Mid clusters, native renderer, legacy retrieval cap8",
+      "variable": "signed relational EigenTrace graph and High induction"
+    }
+  }
+}

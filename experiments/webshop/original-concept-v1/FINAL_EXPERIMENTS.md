@@ -44,8 +44,8 @@ not used to design this retriever.
 | 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Complete |
 | 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
 | 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Complete |
-| 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
-| 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Running |
+| 6 | P100 Semantic-only vs P100 Full, legacy cap8 | Remove relational graph induction and High paths under the historical matched runtime | Complete |
+| 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Complete |
 | 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
 
 ## Completed evidence retained
@@ -75,6 +75,25 @@ task mean is `0.73061`. Final Tower remains higher at `0.75123`, a `+0.02062`
 delta from the NoSkill two-repeat task mean, interval
 `[-0.01829, +0.05992]`. Test-B should therefore be described as an easier
 split, not as evidence that skill injection is generally ineffective.
+
+## Mechanism ablations
+
+| Matched comparison | Reward | Full success | Steps | Input tokens |
+|---|---:|---:|---:|---:|
+| P100 Full legacy cap8 | **0.72092** | **56%** | **7.17** | 32,360 |
+| P100 Semantic-only legacy cap8 | 0.70157 | 50% | 8.30 | 32,469 |
+| P100 Mixed graph cap3 | **0.70892** | 52% | **7.17** | **22,067** |
+| P100 No-Mixed graph cap3 | 0.69825 | 52% | 7.75 | 23,381 |
+
+Full legacy minus Semantic-only is `+0.01935` reward, interval
+`[-0.02948, +0.06701]`, and `-1.13` steps, interval `[-1.93, -0.34]`. The
+step-efficiency gain is significant and full success improves by six points.
+
+No-Mixed minus Mixed is `-0.01067` reward, interval
+`[-0.05250, +0.02917]`, and `+0.58` steps, interval `[-0.11, +1.30]`. The
+direction supports partial/failure evidence as regularization, but this
+single-repeat ablation is not significant. Complete statistics are in
+`final-mechanism-ablations.json`.
 
 ## First final-algorithm results
 

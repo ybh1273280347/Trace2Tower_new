@@ -132,6 +132,18 @@ including the active High path node and its directed successor.
 & $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method no_skill --manifest webshop=experiments/webshop/original-concept-v1/manifests/test-b.jsonl --repeat-id 1 --run-id webshop-original-concept-v1-test-b-flash-noskill-repeat1 --agent-model deepseek-v4-flash --episode-concurrency 1 --api-concurrency 1
 
 & $py -m scripts.experiments.analyze.analyze_test_b_noskill_variance --repeat0-run artifacts/runs/webshop-original-concept-v1-test-b-flash-noskill-r1 --repeat1-run artifacts/runs/webshop-original-concept-v1-test-b-flash-noskill-repeat1 --tower-run artifacts/runs/webshop-original-concept-v1-test-b-flash-final-graph-cap3-r1 --output experiments/webshop/original-concept-v1/test-b-noskill-variance.json
+
+& $py -m scripts.experiments.build.build_trace2tower_graph --input artifacts/trace2tower/original-concept-v1/p100/mixed/preprocessed.jsonl --config configs/experiments/webshop_semantic_clustering.yaml --output-dir artifacts/trace2tower/original-concept-v1/p100/semantic-only/graph --full-report artifacts/trace2tower/original-concept-v1/p100/full/graph/report.json
+
+& $py -m scripts.experiments.build.build_trace2tower_skills --benchmark webshop --input artifacts/trace2tower/original-concept-v1/p100/mixed/preprocessed.jsonl --clusters artifacts/trace2tower/original-concept-v1/p100/semantic-only/graph/clusters.json --config configs/experiments/webshop_semantic_clustering.yaml --output-dir artifacts/trace2tower/original-concept-v1/p100/semantic-only/skills --render-all-mid
+
+& $py -m scripts.experiments.build.build_trace2tower_index --cards artifacts/trace2tower/original-concept-v1/p100/semantic-only/skills/rendered-cards.json --config configs/experiments/webshop_semantic_clustering.yaml --output artifacts/trace2tower/original-concept-v1/p100/semantic-only/index.json --direct-mid-top-k 8
+
+& $py -m scripts.experiments.build.build_tower_snapshot --benchmark webshop --version v0 --input artifacts/trace2tower/original-concept-v1/p100/mixed/preprocessed.jsonl --clusters artifacts/trace2tower/original-concept-v1/p100/semantic-only/graph/clusters.json --high-paths artifacts/trace2tower/original-concept-v1/p100/semantic-only/skills/high-paths.json --cards artifacts/trace2tower/original-concept-v1/p100/semantic-only/skills/rendered-cards.json --index artifacts/trace2tower/original-concept-v1/p100/semantic-only/index.json --config configs/experiments/webshop_semantic_clustering.yaml --output artifacts/trace2tower/original-concept-v1/p100/semantic-only/tower.json
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method semantic_clustering --artifact webshop=artifacts/trace2tower/original-concept-v1/p100/semantic-only/tower.json --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_semantic_clustering_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 2 --api-concurrency 2
+
+& $py -m scripts.experiments.analyze.analyze_final_mechanism_ablations --mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-v0-graph-cap3-r1 --no-mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1 --legacy-full-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --semantic-run artifacts/runs/webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1 --output experiments/webshop/original-concept-v1/final-mechanism-ablations.json
 ```
 
 ## Statistics

@@ -4,7 +4,7 @@ Results are reusable only when the validation manifest, task key, repeat ID, age
 
 | Condition | Reuse status | Evidence |
 |---|---|---|
-| Original-concept Full, cap8 | Reuse | `webshop-original-concept-v1-validation-flash-cap8-r1`, 100/100 keys, zero errors |
+| Original-concept generic-retrieval Full | Reuse as historical mechanism evidence | Recorded cap8 runs retain their exact artifact/runtime bindings and are not relabeled as final deployment |
 | NoSkill | Reuse | `webshop-original-concept-v1-validation-flash-noskill-r1`, 100/100 keys, zero errors |
 | Old event-stratified Tower repeat3 | Reject | Wrong snapshot and reset-time retrieval |
 | Old Semantic repeat3 | Reject | Old full-content segment embeddings and reset-time retrieval |
@@ -15,6 +15,8 @@ Results are reusable only when the validation manifest, task key, repeat ID, age
 | P100 SkillX Flash Test-A | Reuse | `webshop-original-concept-v1-test-flash-p100-skillx-r1`, 100/100 keys, zero errors |
 | Test-B Flash robustness matrix | Reuse only as cross-split evidence | NoSkill, P100 SkillX, and P100 Full each cover 100/100 frozen Test-B keys; zero unresolved errors |
 | P100 No-Mixed Flash Test-A | Reuse as evidence ablation | `webshop-original-concept-v1-test-flash-p100-no-mixed-cap8-r1`, same P100 source pool and runtime as Full, 100/100 keys, zero unresolved errors |
+| P100 Semantic-only Flash Test-A | Reuse as graph-structure ablation | `webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1`, same P100 mixed pool, nine Mid clusters, native renderer, legacy cap8, 100/100 keys |
+| P100 No-Mixed graph-cap3 Test-A | Reuse as failure-evidence ablation | `webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1`, compared with V0 Mixed graph-cap3, 100/100 keys |
 | Test-A Flash repeat3 primary matrix | Reuse | Existing repeat0 plus four repeat1/2 runs for NoSkill, Manual, P100 SkillX, and P100 Full; every method covers 100 tasks x 3 real repeats with zero unresolved errors |
 | Test-A Pro repeat3 primary matrix | Reuse | NoSkill, Manual, P100 SkillX, and P100 Full each cover 100 tasks x 3 real repeats; P100 SkillX uses the native P100 artifact; zero unresolved failure keys |
 | P100 SkillX-style renderer diagnostic | Reuse only as renderer evidence | `webshop-original-concept-v1-test-flash-p100-full-skillx-style-cap8-r1`, same P100 structure and 100/100 test keys |
