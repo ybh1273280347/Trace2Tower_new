@@ -80,6 +80,9 @@ def metric_summary(rows: dict[tuple[str, int], dict]) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--protocol-id", default="webshop-final-graph-cap3-repeat3-v1"
+    )
     parser.add_argument("--model", required=True)
     parser.add_argument("--run", action="append", type=parse_run, required=True)
     parser.add_argument("--final-method", default="final_t1")
@@ -123,7 +126,7 @@ def main() -> int:
             "full_success_bootstrap_ci95": paired_interval(success_differences),
         }
     payload = {
-        "protocol_id": "webshop-final-graph-cap3-repeat3-v1",
+        "protocol_id": options.protocol_id,
         "model": options.model,
         "statistical_unit": "task_mean_across_real_repeats_0_1_2",
         "runs": {

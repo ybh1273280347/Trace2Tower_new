@@ -260,6 +260,7 @@ async def run_matrix_shard(
     benchmark: Benchmark,
     split: ExperimentSplit,
     entries: list[ManifestEntry],
+    manifest_path: Path,
     method: MethodName,
     shard_id: int,
     options: argparse.Namespace,
@@ -368,9 +369,7 @@ async def run_matrix_shard(
         "agent_endpoint_role": options.agent_endpoint_role,
         "shard_id": shard_id,
         "num_shards": options.num_shards,
-        "manifest_path": (
-            Path(common["manifests_dir"]) / f"{benchmark}_{split}.jsonl"
-        ).as_posix(),
+        "manifest_path": manifest_path.as_posix(),
         "result_path": result_path.as_posix(),
         "result_sha256": (
             hashlib.sha256(result_path.read_bytes()).hexdigest()
@@ -425,6 +424,13 @@ async def main(options: argparse.Namespace) -> int:
     manifest_paths = parse_benchmark_paths(options.manifest, "manifest")
     if manifest_paths and set(manifest_paths) != set(benchmarks):
         raise ValueError("every selected benchmark requires one manifest assignment")
+    selected_manifest_paths = {
+        benchmark: manifest_paths.get(
+            benchmark,
+            Path(common["manifests_dir"]) / f"{benchmark}_{split}.jsonl",
+        )
+        for benchmark in benchmarks
+    }
     manual_skill = None
     if method is MethodName.NO_SKILL:
         if artifact_paths:
@@ -451,13 +457,7 @@ async def main(options: argparse.Namespace) -> int:
         }
     entries_by_benchmark = {
         benchmark: select_entries(
-            read_manifest(
-                manifest_paths.get(
-                    benchmark,
-                    Path(common["manifests_dir"])
-                    / f"{benchmark}_{split}.jsonl",
-                )
-            ),
+            read_manifest(selected_manifest_paths[benchmark]),
             tuple(options.sample_id),
             tuple(options.repeat_id),
         )
@@ -476,17 +476,12 @@ async def main(options: argparse.Namespace) -> int:
         },
         "manifests": {
             benchmark.value: {
-                "path": path.as_posix(),
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "path": selected_manifest_paths[benchmark].as_posix(),
+                "sha256": hashlib.sha256(
+                    selected_manifest_paths[benchmark].read_bytes()
+                ).hexdigest(),
             }
             for benchmark in benchmarks
-            for path in (
-                manifest_paths.get(
-                    benchmark,
-                    Path(common["manifests_dir"])
-                    / f"{benchmark}_{split}.jsonl",
-                ),
-            )
         },
     }
     if options.agent_endpoint_role != ModelRole.AGENT:
@@ -529,6 +524,7 @@ async def main(options: argparse.Namespace) -> int:
                     benchmark=benchmark,
                     split=split,
                     entries=entries_by_benchmark[benchmark],
+                    manifest_path=selected_manifest_paths[benchmark],
                     method=method,
                     shard_id=shard_id,
                     options=options,
@@ -589,6 +585,7 @@ async def main(options: argparse.Namespace) -> int:
                     benchmark=benchmark,
                     split=split,
                     entries=entries_by_benchmark[benchmark],
+                    manifest_path=selected_manifest_paths[benchmark],
                     method=method,
                     shard_id=shard_id,
                     options=options,
