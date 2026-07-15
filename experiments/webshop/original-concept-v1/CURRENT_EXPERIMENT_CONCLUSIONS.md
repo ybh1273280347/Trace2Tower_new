@@ -134,6 +134,53 @@ pages, and `Buy Now` are WebShop-level interpretations used only to explain
 the observed results. This diagnostic does not establish a missing event type
 or motivate a change to the Trace2Tower core algorithm.
 
+### Retrieved-skill audit and post-hoc intervention
+
+The six shared zero-reward tasks do not fail because retrieval returns no
+skills. Across their 18 Final Trace2Tower trajectories, the most frequent
+retrieved cards are:
+
+| Skill | Retrievals | Sample coverage |
+|---|---:|---:|
+| `mid_0002`, select required options before purchase | 150 | 6/6 |
+| `high_efbf322a092b`, search, open, and configure | 127 | 6/6 |
+| `mid_0006`, select matching product options | 121 | 6/6 |
+| `mid_0000`, search with core attributes | 114 | 6/6 |
+| `high_f4ff56f0acaa`, search and buy a direct match | 113 | 5/6 |
+| `mid_0001`, refine search terms | 90 | 6/6 |
+
+These cards provide local positive actions but weakly represent cross-step
+control state: which searches and candidates have already failed, which hard
+requirements remain unsupported, when purchase must be blocked, and how much
+episode budget remains. The result is repeated retrieval of search/configure/
+purchase paths without a strong recovery path for a near miss.
+
+A post-hoc manual intervention tested that hypothesis. The fixed skill contains
+no sample IDs, product names, candidate identifiers, or target answers. It adds
+a three-state hard-constraint checklist, a purchase gate for unknown evidence,
+query and candidate ledgers, and a bounded recovery plan.
+
+| Method on shared-zero set, n=6 | Mean reward | Full success | Zero reward | Mean steps |
+|---|---:|---:|---:|---:|
+| Final Trace2Tower | 0.0000 | 0.0% | 100.0% | 14.67 |
+| SkillX | 0.0000 | 0.0% | 100.0% | 15.50 |
+| Existing generic Manual Skill | 0.0000 | 0.0% | 100.0% | 14.83 |
+| **Manual recovery intervention** | **0.1111** | **11.1%** | **88.9%** | 16.00 |
+
+The gain comes entirely from `webshop:969`, which succeeds in two of three
+repeats after inspecting and rejecting plausible but mismatched candidates.
+The other premature-purchase task still buys an incorrect candidate, and all
+four search-stagnation tasks still exhaust 20 steps. Thus there is a real but
+limited recoverable guidance gap. Static skill text is not sufficient to
+reliably enforce cross-step memory, constraint gates, or action budgets.
+
+This suggests a general improvement direction after domain event extraction:
+learn contrastive recovery skills from failed-to-successful event transitions,
+retrieve against the current unresolved state rather than only the task text,
+and expose explicit execution state such as tried alternatives, unresolved
+requirements, and remaining budget. Those state variables are domain-grounded
+but the event-to-recovery-skill construction principle is general.
+
 ## Generality boundary
 
 Trace2Tower assumes that trajectories have already been converted into
@@ -193,4 +240,6 @@ unfinished.
 - `final-algorithm-results.json`
 - `test-b-noskill-variance.json`
 - `failure-overlap.json`
+- `failure-intervention/analysis.json`
+- `failure-intervention/REPORT.md`
 - `construction-cost.json`
