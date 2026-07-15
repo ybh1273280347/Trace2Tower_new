@@ -66,6 +66,32 @@ Mid, balanced across successful and unsuccessful trajectories when available.
 | Mid coverage | complete |
 | High coverage | complete |
 
-The Test-A deployment experiment uses DeepSeek V4 Flash, cap 8, and the V1
-snapshot. The abandoned eight-episode downweight-only probe is not part of the
-formal result.
+## Test-A deployment result
+
+The deployment experiment uses DeepSeek V4 Flash, cap 8, real repeat 0, and the
+same 100 Test-A tasks as the existing NoSkill and Tower V0 runs. The abandoned
+eight-episode downweight-only probe is not part of the formal result.
+
+| Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| Tower V0 | **0.72092** | **56%** | **7.17** | 0.19 | 32,360 |
+| Structural V1 | 0.68049 | 48% | 7.79 | **0.15** | 32,752 |
+
+Structural V1 minus NoSkill is `-0.00026`, with paired task-bootstrap 95%
+interval `[-0.05851, +0.05833]`. Structural V1 minus Tower V0 is `-0.04043`,
+interval `[-0.09267, +0.01167]`. The full structural candidate therefore does
+not pass the deployment gate and is not promoted over V0. Its lower invalid
+action rate is insufficient to offset the reward and full-success loss.
+
+TPM throttling required a resume. The raw V1 run contains duplicate attempts;
+formal analysis freezes the first completed record in each sorted shard file
+for every `(sample_id, repeat_id)` and retains all later rows in
+`test-a-flash.json`. This rule is independent of outcome. The resulting paired
+set contains exactly 100 unique task keys.
+
+The failure is informative for the recursive optimizer: decomposition makes an
+N-to-M proposal auditable, but a decomposition is not an acceptance rule. A
+future refinement round must rank local components on the optimization set and
+apply only Pareto-supported Merge/Split transactions. Test-A must not be used
+to select that subset.

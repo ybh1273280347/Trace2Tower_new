@@ -1,0 +1,514 @@
+{
+  "protocol_id": "webshop-test-a-refinement-v1",
+  "split": "test",
+  "agent_model": "deepseek-v4-flash",
+  "repeat_id": 0,
+  "direct_mid_cap": 8,
+  "duplicate_policy": "first_completion_in_sorted_shard_file_order",
+  "runs": {
+    "structural_v1": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1",
+    "noskill": "artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1",
+    "previous_tower_v0": "artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1"
+  },
+  "audits": {
+    "structural_v1": {
+      "duplicate_key_count": 29,
+      "discarded_row_count": 29,
+      "primary_score_disagreement_count": 2,
+      "step_disagreement_count": 3,
+      "keys": [
+        {
+          "sample_id": "webshop:109",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.6666666666666666,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.6666666666666666,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:12",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 8
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 8
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:120",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.6666666666666666,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-04/results.jsonl",
+              "primary_score": 0.6666666666666666,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:178",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 6
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 6
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:184",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:185",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-04/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:282",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 7
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 7
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:284",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:298",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 7
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-04/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 7
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:342",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.0,
+            "steps": 20
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-01/results.jsonl",
+              "primary_score": 0.0,
+              "steps": 20
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:345",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.6,
+            "steps": 9
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.6,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:350",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.25,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 0.25,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:359",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.1,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-04/results.jsonl",
+              "primary_score": 0.1,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:405",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.75,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-01/results.jsonl",
+              "primary_score": 0.75,
+              "steps": 7
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:407",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.0,
+            "steps": 20
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.5,
+              "steps": 20
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:435",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.5,
+            "steps": 10
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 0.5,
+              "steps": 10
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:46",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.0,
+            "steps": 20
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-04/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 9
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:492",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.0,
+            "steps": 20
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.0,
+              "steps": 20
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:499",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.0,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 0.0,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:65",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.6666666666666666,
+            "steps": 4
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.6666666666666666,
+              "steps": 4
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:658",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:788",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 8
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-01/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 8
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:797",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 3
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 3
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:8",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 7
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 7
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:875",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-01/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:89",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:899",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:969",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 0.5,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-02/results.jsonl",
+              "primary_score": 0.5,
+              "steps": 5
+            }
+          ]
+        },
+        {
+          "sample_id": "webshop:975",
+          "repeat_id": 0,
+          "selected": {
+            "primary_score": 1.0,
+            "steps": 5
+          },
+          "discarded": [
+            {
+              "result_path": "artifacts/runs/webshop-original-concept-v1-test-a-flash-refinement-v1-structural-cap8-r1/webshop/test/trace2tower/shard-03/results.jsonl",
+              "primary_score": 1.0,
+              "steps": 5
+            }
+          ]
+        }
+      ]
+    },
+    "noskill": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "previous_tower_v0": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    }
+  },
+  "summary": {
+    "structural_v1": {
+      "task_count": 100,
+      "mean_reward": 0.6804880952380951,
+      "full_success_rate": 0.48,
+      "mean_steps": 7.79,
+      "mean_invalid_actions": 0.15,
+      "mean_input_tokens": 32751.96
+    },
+    "noskill": {
+      "task_count": 100,
+      "mean_reward": 0.6807499999999999,
+      "full_success_rate": 0.51,
+      "mean_steps": 7.98,
+      "mean_invalid_actions": 0.36,
+      "mean_input_tokens": 21388.46
+    },
+    "previous_tower_v0": {
+      "task_count": 100,
+      "mean_reward": 0.7209166666666665,
+      "full_success_rate": 0.56,
+      "mean_steps": 7.17,
+      "mean_invalid_actions": 0.19,
+      "mean_input_tokens": 32359.55
+    }
+  },
+  "paired_deltas": {
+    "structural_v1_minus_noskill": {
+      "mean_reward": -0.0002619047619047621,
+      "bootstrap_ci95": [
+        -0.0585125,
+        0.0583348214285714
+      ]
+    },
+    "structural_v1_minus_previous_tower_v0": {
+      "mean_reward": -0.040428571428571425,
+      "bootstrap_ci95": [
+        -0.09266666666666666,
+        0.011670238095238043
+      ]
+    }
+  }
+}
