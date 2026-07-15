@@ -39,10 +39,10 @@ not used to design this retriever.
 
 | Priority | Experiment | Purpose | Status |
 |---:|---|---|---|
-| 1 | V0 graph-cap3 vs T1 graph-cap3, Flash Test-A repeat0 | Isolate Pareto refinement from retrieval | Running |
-| 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Running |
-| 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Queued |
-| 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Queued |
+| 1 | V0 graph-cap3 vs T1 graph-cap3, Flash Test-A repeat0 | Isolate Pareto refinement from retrieval | Complete |
+| 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Complete |
+| 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Running |
+| 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Running |
 | 5 | Pro repeat1/2 | Extend only after the repeat0 direction and cost are known | Conditional |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
 | 7 | No-Mixed with graph retrieval cap3 | Test the value of failure evidence under the final runtime | Pending profile build |
@@ -57,3 +57,25 @@ not used to design this retriever.
 - Existing NoSkill, Manual, native P100 SkillX, legacy Tower, scale, renderer,
   and seen-task runs remain historical or baseline evidence under their exact
   recorded runtime contracts.
+
+## First final-algorithm results
+
+| Split / method | Mean reward | Full success | Mean steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| Test-A V0 graph cap3 | 0.70892 | 52% | 7.17 | 0.13 | 22,067 |
+| Test-A final T1 graph cap3 | **0.71925** | **54%** | **6.81** | 0.16 | **20,059** |
+| Test-B NoSkill | 0.73323 | 48% | 7.32 | 0.32 | 16,571 |
+| Test-B P100 SkillX | 0.69573 | 47% | 7.50 | 0.34 | 27,330 |
+| Test-B final T1 graph cap3 | **0.75123** | **53%** | **6.87** | **0.08** | **19,637** |
+
+The Test-A isolation keeps graph retrieval and cap3 fixed, so the `+0.01033`
+mean reward difference is attributable to the registered T1 refinement bundle
+rather than to the retriever. Its paired 95% interval is
+`[-0.00883, +0.03300]`, so the refinement gain is positive but not significant.
+
+Test-B was not used to design graph retrieval. Final T1 exceeds NoSkill by
+`+0.01800`, interval `[-0.02175, +0.05825]`, and P100 SkillX by `+0.05550`,
+interval `[+0.01500, +0.10300]`. The SkillX comparison is significant under
+the registered paired task bootstrap. Final T1 also exceeds legacy V0 by
+`+0.03658`, interval `[-0.00300, +0.07825]`. Complete paired statistics are
+recorded in `final-algorithm-results.json`.
