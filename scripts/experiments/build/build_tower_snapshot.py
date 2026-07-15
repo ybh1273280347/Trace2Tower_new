@@ -28,8 +28,14 @@ def main(options: argparse.Namespace) -> int:
     ]
     if any(record.get("split") != ExperimentSplit.TRAIN for record in records):
         raise ValueError("Tower snapshots may only use explicit training trajectories")
-    if any(record.get("trajectory_method") != "no_skill" for record in records):
+    trajectory_methods = {record.get("trajectory_method") for record in records}
+    if options.version is TowerVersion.V0 and trajectory_methods != {"no_skill"}:
         raise ValueError("Tower v0 requires shared No-Skill trajectories")
+    if options.version is TowerVersion.V1 and not trajectory_methods <= {
+        "no_skill",
+        "trace2tower",
+    }:
+        raise ValueError("Tower v1 accepts only No-Skill and prior-Tower feedback")
     if any(record["benchmark"] != options.benchmark for record in records):
         raise ValueError("preprocessed benchmark does not match snapshot benchmark")
     cluster_payload = json.loads(options.clusters.read_text(encoding="utf-8"))
@@ -37,7 +43,7 @@ def main(options: argparse.Namespace) -> int:
     card_payload = json.loads(options.cards.read_text(encoding="utf-8"))
     index_payload = json.loads(options.index.read_text(encoding="utf-8"))
     snapshot = build_tower_snapshot(
-        version=TowerVersion.V0,
+        version=options.version,
         benchmark=options.benchmark,
         config=Trace2TowerConfig.from_record(load_yaml(options.config)),
         training_trajectory_ids=tuple(record["trajectory_id"] for record in records),
@@ -83,6 +89,9 @@ def main(options: argparse.Namespace) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--benchmark", type=Benchmark, choices=tuple(Benchmark), required=True)
+    parser.add_argument(
+        "--version", type=TowerVersion, choices=tuple(TowerVersion), default=TowerVersion.V0
+    )
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--clusters", type=Path, required=True)
     parser.add_argument("--high-paths", type=Path, required=True)

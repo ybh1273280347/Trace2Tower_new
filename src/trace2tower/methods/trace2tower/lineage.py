@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+import hashlib
 import math
 from collections import defaultdict
 from dataclasses import asdict, dataclass
@@ -9,6 +10,7 @@ from trace2tower.methods.trace2tower.models import MidCluster
 from trace2tower.methods.trace2tower.refinement import (
     LegalMergeProposal,
     LegalSplitProposal,
+    RefinementAction,
 )
 
 
@@ -78,6 +80,161 @@ class MidLineage:
                 proposal.to_record() for proposal in self.complex_repartitions
             ],
         }
+
+
+@dataclass(frozen=True, slots=True)
+class AtomicLineageStep:
+    step_id: str
+    component_id: str
+    order: int
+    action: RefinementAction
+    source_node_ids: tuple[str, ...]
+    target_node_ids: tuple[str, ...]
+
+    def to_record(self) -> dict:
+        return {
+            **asdict(self),
+            "action": self.action.value,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class LineageDecomposition:
+    min_shared_member_count: int
+    min_old_retention: float
+    min_new_historical_purity: float
+    selected_edges: tuple[MidLineageEdge, ...]
+    ignored_edges: tuple[MidLineageEdge, ...]
+    continuations: tuple[tuple[str, str], ...]
+    components: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]
+    steps: tuple[AtomicLineageStep, ...]
+
+    def to_record(self) -> dict:
+        return {
+            "edge_policy": {
+                "min_shared_member_count": self.min_shared_member_count,
+                "min_old_retention": self.min_old_retention,
+                "min_new_historical_purity": self.min_new_historical_purity,
+            },
+            "selected_edges": [edge.to_record() for edge in self.selected_edges],
+            "ignored_edges": [edge.to_record() for edge in self.ignored_edges],
+            "continuations": [
+                {"old_skill_id": old_id, "candidate_cluster_id": candidate_id}
+                for old_id, candidate_id in self.continuations
+            ],
+            "components": [
+                {
+                    "old_skill_ids": old_ids,
+                    "candidate_cluster_ids": candidate_ids,
+                }
+                for old_ids, candidate_ids in self.components
+            ],
+            "steps": [step.to_record() for step in self.steps],
+        }
+
+
+def decompose_mid_lineage(
+    lineage: MidLineage,
+    *,
+    min_shared_member_count: int = 5,
+    min_old_retention: float = 0.10,
+    min_new_historical_purity: float = 0.10,
+) -> LineageDecomposition:
+    """把显著的 Mid 谱系分解为可审计的 Merge/Split 原子序列。"""
+
+    if min_shared_member_count <= 0:
+        raise ValueError("lineage decomposition requires positive shared support")
+    if not 0 <= min_old_retention <= 1 or not 0 <= min_new_historical_purity <= 1:
+        raise ValueError("lineage decomposition ratios must be in [0, 1]")
+
+    selected = tuple(
+        edge
+        for edge in lineage.edges
+        if edge.shared_member_count >= min_shared_member_count
+        and edge.old_retention >= min_old_retention
+        and edge.new_historical_purity >= min_new_historical_purity
+    )
+    ignored = tuple(edge for edge in lineage.edges if edge not in selected)
+    all_old_ids = {edge.old_skill_id for edge in lineage.edges}
+    all_candidate_ids = {edge.candidate_cluster_id for edge in lineage.edges}
+    selected_old_ids = {edge.old_skill_id for edge in selected}
+    selected_candidate_ids = {edge.candidate_cluster_id for edge in selected}
+    if selected_old_ids != all_old_ids or selected_candidate_ids != all_candidate_ids:
+        missing_old = sorted(all_old_ids - selected_old_ids)
+        missing_candidate = sorted(all_candidate_ids - selected_candidate_ids)
+        raise ValueError(
+            "lineage edge policy leaves clusters without an interpretable relation: "
+            f"old={missing_old}, candidate={missing_candidate}"
+        )
+
+    old_to_candidates: dict[str, list[str]] = defaultdict(list)
+    candidate_to_old: dict[str, list[str]] = defaultdict(list)
+    for edge in selected:
+        old_to_candidates[edge.old_skill_id].append(edge.candidate_cluster_id)
+        candidate_to_old[edge.candidate_cluster_id].append(edge.old_skill_id)
+
+    components = _all_components(old_to_candidates, candidate_to_old)
+    continuations = []
+    steps = []
+    for component_index, (old_ids, candidate_ids) in enumerate(components):
+        component_id = f"lineage_component_{component_index:02d}"
+        if len(old_ids) == 1 and len(candidate_ids) == 1:
+            continuations.append((old_ids[0], candidate_ids[0]))
+            continue
+        if len(old_ids) == 1:
+            steps.append(
+                _atomic_lineage_step(
+                    component_id,
+                    1,
+                    RefinementAction.SPLIT,
+                    old_ids,
+                    candidate_ids,
+                )
+            )
+            continue
+        if len(candidate_ids) == 1:
+            steps.append(
+                _atomic_lineage_step(
+                    component_id,
+                    1,
+                    RefinementAction.MERGE,
+                    old_ids,
+                    candidate_ids,
+                )
+            )
+            continue
+
+        # N→M 不是第五种动作：先汇合历史来源，再按新结构拆分。
+        intermediate_id = _lineage_intermediate_id(old_ids, candidate_ids)
+        steps.append(
+            _atomic_lineage_step(
+                component_id,
+                1,
+                RefinementAction.MERGE,
+                old_ids,
+                (intermediate_id,),
+            )
+        )
+        steps.append(
+            _atomic_lineage_step(
+                component_id,
+                2,
+                RefinementAction.SPLIT,
+                (intermediate_id,),
+                candidate_ids,
+            )
+        )
+
+    return LineageDecomposition(
+        min_shared_member_count=min_shared_member_count,
+        min_old_retention=min_old_retention,
+        min_new_historical_purity=min_new_historical_purity,
+        selected_edges=selected,
+        ignored_edges=ignored,
+        continuations=tuple(continuations),
+        components=components,
+        steps=tuple(steps),
+    )
 
 
 def build_mid_lineage(
@@ -276,6 +433,66 @@ def _complex_components(
         if len(old_ids) > 1 and len(candidate_ids) > 1:
             components.append((tuple(sorted(old_ids)), tuple(sorted(candidate_ids))))
     return tuple(components)
+
+
+def _all_components(
+    old_to_candidates: dict[str, list[str]],
+    candidate_to_old: dict[str, list[str]],
+) -> tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]:
+    visited_old: set[str] = set()
+    components = []
+    for root in sorted(old_to_candidates):
+        if root in visited_old:
+            continue
+        old_ids = set()
+        candidate_ids = set()
+        pending_old = [root]
+        while pending_old:
+            old_id = pending_old.pop()
+            if old_id in visited_old:
+                continue
+            visited_old.add(old_id)
+            old_ids.add(old_id)
+            for candidate_id in old_to_candidates[old_id]:
+                candidate_ids.add(candidate_id)
+                pending_old.extend(candidate_to_old[candidate_id])
+        components.append((tuple(sorted(old_ids)), tuple(sorted(candidate_ids))))
+    return tuple(components)
+
+
+def _atomic_lineage_step(
+    component_id: str,
+    order: int,
+    action: RefinementAction,
+    source_node_ids: tuple[str, ...],
+    target_node_ids: tuple[str, ...],
+) -> AtomicLineageStep:
+    identity = "|".join(
+        (
+            component_id,
+            str(order),
+            action.value,
+            *source_node_ids,
+            "->",
+            *target_node_ids,
+        )
+    )
+    digest = hashlib.sha256(identity.encode()).hexdigest()[:12]
+    return AtomicLineageStep(
+        step_id=f"{action.value}_{digest}",
+        component_id=component_id,
+        order=order,
+        action=action,
+        source_node_ids=source_node_ids,
+        target_node_ids=target_node_ids,
+    )
+
+
+def _lineage_intermediate_id(
+    old_ids: tuple[str, ...], candidate_ids: tuple[str, ...]
+) -> str:
+    identity = "|".join((*old_ids, "->", *candidate_ids))
+    return f"mid_merge_stage_{hashlib.sha256(identity.encode()).hexdigest()[:12]}"
 
 
 def _cluster_map(

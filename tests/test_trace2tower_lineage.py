@@ -1,5 +1,6 @@
 from trace2tower.methods.trace2tower.lineage import (
     build_mid_lineage,
+    decompose_mid_lineage,
     legal_merge_proposals,
     legal_split_proposals,
 )
@@ -55,3 +56,61 @@ def test_lineage_keeps_cross_split_merge_out_of_legal_proposals() -> None:
     )
     assert not legal_split_proposals(lineage)
     assert not legal_merge_proposals(lineage, old, candidate)
+
+
+def test_many_to_many_lineage_decomposes_into_merge_then_split() -> None:
+    old = (
+        cluster("old-a", tuple(f"a{index}" for index in range(10)), 1.0),
+        cluster("old-b", tuple(f"b{index}" for index in range(10)), 0.0),
+    )
+    candidate = (
+        cluster(
+            "new-left",
+            tuple(f"a{index}" for index in range(5))
+            + tuple(f"b{index}" for index in range(5)),
+            0.5,
+        ),
+        cluster(
+            "new-right",
+            tuple(f"a{index}" for index in range(5, 10))
+            + tuple(f"b{index}" for index in range(5, 10)),
+            0.5,
+        ),
+    )
+
+    decomposition = decompose_mid_lineage(build_mid_lineage(old, candidate))
+
+    assert len(decomposition.components) == 1
+    assert [step.action.value for step in decomposition.steps] == ["merge", "split"]
+    merge, split = decomposition.steps
+    assert merge.source_node_ids == ("old-a", "old-b")
+    assert merge.target_node_ids == split.source_node_ids
+    assert split.target_node_ids == ("new-left", "new-right")
+
+
+def test_lineage_decomposition_ignores_small_cross_cluster_leakage() -> None:
+    old = (
+        cluster("old-a", tuple(f"a{index}" for index in range(20)), 1.0),
+        cluster("old-b", tuple(f"b{index}" for index in range(20)), 0.0),
+    )
+    candidate = (
+        cluster(
+            "new-a",
+            tuple(f"a{index}" for index in range(19)) + ("b0",),
+            0.95,
+        ),
+        cluster(
+            "new-b",
+            ("a19",) + tuple(f"b{index}" for index in range(1, 20)),
+            0.05,
+        ),
+    )
+
+    decomposition = decompose_mid_lineage(build_mid_lineage(old, candidate))
+
+    assert decomposition.continuations == (
+        ("old-a", "new-a"),
+        ("old-b", "new-b"),
+    )
+    assert not decomposition.steps
+    assert len(decomposition.ignored_edges) == 2

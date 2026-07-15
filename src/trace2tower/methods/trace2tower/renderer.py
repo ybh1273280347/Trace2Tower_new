@@ -249,13 +249,13 @@ async def render_mid_card(
                 "content": json.dumps(
                     (
                         {
-                            "target": render_input.to_record(),
+                            "target": _mid_render_profile(render_input),
                             "sibling_profiles": [
                                 _mid_render_profile(item) for item in sibling_inputs
                             ],
                         }
                         if sibling_inputs
-                        else render_input.to_record()
+                        else _mid_render_profile(render_input)
                     ),
                     ensure_ascii=False,
                     sort_keys=True,
@@ -297,8 +297,28 @@ async def render_mid_card(
 
 def _mid_render_profile(render_input: MidRenderInput) -> dict:
     scores = [item.trajectory_score for item in render_input.segment_evidence]
-    examples = sorted(render_input.segment_evidence, key=lambda item: item.segment_id)[:8]
+    successful = sorted(
+        (item for item in render_input.segment_evidence if item.trajectory_score >= 0.999),
+        key=lambda item: item.segment_id,
+    )
+    unsuccessful = sorted(
+        (item for item in render_input.segment_evidence if item.trajectory_score < 0.999),
+        key=lambda item: item.segment_id,
+    )
+    examples = [*successful[:4], *unsuccessful[:4]]
+    if len(examples) < 8:
+        selected_ids = {item.segment_id for item in examples}
+        remaining = sorted(
+            (
+                item
+                for item in render_input.segment_evidence
+                if item.segment_id not in selected_ids
+            ),
+            key=lambda item: item.segment_id,
+        )
+        examples.extend(remaining[: 8 - len(examples)])
     return {
+        "cluster_id": render_input.cluster_id,
         "support_count": render_input.support_count,
         "mean_trajectory_score": fmean(scores),
         "full_score_ratio": sum(score >= 0.999 for score in scores) / len(scores),
