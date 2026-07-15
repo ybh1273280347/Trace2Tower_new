@@ -46,7 +46,7 @@ not used to design this retriever.
 | 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
 | 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Running |
-| 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Running |
+| 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
 
 ## Completed evidence retained
 
@@ -67,6 +67,14 @@ Test-B NoSkill repeat1 is a variance diagnostic triggered by the unusually high
 repeat0 point estimate. It cannot replace repeat0. The report must show both
 repeats and their two-repeat task mean regardless of direction; selecting only
 the lower repeat would invalidate the robustness comparison.
+
+The rerun confirms that Test-B NoSkill is genuinely high rather than a repeat0
+outlier. Repeat0 scores `0.73323`; repeat1 scores `0.72798`; repeat1 minus
+repeat0 is `-0.00525`, paired interval `[-0.03234, +0.01825]`. Their two-repeat
+task mean is `0.73061`. Final Tower remains higher at `0.75123`, a `+0.02062`
+delta from the NoSkill two-repeat task mean, interval
+`[-0.01829, +0.05992]`. Test-B should therefore be described as an easier
+split, not as evidence that skill injection is generally ineffective.
 
 ## First final-algorithm results
 
