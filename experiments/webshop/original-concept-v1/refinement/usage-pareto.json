@@ -1,0 +1,193 @@
+{
+  "protocol_id": "webshop-train-refinement-v1-pareto-selection",
+  "tower_snapshot_id": "tower_9094918372ee0a39",
+  "benchmark": "webshop",
+  "split": "train",
+  "agent_model": "deepseek-v4-flash",
+  "paired_episode_count": 300,
+  "primary_objectives": [
+    "performance_level",
+    "paired_reward_gain",
+    "guarded_step_saving"
+  ],
+  "secondary_metrics": [
+    "guarded_cost_saving"
+  ],
+  "ranking_status": "complete",
+  "ranked_skills": [
+    {
+      "skill_id": "high_efbf322a092b",
+      "skill_level": "high",
+      "objective_vector": {
+        "performance_level": 0.7208628841607565,
+        "paired_reward_gain": 0.02828014184397163,
+        "guarded_step_saving": -0.11121869601218787,
+        "guarded_cost_saving": -2.089077306744708
+      },
+      "exposure_count": 282,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": [
+        "high_f4ff56f0acaa"
+      ]
+    },
+    {
+      "skill_id": "high_f4ff56f0acaa",
+      "skill_level": "high",
+      "objective_vector": {
+        "performance_level": 0.5555555555555556,
+        "paired_reward_gain": -0.07777777777777778,
+        "guarded_step_saving": -0.23456790123456792,
+        "guarded_cost_saving": -2.1250594752317102
+      },
+      "exposure_count": 18,
+      "pareto_front_rank": 2,
+      "dominated_by": [
+        "high_efbf322a092b"
+      ],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0000",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0001",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0002",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0003",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0004",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0005",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0006",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0007",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    },
+    {
+      "skill_id": "mid_0008",
+      "skill_level": "mid",
+      "objective_vector": {
+        "performance_level": 0.7109444444444445,
+        "paired_reward_gain": 0.021916666666666668,
+        "guarded_step_saving": -0.11861964832553068,
+        "guarded_cost_saving": -2.091236236853928
+      },
+      "exposure_count": 300,
+      "pareto_front_rank": 1,
+      "dominated_by": [],
+      "dominates": []
+    }
+  ],
+  "mid_usage_identifiable": false,
+  "mid_usage_evidence": {
+    "unique_exposure_sets": 1,
+    "mid_skill_count": 9,
+    "reason": "all Mid skills were co-injected on the same paired episodes"
+  },
+  "selected_usage_actions": {
+    "downweight": {
+      "skill_id": "high_f4ff56f0acaa",
+      "action": "downweight",
+      "previous_status": "active",
+      "new_status": "downweighted",
+      "refinement_round": 1,
+      "pareto_front_rank": 2
+    }
+  }
+}

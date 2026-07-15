@@ -1,7 +1,7 @@
 {
   "protocol_id": "webshop-train-refinement-v1",
   "source_tower_snapshot_id": "tower_9094918372ee0a39",
-  "tower_snapshot_id": "tower_2e4d04d23287f600",
+  "tower_snapshot_id": "tower_bb3ec5295dfe207d",
   "ranking_status": "complete",
   "direct_mid_top_k": 8,
   "status_tie_epsilon": 0.01,
@@ -1151,28 +1151,61 @@
     ]
   },
   "applied_atomic_action_counts": {
-    "split": 3,
-    "merge": 2,
-    "promote": 0,
+    "split": 1,
+    "merge": 0,
+    "promote": 1,
     "downweight": 1
   },
-  "complex_repartition_policy": {
-    "candidate_count": 1,
-    "applied": true,
-    "execution": "each significant local N-to-M component is factored into Merge then Split",
+  "selected_actions": {
+    "structural_transaction": {
+      "component_id": "lineage_component_03",
+      "atomic_steps": [
+        {
+          "step_id": "split_54bf79561d1b",
+          "component_id": "lineage_component_03",
+          "order": 1,
+          "action": "split",
+          "source_node_ids": [
+            "mid_0003"
+          ],
+          "target_node_ids": [
+            "mid_0004",
+            "mid_0005",
+            "mid_0006",
+            "mid_0010"
+          ]
+        }
+      ]
+    },
+    "promote": {
+      "skill_id": "high_69655a587d87"
+    },
+    "downweight": {
+      "skill_id": "high_f4ff56f0acaa",
+      "action": "downweight",
+      "previous_status": "active",
+      "new_status": "downweighted",
+      "refinement_round": 1,
+      "pareto_front_rank": 2
+    }
+  },
+  "structural_selection": {
+    "report": "experiments/webshop/original-concept-v1/refinement/structural-pareto.json",
+    "selected_component_id": "lineage_component_03",
     "weak_edges": "retained in the lineage audit but excluded from structural actions"
   },
-  "source_lifecycle_actions": {
-    "downweight": [
-      {
-        "skill_id": "high_f4ff56f0acaa",
-        "action": "downweight",
-        "previous_status": "active",
-        "new_status": "downweighted",
-        "refinement_round": 1,
-        "pareto_front_rank": 2
-      }
-    ]
+  "usage_selection": {
+    "report": "experiments/webshop/original-concept-v1/refinement/usage-pareto.json",
+    "mid_usage_identifiable": false
   },
-  "downweight": []
+  "downweight": [
+    {
+      "skill_id": "high_f4ff56f0acaa",
+      "action": "downweight",
+      "previous_status": "active",
+      "new_status": "downweighted",
+      "refinement_round": 1,
+      "pareto_front_rank": 2
+    }
+  ]
 }

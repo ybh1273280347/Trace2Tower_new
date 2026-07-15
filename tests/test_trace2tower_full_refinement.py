@@ -1,5 +1,8 @@
+from dataclasses import replace
+
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.full_refinement import (
+    StructuralSelection,
     apply_mid_updates,
     select_structural_updates,
 )
@@ -7,6 +10,7 @@ from trace2tower.methods.trace2tower.lineage import build_mid_lineage
 from trace2tower.methods.trace2tower.models import HighPath, MidCluster, SegmentInstance
 from trace2tower.methods.trace2tower.refinement import (
     EpisodePairKey,
+    LegalSplitProposal,
     ObjectiveVector,
     RankedSkillObjective,
     SkillLevel,
@@ -90,6 +94,58 @@ def test_full_refinement_applies_one_split_and_partitions_new_segments() -> None
     assert len(refined.replacement_by_old_id["mid-a"]) == 2
     assert len(refined.primary_replacement_by_old_id["mid-a"]) == 1
     assert refined.replacement_by_old_id["mid-b"] == ("mid-b",)
+
+
+def test_local_split_does_not_take_weak_historical_members_from_other_mid() -> None:
+    old = (
+        cluster("mid-a", ("t1:segment:0", "t2:segment:0"), 1.0),
+        cluster("mid-b", ("t3:segment:0",), 0.0),
+    )
+    candidate = (
+        cluster("candidate-a1", ("t1:segment:0", "t3:segment:0", "t4:segment:0"), 1.0),
+        cluster("candidate-a2", ("t2:segment:0",), 0.8),
+        cluster("candidate-b", ("t5:segment:0",), 0.0),
+    )
+    lineage = build_mid_lineage(old, candidate)
+    lineage = replace(
+        lineage,
+        splits=(("mid-a", ("candidate-a1", "candidate-a2")),),
+    )
+    selection = StructuralSelection(
+        split=LegalSplitProposal("split:mid-a", "mid-a"),
+        merge=None,
+        repartition=None,
+        rejected_split_proposal_ids=(),
+        rejected_repartition_proposal_ids=(),
+        rejected_merge_proposal_ids=(),
+        pareto_protected_merge_proposal_ids=(),
+    )
+    segments = {
+        segment_id: segment(segment_id, index / 5)
+        for index, segment_id in enumerate(
+            (
+                "t1:segment:0",
+                "t2:segment:0",
+                "t3:segment:0",
+                "t4:segment:0",
+                "t5:segment:0",
+            )
+        )
+    }
+
+    refined = apply_mid_updates(lineage, selection, old, candidate, segments)
+
+    unchanged = next(item for item in refined.clusters if item.cluster_id == "mid-b")
+    assert "t3:segment:0" in unchanged.member_segment_ids
+    split_members = {
+        member
+        for mid_id in refined.replacement_by_old_id["mid-a"]
+        for member in next(
+            item.member_segment_ids for item in refined.clusters if item.cluster_id == mid_id
+        )
+    }
+    assert "t3:segment:0" not in split_members
+    assert "t4:segment:0" in split_members
 
 
 def test_full_refinement_applies_complex_repartition_atomically() -> None:

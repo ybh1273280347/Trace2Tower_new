@@ -1,0 +1,90 @@
+{
+  "protocol_id": "webshop-train-refinement-v1-structural-pareto",
+  "tower_snapshot_id": "tower_9094918372ee0a39",
+  "comparison_scope": "shared historical core members per local lineage component",
+  "objectives": [
+    "outcome_consistency_gain",
+    "transition_role_coherence_gain",
+    "spectral_compactness_gain"
+  ],
+  "selection_gate": "candidate must Pareto-dominate the no-op vector (0, 0, 0)",
+  "candidates": [
+    {
+      "component_id": "lineage_component_01",
+      "source_old_skill_ids": [
+        "mid_0001",
+        "mid_0005",
+        "mid_0008"
+      ],
+      "candidate_cluster_ids": [
+        "mid_0001",
+        "mid_0003",
+        "mid_0008",
+        "mid_0012"
+      ],
+      "core_member_count": 367,
+      "source_member_coverage": 0.7858672376873662,
+      "minimum_target_core_count": 27,
+      "outcome_consistency_gain": 0.006678253486419906,
+      "transition_role_coherence_gain": 0.0028717190228702005,
+      "spectral_compactness_gain": 0.6361654660568491,
+      "pareto_front_rank": 2,
+      "dominates_noop": true
+    },
+    {
+      "component_id": "lineage_component_03",
+      "source_old_skill_ids": [
+        "mid_0003"
+      ],
+      "candidate_cluster_ids": [
+        "mid_0004",
+        "mid_0005",
+        "mid_0006",
+        "mid_0010"
+      ],
+      "core_member_count": 328,
+      "source_member_coverage": 0.9820359281437125,
+      "minimum_target_core_count": 51,
+      "outcome_consistency_gain": 0.02311875390750325,
+      "transition_role_coherence_gain": 0.009570797448267498,
+      "spectral_compactness_gain": 0.7083523516222086,
+      "pareto_front_rank": 1,
+      "dominates_noop": true
+    },
+    {
+      "component_id": "lineage_component_04",
+      "source_old_skill_ids": [
+        "mid_0004",
+        "mid_0006",
+        "mid_0007"
+      ],
+      "candidate_cluster_ids": [
+        "mid_0007",
+        "mid_0009",
+        "mid_0011"
+      ],
+      "core_member_count": 567,
+      "source_member_coverage": 0.8603945371775418,
+      "minimum_target_core_count": 99,
+      "outcome_consistency_gain": 0.01591870603800777,
+      "transition_role_coherence_gain": 0.0,
+      "spectral_compactness_gain": 0.5203740893550156,
+      "pareto_front_rank": 2,
+      "dominates_noop": true
+    },
+    {
+      "component_id": "noop",
+      "source_old_skill_ids": [],
+      "candidate_cluster_ids": [],
+      "core_member_count": 0,
+      "source_member_coverage": 1.0,
+      "minimum_target_core_count": 0,
+      "outcome_consistency_gain": 0.0,
+      "transition_role_coherence_gain": 0.0,
+      "spectral_compactness_gain": 0.0,
+      "pareto_front_rank": 3,
+      "dominates_noop": false
+    }
+  ],
+  "selected_component_id": "lineage_component_03"
+}

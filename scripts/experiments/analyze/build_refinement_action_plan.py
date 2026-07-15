@@ -22,7 +22,9 @@ def main() -> int:
     parser.add_argument("--tower", type=Path, required=True)
     parser.add_argument("--refined-tower", type=Path, required=True)
     parser.add_argument("--candidate-clusters", type=Path, required=True)
-    parser.add_argument("--pareto-report", type=Path, required=True)
+    parser.add_argument("--usage-pareto", type=Path, required=True)
+    parser.add_argument("--structural-pareto", type=Path, required=True)
+    parser.add_argument("--refined-build-report", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     options = parser.parse_args()
 
@@ -34,23 +36,37 @@ def main() -> int:
         MidCluster.from_record(record)
         for record in json.loads(options.candidate_clusters.read_text(encoding="utf-8"))["clusters"]
     )
-    pareto = json.loads(options.pareto_report.read_text(encoding="utf-8"))
+    usage_pareto = json.loads(options.usage_pareto.read_text(encoding="utf-8"))
+    structural_pareto = json.loads(
+        options.structural_pareto.read_text(encoding="utf-8")
+    )
+    build_report = json.loads(
+        options.refined_build_report.read_text(encoding="utf-8")
+    )
     if (
-        pareto["tower_snapshot_id"] != tower.snapshot_id
-        or pareto["split"] != "train"
-        or pareto["ranking_status"] != "complete"
+        usage_pareto["tower_snapshot_id"] != tower.snapshot_id
+        or structural_pareto["tower_snapshot_id"] != tower.snapshot_id
+        or usage_pareto["split"] != "train"
+        or usage_pareto["ranking_status"] != "complete"
     ):
         raise ValueError("Pareto feedback does not bind to the train-side Tower snapshot")
+    if refined_tower.version.value != "v1":
+        raise ValueError("refined action plan requires a Tower v1 target")
     lineage = build_mid_lineage(tower.mid_clusters, candidate)
     decomposition = decompose_mid_lineage(lineage)
-    if refined_tower.version.value != "v1" or refined_tower.mid_clusters != candidate:
-        raise ValueError("refined Tower does not materialize the candidate Mid structure")
-    updates = tuple(pareto.get("downweight", ()))
-    if len(updates) > 1:
-        raise ValueError("one refinement round permits at most one downweight")
+    selected_component_id = structural_pareto["selected_component_id"]
+    if selected_component_id != build_report["selected_component_id"]:
+        raise ValueError("refined build does not match structural Pareto selection")
+    selected_steps = tuple(
+        step.to_record()
+        for step in decomposition.steps
+        if step.component_id == selected_component_id
+    )
+    if not selected_steps:
+        raise ValueError("selected structural component contains no atomic steps")
+    update = usage_pareto["selected_usage_actions"]["downweight"]
     downweight = None
-    if updates:
-        update = updates[0]
+    if update is not None:
         downweight = LifecycleUpdate(
             skill_id=str(update["skill_id"]),
             action=LifecycleAction(update["action"]),
@@ -59,8 +75,14 @@ def main() -> int:
             refinement_round=int(update["refinement_round"]),
             pareto_front_rank=int(update["pareto_front_rank"]),
         )
-    split_count = sum(step.action.value == "split" for step in decomposition.steps)
-    merge_count = sum(step.action.value == "merge" for step in decomposition.steps)
+    split_count = sum(step["action"] == "split" for step in selected_steps)
+    merge_count = sum(step["action"] == "merge" for step in selected_steps)
+    promoted_high_id = build_report["promoted_high_id"]
+    known_target_high_ids = {path.path_id for path in refined_tower.high_paths}
+    if promoted_high_id not in known_target_high_ids:
+        raise ValueError("promoted High is absent from the refined Tower")
+    if downweight is not None and downweight.skill_id not in known_target_high_ids:
+        raise ValueError("downweighted High is absent from the refined Tower")
     payload = {
         "protocol_id": "webshop-train-refinement-v1",
         "source_tower_snapshot_id": tower.snapshot_id,
@@ -75,19 +97,27 @@ def main() -> int:
         "applied_atomic_action_counts": {
             "split": split_count,
             "merge": merge_count,
-            "promote": 0,
-            "downweight": len(updates),
+            "promote": 1,
+            "downweight": int(downweight is not None),
         },
-        "complex_repartition_policy": {
-            "candidate_count": len(lineage.complex_repartitions),
-            "applied": True,
-            "execution": "each significant local N-to-M component is factored into Merge then Split",
+        "selected_actions": {
+            "structural_transaction": {
+                "component_id": selected_component_id,
+                "atomic_steps": selected_steps,
+            },
+            "promote": {"skill_id": promoted_high_id},
+            "downweight": downweight.to_record() if downweight is not None else None,
+        },
+        "structural_selection": {
+            "report": options.structural_pareto.as_posix(),
+            "selected_component_id": selected_component_id,
             "weak_edges": "retained in the lineage audit but excluded from structural actions",
         },
-        "source_lifecycle_actions": {
-            "downweight": [downweight.to_record()] if downweight is not None else [],
+        "usage_selection": {
+            "report": options.usage_pareto.as_posix(),
+            "mid_usage_identifiable": usage_pareto["mid_usage_identifiable"],
         },
-        "downweight": [],
+        "downweight": [downweight.to_record()] if downweight is not None else [],
     }
     options.output.parent.mkdir(parents=True, exist_ok=True)
     options.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

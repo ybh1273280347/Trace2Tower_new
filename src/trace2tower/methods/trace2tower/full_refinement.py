@@ -320,15 +320,22 @@ def apply_mid_updates(
 
     if selection.split:
         source_id = selection.split.source_skill_id
+        source_historical_ids = set(old_by_id[source_id].member_segment_ids)
         final_members.pop(source_id)
         source_old_ids.pop(source_id)
         replacement_ids = []
         for candidate_id in dict(lineage.splits)[source_id]:
             cluster = candidate_by_id[candidate_id]
-            final_id = _structural_mid_id(
-                "split", (source_id,), cluster.member_segment_ids
+            local_members = tuple(
+                segment_id
+                for segment_id in cluster.member_segment_ids
+                if segment_id not in historical_ids
+                or segment_id in source_historical_ids
             )
-            final_members[final_id] = set(cluster.member_segment_ids)
+            final_id = _structural_mid_id(
+                "split", (source_id,), local_members
+            )
+            final_members[final_id] = set(local_members)
             source_old_ids[final_id] = (source_id,)
             candidate_to_final[candidate_id] = final_id
             replacement_ids.append(final_id)

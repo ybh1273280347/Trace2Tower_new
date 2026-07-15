@@ -22,6 +22,12 @@ EigenTrace graph selected 13 candidate Mid clusters, versus 9 in Tower v0.
 Chat tokens are recorded as a secondary diagnostic and are not part of the
 primary Pareto rank.
 
+All nine Mid skills were injected in all 300 Tower episodes. They therefore
+share one exposure set and the same usage vector: performance `0.71094`, paired
+gain `+0.02192`, and guarded step saving `-0.11862`. Usage Pareto cannot rank
+the Mid structural sources, so it is used for Downweight only. Structural
+actions are ranked independently from the rebuilt graph below.
+
 ## Interpretable structural decomposition
 
 Raw member overlap makes all 9 old Mid clusters and 13 candidates one connected
@@ -43,13 +49,25 @@ intermediate node, followed by Split into the candidate Mids.
 | 3 | `mid_0003` | `mid_0004, mid_0005, mid_0006, mid_0010` | Split |
 | 4 | `mid_0004, mid_0006, mid_0007` | `mid_0007, mid_0009, mid_0011` | Merge, then Split |
 
-This yields two Merge steps and three Split steps. The dominated V0 High bundle
-`high_f4ff56f0acaa` is downweighted in the source lifecycle and disappears when
-the High layer is re-mined, so V1 does not carry a dangling status penalty.
-Promote is not selected separately in this round: all High paths are re-mined
-under the unchanged original support and contrast rules.
+The three non-continuation components are compared against a no-op vector on
+outcome consistency gain, transition-role coherence gain, and EigenTrace
+spectral compactness gain. All quantities use the same shared historical core
+members before and after the proposed local transaction.
 
-## Materialized Tower V1
+| Component | Outcome gain | Transition-role gain | Spectral gain | Source coverage | Front |
+|---|---:|---:|---:|---:|---:|
+| 1 | +0.00668 | +0.00287 | +0.63617 | 78.6% | 2 |
+| **3** | **+0.02312** | **+0.00957** | **+0.70835** | **98.2%** | **1** |
+| 4 | +0.01592 | 0.00000 | +0.52037 | 86.0% | 2 |
+| No-op | 0 | 0 | 0 | - | 3 |
+
+Component 3 is selected: split `mid_0003` into candidate descendants
+`mid_0004`, `mid_0005`, `mid_0006`, and `mid_0010`. Weak historical leakage
+from other old Mids remains with its original owner; new feedback segments in
+the selected descendants join the split children. This produces a complete,
+non-overlapping partial update.
+
+## Pareto-refined Tower V1
 
 The final input contains 700 NoSkill and 300 prior-Tower feedback trajectories.
 The scalable renderer preserves complete cluster membership and aggregate
@@ -59,18 +77,23 @@ Mid, balanced across successful and unsuccessful trajectories when available.
 | Field | Value |
 |---|---:|
 | Source snapshot | `tower_9094918372ee0a39` |
-| Refined snapshot | `tower_2e4d04d23287f600` |
+| Refined snapshot | `tower_bb3ec5295dfe207d` |
 | Training trajectories | 1,000 |
-| Mid skills | 13 |
-| High skills | 18 |
+| Mid skills | 12 |
+| High skills | 6 |
 | Mid coverage | complete |
 | High coverage | complete |
 
-## Test-A deployment result
+The round applies one Split, promotes the highest-contrast new partial-Tower
+path `high_69655a587d87`, and downweights usage-Pareto Front-2 bundle
+`high_f4ff56f0acaa`. No Merge is applied in this round.
 
-The deployment experiment uses DeepSeek V4 Flash, cap 8, real repeat 0, and the
-same 100 Test-A tasks as the existing NoSkill and Tower V0 runs. The abandoned
-eight-episode downweight-only probe is not part of the formal result.
+## Full-repartition diagnostic
+
+Before structural Pareto was connected, the complete 9-to-13 candidate Tower
+was run on the same Test-A tasks. It was not selected by the final optimization
+rule and is retained only as evidence that applying every candidate change is
+harmful. The abandoned eight-episode downweight-only probe is also excluded.
 
 | Method | Mean reward | Full success | Steps | Invalid actions | Input tokens |
 |---|---:|---:|---:|---:|---:|
@@ -90,8 +113,6 @@ for every `(sample_id, repeat_id)` and retains all later rows in
 `test-a-flash.json`. This rule is independent of outcome. The resulting paired
 set contains exactly 100 unique task keys.
 
-The failure is informative for the recursive optimizer: decomposition makes an
-N-to-M proposal auditable, but a decomposition is not an acceptance rule. A
-future refinement round must rank local components on the optimization set and
-apply only Pareto-supported Merge/Split transactions. Test-A must not be used
-to select that subset.
+This diagnostic did not select the partial T1. The structural Pareto rule and
+partial snapshot were frozen from train-only graph evidence before evaluating
+the selected T1 on Test-A.
