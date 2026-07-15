@@ -45,7 +45,7 @@ not used to design this retriever.
 | 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
 | 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
-| 7 | No-Mixed with graph retrieval cap3 | Test the value of failure evidence under the final runtime | Pending profile build |
+| 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Running |
 
 ## Completed evidence retained
 
@@ -57,6 +57,10 @@ not used to design this retriever.
 - Existing NoSkill, Manual, native P100 SkillX, legacy Tower, scale, renderer,
   and seen-task runs remain historical or baseline evidence under their exact
   recorded runtime contracts.
+
+No-Mixed is compared with V0 Mixed rather than final T1. Both use the same P100
+rollout pool and frozen graph-cap3 retriever; comparing No-Mixed directly with
+T1 would also change the refinement feedback pool and Pareto lifecycle.
 
 ## First final-algorithm results
 
