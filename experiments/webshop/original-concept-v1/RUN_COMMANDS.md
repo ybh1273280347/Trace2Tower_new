@@ -102,7 +102,9 @@ foreach ($root in $runRoots) {
 ## Live Monitor
 
 ```powershell
-$root = "artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-r2"
+$runId = "webshop-original-concept-v1-test-a-flash-pareto-v1-cap8-r1"
+$root = "artifacts/runs/$runId"
+if (-not (Test-Path $root)) { throw "Run directory does not exist: $root" }
 while ($true) {
   $rows = @(Get-ChildItem $root -Recurse -Filter results.jsonl -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName } | Where-Object { $_ } | ForEach-Object { $_ | ConvertFrom-Json })
   $errors = @(Get-ChildItem $root -Recurse -Filter errors.jsonl -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName } | Where-Object { $_ })
