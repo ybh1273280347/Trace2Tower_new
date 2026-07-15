@@ -130,32 +130,56 @@ general algorithm:
 
 The common failures separate into search-stagnation failures and premature
 terminal-decision failures. Product constraints, option codes, prices, search
-pages, and `Buy Now` are WebShop interpretations of those failures. They must
-not be promoted into Trace2Tower core features.
+pages, and `Buy Now` are evidence available to the WebShop event extractor.
+They may justify refining the WebShop event taxonomy, but they must not become
+hard-coded fields in the graph, clustering, or skill-induction core.
 
 ## Generality boundary
 
-Trace2Tower is a general skill-induction method. Its required inputs remain:
+Trace2Tower is general because every supported domain follows the same
+algorithmic stages, not because every domain shares one event vocabulary.
+Event extraction is a required stage for all trajectory data, while each
+domain owns the event ontology and extraction rules appropriate to its state
+and action space.
 
-1. task or goal text;
-2. observations or states;
-3. actions;
-4. temporal order;
-5. trajectory outcome or reward.
+The intended pipeline is:
 
-The core graph may use only signals derivable uniformly from those inputs:
-semantic similarity, observed transition strength, outcome consistency,
-state-change or recurrence statistics, and normalized temporal position.
-Benchmark-specific concepts such as product options, prices, page types,
-household object classes, or named terminal actions are optional diagnostics
-or adapter views. The algorithm must still construct Low, Mid, and High skills
-when those labels are absent.
+1. convert raw interactions into step transitions;
+2. apply the domain event extractor;
+3. emit event-level segments through one shared segment contract;
+4. build the semantic, temporal, and outcome-conditioned EigenTrace graph;
+5. induce Low, Mid, and High skills;
+6. retrieve and execute the induced skills.
 
-Therefore the current WebShop failure analysis motivates a general research
-question - how to represent progress, stagnation, and risky terminal behavior
-from raw trajectories - but it does not justify a WebShop-specific constraint
-state machine in the core method. Any future change must be validated on both
-WebShop and ALFWorld before it becomes part of the final algorithm.
+| Component | Domain-specific responsibility | Shared responsibility |
+|---|---|---|
+| Event extractor | Define and recognize meaningful domain events | Produce ordered event segments |
+| Event segment | Carry a domain-local event type and grounded transitions | Expose boundaries, embeddings, actions, and outcome evidence |
+| EigenTrace graph | None of its equations depend on WebShop or ALFWorld names | Combine semantic, transition, and outcome relations |
+| Skill induction | Render domain-appropriate skill text | Cluster segments and induce supported paths |
+| Retrieval | Interpret the current domain state through its event extractor | Match the active event and follow the learned graph |
+
+For example, WebShop may extract query formulation, candidate selection,
+attribute inspection, option selection, and purchase decision. ALFWorld may
+extract object localization, acquisition, transformation, and placement. The
+event names and recognition logic differ, but both produce the same structural
+object: an ordered, outcome-labeled event segment grounded in raw transitions.
+
+The current code has not completed this boundary. WebShop has a deterministic
+event classifier and event-level segmentation. ALFWorld currently uses
+change-point segmentation without a domain event type, the shared segment
+model is typed as `WebShopEventType | None`, and graph-aware retrieval is
+implemented only for WebShop. These are implementation gaps in the general
+pipeline, not evidence that event extraction should be optional or replaced by
+domain-free latent segmentation.
+
+The WebShop failure analysis should therefore be used to assess whether the
+WebShop event ontology is expressive enough. Any new event concept must remain
+inside that extractor. A corresponding ALFWorld extractor must be developed
+under the same segment contract, and the graph and retrieval layers must
+consume domain-local event types without importing either domain's vocabulary.
+Cross-domain validation is required before this architecture is presented as
+fully implemented.
 
 ## Defensible current claim
 
