@@ -144,6 +144,8 @@ including the active High path node and its directed successor.
 & $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method semantic_clustering --artifact webshop=artifacts/trace2tower/original-concept-v1/p100/semantic-only/tower.json --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_semantic_clustering_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 2 --api-concurrency 2
 
 & $py -m scripts.experiments.analyze.analyze_final_mechanism_ablations --mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-v0-graph-cap3-r1 --no-mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1 --legacy-full-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --semantic-run artifacts/runs/webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1 --output experiments/webshop/original-concept-v1/final-mechanism-ablations.json
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 1 --repeat-id 2 --run-id webshop-original-concept-v1-test-a-flash-final-graph-cap8-repeat12 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_final_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 3 --api-concurrency 3
 ```
 
 ## Statistics

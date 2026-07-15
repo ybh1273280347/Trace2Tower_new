@@ -47,6 +47,7 @@ not used to design this retriever.
 | 6 | P100 Semantic-only vs P100 Full, legacy cap8 | Remove relational graph induction and High paths under the historical matched runtime | Complete |
 | 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Complete |
 | 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
+| 9 | T1 graph-cap8, Flash Test-A repeat1/2 | Compare graph and legacy cap8 without prioritizing token cost | Running |
 
 ## Completed evidence retained
 
@@ -58,6 +59,11 @@ not used to design this retriever.
 - Existing NoSkill, Manual, native P100 SkillX, legacy Tower, scale, renderer,
   and seen-task runs remain historical or baseline evidence under their exact
   recorded runtime contracts.
+
+Graph-cap8 uses the final T1 artifact and graph-aware retriever with only the
+total Mid budget changed from 3 to 8. Its repeat3 result is compared with the
+existing legacy-cap8 repeat3 result. Token cost is reported separately and does
+not determine the reward comparison.
 
 No-Mixed is compared with V0 Mixed rather than final T1. Both use the same P100
 rollout pool and frozen graph-cap3 retriever; comparing No-Mixed directly with
