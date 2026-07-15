@@ -91,9 +91,9 @@ comparison produces different skills.
 ## Graph-aware Test-A
 
 ```powershell
-& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_refinement_v1_graph_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap3-r2.log
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_final_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap3-r2.log
 
-& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap8-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_refinement_v1_graph_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap8-r2.log
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap8-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_final_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap8-r2.log
 ```
 
 The CLI option retains its historical name, but with `retrieval_strategy:
@@ -102,6 +102,16 @@ including the active High path node and its directed successor.
 
 ```powershell
 & $py -m scripts.experiments.analyze.analyze_graph_retrieval_test --noskill-run artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1 --v0-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --legacy-cap8-run artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap8-r1 --legacy-cap3-run artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap3-r1 --graph-cap3-run artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --graph-cap8-run artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap8-r2 --output experiments/webshop/original-concept-v1/refinement/graph-retrieval-test-a.json
+```
+
+## Final Algorithm Follow-ups
+
+```powershell
+& $py -m scripts.experiments.build.build_tower_graph_profile --tower $v0 --preprocessed artifacts/trace2tower/original-concept-v1/p100/mixed/preprocessed.jsonl --output artifacts/trace2tower/original-concept-v1/p100/full/graph-retrieval-profile.json
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$v0 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-v0-graph-cap3-r1 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_v0_graph_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 2 --api-concurrency 2
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=experiments/webshop/original-concept-v1/manifests/test-b.jsonl --repeat-id 0 --run-id webshop-original-concept-v1-test-b-flash-final-graph-cap3-r1 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_final_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 2 --api-concurrency 2
 ```
 
 ## Statistics

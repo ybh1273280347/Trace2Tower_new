@@ -182,17 +182,42 @@ def create_provider(
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
         graph = retrieval_strategy == "graph"
-        provider = Trace2TowerSkillProvider.from_path(
-            runtime,
-            artifact.path,
-            include_high=bool(method_config["include_high"]),
-            direct_mid_top_k=int(method_config["direct_mid_top_k"]),
-            high_similarity_threshold=float(
+        common_kwargs = {
+            "include_high": bool(method_config["include_high"]),
+            "high_similarity_threshold": float(
                 method_config["high_similarity_threshold"]
             ),
-            include_high_child_context=method_config[
-                "include_high_child_context"
-            ],
+            "lifecycle_report_path": (
+                Path(method_config["lifecycle_report"])
+                if method_config.get("lifecycle_report")
+                else None
+            ),
+            "status_tie_epsilon": float(
+                method_config.get("status_tie_epsilon", 0.0)
+            ),
+        }
+        if graph:
+            return Trace2TowerSkillProvider.from_path(
+                runtime,
+                artifact.path,
+                graph_profile_path=Path(method_config["graph_profile"]),
+                mid_context_budget=int(method_config["mid_context_budget"]),
+                min_event_compatibility=float(
+                    method_config["min_event_compatibility"]
+                ),
+                direct_mid_dedup_similarity_threshold=float(
+                    method_config["direct_mid_dedup_similarity_threshold"]
+                ),
+                direct_mid_mmr_lambda=float(method_config["direct_mid_mmr_lambda"]),
+                **common_kwargs,
+            )
+        return Trace2TowerSkillProvider.from_path(
+            runtime,
+            artifact.path,
+            direct_mid_top_k=int(method_config["direct_mid_top_k"]),
+            include_high_child_context=bool(
+                method_config["include_high_child_context"]
+            ),
             direct_mid_candidate_top_k=(
                 int(method_config["direct_mid_candidate_top_k"])
                 if diverse
@@ -210,25 +235,8 @@ def create_provider(
             direct_mid_mmr_lambda=float(
                 method_config.get("direct_mid_mmr_lambda", 0.75)
             ),
-            lifecycle_report_path=(
-                Path(method_config["lifecycle_report"])
-                if method_config.get("lifecycle_report")
-                else None
-            ),
-            graph_profile_path=(
-                Path(method_config["graph_profile"]) if graph else None
-            ),
-            mid_context_budget=(
-                int(method_config["mid_context_budget"]) if graph else None
-            ),
-            min_event_compatibility=float(
-                method_config.get("min_event_compatibility", 0.1)
-            ),
-            status_tie_epsilon=float(
-                method_config.get("status_tie_epsilon", 0.0)
-            ),
+            **common_kwargs,
         )
-        return provider
     raise ValueError(f"unsupported provider method: {artifact.method}")
 
 

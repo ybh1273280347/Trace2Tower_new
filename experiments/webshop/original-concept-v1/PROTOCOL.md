@@ -4,6 +4,15 @@
 
 `Trace2Tower原始资料.md` is the sole algorithm authority. Later implementation notes and the deprecated event-stratified variant do not define Trace2Tower.
 
+## Final deployment freeze
+
+`FINAL_EXPERIMENTS.md` defines the final post-hoc deployment configuration and
+the remaining execution matrix. It supersedes the legacy cap8 retrieval policy
+below wherever the two conflict. The final method is P100 Pareto T1 with native
+rendering, per-step graph-aware retrieval, and a total Mid context budget of 3.
+Earlier cap8 Full runs remain historical evidence under their recorded legacy
+runtime; they are not relabeled as final-algorithm results.
+
 ## Full mechanism
 
 1. Convert each trajectory into event segments.
@@ -16,7 +25,10 @@
 8. Lift the shared graph into success and failure mass: `W+_uv = B_uv * sqrt(rho_u rho_v)` and `W-_uv = B_uv * sqrt((1-rho_u)(1-rho_v))`.
 9. Compute `W_CE = W+ - W-`, its signed normalized Laplacian, the EigenTrace representation, and K-means Mid clusters.
 10. Map trajectories to Mid sequences and mine contrastive contiguous paths as High skills.
-11. At deployment, retrieve from `(goal, current observation)` at every agent step. High Top-1 and its child Mid skills are injected with direct Mid retrieval.
+11. At final deployment, retrieve from `(goal, current observation)` at every
+    agent step. Graph-aware ranking selects a High path, its active Mid, and at
+    most one directed successor. Event compatibility filters mixed-event tails,
+    and a total Mid budget of 3 includes both path children and direct Mids.
 
 `semantic_clustering` is the graph-structure ablation: it uses the same segments and compact embeddings but skips `S/T/O`, contrastive graph construction, spectral decomposition, and High induction, then directly applies K-means.
 

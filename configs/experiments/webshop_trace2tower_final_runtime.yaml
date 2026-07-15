@@ -2,8 +2,6 @@ method: trace2tower
 retrieval_strategy: graph
 include_high: true
 high_similarity_threshold: -1.0
-direct_mid_top_k: 8
-include_high_child_context: false
 mid_context_budget: 3
 min_event_compatibility: 0.1
 direct_mid_dedup_similarity_threshold: 0.92
