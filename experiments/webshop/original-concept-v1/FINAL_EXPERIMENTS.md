@@ -41,7 +41,7 @@ not used to design this retriever.
 |---:|---|---|---|
 | 1 | V0 graph-cap3 vs T1 graph-cap3, Flash Test-A repeat0 | Isolate Pareto refinement from retrieval | Complete |
 | 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Complete |
-| 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Running |
+| 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Complete |
 | 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
 | 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
@@ -89,3 +89,20 @@ NoSkill by `+0.07392`, paired 95% interval `[+0.02108, +0.12883]`, which is
 significant. Its deltas over P100 SkillX and legacy Tower are respectively
 `+0.01933`, interval `[-0.03717, +0.07517]`, and `+0.03658`, interval
 `[-0.02217, +0.09658]`.
+
+## Flash repeat3 result
+
+| Method | Repeat3 reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68492 | 50.33% | 7.89 | 0.38 | 20,610 |
+| Manual | 0.69158 | 50.67% | **6.53** | **0.06** | **19,259** |
+| P100 SkillX | 0.70627 | 49.33% | 7.04 | 0.31 | 25,009 |
+| **Final T1 graph cap3** | **0.71119** | **53.67%** | 6.83 | 0.16 | 20,461 |
+
+Final T1 minus NoSkill is `+0.02628`, paired task-bootstrap interval
+`[-0.02936, +0.08356]`. Final T1 minus SkillX is `+0.00493`, interval
+`[-0.03094, +0.04072]`, with a `+4.33` point full-success difference, interval
+`[-0.67, +9.67]` points. Reward superiority is directional rather than
+significant, but final T1 retains the highest repeat3 reward and full-success
+rate while using 18.2% fewer input tokens than SkillX. Complete results are in
+`final-flash-repeat3.json`.
