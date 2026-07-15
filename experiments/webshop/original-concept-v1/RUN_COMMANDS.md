@@ -146,6 +146,8 @@ including the active High path node and its directed successor.
 & $py -m scripts.experiments.analyze.analyze_final_mechanism_ablations --mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-v0-graph-cap3-r1 --no-mixed-graph-run artifacts/runs/webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1 --legacy-full-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --semantic-run artifacts/runs/webshop-original-concept-v1-test-a-flash-p100-semantic-cap8-r1 --output experiments/webshop/original-concept-v1/final-mechanism-ablations.json
 
 & $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 1 --repeat-id 2 --run-id webshop-original-concept-v1-test-a-flash-final-graph-cap8-repeat12 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_final_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 3 --api-concurrency 3
+
+& $py -m scripts.experiments.analyze.analyze_failure_overlap --final-run artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --skillx-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-skillx-r1 --legacy-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --noskill-run artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1 --output-json experiments/webshop/original-concept-v1/failure-overlap.json --output-md experiments/webshop/original-concept-v1/FAILURE_OVERLAP.md
 ```
 
 ## Statistics

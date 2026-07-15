@@ -59,6 +59,8 @@ not used to design this retriever.
 - Existing NoSkill, Manual, native P100 SkillX, legacy Tower, scale, renderer,
   and seen-task runs remain historical or baseline evidence under their exact
   recorded runtime contracts.
+- Final Tower and SkillX failure overlap is audited separately: zero-reward
+  Jaccard 0.750, non-full Jaccard 0.830, reward correlation 0.878.
 
 Graph-cap8 uses the final T1 artifact and graph-aware retriever with only the
 total Mid budget changed from 3 to 8. Its repeat3 result is compared with the

@@ -65,6 +65,25 @@ tokens because it injects fewer, more state-appropriate skills and often
 finishes in fewer steps. This directly addresses the main weakness of the
 legacy Tower deployment while preserving its competitive reward evidence.
 
+## Failure overlap supports a shared difficulty regime
+
+Final Tower and P100 SkillX largely fail on the same Test-A tasks. Their seven
+zero-reward sets share six tasks: Jaccard `0.750`, covering 85.7% of each
+method's hard failures. Their non-full sets share 44 tasks: Jaccard `0.830`,
+covering 95.7% of Final Tower's non-full tasks. Per-task reward correlation is
+`0.878`.
+
+Four of the six shared zero-reward tasks make both methods consume all 20
+steps. The common set contains obscure products with multiple exact
+constraints, such as model/color combinations, unusual dimensions, and
+low-price requirements. Each method has only one unique zero-reward task.
+
+This high overlap indicates a shared environment-difficulty regime rather than
+method-specific catastrophic behavior. Final Tower converts seven SkillX
+non-full tasks to full success, while SkillX converts two Final non-full tasks.
+The detailed task list and terminal actions are recorded in
+`FAILURE_OVERLAP.md` and `failure-overlap.json`.
+
 ## Defensible conclusion
 
 The defensible paper claim is:
