@@ -43,7 +43,7 @@ not used to design this retriever.
 | 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Complete |
 | 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Complete |
 | 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
-| 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
+| 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Complete |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
 | 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Running |
 | 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
@@ -124,3 +124,21 @@ Final T1 minus NoSkill is `+0.02628`, paired task-bootstrap interval
 significant, but final T1 retains the highest repeat3 reward and full-success
 rate while using 18.2% fewer input tokens than SkillX. Complete results are in
 `final-flash-repeat3.json`.
+
+## Pro repeat3 result
+
+| Method | Repeat3 reward | Full success | Steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.59217 | 42.67% | 9.23 | 0.88 | 25,672 |
+| Manual | 0.69194 | 51.00% | **6.59** | **0.04** | **18,700** |
+| P100 SkillX | 0.67453 | 48.33% | 7.68 | 0.19 | 28,444 |
+| **Final T1 graph cap3** | **0.69919** | **51.33%** | 7.56 | 0.38 | 25,376 |
+
+Final T1 minus NoSkill is `+0.10703`, paired task-bootstrap interval
+`[+0.06255, +0.15334]`; its `+8.67` point full-success difference has interval
+`[+3.33, +14.33]`. Both exclude zero. Final T1 minus SkillX is `+0.02467`,
+interval `[-0.01806, +0.07022]`, while using 10.8% fewer input tokens. Final
+T1 minus Manual is `+0.00725`, interval `[-0.03514, +0.05081]`. The final
+Tower has the highest Pro repeat3 reward point estimate; only its advantage over
+NoSkill is statistically established. Complete results are in
+`final-pro-repeat3.json`.
