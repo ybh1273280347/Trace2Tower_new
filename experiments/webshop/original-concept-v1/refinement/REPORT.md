@@ -116,3 +116,33 @@ set contains exactly 100 unique task keys.
 This diagnostic did not select the partial T1. The structural Pareto rule and
 partial snapshot were frozen from train-only graph evidence before evaluating
 the selected T1 on Test-A.
+
+## Pareto T1 Test-A Result
+
+The selected partial T1 completed all 100 Test-A keys with zero duplicate keys.
+
+| Tower | Mean reward | Full success | Mean steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| V0 | **0.72092** | **56%** | **7.17** | 0.19 | 32,360 |
+| Pareto T1 | 0.67983 | 52% | 7.66 | 0.25 | 35,273 |
+
+The selected graph Split plus Promote and High Downweight did not improve
+deployment reward. The offline structural gains are therefore diagnostic
+evidence for proposal quality, not evidence that the action should be deployed
+without an outcome gate.
+
+The rendered C3 children are behaviorally distinct rather than simple copies of
+the old `mid_0003` card. The old card was a generic detail-tab inspection;
+the new cards specialize in Features inspection/backtracking, Attributes
+inspection, Description verification, and a bounded generic detail check. The
+promoted High `high_69655a587d87` composes Description verification followed by
+Features verification.
+
+## High Path Length Authority
+
+The authoritative original material specifies retrieving Top-1 High, but does
+not prescribe a maximum High path length of 4. The `max_high_path_length: 4`
+value comes from the current project configuration and validation contract, not
+from `Trace2Tower原始资料.md`. It must therefore be treated as an experiment
+configuration choice, not an algorithmic rule from the original concept.
