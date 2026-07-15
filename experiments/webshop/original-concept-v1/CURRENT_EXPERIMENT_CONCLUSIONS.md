@@ -130,56 +130,45 @@ general algorithm:
 
 The common failures separate into search-stagnation failures and premature
 terminal-decision failures. Product constraints, option codes, prices, search
-pages, and `Buy Now` are evidence available to the WebShop event extractor.
-They may justify refining the WebShop event taxonomy, but they must not become
-hard-coded fields in the graph, clustering, or skill-induction core.
+pages, and `Buy Now` are WebShop-level interpretations used only to explain
+the observed results. This diagnostic does not establish a missing event type
+or motivate a change to the Trace2Tower core algorithm.
 
 ## Generality boundary
 
-Trace2Tower is general because every supported domain follows the same
-algorithmic stages, not because every domain shares one event vocabulary.
-Event extraction is a required stage for all trajectory data, while each
-domain owns the event ontology and extraction rules appropriate to its state
-and action space.
+Trace2Tower assumes that trajectories have already been converted into
+domain-meaningful event segments. Event extraction is necessarily
+domain-specific: WebShop and ALFWorld use different event definitions and may
+use different extraction procedures. The method does not require, propose, or
+claim a universal event extraction algorithm.
 
-The intended pipeline is:
+The general Trace2Tower contribution begins after event extraction:
 
-1. convert raw interactions into step transitions;
-2. apply the domain event extractor;
-3. emit event-level segments through one shared segment contract;
-4. build the semantic, temporal, and outcome-conditioned EigenTrace graph;
-5. induce Low, Mid, and High skills;
-6. retrieve and execute the induced skills.
+\[
+\mathcal{D}_{seg}
+\rightarrow G_{ET}
+\rightarrow Z_{ET}
+\rightarrow \mathcal{T}
+\]
 
-| Component | Domain-specific responsibility | Shared responsibility |
-|---|---|---|
-| Event extractor | Define and recognize meaningful domain events | Produce ordered event segments |
-| Event segment | Carry a domain-local event type and grounded transitions | Expose boundaries, embeddings, actions, and outcome evidence |
-| EigenTrace graph | None of its equations depend on WebShop or ALFWorld names | Combine semantic, transition, and outcome relations |
-| Skill induction | Render domain-appropriate skill text | Cluster segments and induce supported paths |
-| Retrieval | Interpret the current domain state through its event extractor | Match the active event and follow the learned graph |
+Given extracted events, the same downstream principles apply across domains:
 
-For example, WebShop may extract query formulation, candidate selection,
-attribute inspection, option selection, and purchase decision. ALFWorld may
-extract object localization, acquisition, transformation, and placement. The
-event names and recognition logic differ, but both produce the same structural
-object: an ordered, outcome-labeled event segment grounded in raw transitions.
+1. represent event segments semantically;
+2. connect them using observed temporal transitions;
+3. encode success and failure consistency;
+4. perform contrastive spectral decomposition;
+5. induce Low, Mid, and High skills from the resulting structure.
 
-The current code has not completed this boundary. WebShop has a deterministic
-event classifier and event-level segmentation. ALFWorld currently uses
-change-point segmentation without a domain event type, the shared segment
-model is typed as `WebShopEventType | None`, and graph-aware retrieval is
-implemented only for WebShop. These are implementation gaps in the general
-pipeline, not evidence that event extraction should be optional or replaced by
-domain-free latent segmentation.
+Generality therefore means that any domain with a suitable event extractor can
+use the same event-to-graph-to-Tower procedure. It does not mean that event
+names, event boundaries, or extraction rules must be shared across domains.
 
-The WebShop failure analysis should therefore be used to assess whether the
-WebShop event ontology is expressive enough. Any new event concept must remain
-inside that extractor. A corresponding ALFWorld extractor must be developed
-under the same segment contract, and the graph and retrieval layers must
-consume domain-local event types without importing either domain's vocabulary.
-Cross-domain validation is required before this architecture is presented as
-fully implemented.
+The current WebShop failure analysis is a diagnostic of the evaluated agent
+and task set. It does not by itself identify a missing component in the
+general algorithm. Any future algorithmic improvement motivated by these
+failures must operate on the already extracted events, their graph relations,
+or their outcome evidence, rather than redefining domain event extraction as a
+new research problem.
 
 ## Defensible current claim
 
