@@ -126,6 +126,8 @@ including the active High path node and its directed successor.
 & $py -m scripts.experiments.build.build_tower_graph_profile --tower artifacts/trace2tower/original-concept-v1/p100/no-mixed/tower.json --preprocessed artifacts/trace2tower/original-concept-v1/p100/no-mixed/preprocessed.jsonl --output artifacts/trace2tower/original-concept-v1/p100/no-mixed/graph-retrieval-profile.json
 
 & $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower_no_mixed --artifact webshop=artifacts/trace2tower/original-concept-v1/p100/no-mixed/tower.json --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-no-mixed-graph-cap3-r1 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_no_mixed_graph_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 2 --api-concurrency 2
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method no_skill --manifest webshop=experiments/webshop/original-concept-v1/manifests/test-b.jsonl --repeat-id 1 --run-id webshop-original-concept-v1-test-b-flash-noskill-repeat1 --agent-model deepseek-v4-flash --episode-concurrency 1 --api-concurrency 1
 ```
 
 ## Statistics

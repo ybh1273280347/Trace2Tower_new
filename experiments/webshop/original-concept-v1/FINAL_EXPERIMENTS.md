@@ -1,4 +1,4 @@
-# Final Algorithm and Experiment Matrix
+#  Final Algorithm and Experiment Matrix
 
 ## Frozen final algorithm
 
@@ -46,6 +46,7 @@ not used to design this retriever.
 | 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
 | 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Running |
+| 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Running |
 
 ## Completed evidence retained
 
@@ -61,6 +62,11 @@ not used to design this retriever.
 No-Mixed is compared with V0 Mixed rather than final T1. Both use the same P100
 rollout pool and frozen graph-cap3 retriever; comparing No-Mixed directly with
 T1 would also change the refinement feedback pool and Pareto lifecycle.
+
+Test-B NoSkill repeat1 is a variance diagnostic triggered by the unusually high
+repeat0 point estimate. It cannot replace repeat0. The report must show both
+repeats and their two-repeat task mean regardless of direction; selecting only
+the lower repeat would invalidate the robustness comparison.
 
 ## First final-algorithm results
 

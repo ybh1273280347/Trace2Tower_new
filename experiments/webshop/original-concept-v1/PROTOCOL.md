@@ -80,3 +80,9 @@ Test-B is frozen before any Test-B rollout with seed `20260720`. It samples 100 
 Test-B uses `deepseek-v4-flash`, cap 8, and one real execution per task. The required methods are NoSkill, the P100 native SkillX artifact, and P100 Full Trace2Tower. Manual remains an optional baseline and is not required for this robustness matrix. Test-B measures cross-split heterogeneity; it does not replace Test-A. Every required Test-B result must be reported regardless of direction, and no candidate split may be retained or discarded based on reward.
 
 Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.
+
+The unusually high Test-B NoSkill repeat0 result is followed by one registered
+NoSkill repeat1 variance diagnostic. Repeat1 does not replace repeat0. Both
+per-repeat results and the two-repeat task mean must be reported regardless of
+direction. Final Tower and SkillX remain single-repeat Test-B conditions unless
+an explicitly registered extension evaluates all compared methods again.
