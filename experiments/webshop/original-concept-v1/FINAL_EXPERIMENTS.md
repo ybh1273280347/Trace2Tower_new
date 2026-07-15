@@ -47,7 +47,7 @@ not used to design this retriever.
 | 6 | P100 Semantic-only vs P100 Full, legacy cap8 | Remove relational graph induction and High paths under the historical matched runtime | Complete |
 | 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Complete |
 | 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
-| 9 | T1 graph-cap8, Flash Test-A repeat1/2 | Compare graph and legacy cap8 without prioritizing token cost | Running |
+| 9 | T1 graph-cap8, Flash Test-A repeat1/2 | Compare graph and legacy cap8 without prioritizing token cost | Complete |
 
 ## Completed evidence retained
 
