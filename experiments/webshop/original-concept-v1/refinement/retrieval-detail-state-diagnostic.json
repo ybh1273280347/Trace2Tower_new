@@ -1,0 +1,2308 @@
+{
+  "records": [
+    {
+      "run": "v0-cap8",
+      "sample_id": "webshop:721",
+      "task_goal": "i'm looking for strawberry lemonade that is free of caffeine and sugar, and price lower than 40.00 dollars",
+      "primary_score": 0.75,
+      "trajectory_skill_ids": [
+        "high_f4ff56f0acaa",
+        "mid_0004",
+        "mid_0002",
+        "mid_0007",
+        "mid_0000",
+        "mid_0008",
+        "mid_0005",
+        "mid_0001",
+        "mid_0003",
+        "mid_0006"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4587794181775009,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5361622278615976
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.5257092615003697
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5205161391914279
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.48622548268941845
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4846874554792331
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4528181413628952
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.4322966857322636
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.41702515844776705
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338201884791191
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279125283593708
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276411500991682
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213687607463778
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713452792610934
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617628496026206
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5958227131427302
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5269145439997486
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_0005",
+            "mid_0001",
+            "mid_0003",
+            "mid_0006"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4587794181775009,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.35098559519696626
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3402640348724259
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.33252435937303776
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.31237697873790077
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.30747296282590897
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.29415088094661573
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.294033652817277
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2800766379328626
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4046717602430695
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.404319494482094
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4036574697996148
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.38932419510273664
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.380383598209194
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.37999895753197593
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3699391785091218
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.363666360250768
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_0005",
+            "mid_0003",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4587794181775009,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4143170981434412
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40709635343045975
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037785832005949
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.37731322542108525
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37291929512096345
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3717922020388829
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.36934100457536906
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3481028689061653
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.49499083486224194
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.49122111639220206
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49059445745838814
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.48918894755093256
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4749790101506057
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597271888838386
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.44682747328637223
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4444414407106891
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0003",
+            "mid_0005",
+            "mid_0008",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 3,
+          "observation": "Description:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.45872659910845387,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4853446698778902
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.48444449474309775
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.48407711433075573
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.45849617918935953
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4439298865675849
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.44353579432747525
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.42256785243039874
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.41883680206788326
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5459039169312376
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5004210768554912
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4986302263226812
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4915266352916474
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4751341190730524
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.46706682522935883
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4476384473728951
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.444071622645227
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0005",
+            "mid_0008",
+            "mid_0003",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 4,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.45872659910845387,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.41431566088979904
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4070945692122103
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40377604972787307
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3772977633620185
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37291130731571825
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.37179488503775987
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.36933891917267414
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.34810162744873224
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4949758143251853
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.4912079938000267
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49057863339338365
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4891734240154741
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.47495865674039256
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.45971341668753307
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4468131298351967
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.44442669268233614
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0003",
+            "mid_0005",
+            "mid_0008",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 5,
+          "observation": "Attributes:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.45872659910845387,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4475561403295267
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.44696646905231724
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4449597945933967
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.408447621158617
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40820294198167906
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.4044700823736623
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.39527261561884625
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.37643837479090086
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.469795997615583
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.45775675334753335
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.44460163178784473
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.43607443661428746
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4334608214081801
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4222293174000433
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.400560321718715
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.39501845147798215
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0005",
+            "mid_0008",
+            "mid_0003",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 6,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.45872659910845387,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.41431566088979904
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4070945692122103
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40377604972787307
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3772977633620185
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37291130731571825
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.37179488503775987
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.36933891917267414
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.34810162744873224
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4949758143251853
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.4912079938000267
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49057863339338365
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4891734240154741
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.47495865674039256
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.45971341668753307
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4468131298351967
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.44442669268233614
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0007",
+            "mid_0000",
+            "mid_0003",
+            "mid_0005",
+            "mid_0008",
+            "mid_0006",
+            "mid_0001"
+          ],
+          "context_skill_count": 10
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap8",
+      "sample_id": "webshop:721",
+      "task_goal": "i'm looking for strawberry lemonade that is free of caffeine and sugar, and price lower than 40.00 dollars",
+      "primary_score": 0.75,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0004",
+        "mid_0007",
+        "mid_0000",
+        "mid_0008",
+        "mid_6fd1c9c5ff45",
+        "mid_8c09e379d380"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.45734726472575893,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5361867605566015
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.5257582703895721
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5205863293610904
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4862506875048748
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.48473278859342456
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.452866060167939
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4170888267996
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3835945592480335
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338720647572899
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279041836986553
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276351159703526
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.721385571780423
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713246916094927
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.661814308939613
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579916618178827
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359791277628534
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5541549548675664,
+              "goal_score": 0.45734726472575893,
+              "state_score": 0.661814308939613,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.35106529383681917
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.340363135812557
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.332631524655546
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3124552077507871
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3075628442895812
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.2941141241323594
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2801652071196032
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.25376963616981
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4047126100920563
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4043751129682517
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4037063016204786
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.38933685656762396
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.38001177597047975
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3699608180466543
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.36368729949657974
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.32014114354655765
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.4334008760571985,
+              "goal_score": 0.4587461958823342,
+              "state_score": 0.4047126100920563,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.414288392931162
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40708241475692053
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037586623454654
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37285579133502134
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3717479826959171
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.369299847858133
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.34804865004509267
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3199308485974047
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4950182819166553
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49062126707192577
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4892087660897311
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4749476029528951
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597152941064196
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4468063163422426
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.44442962156247673
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.4129138994762822
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.495797628120314,
+              "goal_score": 0.4573001305594877,
+              "state_score": 0.4597152941064196,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_6fd1c9c5ff45"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 3,
+          "observation": "Description:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.48532053676542164
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.48443235111152816
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.48407292562779447
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4584516243178789
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.44389070560132954
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.42254760029019334
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4187981965561356
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3710144432858064
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_9946c03e5b7f",
+              "name": "Open the product description to verify details",
+              "score": 0.5432774208458638
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5003881565219607
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.49866789190048394
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4915605162491716
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4751641840316537
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.47256830252870274
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.46704992784259625
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.4492057479054755
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_69655a587d87",
+              "name": "Check description, then features, for requirement evidence",
+              "graph_score": 0.46971438402121357,
+              "goal_score": 0.37273125456212874,
+              "state_score": 0.47256830252870274,
+              "event_compatibility": 0.6980609418282548,
+              "path_quality": 0.3424735067377163
+            },
+            "mid_ids": [
+              "mid_6fd1c9c5ff45",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Inspect features and return to the product page",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_6fd1c9c5ff45"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 4,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.414288392931162
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40708241475692053
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037586623454654
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37285579133502134
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3717479826959171
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.369299847858133
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.34804865004509267
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3199308485974047
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4950182819166553
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49062126707192577
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4892087660897311
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4749476029528951
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597152941064196
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4468063163422426
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.44442962156247673
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.4129138994762822
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.495797628120314,
+              "goal_score": 0.4573001305594877,
+              "state_score": 0.4597152941064196,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_6fd1c9c5ff45"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 5,
+          "observation": "Attributes:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4475886172483683
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.44702963438509274
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.44500947382020123
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.40847349034213426
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40822812535638614
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3952838640276377
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3764619077297935
+            },
+            {
+              "skill_id": "mid_8c09e379d380",
+              "name": "Inspect product attributes",
+              "score": 0.3365106545803573
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.45779589020750977
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.44463531345719187
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4360586571911864
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.43350004097556505
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.42221211789000246
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40054946136306296
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.39501657676557606
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3871932639198233
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_69655a587d87",
+              "name": "Check description, then features, for requirement evidence",
+              "graph_score": 0.43983312050810586,
+              "goal_score": 0.37273125456212874,
+              "state_score": 0.3871932639198233,
+              "event_compatibility": 0.6980609418282548,
+              "path_quality": 0.3424735067377163
+            },
+            "mid_ids": [
+              "mid_6fd1c9c5ff45",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Inspect features and return to the product page",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_8c09e379d380"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 6,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573001305594877,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.414288392931162
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40708241475692053
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037586623454654
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.37285579133502134
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3717479826959171
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.369299847858133
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.34804865004509267
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3199308485974047
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4950182819166553
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49062126707192577
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4892087660897311
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4749476029528951
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597152941064196
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4468063163422426
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.44442962156247673
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.4129138994762822
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.495797628120314,
+              "goal_score": 0.4573001305594877,
+              "state_score": 0.4597152941064196,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000",
+            "mid_0008",
+            "mid_6fd1c9c5ff45"
+          ],
+          "context_skill_count": 10
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap3",
+      "sample_id": "webshop:721",
+      "task_goal": "i'm looking for strawberry lemonade that is free of caffeine and sugar, and price lower than 40.00 dollars",
+      "primary_score": 0.75,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0004",
+        "mid_0007",
+        "mid_0000"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4573122019477888,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5361198662445193
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.5256901011891704
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5205175606742366
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338812228979367
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279200258885297
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276498475288233
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7214015575127992
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713388110828981
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6618192937226233
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579947302108192
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359778334365782
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5541444275693305,
+              "goal_score": 0.4573122019477888,
+              "state_score": 0.6618192937226233,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.45729363116626226,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.35109856977800785
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.34040187021342455
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3326683852538799
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4047299904837033
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40439297542647246
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40372388663352565
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3893588769567118
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3800295901909644
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.36997626306213227
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3637102423869516
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.32016160261514487
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.4334043305498302,
+              "goal_score": 0.45873868546963475,
+              "state_score": 0.4047299904837033,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.45729363116626226,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4142790372043838
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40706996490916225
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037496045216808
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4950238048834901
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49062710756220274
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4892164748584415
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.474958406721522
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597308146861859
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.44681332344939484
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4444411495059479
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.41292097257735
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.4958007855356033,
+              "goal_score": 0.45729363116626226,
+              "state_score": 0.4597308146861859,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 3,
+          "observation": "Description:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.45729363116626226,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.48530524673750713
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4844178193593552
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.48406256772805273
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_9946c03e5b7f",
+              "name": "Open the product description to verify details",
+              "score": 0.5432708115623202
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5003997305206658
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.49868222732773576
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4915800866458229
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.47517964645761046
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.472576481717351
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.46706782249591033
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.4492156223579863
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_69655a587d87",
+              "name": "Check description, then features, for requirement evidence",
+              "graph_score": 0.46971449954058586,
+              "goal_score": 0.37272340542882987,
+              "state_score": 0.472576481717351,
+              "event_compatibility": 0.6980609418282548,
+              "path_quality": 0.3424735067377163
+            },
+            "mid_ids": [
+              "mid_6fd1c9c5ff45",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Inspect features and return to the product page",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 4,
+          "observation": "Product: 310 Lemonade Kiwi Strawberry - Slimming Lemonade Helps Restore PH Balance to Your Body SUGAR-FREE and CAFFEINE-",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.45729363116626226,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4142790372043838
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.40706996490916225
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4037496045216808
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4950238048834901
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.49062710756220274
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4892164748584415
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.474958406721522
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4597308146861859
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.44681332344939484
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4444411495059479
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.41292097257735
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.4958007855356033,
+              "goal_score": 0.45729363116626226,
+              "state_score": 0.4597308146861859,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0007",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        }
+      ]
+    }
+  ]
+}

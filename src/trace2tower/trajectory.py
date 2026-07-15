@@ -26,6 +26,8 @@ class StepRecord:
     valid_action: bool
     admissible_actions: tuple[str, ...]
     clickable_types: dict[str, ClickableKind]
+    retrieved_skill_ids: tuple[str, ...] = ()
+    retrieved_context_skill_ids: tuple[str, ...] = ()
 
     @classmethod
     def from_record(cls, record: dict[str, Any]) -> StepRecord:
@@ -43,6 +45,10 @@ class StepRecord:
                 value: ClickableKind(kind)
                 for value, kind in record["clickable_types"].items()
             },
+            retrieved_skill_ids=tuple(record.get("retrieved_skill_ids", ())),
+            retrieved_context_skill_ids=tuple(
+                record.get("retrieved_context_skill_ids", ())
+            ),
         )
 
 

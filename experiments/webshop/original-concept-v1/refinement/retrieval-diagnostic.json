@@ -1,0 +1,3682 @@
+{
+  "records": [
+    {
+      "run": "v0-cap8",
+      "sample_id": "webshop:170",
+      "task_goal": "could you get me listerine toothpaste that takes care of bad breath?, and price lower than 130.00 dollars",
+      "primary_score": 1.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0007",
+        "mid_0004",
+        "mid_0000",
+        "mid_0008",
+        "mid_0003"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4828628007713114,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.6219836086190899
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.6158473226025247
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5939643188389552
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5629184792889705
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5575379479644877
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5424990518305349
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.5211572448467199
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5021810867268686
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338206615442278
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279050003103296
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276391615963823
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213683056589318
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713370552781128
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617580703193383
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5958356081457253
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5269318918263871
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0008",
+            "mid_0003"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4828504313547821,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4317471958577346
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.42356488834047856
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4040065967540633
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3948303578039989
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.38052319344989377
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3797313211407539
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.35800915058637006
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3517061696430601
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.45002712408502765
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.43484601518644533
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.42923827926266306
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.42871002120460827
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4112447366188329
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.40766764851023574
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4045598072912838
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3791128357823116
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0008",
+            "mid_0003"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Listerine Essential Care Original Gel Fluoride Toothpaste, Prevents Bad Breath and Cavities, Powerful Mint Flav",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4828504313547821,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3696948884621976
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.357779766938701
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3409912142631155
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3394546077116454
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3299750845302453
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3178585091856519
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3167861406183342
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2912721630744972
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.34570411917728455
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.33998413206659983
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.33819906115647946
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3328277321683017
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3271911842686888
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3137343686222108
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3134819767562079
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2871042286920791
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0003",
+            "mid_0008"
+          ],
+          "context_skill_count": 10
+        }
+      ]
+    },
+    {
+      "run": "v0-cap8",
+      "sample_id": "webshop:873",
+      "task_goal": "i would like some chocolates that are individually wrapped that say congratulations, and price lower than 40.00 dollars",
+      "primary_score": 0.03333333333333333,
+      "trajectory_skill_ids": [
+        "high_f4ff56f0acaa",
+        "mid_0004",
+        "mid_0002",
+        "mid_0000",
+        "mid_0007",
+        "mid_0008",
+        "mid_0005",
+        "mid_0003",
+        "mid_0001",
+        "mid_0006"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4099753508843572,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.6433755893857277
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.6356593997026863
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.6250521904011349
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5906068151170347
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5646638149907637
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5467116727920949
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.5399524989534121
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5294611733798456
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338300351024547
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279142019664313
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.727644528774007
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.72137551745263
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713486704901825
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617636377186533
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.595847728457095
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.526935782016639
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0005",
+            "mid_0003",
+            "mid_0001",
+            "mid_0006"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4099753508843572,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3460934967655795
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3288709057151746
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3266157091885221
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3109220601103607
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.30585938523500655
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.29626824996645906
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.2770164730999847
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.27657135981539005
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.40772462799904896
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4022348400408713
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40159859258142255
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.38428180789937877
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3797973803636654
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.37194281995614015
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3608611290134316
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3403486651435211
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0006",
+            "mid_0003",
+            "mid_0005"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Congratulations Cookie Talk Chocolate Covered Oreo Trio",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4099753508843572,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.33444779474982866
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.31737848126420476
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3152572093757877
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.311674667931734
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3018824780471827
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.2846477151789035
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.27621757187782137
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.25567405675953203
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3495105654619343
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3425352514680238
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.33370756306132154
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3278966918727088
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3183123620383338
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.309227373532912
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.30160326228520307
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.28180052153030105
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0006",
+            "mid_0008",
+            "mid_0003",
+            "mid_0005"
+          ],
+          "context_skill_count": 9
+        }
+      ]
+    },
+    {
+      "run": "v0-cap8",
+      "sample_id": "webshop:969",
+      "task_goal": "i'm looking for a cheese platter that i can include in a gift basket, and price lower than 80.00 dollars",
+      "primary_score": 0.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0004",
+        "mid_0000",
+        "mid_0007",
+        "mid_0008",
+        "mid_0003"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43581868766633075,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5586948401864543
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5501908449769798
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.5436150193262256
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5091314698993278
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5079048053841263
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.48250548309493824
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4718694855353398
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.4685765374071022
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338206615442278
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279050003103296
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276391615963823
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213683056589318
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713370552781128
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617580703193383
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.5958356081457253
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5269318918263871
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0003"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43581601862824804,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.2984938719231946
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.2945728656965331
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.28864526391327444
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.26734018972580154
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.26205746011401804
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.2615933176000951
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.25286954535774253
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2290901794898251
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3546128029296824
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.34535202535428366
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.34444041551129007
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.32973636085536184
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.326605951243194
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.32448862203770407
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3173553615461665
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.29148177758939287
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0003"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43581601862824804,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.37338051125080496
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3722144020314206
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3631206438417465
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3584889698135657
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3456352750931218
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.33309839010856446
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.33157240280396344
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.29863207916074946
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4584127148744278
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.451984243459215
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.447143316036147
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.44162441018821236
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.43987961369486567
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.43372169736587063
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4075616373259041
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.39372908491569536
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007",
+            "mid_0003",
+            "mid_0008"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 3,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43581601862824804,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.39144015429238055
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3909205198922932
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3806773338783884
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3773711075289108
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.3619230419386847
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3475832032503091
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3457686456314034
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.31549554851587974
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4631413465732189
+            },
+            {
+              "skill_id": "mid_0003",
+              "name": "Inspect product details and return to the item page",
+              "score": 0.4570189489201159
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4566694682813307
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.44821265211059635
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4441738584375364
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4341986193027242
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40998704849784984
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3943571949654331
+            }
+          ],
+          "graph_preview": null,
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007",
+            "mid_0003",
+            "mid_0008"
+          ],
+          "context_skill_count": 10
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap8",
+      "sample_id": "webshop:170",
+      "task_goal": "could you get me listerine toothpaste that takes care of bad breath?, and price lower than 130.00 dollars",
+      "primary_score": 1.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0007",
+        "mid_0004",
+        "mid_0000",
+        "mid_0008",
+        "mid_c3b9456ca379",
+        "mid_8c09e379d380",
+        "mid_6fd1c9c5ff45"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.482812864431924,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.6219547764398916
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.6157986405629357
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5939520642807485
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5628447306450771
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.557489680176326
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.5211110155063798
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5021701968246413
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.46450775397340066
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338724665684929
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279081145360533
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276254673113497
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213932005720985
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.671332539254144
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6618134059674939
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5580046437842173
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359906212444728
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5630675987244825,
+              "goal_score": 0.482812864431924,
+              "state_score": 0.6618134059674939,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0008",
+            "mid_c3b9456ca379"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.48284700127826186,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4318235488213954
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4236268330416758
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40409477230862584
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3948726922374406
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.38059973857786905
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.35806724396245665
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3517613925906124
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.32769754456088035
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4500611428434489
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4348768953385514
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.42927871848956195
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4112451588523675
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4076851586035228
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.40456520500295046
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3791322230741573
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.3769010978362721
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.44614978712277464,
+              "goal_score": 0.4650073708231995,
+              "state_score": 0.4348768953385514,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002",
+              "mid_0007"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase",
+              "Search and open the closest matching product"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0008",
+            "mid_c3b9456ca379"
+          ],
+          "context_skill_count": 10
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Listerine Essential Care Original Gel Fluoride Toothpaste, Prevents Bad Breath and Cavities, Powerful Mint Flav",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.48284700127826186,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3697075666997409
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.35778035507105027
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.34100337831881017
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.32995324011902566
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3178580678249096
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3167662611524443
+            },
+            {
+              "skill_id": "mid_8c09e379d380",
+              "name": "Inspect product attributes",
+              "score": 0.29794607723614913
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.2932347406669488
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3457504303573197
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3382335268572498
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.332875946419605
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.32721747408839114
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.31374103882559917
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3134973746386193
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3052629973611361
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.2962177282878387
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.46475278038946966,
+              "goal_score": 0.48284700127826186,
+              "state_score": 0.27569866562801737,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000",
+            "mid_0008",
+            "mid_8c09e379d380",
+            "mid_6fd1c9c5ff45"
+          ],
+          "context_skill_count": 11
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap8",
+      "sample_id": "webshop:873",
+      "task_goal": "i would like some chocolates that are individually wrapped that say congratulations, and price lower than 40.00 dollars",
+      "primary_score": 0.03333333333333333,
+      "trajectory_skill_ids": [
+        "high_f4ff56f0acaa",
+        "mid_0004",
+        "mid_0002",
+        "mid_0000",
+        "mid_0007",
+        "mid_0008",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4099932577550413,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.6433368793036048
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.635628562362061
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.625006879199832
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5905367799879483
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5646161433732333
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.5399318245876156
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.5294089613519095
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.5077695074716027
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338727633821113
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7279054699632698
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276190160899271
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213893747746826
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713144815474069
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6618127053429309
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579940492416202
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.53597537984807
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5293948002033352,
+              "goal_score": 0.3866055692817804,
+              "state_score": 0.6618127053429309,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4100102114476443,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.34608555143767455
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.32885085288054167
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3266134926125077
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.31088849357126175
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.30585326830133885
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.27700450143572514
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.2766003446844578
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.25983249371481604
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.40780175560877957
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4022969580817272
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40165985101387225
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.37981465192359926
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3719540820975269
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.36088041002313304
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.34038953035557035
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3320910839594058
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.41742448243591024,
+              "goal_score": 0.4100102114476443,
+              "state_score": 0.40780175560877957,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008",
+            "mid_0006",
+            "mid_0005",
+            "mid_0001"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Congratulations Cookie Talk Chocolate Covered Oreo Trio",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4100102114476443,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3344739569634654
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3173899463476689
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.31527369162477786
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.31168192803482864
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.30186934078327626
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.2846806547414546
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.25566862823634384
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2464372399548643
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.34953382135972005
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.34258714222090986
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3337485147257652
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.32793544277810394
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3183534290053808
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.30923865623195795
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.28182696696131626
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.26644937757892184
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.4460033576153766,
+              "goal_score": 0.386622458546347,
+              "state_score": 0.3183534290053808,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007",
+            "mid_0006",
+            "mid_0008",
+            "mid_0005",
+            "mid_0001"
+          ],
+          "context_skill_count": 9
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap8",
+      "sample_id": "webshop:969",
+      "task_goal": "i'm looking for a cheese platter that i can include in a gift basket, and price lower than 80.00 dollars",
+      "primary_score": 0.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0004",
+        "mid_0000",
+        "mid_0007",
+        "mid_0008"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4358308511535387,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5587032496975235
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5502147032543407
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.543627542895474
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.5091348133017124
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.5078849172198742
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4718810419816238
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.46859118146629924
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.4260407295178947
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338476659950544
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7278832801805754
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276152817979086
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213625517203619
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713056648370277
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617922353221736
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579817341906786
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359651575652014
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5466164843511856,
+              "goal_score": 0.4358308511535387,
+              "state_score": 0.6617922353221736,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4358471980565106,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.2984821030391221
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.2945724621429579
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.28864184586738845
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.26730139559864297
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.2620514614675829
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.2615838264004387
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.22907231783696336
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.21909953113710698
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3546670783372915
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.34539138747317594
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.34448772929422605
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.32975576560541975
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.32664125528074994
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3173598072549188
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2915091333210674
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.28477146440588325
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.3955840460930994,
+              "goal_score": 0.4358471980565106,
+              "state_score": 0.32664125528074994,
+              "event_compatibility": 0.5825082508250825,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Search or return to search",
+              "Refine search terms and inspect matching results",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4358471980565106,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.37344454181842235
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.37226279742468615
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.363170734411379
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3585159503446236
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.33311782188911926
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3316019733174124
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.2986938417560161
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.29708392939184675
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.45842596688359477
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.44711386917406953
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.44164337861257663
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.43988148263565763
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4336794503367132
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4075282087615523
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3937002451316972
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3912209255024579
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.48600655279696864,
+              "goal_score": 0.4358471980565106,
+              "state_score": 0.3834235328711944,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        },
+        {
+          "step_index": 3,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.4358471980565106,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3914153191580828
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.39088604471500105
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3806436589356073
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.37731813554843036
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3475135038458226
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.34571042502534804
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.31548287450580065
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.30976693096740043
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.46315720867468796
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4566360464323611
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.44823973082343876
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.44418510643389914
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.43416363053783713
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40996478608847287
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.39457008480784356
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.3943385201303277
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.48721136505835155,
+              "goal_score": 0.4358471980565106,
+              "state_score": 0.4566360464323611,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007",
+            "mid_0008"
+          ],
+          "context_skill_count": 9
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap3",
+      "sample_id": "webshop:170",
+      "task_goal": "could you get me listerine toothpaste that takes care of bad breath?, and price lower than 130.00 dollars",
+      "primary_score": 1.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0007",
+        "mid_0004",
+        "mid_0000"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.482863100605042,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.6219860897731744
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.615831133596895
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5939857811295807
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338558323237647
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7278934202015347
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276198841216989
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213789278432199
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713192327226749
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617980316380218
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579983477987499
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359816874117037
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5630798003697586,
+              "goal_score": 0.482863100605042,
+              "state_score": 0.6617980316380218,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.48287541679893653,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4318201516225768
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4236245586820707
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4040921275500758
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.45004980996906896
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.43486839951674067
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4292675079420375
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.4112343989302376
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.40767235810580665
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4045659879896479
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.37911437914282525
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.3769107585222241
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.446156146096764,
+              "goal_score": 0.4650340351421227,
+              "state_score": 0.43486839951674067,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002",
+              "mid_0007"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase",
+              "Search and open the closest matching product"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Listerine Essential Care Original Gel Fluoride Toothpaste, Prevents Bad Breath and Cavities, Powerful Mint Flav",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.48287541679893653,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3697002562004555
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3577734141075778
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3409906738381755
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.34570255420025764
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.33818519174294914
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.33282089665429404
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.32716854833566283
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.3136969703002444
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3134407595847603
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.30522063764398527
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.2961720376391784
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.46474707255782693,
+              "goal_score": 0.48287541679893653,
+              "state_score": 0.27565394201693505,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0007",
+            "mid_0004",
+            "mid_0000"
+          ],
+          "context_skill_count": 8
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap3",
+      "sample_id": "webshop:873",
+      "task_goal": "i would like some chocolates that are individually wrapped that say congratulations, and price lower than 40.00 dollars",
+      "primary_score": 0.03333333333333333,
+      "trajectory_skill_ids": [
+        "high_f4ff56f0acaa",
+        "mid_0004",
+        "mid_0002",
+        "mid_0000",
+        "mid_0007"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.40999898879671104,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.643344186007936
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.6356362917073296
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.6250151032339468
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338602450000109
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7278882262190429
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276170960222673
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213733151616089
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713101347774995
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617989414763112
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5580006731814664
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359781799879282
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5293916758197015,
+              "goal_score": 0.3866104063380179,
+              "state_score": 0.6617989414763112,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007"
+          ],
+          "context_skill_count": 5
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4100199385593072,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.34611325603464
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.32888190602370304
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.32664198677429435
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.40775924552188764
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4022537288153349
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.40161732568176023
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3797850721141699
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.37191445899314024
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.3608492950280909
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3403692101046695
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.33205855946305507
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_f4ff56f0acaa",
+              "name": "Search and buy a direct match",
+              "graph_score": 0.41741300839458007,
+              "goal_score": 0.4100199385593072,
+              "state_score": 0.40775924552188764,
+              "event_compatibility": 0.7005388760585065,
+              "path_quality": 0.010825187544605718
+            },
+            "mid_ids": [
+              "mid_0004",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Search and open a likely matching product",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007"
+          ],
+          "context_skill_count": 5
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Congratulations Cookie Talk Chocolate Covered Oreo Trio",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_f4ff56f0acaa",
+            "name": "Search and buy a direct match",
+            "score": 0.4100199385593072,
+            "children": [
+              "mid_0004",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.33451557997825176
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.31744347822236446
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.31532167028840946
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.3495046234870833
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3425635590217196
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.33371743714875207
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3279114002312871
+            },
+            {
+              "skill_id": "mid_0002",
+              "name": "Select required options before purchase",
+              "score": 0.3183302995056281
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.30921352645989697
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.28179174366107634
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2664180065710935
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.44599824329436,
+              "goal_score": 0.3866309757003379,
+              "state_score": 0.3183302995056281,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_f4ff56f0acaa",
+            "mid_0004",
+            "mid_0002",
+            "mid_0000",
+            "mid_0007"
+          ],
+          "context_skill_count": 5
+        }
+      ]
+    },
+    {
+      "run": "pareto-cap3",
+      "sample_id": "webshop:969",
+      "task_goal": "i'm looking for a cheese platter that i can include in a gift basket, and price lower than 80.00 dollars",
+      "primary_score": 0.0,
+      "trajectory_skill_ids": [
+        "high_efbf322a092b",
+        "mid_0005",
+        "mid_0001",
+        "mid_0006",
+        "mid_0002",
+        "mid_0004",
+        "mid_0000",
+        "mid_0007"
+      ],
+      "steps": [
+        {
+          "step_index": 0,
+          "observation": "WebShop search page.",
+          "action": "search_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43582168272387867,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.5586212036765911
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.5501255293433
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.5435390947428433
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.7338476659950544
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.7278832801805754
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.7276152817979086
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.7213625517203619
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.6713056648370277
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.6617922353221736
+            },
+            {
+              "skill_id": "mid_c3b9456ca379",
+              "name": "Inspect product details and return to the main page",
+              "score": 0.5579817341906786
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.5359651575652014
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.5466132754008045,
+              "goal_score": 0.43582168272387867,
+              "state_score": 0.6617922353221736,
+              "event_compatibility": 0.7511848341232228,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0001",
+              "mid_0006",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Refine search terms and inspect matching results",
+              "Select matching product options",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 1,
+          "observation": "Search results page 1:",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43580624284235686,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.2985086046264211
+            },
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.29459925336028037
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.28866291386972043
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.35462194072552305
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3453424400738438
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3444407207386805
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.32972136867470675
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.326596400960768
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.31731499883852154
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.2914691378000134
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.28474336727305793
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.39555401275615193,
+              "goal_score": 0.43580624284235686,
+              "state_score": 0.326596400960768,
+              "event_compatibility": 0.5825082508250825,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0000"
+            ],
+            "mid_names": [
+              "Search or return to search",
+              "Refine search terms and inspect matching results",
+              "Search with core attributes and open a matching result"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0004",
+            "mid_0000",
+            "mid_0007"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 2,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43580624284235686,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.37343867331108077
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.3722596333631538
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3631606172238843
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.4584362209386532
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4471167189692131
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4416549110299664
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4398961347623861
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.4336906057131788
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40753814736927846
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.39370629687789876
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.3912304894435664
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.4859947578420174,
+              "goal_score": 0.43580624284235686,
+              "state_score": 0.3834307882140588,
+              "event_compatibility": 0.935251798561151,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0002",
+              "mid_0006",
+              "mid_0005"
+            ],
+            "mid_names": [
+              "Select required options before purchase",
+              "Select matching product options",
+              "Search or return to search"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007"
+          ],
+          "context_skill_count": 8
+        },
+        {
+          "step_index": 3,
+          "observation": "Product: Platterful Charcuterie Box - All In One Kit With Several Meats, Cheeses, & More, Couples Gifts, Gifts for Mom, ",
+          "action": "click_action",
+          "high": {
+            "skill_id": "high_efbf322a092b",
+            "name": "Search, open, and configure the chosen product",
+            "score": 0.43580624284235686,
+            "children": [
+              "mid_0005",
+              "mid_0001",
+              "mid_0006",
+              "mid_0002"
+            ]
+          },
+          "direct_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.3914981905556662
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.39097210063471427
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.3807251817160695
+            }
+          ],
+          "state_only_mid": [
+            {
+              "skill_id": "mid_0000",
+              "name": "Search with core attributes and open a matching result",
+              "score": 0.46315296093835295
+            },
+            {
+              "skill_id": "mid_0006",
+              "name": "Select matching product options",
+              "score": 0.4566369262063613
+            },
+            {
+              "skill_id": "mid_0004",
+              "name": "Search and open a likely matching product",
+              "score": 0.4482367078024348
+            },
+            {
+              "skill_id": "mid_0007",
+              "name": "Search and open the closest matching product",
+              "score": 0.4441797585745431
+            },
+            {
+              "skill_id": "mid_0005",
+              "name": "Search or return to search",
+              "score": 0.43415358111328123
+            },
+            {
+              "skill_id": "mid_0008",
+              "name": "Search for a likely match and open it",
+              "score": 0.40995678378754147
+            },
+            {
+              "skill_id": "mid_6fd1c9c5ff45",
+              "name": "Inspect features and return to the product page",
+              "score": 0.39457032777217194
+            },
+            {
+              "skill_id": "mid_0001",
+              "name": "Refine search terms and inspect matching results",
+              "score": 0.39432875924635286
+            }
+          ],
+          "graph_preview": {
+            "high": {
+              "skill_id": "high_efbf322a092b",
+              "name": "Search, open, and configure the chosen product",
+              "graph_score": 0.4871973386542978,
+              "goal_score": 0.43580624284235686,
+              "state_score": 0.4566369262063613,
+              "event_compatibility": 0.8131539611360239,
+              "path_quality": 0.12211437260041712
+            },
+            "mid_ids": [
+              "mid_0006",
+              "mid_0002"
+            ],
+            "mid_names": [
+              "Select matching product options",
+              "Select required options before purchase"
+            ]
+          },
+          "context_skill_ids": [
+            "high_efbf322a092b",
+            "mid_0005",
+            "mid_0001",
+            "mid_0006",
+            "mid_0002",
+            "mid_0000",
+            "mid_0004",
+            "mid_0007"
+          ],
+          "context_skill_count": 8
+        }
+      ]
+    }
+  ]
+}

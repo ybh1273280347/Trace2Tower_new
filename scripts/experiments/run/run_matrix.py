@@ -177,7 +177,11 @@ def create_provider(
             max_skills=int(method_config["max_skills"]),
         )
     if artifact.method in TOWER_ARTIFACT_METHODS:
-        diverse = method_config.get("retrieval_strategy", "legacy") == "diverse"
+        retrieval_strategy = method_config.get("retrieval_strategy", "legacy")
+        if retrieval_strategy not in {"legacy", "diverse", "graph"}:
+            raise ValueError("unknown Tower retrieval strategy")
+        diverse = retrieval_strategy == "diverse"
+        graph = retrieval_strategy == "graph"
         provider = Trace2TowerSkillProvider.from_path(
             runtime,
             artifact.path,
@@ -210,6 +214,15 @@ def create_provider(
                 Path(method_config["lifecycle_report"])
                 if method_config.get("lifecycle_report")
                 else None
+            ),
+            graph_profile_path=(
+                Path(method_config["graph_profile"]) if graph else None
+            ),
+            mid_context_budget=(
+                int(method_config["mid_context_budget"]) if graph else None
+            ),
+            min_event_compatibility=float(
+                method_config.get("min_event_compatibility", 0.1)
             ),
             status_tie_epsilon=float(
                 method_config.get("status_tie_epsilon", 0.0)
@@ -389,10 +402,12 @@ async def main(options: argparse.Namespace) -> int:
     if method in TOWER_ARTIFACT_METHODS:
         if options.direct_mid_top_k not in (3, 5, 8):
             raise ValueError("Tower runs require an explicit direct Mid cap: 3, 5, or 8")
-        method_config = {
-            **method_config,
-            "direct_mid_top_k": options.direct_mid_top_k,
-        }
+        cap_field = (
+            "mid_context_budget"
+            if method_config.get("retrieval_strategy") == "graph"
+            else "direct_mid_top_k"
+        )
+        method_config = {**method_config, cap_field: options.direct_mid_top_k}
     no_skill_config = load_yaml(options.config_root / "webshop_no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")

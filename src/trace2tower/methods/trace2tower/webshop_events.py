@@ -18,6 +18,53 @@ DETAIL_VALUES = {"description", "features", "reviews", "attributes"}
 ASIN_PATTERN = re.compile(r"^[A-Za-z0-9]{8,16}$")
 
 
+def infer_webshop_page_type(observation: str) -> WebShopPageType:
+    first_line = observation.splitlines()[0].strip().casefold() if observation else ""
+    if first_line == "webshop search page.":
+        return WebShopPageType.SEARCH
+    if first_line.startswith("search results page"):
+        return WebShopPageType.RESULTS
+    if first_line.startswith("product:"):
+        return WebShopPageType.ITEM
+    if any(
+        first_line.startswith(f"{detail}:")
+        for detail in ("description", "features", "reviews", "attributes")
+    ):
+        return WebShopPageType.ITEM_DETAIL
+    if first_line.startswith("purchase completed"):
+        return WebShopPageType.TERMINAL
+    return WebShopPageType.UNKNOWN
+
+
+def webshop_applicable_events(page: WebShopPageType) -> frozenset[WebShopEventType]:
+    return {
+        WebShopPageType.SEARCH: frozenset(
+            (WebShopEventType.QUERY_FORMULATION, WebShopEventType.QUERY_REFINEMENT)
+        ),
+        WebShopPageType.RESULTS: frozenset(
+            (
+                WebShopEventType.CANDIDATE_SELECTION,
+                WebShopEventType.RESULT_NAVIGATION,
+                WebShopEventType.SEARCH_BACKTRACKING,
+            )
+        ),
+        WebShopPageType.ITEM: frozenset(
+            (
+                WebShopEventType.OPTION_SELECTION,
+                WebShopEventType.ATTRIBUTE_INSPECTION,
+                WebShopEventType.PURCHASE_DECISION,
+                WebShopEventType.SEARCH_BACKTRACKING,
+            )
+        ),
+        WebShopPageType.ITEM_DETAIL: frozenset(
+            (
+                WebShopEventType.DETAIL_BACKTRACKING,
+                WebShopEventType.SEARCH_BACKTRACKING,
+            )
+        ),
+    }.get(page, frozenset((WebShopEventType.OTHER_CLICK,)))
+
+
 class WebShopEventClassifier:
     def __init__(
         self,

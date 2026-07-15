@@ -72,6 +72,34 @@ Tower T1:  configs/experiments/webshop_trace2tower_refinement_v1_runtime.yaml
 & $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-pareto-v1-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_refinement_v1_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 1 --api-concurrency 1 2>&1 | Tee-Object artifacts/logs/test-a-pareto-v1-r2.log
 ```
 
+## Graph-aware Retrieval Diagnosis
+
+```powershell
+& $py -m scripts.experiments.build.build_tower_graph_profile --tower $t1 --preprocessed artifacts/trace2tower/original-concept-v1/p100/refinement-v1/preprocessed.jsonl --output artifacts/trace2tower/original-concept-v1/p100/pareto-v1/graph-retrieval-profile.json
+
+& $py scripts/experiments/analyze/diagnose_tower_retrieval.py
+
+& $py -m scripts.experiments.build.build_pareto_refined_skills --tower $v0 --preprocessed artifacts/trace2tower/original-concept-v1/p100/refinement-v1/preprocessed.jsonl --candidate-clusters artifacts/trace2tower/original-concept-v1/p100/refinement-v1/graph/clusters.json --structural-pareto experiments/webshop/original-concept-v1/refinement/structural-pareto.json --output-dir artifacts/trace2tower/original-concept-v1/p100/pareto-high6/skills --max-high-path-length 6
+
+Get-FileHash artifacts/trace2tower/original-concept-v1/p100/pareto-v1/skills/high-paths.json, artifacts/trace2tower/original-concept-v1/p100/pareto-high6/skills/high-paths.json -Algorithm SHA256
+```
+
+The max4 and max6 High path files are identical under the frozen P100 support
+contract, so there is no High-length rollout command until the structural
+comparison produces different skills.
+
+## Graph-aware Test-A
+
+```powershell
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_refinement_v1_graph_runtime.yaml --direct-mid-top-k 3 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap3-r2.log
+
+& $py scripts/experiments/run/run_matrix.py --benchmark webshop --split test --method trace2tower --artifact webshop=$t1 --manifest webshop=$test --repeat-id 0 --run-id webshop-original-concept-v1-test-a-flash-graph-cap8-r2 --agent-model deepseek-v4-flash --method-config configs/experiments/webshop_trace2tower_refinement_v1_graph_runtime.yaml --direct-mid-top-k 8 --episode-concurrency 3 --api-concurrency 3 2>&1 | Tee-Object artifacts/logs/test-a-graph-cap8-r2.log
+```
+
+The CLI option retains its historical name, but with `retrieval_strategy:
+graph` it sets `mid_context_budget`. This is a total injected Mid budget,
+including the active High path node and its directed successor.
+
 ## Statistics
 
 ```powershell

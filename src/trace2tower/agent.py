@@ -199,6 +199,8 @@ class AgentEvaluator:
                             False,
                             state.admissible_actions,
                             state.clickable_types,
+                            selection.skill_ids,
+                            selection.context_skill_ids,
                         )
                     )
                     continue
@@ -247,6 +249,8 @@ class AgentEvaluator:
                         next_state.valid_action,
                         state.admissible_actions,
                         state.clickable_types,
+                        selection.skill_ids,
+                        selection.context_skill_ids,
                     )
                 )
                 messages.append(

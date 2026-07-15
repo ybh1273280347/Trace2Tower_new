@@ -146,3 +146,67 @@ not prescribe a maximum High path length of 4. The `max_high_path_length: 4`
 value comes from the current project configuration and validation contract, not
 from `Trace2Tower原始资料.md`. It must therefore be treated as an experiment
 configuration choice, not an algorithmic rule from the original concept.
+
+## Retrieval Diagnosis
+
+The deployed retriever was dynamic in time but not graph-aware. The agent
+refreshed the selection at every environment step, while each refresh still
+used independent cosine Top-K over High and Mid card text. The learned Mid
+transition graph, High path position, and positive-versus-negative path quality
+did not participate in deployment ranking.
+
+Per-step replay found three concrete failures:
+
+- High selection used the task goal alone, so the same generic High usually
+  remained selected across search, result, product, and detail states.
+- `direct_mid_top_k` bounded only direct Mid matches. Expanding all children of
+  the selected High raised actual per-step context to 9-12 skills at cap8 and
+  5-8 skills at cap3.
+- The Mid query concatenated the task goal with the current observation. On a
+  product page, six or more near-duplicate search/open cards could outrank the
+  detail and option skills needed by the current state.
+
+The complete per-step audit is frozen in `RETRIEVAL_DIAGNOSTIC.md`. A separate
+detail-state replay in `RETRIEVAL_DETAIL_STATE_DIAGNOSTIC.md` confirms that the
+promoted detail High was never reached by legacy goal-only High retrieval.
+
+| Legacy T1 | Mean reward | Full success | Mean steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| cap8 | 0.67983 | 52% | 7.66 | 0.25 | 35,273 |
+| cap3 | 0.69283 | 53% | 7.16 | 0.21 | 30,242 |
+
+Cap3 is cheaper and slightly better in this run, but it does not repair the
+retrieval contract. It still expands the entire selected High path outside the
+nominal direct-Mid cap.
+
+## Graph-aware Dynamic Retrieval
+
+The replacement retriever preserves `K_t = Retrieve(g_t, o_t, T)` and gives
+each signal one responsibility:
+
+- goal-to-High semantic similarity represents task relevance;
+- observation-to-Mid similarity represents current-state relevance;
+- the event distribution learned from each Mid's training segments filters
+  small mixed-event tails that are not executable in the current page state;
+- the selected High path supplies the active Mid and one directed successor;
+- High contrastive score carries success/failure consistency into ranking;
+- `mid_context_budget` limits all injected Mid cards, including path children.
+
+The three-task execution probe verified an actual maximum of one High plus
+three Mids per step. On Description and Attributes pages it selects promoted
+High `high_69655a587d87`; on search and result pages it selects search paths.
+New trajectories persist the exact retrieved skill IDs at every step.
+
+## High max=6 Structural Check
+
+Using the same P100 pool, refined Mid clusters, support ratio 0.10, and Pareto
+selection, High mining was repeated with maximum path lengths 4 and 6. Both
+runs mined 10 candidates and produced identical final six High paths. The two
+`high-paths.json` files have the same SHA-256:
+`b5a2eeacf07dd65a37f91cfa69118dd2f8ece382a6020afc6f273e5b65503617`.
+
+The length-four ceiling is therefore not active under the frozen P100 support
+contract. A Flash rollout would compare identical skill content and is not an
+informative max-length experiment. Producing length-five or length-six paths
+would also require changing minimum support, which must be reported as a
+separate two-variable experiment rather than attributed to the length ceiling.

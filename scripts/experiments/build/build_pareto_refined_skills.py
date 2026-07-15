@@ -99,10 +99,15 @@ async def main(options: argparse.Namespace) -> int:
         candidate_clusters,
         segments,
     )
+    max_high_path_length = (
+        options.max_high_path_length
+        if options.max_high_path_length is not None
+        else old_tower.config.max_high_path_length
+    )
     mined_paths = mine_high_paths(
         records,
         refined.clusters,
-        max_path_length=old_tower.config.max_high_path_length,
+        max_path_length=max_high_path_length,
         min_support_ratio=old_tower.config.high_min_support_ratio,
         epsilon=old_tower.config.high_path_epsilon,
         success_threshold=old_tower.config.success_threshold,
@@ -242,6 +247,7 @@ async def main(options: argparse.Namespace) -> int:
             "selected_split_target_candidate_ids": target_ids,
             "refined_mid_count": len(refined.clusters),
             "mined_high_count": len(mined_paths),
+            "max_high_path_length": max_high_path_length,
             "retained_high_count": len(projected_paths),
             "promoted_high_id": promoted.path_id if promoted else None,
             "final_high_count": len(final_paths),
@@ -268,6 +274,7 @@ if __name__ == "__main__":
     parser.add_argument("--candidate-clusters", type=Path, required=True)
     parser.add_argument("--structural-pareto", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--max-high-path-length", type=int)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))
