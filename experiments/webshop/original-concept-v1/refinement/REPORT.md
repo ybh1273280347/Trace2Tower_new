@@ -210,3 +210,42 @@ contract. A Flash rollout would compare identical skill content and is not an
 informative max-length experiment. Producing length-five or length-six paths
 would also require changing minimum support, which must be reported as a
 separate two-variable experiment rather than attributed to the length ceiling.
+
+## Graph-aware Test-A Result
+
+Both graph-aware runs cover the same 100 Test-A keys as NoSkill, V0, and the
+legacy T1 runs. Each run has 100 unique result rows and no duplicate keys.
+Service-side rate limits produced two failed attempts for cap3 and four for
+cap8; single-concurrency retries completed the missing keys. Error attempts are
+retained separately and are not result rows.
+
+| Method | Mean reward | Full success | Mean steps | Invalid actions | Input tokens |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| Tower V0 legacy cap8 | **0.72092** | **56%** | 7.17 | 0.19 | 32,360 |
+| T1 legacy cap8 | 0.67983 | 52% | 7.66 | 0.25 | 35,273 |
+| T1 legacy cap3 | 0.69283 | 53% | 7.16 | 0.21 | 30,242 |
+| T1 graph cap8 | 0.71442 | 54% | 7.56 | 0.21 | 27,808 |
+| T1 graph cap3 | 0.71925 | 54% | **6.81** | **0.16** | **20,059** |
+
+Graph cap3 is `+0.03850` over NoSkill with paired task-bootstrap 95% interval
+`[-0.02109, +0.10034]`. It is `-0.00167` from V0, interval
+`[-0.04083, +0.04033]`, while using 38.0% fewer input tokens than V0. It is
+`+0.03942` over legacy T1 cap8, interval `[-0.00500, +0.09025]`. These reward
+differences are not statistically significant at 100 tasks, so the defensible
+claim is performance recovery and improved execution efficiency, not a reward
+win over V0.
+
+Graph cap3 and cap8 are reward-equivalent in this run: cap3 minus cap8 is
+`+0.00483`, interval `[-0.01517, +0.03133]`. Cap3 is selected for deployment
+optimization because it has fewer steps, fewer invalid actions, and 27.9%
+fewer input tokens than graph cap8 under equivalent reward.
+
+The persisted per-step selections verify that the graph policy is dynamic and
+state-specific. Graph cap3 injected a mean 3.48 total skills per step and never
+exceeded one High plus three Mids. Search pages selected
+`high_efbf322a092b` in all 141 steps. Item-detail pages selected promoted
+detail High `high_69655a587d87` in 65 of 75 steps and detail-to-purchase High
+`high_b979447aef67` in the other 10; no search High was selected on an
+item-detail page. The complete paired statistics and retrieval counts are in
+`graph-retrieval-test-a.json`.

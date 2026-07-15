@@ -100,6 +100,10 @@ The CLI option retains its historical name, but with `retrieval_strategy:
 graph` it sets `mid_context_budget`. This is a total injected Mid budget,
 including the active High path node and its directed successor.
 
+```powershell
+& $py -m scripts.experiments.analyze.analyze_graph_retrieval_test --noskill-run artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1 --v0-run artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1 --legacy-cap8-run artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap8-r1 --legacy-cap3-run artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap3-r1 --graph-cap3-run artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2 --graph-cap8-run artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap8-r2 --output experiments/webshop/original-concept-v1/refinement/graph-retrieval-test-a.json
+```
+
 ## Statistics
 
 ```powershell
