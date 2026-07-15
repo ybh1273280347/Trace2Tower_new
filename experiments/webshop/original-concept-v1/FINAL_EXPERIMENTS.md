@@ -42,8 +42,8 @@ not used to design this retriever.
 | 1 | V0 graph-cap3 vs T1 graph-cap3, Flash Test-A repeat0 | Isolate Pareto refinement from retrieval | Complete |
 | 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Complete |
 | 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Running |
-| 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Running |
-| 5 | Pro repeat1/2 | Extend only after the repeat0 direction and cost are known | Conditional |
+| 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
+| 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Running |
 | 6 | Semantic-only with state-aware Mid retrieval and total cap3 | Remove graph induction and High paths under the final state/budget contract | Pending implementation |
 | 7 | No-Mixed with graph retrieval cap3 | Test the value of failure evidence under the final runtime | Pending profile build |
 
@@ -79,3 +79,13 @@ interval `[+0.01500, +0.10300]`. The SkillX comparison is significant under
 the registered paired task bootstrap. Final T1 also exceeds legacy V0 by
 `+0.03658`, interval `[-0.00300, +0.07825]`. Complete paired statistics are
 recorded in `final-algorithm-results.json`.
+
+Pro repeat0 is also positive: final T1 scores `0.69392/51%`, compared with
+NoSkill `0.62000/45%`, native P100 SkillX `0.67458/48%`, and legacy P100 Tower
+`0.65733/50%`. Final T1 uses 25,305 input tokens on average, below NoSkill's
+25,818 and far below legacy Tower's 41,187. This positive direction authorizes
+the real Pro repeat1/2 extension in the execution matrix. Final T1 exceeds
+NoSkill by `+0.07392`, paired 95% interval `[+0.02108, +0.12883]`, which is
+significant. Its deltas over P100 SkillX and legacy Tower are respectively
+`+0.01933`, interval `[-0.03717, +0.07517]`, and `+0.03658`, interval
+`[-0.02217, +0.09658]`.

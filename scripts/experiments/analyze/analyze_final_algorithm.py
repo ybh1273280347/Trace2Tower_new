@@ -21,7 +21,12 @@ def analyze_scope(run_paths: dict[str, Path], comparisons: tuple[tuple[str, str]
     rows = {}
     audits = {}
     for name, path in run_paths.items():
-        rows[name], audits[name] = read_first_completion(path)
+        run_rows, audits[name] = read_first_completion(path)
+        rows[name] = {
+            key: row for key, row in run_rows.items() if key[1] == 0
+        }
+        audits[name]["selected_repeat_id"] = 0
+        audits[name]["selected_key_count"] = len(rows[name])
     keys = set(next(iter(rows.values())))
     if len(keys) != 100 or any(set(run_rows) != keys for run_rows in rows.values()):
         raise ValueError("all runs in one scope must cover the same 100 task keys")
@@ -54,6 +59,10 @@ def main() -> int:
         "test_b_noskill",
         "test_b_skillx",
         "test_b_legacy_v0",
+        "pro_final",
+        "pro_noskill",
+        "pro_skillx",
+        "pro_legacy_v0",
     ):
         parser.add_argument(f"--{name.replace('_', '-')}-run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -70,6 +79,12 @@ def main() -> int:
         "skillx": options.test_b_skillx_run,
         "legacy_v0": options.test_b_legacy_v0_run,
     }
+    pro_paths = {
+        "final_t1": options.pro_final_run,
+        "noskill": options.pro_noskill_run,
+        "skillx": options.pro_skillx_run,
+        "legacy_v0": options.pro_legacy_v0_run,
+    }
     payload = {
         "protocol_id": "webshop-final-graph-cap3-v1",
         "agent_model": "deepseek-v4-flash",
@@ -80,6 +95,14 @@ def main() -> int:
         ),
         "test_b_robustness": analyze_scope(
             test_b_paths,
+            (
+                ("final_t1", "noskill"),
+                ("final_t1", "skillx"),
+                ("final_t1", "legacy_v0"),
+            ),
+        ),
+        "pro_test_a": analyze_scope(
+            pro_paths,
             (
                 ("final_t1", "noskill"),
                 ("final_t1", "skillx"),
