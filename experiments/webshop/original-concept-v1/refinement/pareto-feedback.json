@@ -1,0 +1,53 @@
+{
+  "benchmark": "webshop",
+  "split": "train",
+  "agent_model": "deepseek-v4-flash",
+  "tower_snapshot_id": "tower_9094918372ee0a39",
+  "direct_mid_top_k": 8,
+  "retrieval_policy_scope": "high_context_bundle",
+  "primary_objectives": [
+    "performance_level",
+    "paired_reward_gain",
+    "guarded_step_saving"
+  ],
+  "secondary_metrics": [
+    "mean_chat_tokens"
+  ],
+  "ranking_status": "complete",
+  "bundles": [
+    {
+      "bundle_id": "high_efbf322a092b",
+      "exposure_count": 282,
+      "performance_level": 0.7208628841607565,
+      "paired_reward_gain": 0.02828014184397163,
+      "guarded_step_saving": -0.11121869601218787,
+      "mean_steps": 6.301418439716312,
+      "mean_chat_tokens": 25527.570921985814,
+      "pareto_front_rank": 1
+    },
+    {
+      "bundle_id": "high_f4ff56f0acaa",
+      "exposure_count": 18,
+      "performance_level": 0.5555555555555556,
+      "paired_reward_gain": -0.07777777777777778,
+      "guarded_step_saving": -0.23456790123456792,
+      "mean_steps": 10.166666666666666,
+      "mean_chat_tokens": 51097.333333333336,
+      "pareto_front_rank": 2
+    }
+  ],
+  "downweight": [
+    {
+      "skill_id": "high_f4ff56f0acaa",
+      "action": "downweight",
+      "previous_status": "active",
+      "new_status": "downweighted",
+      "refinement_round": 1,
+      "pareto_front_rank": 2
+    }
+  ],
+  "card_level_lifecycle": {
+    "status": "disabled",
+    "reason": "Mid cards are co-injected inside High bundles and have no independent exposure"
+  }
+}

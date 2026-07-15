@@ -1,0 +1,14 @@
+{
+  "protocol_id": "webshop-train-refinement-v1",
+  "construction_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p100.jsonl",
+  "noskill_run_root": "artifacts/runs/webshop-original-concept-v1-refinement-train-flash-noskill-r3",
+  "tower_run_root": "artifacts/runs/webshop-original-concept-v1-refinement-train-flash-tower-v0-r3",
+  "construction_count": 400,
+  "feedback_noskill_count": 300,
+  "feedback_tower_count": 300,
+  "materialized_count": 1000,
+  "paired_feedback_count": 300,
+  "output": "artifacts/trajectories/webshop/original-concept-v1/refinement-v0-input.jsonl",
+  "output_sha256": "fc5469f62d24310843b9d0dcd89031eba3d6062859f4445068c03dd512ff5f46",
+  "complete": true
+}
