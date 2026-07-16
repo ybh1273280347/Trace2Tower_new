@@ -142,7 +142,7 @@ def retrieve_mid_three_signal(
     if not anchors or total_anchor_similarity <= 0:
         return ()
 
-    ranked = []
+    signals = {}
     for candidate_id in candidate_mid_ids:
         transition = 0.0
         outcome = 0.0
@@ -156,17 +156,36 @@ def retrieve_mid_three_signal(
                 candidate_id,
                 0.0,
             )
-        semantic = semantic_by_id[candidate_id]
-        score = (semantic + transition + outcome) / 3
+        signals[candidate_id] = (
+            semantic_by_id[candidate_id],
+            transition,
+            outcome,
+        )
+
+    maxima = tuple(
+        max((values[index] for values in signals.values()), default=0.0)
+        for index in range(3)
+    )
+    available_signal_ids = tuple(
+        index for index, maximum in enumerate(maxima) if maximum > 0
+    )
+    if not available_signal_ids:
+        return ()
+
+    ranked = []
+    for candidate_id, values in signals.items():
+        score = sum(
+            values[index] / maxima[index] for index in available_signal_ids
+        ) / len(available_signal_ids)
         if score < score_threshold:
             continue
         ranked.append(
             ThreeSignalMidMatch(
                 candidate_id,
                 score,
-                semantic,
-                transition,
-                outcome,
+                values[0],
+                values[1],
+                values[2],
             )
         )
     return tuple(

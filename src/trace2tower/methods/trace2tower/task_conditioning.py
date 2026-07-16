@@ -125,6 +125,7 @@ class TaskConditionProfile:
 
 class DomainTaskAdapter(Protocol):
     domain: str
+    plan_rewrite_instructions: str
 
     def extract_query(
         self,

@@ -12,6 +12,9 @@ from trace2tower.methods.trace2tower.high_paths import (
     compress_repeated_mid_ids,
     mine_high_paths,
 )
+from trace2tower.methods.trace2tower.goal_conditioned_high_paths import (
+    mine_goal_conditioned_high_paths,
+)
 from trace2tower.methods.trace2tower.models import HighPath, MidCluster, PrimitiveAction
 from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
 from trace2tower.methods.trace2tower.skills import (
@@ -60,6 +63,7 @@ def record(trajectory_id: str, score: float, segment_ids: tuple[str, ...]) -> di
     ]
     return {
         "trajectory_id": trajectory_id,
+        "sample_id": trajectory_id.split("-")[0],
         "primary_score": score,
         "transitions": transitions,
         "segments": segments,
@@ -108,6 +112,22 @@ def test_high_paths_require_positive_contrastive_evidence() -> None:
         MidCluster("mid_b", ("p1b", "p2b", "n1c"), ()),
     )
     assert mine_high_paths(path_records, path_clusters, max_path_length=2) == ()
+
+
+def test_goal_conditioned_high_paths_keep_one_complete_composition_per_goal() -> None:
+    path_records = list(records())
+    for item in path_records[:2]:
+        for transition in item["transitions"]:
+            transition["goal"] = "buy a red washable rug under 100 dollars"
+    for transition in path_records[2]["transitions"]:
+        transition["goal"] = "buy a blue lamp"
+
+    paths = mine_goal_conditioned_high_paths(path_records, clusters())
+
+    assert len(paths) == 1
+    assert paths[0].task_condition == "buy a red washable rug under 100 dollars"
+    assert paths[0].ordered_mid_ids == ("mid_a", "mid_b")
+    assert paths[0].supporting_trajectory_ids == ("positive-2",)
 
 
 def test_mid_evidence_requires_a_cluster_partition() -> None:

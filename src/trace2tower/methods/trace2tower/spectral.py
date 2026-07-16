@@ -33,47 +33,64 @@ def spectral_clustering(
             1,
             config.random_state,
             (float(graph.laplacian[0, 0]),),
+            node_member_segment_ids=_node_members(graph),
         )
 
-    requested = min(node_count, config.max_mid_clusters + 2)
-    if requested == node_count:
-        eigenvalues, eigenvectors = np.linalg.eigh(graph.laplacian.toarray())
-    else:
-        generator = np.random.default_rng(config.random_state)
-        eigenvalues, eigenvectors = eigsh(
-            graph.laplacian,
-            k=requested,
-            which="SM",
-            v0=generator.standard_normal(node_count),
-            tol=1e-8,
-        )
-    order = np.argsort(eigenvalues)
-    eigenvalues = np.asarray(eigenvalues[order], dtype=np.float64)
-    eigenvectors = np.asarray(eigenvectors[:, order], dtype=np.float64)
-    valid_columns = np.isfinite(eigenvectors).all(axis=0) & (np.std(eigenvectors, axis=0) > 1e-10)
-    valid_eigenvalues = eigenvalues[valid_columns]
-    valid_eigenvectors = eigenvectors[:, valid_columns]
-    if valid_eigenvectors.shape[1] == 0:
-        valid_eigenvalues = np.asarray((0.0,))
-        valid_eigenvectors = np.ones((node_count, 1), dtype=np.float64)
-
-    maximum = min(
-        config.max_mid_clusters,
+    requested = min(
         node_count,
-        max(1, len(valid_eigenvalues) - 1),
+        config.max_mid_clusters + 2
+        if config.max_mid_clusters is not None
+        else max(34, config.min_mid_clusters + 2),
     )
-    minimum = min(config.min_mid_clusters, maximum)
-    if minimum == maximum:
-        cluster_count = maximum
-    else:
-        candidates = range(minimum, maximum + 1)
-        cluster_count = max(
-            candidates,
-            key=lambda count: (
-                valid_eigenvalues[count] - valid_eigenvalues[count - 1],
-                -count,
-            ),
+    previous_cluster_count = None
+    while True:
+        if requested == node_count:
+            eigenvalues, eigenvectors = np.linalg.eigh(graph.laplacian.toarray())
+        else:
+            generator = np.random.default_rng(config.random_state)
+            eigenvalues, eigenvectors = eigsh(
+                graph.laplacian,
+                k=requested,
+                which="SM",
+                v0=generator.standard_normal(node_count),
+                tol=1e-8,
+            )
+        order = np.argsort(eigenvalues)
+        eigenvalues = np.asarray(eigenvalues[order], dtype=np.float64)
+        eigenvectors = np.asarray(eigenvectors[:, order], dtype=np.float64)
+        valid_columns = np.isfinite(eigenvectors).all(axis=0) & (
+            np.std(eigenvectors, axis=0) > 1e-10
         )
+        valid_eigenvalues = eigenvalues[valid_columns]
+        valid_eigenvectors = eigenvectors[:, valid_columns]
+        if valid_eigenvectors.shape[1] == 0:
+            valid_eigenvalues = np.asarray((0.0,))
+            valid_eigenvectors = np.ones((node_count, 1), dtype=np.float64)
+
+        maximum = min(
+            config.max_mid_clusters
+            if config.max_mid_clusters is not None
+            else node_count,
+            node_count,
+            max(1, len(valid_eigenvalues) - 1),
+        )
+        minimum = min(config.min_mid_clusters, maximum)
+        if minimum == maximum:
+            cluster_count = maximum
+        else:
+            cluster_count = max(
+                range(minimum, maximum + 1),
+                key=lambda count: (
+                    valid_eigenvalues[count] - valid_eigenvalues[count - 1],
+                    -count,
+                ),
+            )
+        if config.max_mid_clusters is not None or requested == node_count:
+            break
+        if cluster_count == previous_cluster_count and cluster_count < maximum:
+            break
+        previous_cluster_count = cluster_count
+        requested = min(node_count, requested * 2)
     representation = valid_eigenvectors[:, :cluster_count]
     representation = _normalize_rows(representation)
     return cluster_representation(
@@ -83,6 +100,7 @@ def spectral_clustering(
         cluster_count,
         config.random_state,
         tuple(float(value) for value in valid_eigenvalues),
+        node_member_segment_ids=_node_members(graph),
     )
 
 
@@ -102,6 +120,7 @@ def semantic_only_clustering(
         cluster_count,
         random_state,
         (),
+        node_member_segment_ids=tuple((segment_id,) for segment_id in segment_ids),
     )
 
 
@@ -132,6 +151,7 @@ def separate_exclusive_event_clusters(
         labels,
         clustering.eigenvalues,
         clustering.representation,
+        node_member_segment_ids=_node_members(graph),
     )
 
 
@@ -142,6 +162,7 @@ def cluster_representation(
     cluster_count: int,
     random_state: int,
     eigenvalues: tuple[float, ...],
+    node_member_segment_ids: tuple[tuple[str, ...], ...] | None = None,
 ) -> ClusteringResult:
     if cluster_count == 1:
         labels = np.zeros(len(segment_ids), dtype=np.int64)
@@ -159,6 +180,7 @@ def cluster_representation(
         labels,
         eigenvalues,
         representation,
+        node_member_segment_ids=node_member_segment_ids,
     )
 
 
@@ -168,7 +190,13 @@ def _clustering_result(
     labels,
     eigenvalues: tuple[float, ...],
     representation: np.ndarray,
+    node_member_segment_ids: tuple[tuple[str, ...], ...] | None = None,
 ) -> ClusteringResult:
+    node_members = node_member_segment_ids or tuple(
+        (segment_id,) for segment_id in segment_ids
+    )
+    if len(node_members) != len(segment_ids):
+        raise ValueError("spectral node membership must align with graph nodes")
     unique_labels = sorted(set(int(label) for label in labels))
     members = {
         label: tuple(index for index, current_label in enumerate(labels) if current_label == label)
@@ -183,11 +211,20 @@ def _clustering_result(
     clusters = []
     for cluster_index in range(len(ordered_labels)):
         indices = [index for index, label in enumerate(canonical_labels) if label == cluster_index]
-        centroid = tuple(np.mean(segment_embeddings[indices], axis=0).tolist())
+        weights = np.asarray([len(node_members[index]) for index in indices], dtype=np.float64)
+        centroid = tuple(
+            np.average(segment_embeddings[indices], axis=0, weights=weights).tolist()
+        )
         clusters.append(
             MidCluster(
                 cluster_id=f"mid_{cluster_index:04d}",
-                member_segment_ids=tuple(sorted(segment_ids[index] for index in indices)),
+                member_segment_ids=tuple(
+                    sorted(
+                        segment_id
+                        for index in indices
+                        for segment_id in node_members[index]
+                    )
+                ),
                 centroid=centroid,
             )
         )
@@ -203,3 +240,9 @@ def _clustering_result(
 def _normalize_rows(values: np.ndarray) -> np.ndarray:
     norms = np.linalg.norm(values, axis=1, keepdims=True)
     return np.divide(values, norms, out=np.zeros_like(values), where=norms > 0)
+
+
+def _node_members(graph: GraphComponents) -> tuple[tuple[str, ...], ...]:
+    return graph.node_member_segment_ids or tuple(
+        (segment_id,) for segment_id in graph.segment_ids
+    )

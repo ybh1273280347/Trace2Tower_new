@@ -17,6 +17,7 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.alfworld_events import (
+    alfworld_goal_from_observation,
     alfworld_segment_signature,
     segment_alfworld_trajectory,
 )
@@ -84,11 +85,46 @@ async def main(options: argparse.Namespace) -> None:
         dimension=common["embedding_dimension"],
         batch_size=common["embedding_batch_size"],
     )
-    texts = (
-        [alfworld_segment_signature(segment) for group in segment_groups for segment in group]
-        if benchmark is Benchmark.ALFWORLD
-        else [webshop_segment_signature(segment) for group in segment_groups for segment in group]
-    )
+    if benchmark is Benchmark.ALFWORLD:
+        texts = []
+        for trajectory, transitions, segments in zip(
+            trajectories, transition_groups, segment_groups, strict=True
+        ):
+            observed_goal = (
+                alfworld_goal_from_observation(transitions[0].observation_before)
+                if transitions
+                else ""
+            )
+            goal = observed_goal or trajectory.task_goal
+            for index, segment in enumerate(segments):
+                texts.append(
+                    alfworld_segment_signature(
+                        segment,
+                        goal=goal,
+                        previous_event=(segments[index - 1].event_type if index else None),
+                        next_event=(
+                            segments[index + 1].event_type
+                            if index + 1 < len(segments)
+                            else None
+                        ),
+                    )
+                )
+    else:
+        texts = []
+        for trajectory, segments in zip(trajectories, segment_groups, strict=True):
+            for index, segment in enumerate(segments):
+                texts.append(
+                    webshop_segment_signature(
+                        segment,
+                        goal=trajectory.task_goal,
+                        previous_event=(segments[index - 1].event_type if index else None),
+                        next_event=(
+                            segments[index + 1].event_type
+                            if index + 1 < len(segments)
+                            else None
+                        ),
+                    )
+                )
     try:
         vectors = await encoder.embed(texts)
     finally:
@@ -151,7 +187,11 @@ async def main(options: argparse.Namespace) -> None:
         **invocation,
         "embedding_model": os.environ["EMBEDDING_MODEL"],
         "embedding_dimension": common["embedding_dimension"],
-        "embedding_input": "compact_event_segment_signature",
+        "embedding_input": (
+            "task_entity_event_context_signature"
+            if benchmark in (Benchmark.ALFWORLD, Benchmark.WEBSHOP)
+            else "compact_event_segment_signature"
+        ),
         "embedding_request_count": encoder.embedding_request_count,
         "embedding_input_tokens": encoder.embedding_input_tokens,
         "cached_unique_text_count": encoder.cached_unique_text_count,

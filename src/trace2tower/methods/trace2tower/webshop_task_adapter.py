@@ -50,6 +50,14 @@ def _constraint_terms(text: str) -> tuple[str, ...]:
 
 class WebshopTaskAdapter:
     domain = "webshop"
+    plan_rewrite_instructions = """
+WebShop plan semantics:
+- Replace every product category, brand, attribute value, option value, quantity, and price from reference strategies with the requirements of the current task. Never carry a reference value into the plan unless the current task explicitly requires the same value.
+- Use references as procedural evidence for query formulation, candidate screening, detail inspection, option selection, recovery, and purchase. When no reference shares the product category, retain only this workflow evidence.
+- Form a concise search query from the current product type and its most discriminative requested constraints. Do not require every natural-language phrase or the price limit to appear in the query.
+- Treat visible result titles, prices, product details, attribute views, and selectable options as authoritative. Do not infer compliance from semantic similarity alone.
+- Backtrack or refine the query when a candidate cannot satisfy a required property. Buy only after the current product, price, and every required selectable option have been verified.
+"""
 
     def extract_query(
         self,

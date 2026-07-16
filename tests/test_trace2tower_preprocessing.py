@@ -38,6 +38,7 @@ from trace2tower.methods.trace2tower.webshop_events import (
     WebShopEventClassifier,
     classify_webshop_steps,
     segment_webshop_trajectory,
+    webshop_segment_signature,
 )
 from trace2tower.results import FinishReason, MethodName
 from trace2tower.trajectory import EpisodeTrajectory, StepRecord
@@ -91,7 +92,7 @@ def alfworld_step(index: int, action: str) -> StepRecord:
     )
 
 
-def test_alfworld_uses_official_high_level_events_and_compact_signatures() -> None:
+def test_alfworld_uses_official_events_and_task_entity_signatures() -> None:
     steps = (
         alfworld_step(0, "go to countertop 1"),
         alfworld_step(1, "go to fridge 2"),
@@ -130,14 +131,20 @@ def test_alfworld_uses_official_high_level_events_and_compact_signatures() -> No
         (AlfworldEventType.HEAT_OBJECT, 4, 4),
         (AlfworldEventType.PUT_OBJECT, 5, 5),
     ]
-    signature = alfworld_segment_signature(segments[0])
-    assert signature == (
-        "Event: GotoLocation\nLength: 2\n"
-        "Actions: GO_TO(receptacle) -> GO_TO(receptacle)"
+    signature = alfworld_segment_signature(
+        segments[0],
+        goal=trajectory.task_goal,
+        next_event=segments[1].event_type,
     )
-    assert "countertop" not in signature
-    assert "fridge" not in signature
-    assert trajectory.task_goal not in signature
+    assert signature == (
+        "Task: put a hot apple on a countertop\n"
+        "Event context: START -> GotoLocation -> OpenObject\n"
+        "Event: GotoLocation\nLength: 2\n"
+        "Actions: GO_TO(countertop) -> GO_TO(fridge)"
+    )
+    assert "countertop 1" not in signature
+    assert "fridge 2" not in signature
+    assert trajectory.task_goal in signature
     assert "before-0" not in signature
     assert SegmentInstance.from_record(segments[0].to_record()) == segments[0]
 
@@ -304,6 +311,18 @@ def test_webshop_consecutive_events_merge_with_closed_boundaries() -> None:
         PrimitiveAction.CLICK,
         PrimitiveAction.CLICK,
     ]
+
+    signature = webshop_segment_signature(
+        option_segment,
+        goal=trajectory.task_goal,
+        previous_event=segments[1].event_type,
+        next_event=segments[3].event_type,
+    )
+    assert "Goal: buy a blue large shirt" in signature
+    assert "Previous event: CANDIDATE_SELECTION" in signature
+    assert "SELECT_OPTION(value=blue" in signature
+    assert "SELECT_OPTION(value=large" in signature
+    assert "Next event: PURCHASE_DECISION" in signature
 
 
 def test_change_point_dp_uses_semantic_groups_and_maximum_length() -> None:

@@ -124,8 +124,13 @@ class TowerSnapshot:
             if self.version is TowerVersion.V2:
                 if card.member_mid_ids != communities[skill_id].member_mid_ids:
                     raise ValueError(f"High card membership differs from community: {skill_id}")
-                if card.ordered_mid_ids:
-                    raise ValueError(f"Tower v2 High card cannot claim one fixed path: {skill_id}")
+                if card.ordered_mid_ids and not any(
+                    paths[path_id].ordered_mid_ids == card.ordered_mid_ids
+                    for path_id in communities[skill_id].member_path_ids
+                ):
+                    raise ValueError(
+                        f"High card order is not supported by its community: {skill_id}"
+                    )
             elif card.ordered_mid_ids != paths[skill_id].ordered_mid_ids:
                 raise ValueError(f"High card order differs from path: {skill_id}")
             if not set(card.child_mid_ids) <= set(mid_cards):

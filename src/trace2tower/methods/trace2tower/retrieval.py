@@ -191,6 +191,8 @@ def mid_card_text(card: MidSkillCard) -> str:
 
 
 def high_card_text(card: HighSkillCard) -> str:
+    if card.retrieval_condition:
+        return card.retrieval_condition
     return "\n".join(
         (card.name, card.description, *card.procedure, *card.constraints)
     )

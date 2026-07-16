@@ -17,7 +17,7 @@ from trace2tower.methods.trace2tower.alfworld_events import (
 )
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.graph import build_graph, ordered_segment_groups
-from trace2tower.methods.trace2tower.models import SegmentInstance
+from trace2tower.methods.trace2tower.models import SegmentInstance, event_type_from_value
 from trace2tower.methods.trace2tower.spectral import (
     semantic_only_clustering,
     separate_exclusive_event_clusters,
@@ -40,11 +40,28 @@ def load_segment_groups(
                 raise ValueError("preprocessed graph input mixes benchmarks")
             benchmark = current_benchmark
             groups.append(
-                tuple(SegmentInstance.from_record(segment) for segment in record["segments"])
+                tuple(_compact_segment(segment) for segment in record["segments"])
             )
     if benchmark is None:
         raise ValueError("graph input contains no trajectories")
     return benchmark, tuple(groups)
+
+
+def _compact_segment(record: dict) -> SegmentInstance:
+    event_type = record["event_type"]
+    return SegmentInstance(
+        segment_id=str(record["segment_id"]),
+        trajectory_id=str(record["trajectory_id"]),
+        start_step=int(record["start_step"]),
+        end_step=int(record["end_step"]),
+        transition_ids=tuple(record["transition_ids"]),
+        embedding=np.asarray(record["embedding"], dtype=np.float32),
+        trajectory_score=float(record["trajectory_score"]),
+        event_type=event_type_from_value(event_type) if event_type is not None else None,
+        raw_actions=tuple(record["raw_actions"]),
+        observation_before=str(record["observation_before"]),
+        observation_after=str(record["observation_after"]),
+    )
 
 
 def main(options: argparse.Namespace) -> int:
@@ -86,7 +103,7 @@ def main(options: argparse.Namespace) -> int:
         graph = build_graph(ordered_groups, config)
         clustering = spectral_clustering(graph, config)
         spectral_cluster_count = clustering.cluster_count
-        if benchmark is Benchmark.ALFWORLD:
+        if benchmark is Benchmark.ALFWORLD and not config.collapse_duplicate_embeddings:
             clustering = separate_exclusive_event_clusters(
                 clustering,
                 graph,
@@ -116,13 +133,24 @@ def main(options: argparse.Namespace) -> int:
         options.output_dir / "clusters.json",
         {"clusters": [cluster.to_record() for cluster in clustering.clusters]},
     )
-    cluster_sizes = Counter(clustering.labels)
+    cluster_sizes = {
+        index: len(cluster.member_segment_ids)
+        for index, cluster in enumerate(clustering.clusters)
+    }
     event_distribution = Counter(
         segment.event_type.value for segment in segments if segment.event_type is not None
     )
     report = {
         **invocation,
         "method": config.method.value,
+        "exclusive_event_post_merge": (
+            benchmark is Benchmark.ALFWORLD
+            and not config.collapse_duplicate_embeddings
+        ),
+        "graph_node_count": len(graph.segment_ids) if graph else len(segments),
+        "collapsed_segment_count": (
+            len(segments) - len(graph.segment_ids) if graph else 0
+        ),
         "cluster_count": clustering.cluster_count,
         "spectral_cluster_count": (
             spectral_cluster_count if not config.semantic_only else clustering.cluster_count

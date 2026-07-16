@@ -135,9 +135,22 @@ class ThreeSignalTrace2TowerSkillProvider:
         )
         allowed_events = alfworld_applicable_events(state.admissible_actions)
         required_events = alfworld_goal_events(task_goal)
+        selected_card_getter = getattr(
+            self.task_provider,
+            "selected_task_card",
+            None,
+        )
+        selected_card = (
+            selected_card_getter(task_goal) if selected_card_getter else None
+        )
+        graph_mid_ids = (
+            frozenset(selected_card.child_mid_ids)
+            if selected_card is not None
+            else frozenset(self.mid_cards)
+        )
         candidate_mid_ids = frozenset(
             mid_id
-            for mid_id in self.mid_cards
+            for mid_id in graph_mid_ids
             if self.event_profile.compatibility(mid_id, allowed_events)
             >= self.min_event_compatibility
             and frozenset(

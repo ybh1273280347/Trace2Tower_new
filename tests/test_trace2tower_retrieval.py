@@ -7,6 +7,7 @@ import pytest
 from trace2tower.methods.trace2tower.models import PrimitiveAction
 from trace2tower.methods.trace2tower.retrieval import (
     SkillEmbeddingIndex,
+    high_card_text,
     retrieve_tower,
 )
 from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
@@ -22,6 +23,19 @@ def mid_card(skill_id: str) -> MidSkillCard:
         constraints=(f"Check {skill_id}.",),
         grounding_actions=(PrimitiveAction.GOTO,),
     )
+
+
+def test_high_retrieval_text_prefers_the_structural_task_condition() -> None:
+    card = HighSkillCard(
+        "high_rug",
+        ("mid_a", "mid_b"),
+        "Generic shopping plan",
+        "Search, verify, and buy a product.",
+        ("Search for the product.", "Buy after verification."),
+        retrieval_condition="red washable area rug under 100 dollars",
+    )
+
+    assert high_card_text(card) == "red washable area rug under 100 dollars"
 
 
 def test_retrieval_expands_high_then_deduplicates_direct_mid() -> None:

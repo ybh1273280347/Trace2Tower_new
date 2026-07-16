@@ -14,8 +14,11 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.goal_conditioned_high_paths import (
+    mine_goal_conditioned_high_paths,
+)
 from trace2tower.methods.trace2tower.high_paths import mine_high_paths
-from trace2tower.methods.trace2tower.models import MidCluster
+from trace2tower.methods.trace2tower.models import HighPathDiscovery, MidCluster
 from trace2tower.methods.trace2tower.renderer import (
     RendererStyle,
     render_high_card,
@@ -194,6 +197,8 @@ def build_trajectory_render_contexts(
 async def main(options: argparse.Namespace) -> int:
     if options.render_high_limit < 0:
         raise ValueError("render High limit must be non-negative")
+    if options.render_concurrency is not None and options.render_concurrency <= 0:
+        raise ValueError("render concurrency must be positive")
     if options.structure_only and options.render_all_mid:
         raise ValueError("structure-only build cannot render Mid cards")
     load_dotenv(options.env)
@@ -211,18 +216,24 @@ async def main(options: argparse.Namespace) -> int:
     )
     mid_inputs = build_mid_render_inputs(records, clusters)
     trajectory_contexts = build_trajectory_render_contexts(records, clusters)
-    high_paths = (
-        ()
-        if config.semantic_only
-        else mine_high_paths(
+    if config.semantic_only:
+        high_paths = ()
+    elif config.high_path_discovery is HighPathDiscovery.GOAL_CONDITIONED_TRAJECTORY:
+        high_paths = mine_goal_conditioned_high_paths(
+            records,
+            clusters,
+            success_threshold=config.success_threshold,
+        )
+    else:
+        high_paths = mine_high_paths(
             records,
             clusters,
             max_path_length=config.max_high_path_length,
             min_support_ratio=config.high_min_support_ratio,
+            min_success_count=config.high_min_success_count,
             epsilon=config.high_path_epsilon,
             success_threshold=config.success_threshold,
         )
-    )
     used_high_fallback = False
     if not high_paths and options.ensure_high_path and not config.semantic_only:
         high_paths = mine_high_paths(
@@ -230,6 +241,7 @@ async def main(options: argparse.Namespace) -> int:
             clusters,
             max_path_length=config.max_high_path_length,
             min_support_ratio=0.0,
+            min_success_count=0,
             epsilon=config.high_path_epsilon,
             success_threshold=config.success_threshold,
         )[:1]
@@ -246,6 +258,7 @@ async def main(options: argparse.Namespace) -> int:
         "success_threshold": config.success_threshold,
         "ensure_high_path": options.ensure_high_path,
         "renderer_style": options.renderer_style.value,
+        "render_concurrency": options.render_concurrency,
     }
     print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
     options.output_dir.mkdir(parents=True, exist_ok=True)
@@ -316,7 +329,11 @@ async def main(options: argparse.Namespace) -> int:
     if missing_mid_ids or missing_paths:
         common = load_yaml(options.config_root / "common.yaml")
         runtime = CommonLLMRuntime(
-            max_concurrency=common["global_api_concurrency"],
+            max_concurrency=(
+                options.render_concurrency
+                if options.render_concurrency is not None
+                else common["global_api_concurrency"]
+            ),
             max_attempts=common["provider_max_attempts"],
             timeout_seconds=common["provider_timeout_seconds"],
             retry_base_seconds=common["retry_base_seconds"],
@@ -402,7 +419,9 @@ async def main(options: argparse.Namespace) -> int:
         "new_high_count": len(high_cards) - reused_high_count,
         "max_high_path_length": config.max_high_path_length,
         "high_min_support_ratio": config.high_min_support_ratio,
+        "high_min_success_count": config.high_min_success_count,
         "high_path_epsilon": config.high_path_epsilon,
+        "high_path_discovery": config.high_path_discovery.value,
     }
     write_json(options.output_dir / "report.json", report)
     print(yaml.safe_dump(report, sort_keys=False))
@@ -417,6 +436,7 @@ if __name__ == "__main__":
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--render-high-limit", type=int, default=0)
+    parser.add_argument("--render-concurrency", type=int)
     parser.add_argument("--render-all-mid", action="store_true")
     parser.add_argument("--structure-only", action="store_true")
     parser.add_argument("--ensure-high-path", action="store_true")

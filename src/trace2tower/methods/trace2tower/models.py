@@ -60,6 +60,22 @@ class WebShopEventType(StrEnum):
     OTHER_CLICK = "OTHER_CLICK"
 
 
+class HighPathDiscovery(StrEnum):
+    CONTRASTIVE_SUBSEQUENCE = "contrastive_subsequence"
+    GOAL_CONDITIONED_TRAJECTORY = "goal_conditioned_trajectory"
+
+
+class SemanticNeighborScope(StrEnum):
+    GLOBAL = "global"
+    SAME_EVENT = "same_event"
+
+
+class GraphOutcomeMode(StrEnum):
+    BINARY_CONTRASTIVE = "binary_contrastive"
+    CONTINUOUS_SIGNED = "continuous_signed"
+    CONTINUOUS_RESIDUAL = "continuous_residual"
+
+
 EventType = AlfworldEventType | WebShopEventType
 
 
@@ -170,9 +186,13 @@ class HighPath:
     negative_support: float
     contrastive_score: float
     supporting_trajectory_ids: tuple[str, ...]
+    task_condition: str = ""
 
     def to_record(self) -> dict:
-        return asdict(self)
+        record = asdict(self)
+        if not self.task_condition:
+            record.pop("task_condition")
+        return record
 
     @classmethod
     def from_record(cls, record: dict) -> HighPath:
@@ -183,6 +203,7 @@ class HighPath:
             negative_support=float(record["negative_support"]),
             contrastive_score=float(record["contrastive_score"]),
             supporting_trajectory_ids=tuple(record["supporting_trajectory_ids"]),
+            task_condition=str(record.get("task_condition", "")),
         )
 
 

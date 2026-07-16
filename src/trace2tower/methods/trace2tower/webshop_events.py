@@ -209,10 +209,18 @@ def segment_webshop_trajectory(
     return tuple(segments)
 
 
-def webshop_segment_signature(segment: SegmentInstance) -> str:
+def webshop_segment_signature(
+    segment: SegmentInstance,
+    *,
+    goal: str = "",
+    previous_event: WebShopEventType | None = None,
+    next_event: WebShopEventType | None = None,
+) -> str:
     if segment.event_type is None:
         raise ValueError("WebShop segment signature requires an event type")
 
+    before_context = _compact_page_context(segment.observation_before)
+    after_context = _compact_page_context(segment.observation_after)
     action_templates = []
     for raw_action in segment.raw_actions:
         try:
@@ -224,8 +232,8 @@ def webshop_segment_signature(segment: SegmentInstance) -> str:
         arguments = action.get("arguments") or {}
         if name == "search_action":
             keywords = arguments.get("keywords")
-            keyword_count = len(keywords.split()) if isinstance(keywords, str) else 0
-            action_templates.append(f"SEARCH(keywords={keyword_count})")
+            query = _normalize_text(keywords) if isinstance(keywords, str) else ""
+            action_templates.append(f"SEARCH(query={query})")
             continue
         if name != "click_action":
             action_templates.append(str(name or "UNKNOWN_ACTION").upper())
@@ -235,14 +243,18 @@ def webshop_segment_signature(segment: SegmentInstance) -> str:
         normalized_value = value.strip().casefold() if isinstance(value, str) else ""
         if segment.event_type is WebShopEventType.ATTRIBUTE_INSPECTION:
             detail = normalized_value if normalized_value in DETAIL_VALUES else "detail"
-            action_templates.append(f"OPEN_DETAIL({detail})")
+            action_templates.append(f"OPEN_DETAIL({detail}, product={before_context})")
         elif segment.event_type is WebShopEventType.RESULT_NAVIGATION:
             direction = "next" if normalized_value == "next >" else "previous"
             action_templates.append(f"PAGE({direction})")
         elif segment.event_type is WebShopEventType.CANDIDATE_SELECTION:
-            action_templates.append("OPEN_PRODUCT")
+            action_templates.append(
+                f"OPEN_PRODUCT(id={normalized_value}, product={after_context})"
+            )
         elif segment.event_type is WebShopEventType.OPTION_SELECTION:
-            action_templates.append("SELECT_OPTION")
+            action_templates.append(
+                f"SELECT_OPTION(value={normalized_value}, product={before_context})"
+            )
         elif segment.event_type is WebShopEventType.DETAIL_BACKTRACKING:
             action_templates.append("BACK_TO_PRODUCT")
         elif segment.event_type is WebShopEventType.SEARCH_BACKTRACKING:
@@ -254,8 +266,23 @@ def webshop_segment_signature(segment: SegmentInstance) -> str:
 
     return "\n".join(
         (
+            f"Goal: {_normalize_text(goal)}",
+            f"Previous event: {previous_event.value if previous_event else 'START'}",
             f"Event: {segment.event_type.value}",
+            f"Next event: {next_event.value if next_event else 'END'}",
             f"Length: {segment.end_step - segment.start_step + 1}",
             f"Actions: {' -> '.join(action_templates)}",
+            f"Page before: {before_context}",
+            f"Page after: {after_context}",
         )
     )
+
+
+def _compact_page_context(observation: str) -> str:
+    lines = tuple(line.strip() for line in observation.splitlines() if line.strip())
+    first_line = lines[0] if lines else ""
+    return f"{infer_webshop_page_type(observation).value}:{_normalize_text(first_line)[:240]}"
+
+
+def _normalize_text(text: str) -> str:
+    return " ".join(text.casefold().strip().split())

@@ -117,10 +117,11 @@ class HighSkillCard:
     procedure: tuple[str, ...]
     constraints: tuple[str, ...] = ()
     member_mid_ids: tuple[str, ...] = ()
+    retrieval_condition: str = ""
 
     @property
     def child_mid_ids(self) -> tuple[str, ...]:
-        return self.member_mid_ids or self.ordered_mid_ids
+        return self.ordered_mid_ids or self.member_mid_ids
 
     def to_record(self) -> dict:
         record = {
@@ -129,10 +130,13 @@ class HighSkillCard:
             "name": self.name,
             "description": self.description,
             "procedure": self.procedure,
-            "constraints": self.constraints,
         }
+        if self.constraints:
+            record["constraints"] = self.constraints
         if self.member_mid_ids:
             record["member_mid_ids"] = self.member_mid_ids
+        if self.retrieval_condition:
+            record["retrieval_condition"] = self.retrieval_condition
         return record
 
     @classmethod
@@ -145,6 +149,7 @@ class HighSkillCard:
             procedure=tuple(record["procedure"]),
             constraints=tuple(record.get("constraints", ())),
             member_mid_ids=tuple(record.get("member_mid_ids", ())),
+            retrieval_condition=str(record.get("retrieval_condition", "")),
         )
 
 

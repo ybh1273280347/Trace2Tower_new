@@ -11,7 +11,7 @@ import yaml
 from dotenv import load_dotenv
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
-from trace2tower.llm_runtime import CommonLLMRuntime
+from trace2tower.llm_runtime import CommonLLMRuntime, EmbeddingResult, LLMUsage
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.retrieval import (
     SkillEmbeddingIndex,
@@ -44,6 +44,16 @@ async def main(options: argparse.Namespace) -> int:
     }
     reusable_mid_vectors = {}
     reusable_high_vectors = {}
+    embedding_checkpoint_path = options.output.with_name(
+        f"{options.output.stem}.embedding-checkpoint.json"
+    )
+    embedding_checkpoint = (
+        json.loads(embedding_checkpoint_path.read_text(encoding="utf-8")).get(
+            "vectors_by_text_hash", {}
+        )
+        if embedding_checkpoint_path.exists()
+        else {}
+    )
     if options.output.exists():
         existing = json.loads(options.output.read_text(encoding="utf-8"))
         existing_mid = SkillEmbeddingIndex.from_record(existing["mid_index"])
@@ -70,6 +80,16 @@ async def main(options: argparse.Namespace) -> int:
                 )
                 if high_hashes.get(skill_id) == text_hash
             }
+    reusable_mid_vectors |= {
+        skill_id: tuple(embedding_checkpoint[text_hash])
+        for skill_id, text_hash in mid_hashes.items()
+        if skill_id not in reusable_mid_vectors and text_hash in embedding_checkpoint
+    }
+    reusable_high_vectors |= {
+        skill_id: tuple(embedding_checkpoint[text_hash])
+        for skill_id, text_hash in high_hashes.items()
+        if skill_id not in reusable_high_vectors and text_hash in embedding_checkpoint
+    }
     missing_mid_ids = tuple(
         skill_id for skill_id in mid_texts if skill_id not in reusable_mid_vectors
     )
@@ -84,12 +104,28 @@ async def main(options: argparse.Namespace) -> int:
     )
     try:
         mid_result = (
-            await runtime.embed([mid_texts[skill_id] for skill_id in missing_mid_ids])
+            await _embed_batches(
+                runtime,
+                [mid_texts[skill_id] for skill_id in missing_mid_ids],
+                [mid_hashes[skill_id] for skill_id in missing_mid_ids],
+                options.embedding_batch_size,
+                options.embedding_batch_delay_seconds,
+                embedding_checkpoint,
+                embedding_checkpoint_path,
+            )
             if missing_mid_ids
             else None
         )
         high_result = (
-            await runtime.embed([high_texts[skill_id] for skill_id in missing_high_ids])
+            await _embed_batches(
+                runtime,
+                [high_texts[skill_id] for skill_id in missing_high_ids],
+                [high_hashes[skill_id] for skill_id in missing_high_ids],
+                options.embedding_batch_size,
+                options.embedding_batch_delay_seconds,
+                embedding_checkpoint,
+                embedding_checkpoint_path,
+            )
             if missing_high_ids
             else None
         )
@@ -178,6 +214,53 @@ async def main(options: argparse.Namespace) -> int:
     return 0
 
 
+async def _embed_batches(
+    runtime: CommonLLMRuntime,
+    texts: list[str],
+    text_hashes: list[str],
+    batch_size: int,
+    delay_seconds: float,
+    checkpoint: dict[str, list[float]],
+    checkpoint_path: Path,
+) -> EmbeddingResult:
+    if batch_size <= 0 or delay_seconds < 0:
+        raise ValueError("embedding batch settings are invalid")
+    results = []
+    if len(texts) != len(text_hashes):
+        raise ValueError("embedding texts and hashes must align")
+    for start in range(0, len(texts), batch_size):
+        if start and delay_seconds:
+            await asyncio.sleep(delay_seconds)
+        result = await runtime.embed(texts[start : start + batch_size])
+        results.append(result)
+        for text_hash, vector in zip(
+            text_hashes[start : start + batch_size], result.vectors, strict=True
+        ):
+            checkpoint[text_hash] = list(vector)
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        write_json(checkpoint_path, {"vectors_by_text_hash": checkpoint})
+    return EmbeddingResult(
+        vectors=tuple(vector for result in results for vector in result.vectors),
+        usage=LLMUsage(
+            input_tokens=_sum_usage(result.usage.input_tokens for result in results),
+            output_tokens=_sum_usage(result.usage.output_tokens for result in results),
+            billable_tokens=_sum_usage(result.usage.billable_tokens for result in results),
+            cached_input_tokens=_sum_usage(
+                result.usage.cached_input_tokens for result in results
+            ),
+            cache_write_input_tokens=_sum_usage(
+                result.usage.cache_write_input_tokens for result in results
+            ),
+        ),
+        latency_ms=sum(result.latency_ms for result in results),
+    )
+
+
+def _sum_usage(values) -> int | None:
+    counts = tuple(value for value in values if value is not None)
+    return sum(counts) if counts else None
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cards", type=Path, required=True)
@@ -187,6 +270,8 @@ if __name__ == "__main__":
     parser.add_argument("--query-observation")
     parser.add_argument("--direct-mid-top-k", type=int, choices=(3, 5, 8), default=3)
     parser.add_argument("--high-similarity-threshold", type=float, default=-1.0)
+    parser.add_argument("--embedding-batch-size", type=int, default=16)
+    parser.add_argument("--embedding-batch-delay-seconds", type=float, default=0.0)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))

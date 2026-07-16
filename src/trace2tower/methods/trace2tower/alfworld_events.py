@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 
 from trace2tower.methods.trace2tower.action_parser import parse_alfworld_action
@@ -78,6 +79,22 @@ ALFWORLD_GOAL_EVENT_PHRASES = {
 }
 ALFWORLD_EXCLUSIVE_PATH_EVENTS = frozenset(ALFWORLD_GOAL_EVENT_PHRASES)
 
+_OBSERVED_GOAL_RE = re.compile(r"your task is to:\s*(.+?)(?:\n|$)", re.IGNORECASE)
+_INSTANCE_RE = re.compile(r"\s+\d+$")
+_FROM_RE = re.compile(r"^(?:take|pick)\s+(.+?)\s+from\s+(.+?)$", re.IGNORECASE)
+_TO_RE = re.compile(
+    r"^(?:put|move)\s+(.+?)\s+(?:to|in/on|in|on)\s+(.+?)$",
+    re.IGNORECASE,
+)
+_WITH_RE = re.compile(
+    r"^(clean|heat|cool|slice)\s+(.+?)\s+with\s+(.+?)$",
+    re.IGNORECASE,
+)
+_UNARY_RE = re.compile(
+    r"^(go to|open|close|use|toggle|examine)\s+(.+?)$",
+    re.IGNORECASE,
+)
+
 
 def classify_alfworld_transitions(
     transitions: Sequence[StepTransition],
@@ -138,31 +155,65 @@ def segment_alfworld_trajectory(
     return tuple(segments)
 
 
-def alfworld_segment_signature(segment: SegmentInstance) -> str:
+def alfworld_goal_from_observation(observation: str) -> str:
+    match = _OBSERVED_GOAL_RE.search(observation)
+    return _normalize_text(match.group(1)) if match else ""
+
+
+def alfworld_segment_signature(
+    segment: SegmentInstance,
+    *,
+    goal: str = "",
+    previous_event: AlfworldEventType | None = None,
+    next_event: AlfworldEventType | None = None,
+) -> str:
     if not isinstance(segment.event_type, AlfworldEventType):
         raise ValueError("ALFWorld segment signature requires an ALFWorld event type")
 
-    actions = []
-    for raw_action in segment.raw_actions:
-        if segment.event_type is AlfworldEventType.SCAN:
-            action = raw_action.strip().casefold()
-            if action == "inventory":
-                actions.append("INVENTORY")
-            elif action == "look":
-                actions.append("LOOK")
-            elif action.startswith("examine "):
-                actions.append("EXAMINE(entity)")
-            else:
-                actions.append("SCAN")
-        else:
-            actions.append(EVENT_ACTION_TEMPLATES[segment.event_type])
+    actions = [_normalized_action_signature(action) for action in segment.raw_actions]
     return "\n".join(
         (
+            f"Task: {_normalize_text(goal) or 'unknown'}",
+            "Event context: "
+            f"{previous_event.value if previous_event else 'START'} -> "
+            f"{segment.event_type.value} -> "
+            f"{next_event.value if next_event else 'END'}",
             f"Event: {segment.event_type.value}",
             f"Length: {segment.end_step - segment.start_step + 1}",
             f"Actions: {' -> '.join(actions)}",
         )
     )
+
+
+def _normalize_text(value: str) -> str:
+    return " ".join(value.casefold().strip().split())
+
+
+def _normalize_entity(value: str) -> str:
+    return _INSTANCE_RE.sub("", _normalize_text(value))
+
+
+def _normalized_action_signature(raw_action: str) -> str:
+    action = _normalize_text(raw_action)
+    if action in {"inventory", "look", "help"}:
+        return action.upper()
+    match = _FROM_RE.match(action)
+    if match:
+        return f"PICK_UP({_normalize_entity(match.group(1))}, {_normalize_entity(match.group(2))})"
+    match = _TO_RE.match(action)
+    if match:
+        return f"PUT({_normalize_entity(match.group(1))}, {_normalize_entity(match.group(2))})"
+    match = _WITH_RE.match(action)
+    if match:
+        return (
+            f"{match.group(1).upper()}({_normalize_entity(match.group(2))}, "
+            f"{_normalize_entity(match.group(3))})"
+        )
+    match = _UNARY_RE.match(action)
+    if match:
+        operation = match.group(1).replace(" ", "_").upper()
+        return f"{operation}({_normalize_entity(match.group(2))})"
+    return re.sub(r"\s+\d+\b", "", action).upper()
 
 
 def alfworld_applicable_events(

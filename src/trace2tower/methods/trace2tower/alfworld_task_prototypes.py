@@ -78,6 +78,10 @@ def goal_destination(goal: str) -> str:
     return normalize_entity(match.group(1)) if match else ""
 
 
+def goal_target_count(goal: str) -> int:
+    return 2 if re.search(r"\b(?:two|2)\b", goal, re.IGNORECASE) else 1
+
+
 @dataclass(frozen=True, slots=True)
 class AlfworldTaskPrototype:
     canonical_goal: str

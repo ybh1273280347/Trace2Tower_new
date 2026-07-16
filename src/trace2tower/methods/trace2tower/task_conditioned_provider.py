@@ -7,6 +7,7 @@ from trace2tower.agent import SkillSelection
 from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.trace2tower.retrieval import format_tower_context
+from trace2tower.methods.trace2tower.skills import HighSkillCard
 from trace2tower.methods.trace2tower.task_conditioning import (
     DomainTaskAdapter,
     TaskCompatibility,
@@ -28,12 +29,15 @@ class TaskConditionedHighProvider:
         minimum_compatibility: TaskCompatibility,
         similarity_threshold: float = -1.0,
         initial_mid_top_k: int = 0,
+        initial_mid_from_high: bool = False,
     ):
         snapshot.require_complete()
         if set(conditions) != set(snapshot.high_index.skill_ids):
             raise ValueError("task-condition profile does not bind to the Tower")
         if not 0 <= initial_mid_top_k <= len(snapshot.mid_cards):
             raise ValueError("initial Mid Top-K must fit the Mid library")
+        if initial_mid_top_k and initial_mid_from_high:
+            raise ValueError("choose semantic or High-path initial Mid retrieval")
         self.runtime = runtime
         self.snapshot = snapshot
         self.conditions = conditions
@@ -41,8 +45,10 @@ class TaskConditionedHighProvider:
         self.minimum_compatibility = minimum_compatibility
         self.similarity_threshold = similarity_threshold
         self.initial_mid_top_k = initial_mid_top_k
+        self.initial_mid_from_high = initial_mid_from_high
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
+        self.selected_cards: dict[str, HighSkillCard | None] = {}
 
     @classmethod
     def from_path(
@@ -94,7 +100,15 @@ class TaskConditionedHighProvider:
                 query_condition,
                 self.conditions[source_card.skill_id],
             )
-        mid_cards = ()
+        self.selected_cards[self._task_key(task_goal)] = card
+        mid_cards = (
+            tuple(
+                self.mid_cards[mid_id]
+                for mid_id in dict.fromkeys(card.child_mid_ids)
+            )
+            if self.initial_mid_from_high and card is not None
+            else ()
+        )
         if self.initial_mid_top_k:
             mid_matches = self.snapshot.mid_index.search(
                 query.vectors[1],
@@ -111,6 +125,13 @@ class TaskConditionedHighProvider:
             model_output_tokens=0,
             context_skill_ids=(((card.skill_id,) if card else ()) + mid_ids),
         )
+
+    def selected_task_card(self, task_goal: str) -> HighSkillCard | None:
+        return self.selected_cards.get(self._task_key(task_goal))
+
+    @staticmethod
+    def _task_key(task_goal: str) -> str:
+        return " ".join(task_goal.casefold().strip().split())
 
     async def select_state(
         self,

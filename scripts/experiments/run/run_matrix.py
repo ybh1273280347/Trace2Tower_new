@@ -33,6 +33,10 @@ from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.trace2tower.labeled_mid_provider import (
     LabeledMidDiagnosticProvider,
 )
+from trace2tower.methods.trace2tower.plan_rewrite_provider import (
+    PlanRewriteTrace2TowerProvider,
+    PlanRewriteWithDynamicMidProvider,
+)
 from trace2tower.methods.trace2tower.task_adapter_factory import task_adapter_for
 from trace2tower.methods.trace2tower.task_conditioned_provider import (
     TaskConditionedHighProvider,
@@ -197,6 +201,8 @@ def create_provider(
             "three_signal_graph",
             "task_conditioned_high",
             "task_conditioned_three_signal",
+            "plan_rewrite",
+            "plan_rewrite_graph_mid",
         }:
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
@@ -207,7 +213,70 @@ def create_provider(
         task_conditioned_three_signal = (
             retrieval_strategy == "task_conditioned_three_signal"
         )
+        plan_rewrite = retrieval_strategy in {
+            "plan_rewrite",
+            "plan_rewrite_graph_mid",
+        }
         hierarchical = method_config.get("retrieval_contract") == "hierarchical"
+        if plan_rewrite:
+            task_provider = PlanRewriteTrace2TowerProvider.from_path(
+                runtime,
+                artifact.path,
+                adapter=task_adapter_for(artifact.benchmark),
+                reference_high_top_k=int(method_config["reference_high_top_k"]),
+                high_similarity_threshold=float(
+                    method_config["high_similarity_threshold"]
+                ),
+                skills_per_step=int(method_config["skills_per_step"]),
+                max_mid_skills=int(method_config["max_mid_skills"]),
+                mid_similarity_threshold=float(
+                    method_config["mid_similarity_threshold"]
+                ),
+                expose_reference_mid_evidence=bool(
+                    method_config.get("expose_reference_mid_evidence", False)
+                ),
+                rewrite_model_role=ModelRole(method_config["rewrite_model_role"]),
+                rewrite_max_output_tokens=int(
+                    method_config["rewrite_max_output_tokens"]
+                ),
+            )
+            if retrieval_strategy == "plan_rewrite_graph_mid":
+                state_provider = Trace2TowerSkillProvider.from_path(
+                    runtime,
+                    artifact.path,
+                    graph_profile_path=Path(method_config["graph_profile"]),
+                    lifecycle_report_path=(
+                        Path(method_config["lifecycle_report"])
+                        if method_config.get("lifecycle_report")
+                        else None
+                    ),
+                    include_high=False,
+                    high_similarity_threshold=float(
+                        method_config["high_similarity_threshold"]
+                    ),
+                    mid_context_budget=int(method_config["mid_context_budget"]),
+                    min_event_compatibility=float(
+                        method_config["min_event_compatibility"]
+                    ),
+                    direct_mid_similarity_threshold=float(
+                        method_config.get("direct_mid_similarity_threshold", 0.45)
+                    ),
+                    direct_mid_dedup_similarity_threshold=float(
+                        method_config["direct_mid_dedup_similarity_threshold"]
+                    ),
+                    direct_mid_mmr_lambda=float(
+                        method_config["direct_mid_mmr_lambda"]
+                    ),
+                    status_tie_epsilon=float(
+                        method_config.get("status_tie_epsilon", 0.0)
+                    ),
+                    low_top_k=0,
+                )
+                return PlanRewriteWithDynamicMidProvider(
+                    task_provider,
+                    state_provider,
+                )
+            return task_provider
         if task_conditioned_high or task_conditioned_three_signal:
             task_provider = TaskConditionedHighProvider.from_path(
                 runtime,
@@ -219,6 +288,9 @@ def create_provider(
                     method_config["minimum_task_compatibility"]
                 ),
                 initial_mid_top_k=int(method_config.get("initial_mid_top_k", 0)),
+                initial_mid_from_high=bool(
+                    method_config.get("initial_mid_from_high", False)
+                ),
             )
             if task_conditioned_three_signal:
                 return ThreeSignalTrace2TowerSkillProvider.from_task_provider(
@@ -513,9 +585,11 @@ async def main(options: argparse.Namespace) -> int:
         if method_config.get("retrieval_strategy") in {
             "task_conditioned_high",
             "task_conditioned_three_signal",
+            "plan_rewrite",
+            "plan_rewrite_graph_mid",
         }:
             if options.direct_mid_top_k is not None:
-                raise ValueError("task-conditioned High does not accept Mid caps")
+                raise ValueError("one-shot task retrieval does not accept legacy Mid caps")
         elif method_config.get("retrieval_contract") == "hierarchical":
             limits = tuple(
                 int(method_config[field])

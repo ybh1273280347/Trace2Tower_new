@@ -41,10 +41,16 @@ def mine_high_paths(
     *,
     max_path_length: int = 4,
     min_support_ratio: float = 0.02,
+    min_success_count: int = 0,
     epsilon: float = 1e-6,
     success_threshold: float = 0.999,
 ) -> tuple[HighPath, ...]:
-    if max_path_length < 2 or not 0 <= min_support_ratio <= 1 or epsilon <= 0:
+    if (
+        max_path_length < 2
+        or not 0 <= min_support_ratio <= 1
+        or min_success_count < 0
+        or epsilon <= 0
+    ):
         raise ValueError("invalid High path mining configuration")
     sequences = trajectory_mid_sequences(records, clusters)
     records_by_id = {str(record["trajectory_id"]): record for record in records}
@@ -95,7 +101,7 @@ def mine_high_paths(
         negative_support = (
             negative_count / len(negative_samples) if negative_samples else 0.0
         )
-        if positive_support < min_support_ratio:
+        if positive_count < min_success_count or positive_support < min_support_ratio:
             continue
         contrastive_score = positive_support * math.log(
             (positive_support + epsilon) / (negative_support + epsilon)

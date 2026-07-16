@@ -50,7 +50,7 @@ Card requirements:
 - grounding_actions: choose only from the enum exposed by the function schema. Include an action only when it is needed by the rendered procedure. An empty list is valid if the cluster contains no legal official primitive.
 
 Generalization rules:
-- Generalize incidental entity names and values into functional roles only when the role is evident.
+- Preserve goal-defining entity categories, attributes, quantities, and constraints when they are stable across positive members. Generalize a value into a functional role only when it actually varies across the positive evidence or is absent from the goals.
 - Keep distinctions that change execution, prerequisites, observable state, or completion.
 - Do not merge separate goals into a synthetic compound goal. If members show variants of one behavior, express the common behavior and place variant-specific conditions in constraints.
 - Do not omit a stable prerequisite, state check, or completion check merely because it occurs immediately outside the local segment. Keep the card focused on the Mid behavior, but make it self-contained enough that another agent can apply it without rediscovering the required state.
@@ -131,6 +131,7 @@ Card requirements:
 
 Composition rules:
 - Bind the objective's required entities, quantities, attributes, transformations, and destination before acting when successful evidence does so.
+- Treat task_condition as authoritative applicability evidence. Preserve its goal-defining entity category, attributes, quantities, and constraints; do not erase them into generic words such as target, product, object, attribute, or option. Parameterize only values that vary across successful examples, and never memorize opaque environment identifiers.
 - Preserve dependencies across phases. Do not enter a later phase merely because its tool, location, control, or entity is visible.
 - Generalize incidental values but keep distinctions that change prerequisites, order, verification, or completion.
 - Remove exploration and repeated detours from the main procedure. Put necessary search and recovery discipline in constraints.
@@ -442,6 +443,7 @@ async def render_high_card(
         raise ValueError(f"High path is missing child Mid cards: {sorted(missing)}")
     render_input = {
         "path_id": path.path_id,
+        "task_condition": path.task_condition,
         "ordered_mid_ids": path.ordered_mid_ids,
         "child_mid_cards": [
             {
@@ -508,6 +510,114 @@ async def render_high_card(
             description=_required_text(payload, "description"),
             procedure=_required_text_tuple(payload, "procedure"),
             constraints=_required_text_tuple(payload, "constraints"),
+            retrieval_condition=path.task_condition,
+        ),
+        result,
+    )
+
+
+async def render_task_conditioned_high_card(
+    runtime: CommonLLMRuntime,
+    benchmark: Benchmark,
+    community_id: str,
+    task_condition: Mapping[str, object],
+    path: HighPath,
+    parent_high_card: HighSkillCard,
+    child_mid_cards: Mapping[str, MidSkillCard],
+    member_mid_ids: Sequence[str],
+    successful_examples: Sequence[Mapping[str, object]],
+    unsuccessful_examples: Sequence[Mapping[str, object]],
+) -> tuple[HighSkillCard, ChatResult]:
+    missing = set(path.ordered_mid_ids) - set(child_mid_cards)
+    if missing:
+        raise ValueError(f"task-conditioned High is missing Mid cards: {sorted(missing)}")
+    render_input = {
+        "task_condition": task_condition,
+        "parent_community_strategy": {
+            "name": parent_high_card.name,
+            "description": parent_high_card.description,
+            "procedure": parent_high_card.procedure,
+            "constraints": parent_high_card.constraints,
+        },
+        "ordered_mid_ids": path.ordered_mid_ids,
+        "child_mid_cards": [
+            {
+                "skill_id": child_mid_cards[mid_id].skill_id,
+                "name": child_mid_cards[mid_id].name,
+                "description": child_mid_cards[mid_id].description,
+                "procedure": child_mid_cards[mid_id].procedure,
+                "constraints": child_mid_cards[mid_id].constraints,
+                "grounding_actions": child_mid_cards[mid_id].grounding_actions,
+            }
+            for mid_id in path.ordered_mid_ids
+        ],
+        "positive_support": path.positive_support,
+        "negative_support": path.negative_support,
+        "contrastive_path_score": path.contrastive_score,
+        "successful_complete_trajectories": list(successful_examples),
+        "unsuccessful_complete_trajectories": list(unsuccessful_examples),
+    }
+    tool = _tool(
+        "render_high_skill",
+        "Render one task-conditioned end-to-end strategy from a fixed graph path.",
+        {
+            "name": _text_property("Short strategy name."),
+            "description": _text_property("Complete concrete objective for this strategy."),
+            "procedure": _string_array("End-to-end execution checklist."),
+            "constraints": _string_array("Contrast-derived failure guards and recovery rules."),
+        },
+        ["name", "description", "procedure", "constraints"],
+    )
+    result = await runtime.chat(
+        ModelRole.RENDERER,
+        [
+            {
+                "role": "system",
+                "content": (
+                    _high_renderer_instructions(RendererStyle.TRACE2TOWER, benchmark)
+                    + """
+
+Task-conditioned graph contract:
+- The task condition is authoritative for target type, quantity, required transformation, device class, and final destination.
+- The ordered Mid path is fixed graph evidence. Preserve its causal relations, but restore initial search, acquisition, repeated-object progress, and final completion when the mined path is only a structural backbone.
+- Compare all supplied successful and unsuccessful complete trajectories for this task condition. Prefer relations repeated across successful variants over any one shortest trajectory.
+- Preserve source receptacle categories that repeat across successful variants as an ordered search prior. Phrase them as likely candidates with fallback to other unvisited locations, never as a guaranteed fixed location.
+- Instance numbers and one-off source locations are scene-specific and must not be copied.
+- Name exact environment action forms only as conditional examples. Never prescribe a source receptacle merely because one successful trajectory used it.
+- Produce one compact execution card suitable for one-time task-start injection.
+"""
+                ),
+            },
+            {
+                "role": "user",
+                "content": json.dumps(
+                    render_input,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ),
+            },
+        ],
+        tools=[tool],
+        tool_choice="required",
+        temperature=0,
+        max_output_tokens=1200,
+        prompt_cache_key=f"trace2tower:high:{benchmark.value}:task-community-v3",
+    )
+    payload = _tool_payload(
+        result,
+        "render_high_skill",
+        {"name", "description", "procedure", "constraints"},
+    )
+    return (
+        HighSkillCard(
+            community_id,
+            path.ordered_mid_ids,
+            _required_text(payload, "name"),
+            _required_text(payload, "description"),
+            _required_text_tuple(payload, "procedure"),
+            _required_text_tuple(payload, "constraints"),
+            tuple(member_mid_ids),
         ),
         result,
     )

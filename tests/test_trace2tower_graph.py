@@ -16,7 +16,9 @@ from trace2tower.methods.trace2tower.graph import (
 )
 from trace2tower.methods.trace2tower.models import (
     AlfworldEventType,
+    GraphOutcomeMode,
     SegmentInstance,
+    SemanticNeighborScope,
     WebShopEventType,
 )
 from trace2tower.methods.trace2tower.spectral import (
@@ -74,6 +76,72 @@ def test_rho_uses_own_score_with_unit_smoothing_prior() -> None:
     )
     graph = build_graph(segments, config())
     assert graph.rho == pytest.approx((0.5, 0.5))
+
+
+def test_collapsed_duplicate_embeddings_use_full_group_outcome() -> None:
+    groups = (
+        (segment("s0", "t0", 0, (1.0, 0.0), 1.0),),
+        (segment("s1", "t1", 0, (1.0, 0.0), 1.0),),
+        (segment("s2", "t2", 0, (1.0, 0.0), 0.0),),
+        (segment("s3", "t3", 0, (0.0, 1.0), 0.0),),
+    )
+    graph = build_graph(groups, config(collapse_duplicate_embeddings=True))
+    assert len(graph.segment_ids) == 2
+    assert sorted(len(group) for group in graph.node_member_segment_ids) == [1, 3]
+    assert sorted(graph.rho) == pytest.approx([0.0, 2 / 3])
+
+    clustering = cluster_representation(
+        graph.segment_ids,
+        graph.segment_embeddings,
+        np.eye(2),
+        2,
+        42,
+        (),
+        node_member_segment_ids=graph.node_member_segment_ids,
+    )
+    assert sorted(len(cluster.member_segment_ids) for cluster in clustering.clusters) == [1, 3]
+
+
+def test_continuous_graph_outcome_preserves_partial_reward() -> None:
+    groups = (
+        (segment("s0", "t0", 0, (1.0, 0.0), 0.75),),
+        (segment("s1", "t1", 0, (0.0, 1.0), 0.25),),
+    )
+
+    binary = build_graph(groups, config(collapse_duplicate_embeddings=True))
+    continuous = build_graph(
+        groups,
+        config(
+            collapse_duplicate_embeddings=True,
+            graph_outcome_mode=GraphOutcomeMode.CONTINUOUS_SIGNED,
+        ),
+    )
+
+    assert binary.rho == pytest.approx((0.0, 0.0))
+    assert continuous.rho == pytest.approx((0.75, 0.25))
+
+
+def test_continuous_residual_only_calibrates_existing_edge_weights() -> None:
+    groups = (
+        (segment("s0", "t0", 0, (1.0, 0.0), 1.0),),
+        (segment("s1", "t1", 0, (0.9, 0.1), 0.5),),
+        (segment("s2", "t2", 0, (0.8, 0.2), 0.0),),
+    )
+    graph = build_graph(
+        groups,
+        config(
+            collapse_duplicate_embeddings=True,
+            graph_outcome_mode=GraphOutcomeMode.CONTINUOUS_RESIDUAL,
+            continuous_residual_weight=0.2,
+        ),
+    )
+
+    assert graph.adjacency.nnz == graph.base.nnz
+    assert np.all(graph.adjacency.data >= 0)
+    assert np.all(graph.adjacency.data <= 1.2 * graph.base.data + 1e-12)
+    assert np.all(graph.adjacency.data >= 0.8 * graph.base.data - 1e-12)
+    assert graph.positive.nnz > 0
+    assert graph.negative.nnz > 0
 
 
 def test_config_rejects_string_boolean() -> None:
@@ -136,6 +204,40 @@ def test_observed_transitions_connect_different_event_types() -> None:
     assert graph.negative[2, 3] > graph.positive[2, 3]
     assert graph.adjacency[0, 1] > 0
     assert graph.adjacency[2, 3] < 0
+
+
+def test_same_event_semantic_scope_does_not_create_cross_event_neighbors() -> None:
+    groups = (
+        (
+            segment(
+                "left",
+                "left-trajectory",
+                0,
+                (1.0, 0.0),
+                1.0,
+                WebShopEventType.QUERY_FORMULATION,
+            ),
+        ),
+        (
+            segment(
+                "right",
+                "right-trajectory",
+                0,
+                (1.0, 0.0),
+                1.0,
+                WebShopEventType.CANDIDATE_SELECTION,
+            ),
+        ),
+    )
+
+    global_graph = build_graph(groups, config())
+    same_event_graph = build_graph(
+        groups,
+        config(semantic_neighbor_scope=SemanticNeighborScope.SAME_EVENT),
+    )
+
+    assert global_graph.cross_event_edge_count == 1
+    assert same_event_graph.cross_event_edge_count == 0
 
 
 def test_transition_graph_rejects_unlabeled_segments() -> None:
