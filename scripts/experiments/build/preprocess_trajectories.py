@@ -25,6 +25,7 @@ from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
 from trace2tower.methods.trace2tower.transitions import build_transitions
 from trace2tower.methods.trace2tower.webshop_events import (
     segment_webshop_trajectory,
+    webshop_decision_state_signature,
     webshop_entity_signature,
     webshop_segment_signature,
 )
@@ -119,7 +120,9 @@ async def main(options: argparse.Namespace) -> None:
     else:
         texts = []
         signature_builder = (
-            webshop_entity_signature
+            webshop_decision_state_signature
+            if options.webshop_signature_mode is WebShopSignatureMode.DECISION_STATE
+            else webshop_entity_signature
             if options.webshop_signature_mode is WebShopSignatureMode.PRODUCT_ENTITY
             else webshop_segment_signature
         )
@@ -203,6 +206,9 @@ async def main(options: argparse.Namespace) -> None:
             "task_product_entity_signature"
             if benchmark is Benchmark.WEBSHOP
             and options.webshop_signature_mode is WebShopSignatureMode.PRODUCT_ENTITY
+            else "task_decision_state_signature"
+            if benchmark is Benchmark.WEBSHOP
+            and options.webshop_signature_mode is WebShopSignatureMode.DECISION_STATE
             else "task_entity_event_context_signature"
             if benchmark in (Benchmark.ALFWORLD, Benchmark.WEBSHOP)
             else "compact_event_segment_signature"

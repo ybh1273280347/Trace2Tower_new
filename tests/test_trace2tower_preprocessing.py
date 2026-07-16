@@ -39,6 +39,7 @@ from trace2tower.methods.trace2tower.webshop_events import (
     WebShopEventClassifier,
     classify_webshop_steps,
     segment_webshop_trajectory,
+    webshop_decision_state_signature,
     webshop_entity_signature,
     webshop_segment_signature,
 )
@@ -364,6 +365,44 @@ def test_webshop_entity_signature_centers_product_and_constraints() -> None:
     assert "PRODUCT title=blue travel mug" in signature
     assert "options=color=blue, red" in signature
     assert "Entity relation: configure candidate product variant" in signature
+
+
+def test_webshop_decision_state_signature_keeps_slots_and_decision_role() -> None:
+    segment = SegmentInstance(
+        segment_id="decision-segment",
+        trajectory_id="decision-trajectory",
+        start_step=0,
+        end_step=0,
+        transition_ids=("transition",),
+        embedding=(1.0, 0.0),
+        trajectory_score=1.0,
+        event_type=WebShopEventType.CANDIDATE_SELECTION,
+        raw_actions=(
+            json.dumps({"name": "click_action", "arguments": {"value": "B01"}}),
+        ),
+        observation_before=(
+            "Search results page for: blue travel mug\n"
+            "B01 | Blue Travel Mug | $19.99"
+        ),
+        observation_after=(
+            "Product: Blue Travel Mug\n"
+            "Price: $19.99\n"
+            "Options:\n"
+            "- color: blue, red"
+        ),
+    )
+
+    signature = webshop_decision_state_signature(
+        segment,
+        goal="buy a blue travel mug under 25 dollars",
+        previous_event=WebShopEventType.QUERY_FORMULATION,
+        next_event=WebShopEventType.OPTION_SELECTION,
+    )
+
+    assert "price_ceiling=25" in signature
+    assert "Event role: bind a candidate product for verification" in signature
+    assert "candidate_count=1" in signature
+    assert "candidate_title=blue travel mug" in signature
 
 
 def test_change_point_dp_uses_semantic_groups_and_maximum_length() -> None:

@@ -22,6 +22,7 @@ from trace2tower.methods.trace2tower.skills import (
 
 class RendererStyle(StrEnum):
     TRACE2TOWER = "trace2tower"
+    TRACE2TOWER_DECISION_STATE = "trace2tower_decision_state"
     SKILLX = "skillx"
 
 MID_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower MidCluster into a concise reusable execution skill. A Mid skill is one stable behavior phase discovered by contrastive spectral decomposition. It is not an atomic action and not an end-to-end task strategy.
@@ -84,6 +85,49 @@ WebShop execution semantics:
 - Partial reward can support a useful substep but does not establish a complete purchase strategy.
 """,
 }
+
+
+DECISION_STATE_RENDERER_INSTRUCTIONS = """
+WebShop decision-state rendering profile:
+- Render a decision card, not a generic search/click tutorial. The card must
+  bind the task's product category, identity, attributes, options, and price
+  constraints to observable page evidence.
+- Name the candidate discriminator: what visible title, category, price,
+  option, or detail evidence makes a candidate acceptable or unacceptable.
+- Treat evidence as supported, contradicted, or uncertain. Contradiction means
+  reject and recover; uncertainty means perform one targeted verification when
+  the evidence supports it; supported means advance or stop when the purchase
+  gate is complete.
+- Convert repeated failure behavior into a concrete recovery guard: change the
+  query, return to results, reject the current candidate, correct an option, or
+  stop. Do not emit a warning without the corrective action.
+- Preserve exact product attributes and option values when they are stable in
+  the evidence. Do not replace a concrete product behavior with generic words
+  such as "target item" or "check details".
+- A reusable card may cover one decision role (query, candidate, option,
+  verification, recovery, or stop), but it must state its applicability and
+  completion condition so it can be routed by the current state.
+"""
+
+
+WEBSHOP_HIGH_DECISION_TREE_INSTRUCTIONS = """
+WebShop High strategy form:
+- WebShop execution is a conditional policy, not a single linear event list.
+  The procedure may contain explicit `IF condition -> action` and
+  `ELSE/OTHERWISE -> recovery` items. Use this form whenever successful and
+  unsuccessful trajectories diverge.
+- Start with one objective-binding and query step, then branch on the observed
+  candidate set. If no plausible candidate is present, reformulate or return
+  to search; do not pretend that the original query succeeded.
+- For each candidate, branch on category/identity, price, attributes, and
+  required options: contradicted means reject and recover; uncertain means one
+  targeted verification; supported means continue toward purchase.
+- Include the positive stopping branch explicitly: when all required slots are
+  supported and exact options are selected, purchase immediately. Do not force
+  every task through detail tabs or a fixed number of candidates.
+- Keep the strategy end to end, but express alternatives as guarded branches
+  rather than flattening them into a generic `search -> inspect -> buy` list.
+"""
 
 
 MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS = """
@@ -180,6 +224,12 @@ Diagnostic adapter contract:
 def _mid_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
     if style is RendererStyle.TRACE2TOWER:
         return MID_RENDERER_INSTRUCTIONS + MID_BENCHMARK_INSTRUCTIONS[benchmark]
+    if style is RendererStyle.TRACE2TOWER_DECISION_STATE:
+        return (
+            MID_RENDERER_INSTRUCTIONS
+            + MID_BENCHMARK_INSTRUCTIONS[benchmark]
+            + (DECISION_STATE_RENDERER_INSTRUCTIONS if benchmark is Benchmark.WEBSHOP else "")
+        )
 
     from third_party.SkillX.prompts.skill_prompts import FUNCTIONAL_SKILL_PROMPT
 
@@ -193,6 +243,17 @@ def _mid_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> st
 def _high_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
     if style is RendererStyle.TRACE2TOWER:
         return HIGH_RENDERER_INSTRUCTIONS + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
+    if style is RendererStyle.TRACE2TOWER_DECISION_STATE:
+        return (
+            HIGH_RENDERER_INSTRUCTIONS
+            + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
+            + (
+                DECISION_STATE_RENDERER_INSTRUCTIONS
+                + WEBSHOP_HIGH_DECISION_TREE_INSTRUCTIONS
+                if benchmark is Benchmark.WEBSHOP
+                else ""
+            )
+        )
 
     from third_party.SkillX.prompts.plan_prompts import PLAN_EXTRACTION_PROMPTS
 

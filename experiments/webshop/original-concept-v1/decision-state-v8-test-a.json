@@ -1,0 +1,52 @@
+{
+  "experiment": "webshop_decision_state_v8_p200",
+  "representation": "goal slots plus candidate decision state",
+  "graph": {
+    "trajectory_count": 800,
+    "segment_count": 5419,
+    "graph_node_count": 1816,
+    "mid_count": 90,
+    "high_count": 29,
+    "cross_event_edge_count": 8164,
+    "connected_component_count": 3
+  },
+  "renderer": {
+    "model": "gpt-5.4",
+    "style": "trace2tower_decision_state",
+    "high_with_explicit_branches": 29,
+    "high_without_explicit_branches": 0
+  },
+  "runtime": {
+    "retrieval_contract": "hierarchical",
+    "high_top_k": 1,
+    "mid_top_k": 2,
+    "low_top_k": 0
+  },
+  "test_a_repeat0": {
+    "run_id": "webshop-test-a-flash-decision-state-v8-p200-r0",
+    "agent_model": "deepseek-v4-flash",
+    "episodes": 100,
+    "errors": 0,
+    "mean_reward": 0.7006666667,
+    "full_success_rate": 0.50,
+    "mean_steps": 8.18,
+    "mean_invalid_actions": 0.38,
+    "mean_input_tokens": 31434.70
+  },
+  "paired_vs_no_skill_repeat0": {
+    "baseline_mean_reward": 0.68075,
+    "mean_reward_difference": 0.0199166667,
+    "reward_confidence_interval_95": [-0.0400854167, 0.0813333333],
+    "full_success_rate_difference": -0.01,
+    "full_success_confidence_interval_95": [-0.09, 0.06],
+    "wins": 14,
+    "losses": 13,
+    "ties": 73,
+    "rescued_zero_score_samples": 8,
+    "new_zero_score_samples": 4,
+    "mean_step_difference": 0.20,
+    "mean_invalid_action_difference": 0.02,
+    "mean_input_token_difference": 10046.24
+  },
+  "conclusion": "Decision-tree High cards avoid the previous linear rendering collapse and produce a positive mean-reward point estimate with twice as many zero-score rescues as regressions. The confidence interval crosses zero and full success does not improve, so v8 is promising representation evidence rather than a new main result."
+}

@@ -316,6 +316,118 @@ def webshop_entity_signature(
     )
 
 
+def webshop_decision_state_signature(
+    segment: SegmentInstance,
+    *,
+    goal: str = "",
+    previous_event: WebShopEventType | None = None,
+    next_event: WebShopEventType | None = None,
+) -> str:
+    """用紧凑目标槽位和候选决策状态表达片段。"""
+    if segment.event_type is None:
+        raise ValueError("WebShop decision-state signature requires an event type")
+
+    role = {
+        WebShopEventType.QUERY_FORMULATION: "formulate query to expose candidates",
+        WebShopEventType.QUERY_REFINEMENT: "refine query after weak candidate evidence",
+        WebShopEventType.RESULT_NAVIGATION: "navigate candidate set",
+        WebShopEventType.CANDIDATE_SELECTION: "bind a candidate product for verification",
+        WebShopEventType.OPTION_SELECTION: "bind a required product option",
+        WebShopEventType.ATTRIBUTE_INSPECTION: "reduce an unresolved attribute",
+        WebShopEventType.DETAIL_BACKTRACKING: "return after targeted verification",
+        WebShopEventType.SEARCH_BACKTRACKING: "recover from candidate conflict",
+        WebShopEventType.PURCHASE_DECISION: "stop after purchase-gate verification",
+        WebShopEventType.OTHER_CLICK: "advance the current candidate state",
+    }[segment.event_type]
+    actions = _decision_action_templates(segment)
+    return "\n".join(
+        (
+            f"Goal slots: {_goal_slot_context(goal)}",
+            f"Previous event: {previous_event.value if previous_event else 'START'}",
+            f"Event role: {role}",
+            f"Next event: {next_event.value if next_event else 'END'}",
+            f"State before: {_decision_page_state(segment.observation_before)}",
+            f"State after: {_decision_page_state(segment.observation_after)}",
+            f"Slot-changing actions: {' -> '.join(actions)}",
+        )
+    )
+
+
+def _goal_slot_context(goal: str) -> str:
+    normalized = _normalize_text(goal)
+    price_match = re.search(
+        r"(?:under|below|less than|no more than|at most)\s*\$?\s*(\d+(?:\.\d+)?)",
+        normalized,
+    )
+    price = price_match.group(1) if price_match else "unspecified"
+    return f"target={normalized[:360]} | price_ceiling={price}"
+
+
+def _decision_page_state(observation: str) -> str:
+    lines = tuple(line.strip() for line in observation.splitlines() if line.strip())
+    if not lines:
+        return "page=UNKNOWN"
+    result_count = sum(1 for line in lines if RESULT_ENTITY_PATTERN.match(line))
+    title = ""
+    price = ""
+    selected = ""
+    options = []
+    for line in lines:
+        lowered = line.casefold()
+        if lowered.startswith("product:"):
+            title = _normalize_text(line.split(":", 1)[1])[:160]
+        elif lowered.startswith("price:"):
+            price = _normalize_text(line.split(":", 1)[1])[:40]
+        elif lowered.startswith("selected:"):
+            selected = _normalize_text(line.split(":", 1)[1])[:120]
+        elif line.startswith("- ") and ":" in line:
+            name, values = line[2:].split(":", 1)
+            options.append(f"{_normalize_text(name)}={_normalize_text(values)[:100]}")
+    inferred_page = infer_webshop_page_type(observation)
+    page = (
+        WebShopPageType.ITEM.value
+        if title
+        else WebShopPageType.RESULTS.value
+        if result_count
+        else inferred_page.value
+    )
+    fields = [f"page={page}"]
+    if result_count:
+        fields.append(f"candidate_count={result_count}")
+    if title:
+        fields.append(f"candidate_title={title}")
+    if price:
+        fields.append(f"price={price}")
+    if options:
+        fields.append("options=" + "; ".join(options[:4]))
+    if selected:
+        fields.append(f"selected={selected}")
+    return " | ".join(fields)
+
+
+def _decision_action_templates(segment: SegmentInstance) -> list[str]:
+    actions = []
+    for raw_action in segment.raw_actions:
+        try:
+            action = json.loads(raw_action)
+        except json.JSONDecodeError:
+            actions.append("UNKNOWN_ACTION")
+            continue
+        name = action.get("name")
+        arguments = action.get("arguments") or {}
+        if name == "search_action":
+            query = arguments.get("keywords")
+            normalized_query = _normalize_text(query) if isinstance(query, str) else ""
+            actions.append(f"SEARCH(query={normalized_query[:160]})")
+        elif name == "click_action":
+            value = arguments.get("value")
+            normalized = _normalize_text(value) if isinstance(value, str) else ""
+            actions.append(f"CLICK(value={normalized[:120]})")
+        else:
+            actions.append(str(name or "UNKNOWN_ACTION").upper())
+    return actions
+
+
 def _product_entity_context(observation: str) -> str:
     lines = tuple(line.strip() for line in observation.splitlines() if line.strip())
     if not lines:

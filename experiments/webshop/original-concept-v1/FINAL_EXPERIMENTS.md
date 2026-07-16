@@ -253,6 +253,27 @@ NoSkill 为 -0.02742，区间 [-0.08375, +0.02817]。原先的商品类别错配
 属性约束进行对象条件化，High 仍从关系图中的可复用行为结构归纳；商品实体负责绑定
 候选与约束，流程关系负责跨商品复用。该方向尚未完成新的全量实验。
 
+联网资料审计与 WebShop 官方契约见 `WEBSHOP_EXTERNAL_DISCOVERY.md`。下一版尝试
+`decision_state` 签名：保持事件关系图不变，在事件之后增加目标槽位、候选状态和下一
+决策角色，避免完整商品文本导致的图碎片化。
+
+### v8 决策状态图与条件式 High
+
+v8 将 WebShop High 从线性计划改为条件策略，显式允许查询失败、候选冲突、属性不确定
+和购买门槛的 `IF/OTHERWISE` 分支。P200 得到 90 个 Mid、29 个 High，29/29 条
+High 均包含条件分支。Test-A repeat0 使用 hierarchical `High top-1 + Mid top-2 +
+Low 0`：
+
+| WebShop Test-A | 平均奖励 | 完全成功率 | 平均步数 | 平均无效动作 | 输入 token |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| decision-state v8 | 0.70067 | 50% | 8.18 | 0.38 | 31,435 |
+
+配对 reward 差为 +0.01992，95% 区间 [-0.04009, +0.08133]；v8 为 14 胜、13 负、
+73 平，救回 8 个 NoSkill 零分样本并新增 4 个零分。它说明条件式 High 比线性同构
+叙事更有潜力，但完全成功率未提升、输入增加约 10,046 token，不能升级为主结果。
+完整记录见 `decision-state-v8-test-a.json`。
+
 ### 双层表示前置实验：手写决策执行卡
 
 在实现双层 renderer 之前，先用一张独立的手写 WebShop skill 验证“全局端到端指导
@@ -611,6 +632,7 @@ WebShop 中的搜索、商品选项和购买动作只是领域事件的具体实
 | WebShop v6 validation/Test-B                | 跨 split 泛化审计          | 完成 |
 | WebShop v7 商品实体中心图 Test-A            | 商品核心表示诊断          | 完成（未采用） |
 | WebShop 双层手写决策卡 Test-A repeat0      | 验证全局指导与对象决策单元 | 完成（前置诊断） |
+| WebShop v8 决策状态图与条件式 High Test-A | 验证分支策略和槽位状态表示 | 完成（正向点估计） |
 | Top-3 High → GPT-5.4 pseudo-High           | 对齐运行时计划改写能力      | 完成 |
 | pseudo-High 步骤召回 + Mid self-filter         | 控制具体 Mid 噪声      | 完成 |
 | ALFWorld hard35 与 manual-gap6              | 后验失败机制门控         | 完成 |

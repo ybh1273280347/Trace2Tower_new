@@ -63,6 +63,7 @@ class WebShopEventType(StrEnum):
 class WebShopSignatureMode(StrEnum):
     EVENT_CONTEXT = "event_context"
     PRODUCT_ENTITY = "product_entity"
+    DECISION_STATE = "decision_state"
 
 
 class HighPathDiscovery(StrEnum):
