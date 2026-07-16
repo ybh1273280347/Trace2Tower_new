@@ -196,6 +196,7 @@ def create_provider(
             "labeled_mid_diagnostic",
             "three_signal_graph",
             "task_conditioned_high",
+            "task_conditioned_three_signal",
         }:
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
@@ -203,9 +204,12 @@ def create_provider(
         labeled_mid_diagnostic = retrieval_strategy == "labeled_mid_diagnostic"
         three_signal_graph = retrieval_strategy == "three_signal_graph"
         task_conditioned_high = retrieval_strategy == "task_conditioned_high"
+        task_conditioned_three_signal = (
+            retrieval_strategy == "task_conditioned_three_signal"
+        )
         hierarchical = method_config.get("retrieval_contract") == "hierarchical"
-        if task_conditioned_high:
-            return TaskConditionedHighProvider.from_path(
+        if task_conditioned_high or task_conditioned_three_signal:
+            task_provider = TaskConditionedHighProvider.from_path(
                 runtime,
                 artifact.path,
                 profile_path=Path(method_config["task_condition_profile"]),
@@ -214,7 +218,20 @@ def create_provider(
                 minimum_compatibility=TaskCompatibility(
                     method_config["minimum_task_compatibility"]
                 ),
+                initial_mid_top_k=int(method_config.get("initial_mid_top_k", 0)),
             )
+            if task_conditioned_three_signal:
+                return ThreeSignalTrace2TowerSkillProvider.from_task_provider(
+                    task_provider,
+                    graph_profile_path=Path(method_config["graph_profile"]),
+                    signal_profile_path=Path(method_config["signal_profile"]),
+                    mid_top_k=int(method_config["mid_top_k"]),
+                    score_threshold=float(method_config["three_signal_threshold"]),
+                    min_event_compatibility=float(
+                        method_config["min_event_compatibility"]
+                    ),
+                )
+            return task_provider
         common_kwargs = {
             "include_high": (
                 int(method_config["high_top_k"]) == 1
@@ -493,7 +510,10 @@ async def main(options: argparse.Namespace) -> int:
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_strategy") == "task_conditioned_high":
+        if method_config.get("retrieval_strategy") in {
+            "task_conditioned_high",
+            "task_conditioned_three_signal",
+        }:
             if options.direct_mid_top_k is not None:
                 raise ValueError("task-conditioned High does not accept Mid caps")
         elif method_config.get("retrieval_contract") == "hierarchical":

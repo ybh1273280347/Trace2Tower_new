@@ -27,17 +27,22 @@ class TaskConditionedHighProvider:
         *,
         minimum_compatibility: TaskCompatibility,
         similarity_threshold: float = -1.0,
+        initial_mid_top_k: int = 0,
     ):
         snapshot.require_complete()
         if set(conditions) != set(snapshot.high_index.skill_ids):
             raise ValueError("task-condition profile does not bind to the Tower")
+        if not 0 <= initial_mid_top_k <= len(snapshot.mid_cards):
+            raise ValueError("initial Mid Top-K must fit the Mid library")
         self.runtime = runtime
         self.snapshot = snapshot
         self.conditions = conditions
         self.adapter = adapter
         self.minimum_compatibility = minimum_compatibility
         self.similarity_threshold = similarity_threshold
+        self.initial_mid_top_k = initial_mid_top_k
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
+        self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
     @classmethod
     def from_path(
@@ -65,7 +70,12 @@ class TaskConditionedHighProvider:
         state: EnvironmentState,
     ) -> SkillSelection:
         query_condition = self.adapter.extract_query(task_goal, state)
-        query = await self.runtime.embed([query_condition.retrieval_text])
+        query_texts = [query_condition.retrieval_text]
+        if self.initial_mid_top_k:
+            query_texts.append(
+                f"{query_condition.retrieval_text}\n{state.observation}"
+            )
+        query = await self.runtime.embed(query_texts)
         selected = retrieve_task_conditioned_high(
             query.vectors[0],
             self.snapshot.high_index,
@@ -84,12 +94,22 @@ class TaskConditionedHighProvider:
                 query_condition,
                 self.conditions[source_card.skill_id],
             )
+        mid_cards = ()
+        if self.initial_mid_top_k:
+            mid_matches = self.snapshot.mid_index.search(
+                query.vectors[1],
+                self.initial_mid_top_k,
+            )
+            mid_cards = tuple(
+                self.mid_cards[match.skill_id] for match in mid_matches
+            )
+        mid_ids = tuple(mid_card.skill_id for mid_card in mid_cards)
         return SkillSelection(
-            skill_ids=(card.skill_id,) if card else (),
-            context=format_tower_context(card, ()),
+            skill_ids=(((card.skill_id,) if card else ()) + mid_ids),
+            context=format_tower_context(card, mid_cards),
             model_input_tokens=query.usage.input_tokens,
             model_output_tokens=0,
-            context_skill_ids=(card.skill_id,) if card else (),
+            context_skill_ids=(((card.skill_id,) if card else ()) + mid_ids),
         )
 
     async def select_state(
