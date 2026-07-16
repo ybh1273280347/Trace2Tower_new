@@ -1,0 +1,9 @@
+method: trace2tower
+retrieval_strategy: graph
+include_high: true
+high_similarity_threshold: -1.0
+mid_context_budget: 3
+min_event_compatibility: 0.1
+direct_mid_dedup_similarity_threshold: 0.92
+direct_mid_mmr_lambda: 0.7
+graph_profile: artifacts/trace2tower/alfworld/original-concept-v6/p310/graph-retrieval-profile.json

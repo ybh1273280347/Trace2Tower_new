@@ -217,6 +217,7 @@ async def main(options: argparse.Namespace) -> int:
                 continue
             card, result = await render_high_card(
                 runtime,
+                old_tower.benchmark,
                 path,
                 mid_cards,
                 build_high_render_examples(records, refined.clusters, path),

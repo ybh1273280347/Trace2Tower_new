@@ -1,0 +1,11 @@
+method: trace2tower
+retrieval_strategy: labeled_mid_diagnostic
+retrieval_contract: hierarchical
+high_top_k: 1
+mid_top_k: 1
+low_top_k: 0
+high_similarity_threshold: -1.0
+min_event_compatibility: 0.1
+manipulation_mid_id: mid_0000
+graph_profile: artifacts/trace2tower/alfworld/original-concept-v9/p310/graph-retrieval-profile.json
+labels: experiments/alfworld/official/validation/labeled-mid-failure-diagnostic.json

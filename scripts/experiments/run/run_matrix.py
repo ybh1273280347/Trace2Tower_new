@@ -30,7 +30,13 @@ from trace2tower.methods.global_e2e.provider import GlobalE2ESkillProvider
 from trace2tower.methods.manual_skill.provider import ManualSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
+from trace2tower.methods.trace2tower.labeled_mid_provider import (
+    LabeledMidDiagnosticProvider,
+)
 from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
+from trace2tower.methods.trace2tower.three_signal_provider import (
+    ThreeSignalTrace2TowerSkillProvider,
+)
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
 from trace2tower.results import EpisodeResultWriter, MethodName
 from trace2tower.runner import run_shard
@@ -178,15 +184,29 @@ def create_provider(
         )
     if artifact.method in TOWER_ARTIFACT_METHODS:
         retrieval_strategy = method_config.get("retrieval_strategy", "legacy")
-        if retrieval_strategy not in {"legacy", "diverse", "graph"}:
+        if retrieval_strategy not in {
+            "legacy",
+            "diverse",
+            "graph",
+            "labeled_mid_diagnostic",
+            "three_signal_graph",
+        }:
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
         graph = retrieval_strategy == "graph"
+        labeled_mid_diagnostic = retrieval_strategy == "labeled_mid_diagnostic"
+        three_signal_graph = retrieval_strategy == "three_signal_graph"
+        hierarchical = method_config.get("retrieval_contract") == "hierarchical"
         common_kwargs = {
-            "include_high": bool(method_config["include_high"]),
+            "include_high": (
+                int(method_config["high_top_k"]) == 1
+                if hierarchical
+                else bool(method_config["include_high"])
+            ),
             "high_similarity_threshold": float(
                 method_config["high_similarity_threshold"]
             ),
+            "low_top_k": int(method_config.get("low_top_k", 0)),
             "lifecycle_report_path": (
                 Path(method_config["lifecycle_report"])
                 if method_config.get("lifecycle_report")
@@ -196,14 +216,50 @@ def create_provider(
                 method_config.get("status_tie_epsilon", 0.0)
             ),
         }
+        if three_signal_graph:
+            return ThreeSignalTrace2TowerSkillProvider.from_path(
+                runtime,
+                artifact.path,
+                graph_profile_path=Path(method_config["graph_profile"]),
+                signal_profile_path=Path(method_config["signal_profile"]),
+                mid_top_k=int(method_config["mid_top_k"]),
+                score_threshold=float(method_config["three_signal_threshold"]),
+                high_similarity_threshold=float(
+                    method_config["high_similarity_threshold"]
+                ),
+                min_event_compatibility=float(
+                    method_config["min_event_compatibility"]
+                ),
+            )
+        if labeled_mid_diagnostic:
+            return LabeledMidDiagnosticProvider.from_path(
+                runtime,
+                artifact.path,
+                graph_profile_path=Path(method_config["graph_profile"]),
+                labels_path=Path(method_config["labels"]),
+                manipulation_mid_id=str(method_config["manipulation_mid_id"]),
+                high_similarity_threshold=float(
+                    method_config["high_similarity_threshold"]
+                ),
+                min_event_compatibility=float(
+                    method_config["min_event_compatibility"]
+                ),
+            )
         if graph:
             return Trace2TowerSkillProvider.from_path(
                 runtime,
                 artifact.path,
                 graph_profile_path=Path(method_config["graph_profile"]),
-                mid_context_budget=int(method_config["mid_context_budget"]),
+                mid_context_budget=int(
+                    method_config["mid_top_k"]
+                    if hierarchical
+                    else method_config["mid_context_budget"]
+                ),
                 min_event_compatibility=float(
                     method_config["min_event_compatibility"]
+                ),
+                direct_mid_similarity_threshold=float(
+                    method_config.get("direct_mid_similarity_threshold", 0.45)
                 ),
                 direct_mid_dedup_similarity_threshold=float(
                     method_config["direct_mid_dedup_similarity_threshold"]
@@ -214,7 +270,11 @@ def create_provider(
         return Trace2TowerSkillProvider.from_path(
             runtime,
             artifact.path,
-            direct_mid_top_k=int(method_config["direct_mid_top_k"]),
+            direct_mid_top_k=int(
+                method_config["mid_top_k"]
+                if hierarchical
+                else method_config["direct_mid_top_k"]
+            ),
             include_high_child_context=bool(
                 method_config["include_high_child_context"]
             ),
@@ -338,8 +398,16 @@ async def run_matrix_shard(
             skill_context=None,
             shard_id=current_shard_id,
             max_steps=benchmark_config["max_steps"],
-            skill_provider=provider.select if provider else None,
-            refresh_skill_each_step=method in TOWER_ARTIFACT_METHODS,
+            skill_provider=(
+                provider.select_task
+                if provider and method in TOWER_ARTIFACT_METHODS
+                else provider.select if provider else None
+            ),
+            state_skill_provider=(
+                provider.select_state
+                if provider and method in TOWER_ARTIFACT_METHODS
+                else None
+            ),
         )
 
     summary = await run_shard(
@@ -407,14 +475,28 @@ async def main(options: argparse.Namespace) -> int:
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if options.direct_mid_top_k not in (3, 5, 8):
-            raise ValueError("Tower runs require an explicit direct Mid cap: 3, 5, or 8")
-        cap_field = (
-            "mid_context_budget"
-            if method_config.get("retrieval_strategy") == "graph"
-            else "direct_mid_top_k"
-        )
-        method_config = {**method_config, cap_field: options.direct_mid_top_k}
+        if method_config.get("retrieval_contract") == "hierarchical":
+            limits = tuple(
+                int(method_config[field])
+                for field in ("high_top_k", "mid_top_k", "low_top_k")
+            )
+            if not (
+                limits[0] in (0, 1)
+                and 0 <= limits[1] <= 12
+                and 0 <= limits[2] <= 3
+            ):
+                raise ValueError("hierarchical retrieval requires valid High/Mid/Low Top-K")
+            if options.direct_mid_top_k is not None:
+                raise ValueError("hierarchical retrieval does not accept legacy Mid caps")
+        else:
+            if options.direct_mid_top_k not in (3, 5, 8):
+                raise ValueError("legacy Tower runs require an explicit direct Mid cap")
+            cap_field = (
+                "mid_context_budget"
+                if method_config.get("retrieval_strategy") == "graph"
+                else "direct_mid_top_k"
+            )
+            method_config = {**method_config, cap_field: options.direct_mid_top_k}
     no_skill_config = load_yaml(options.config_root / "webshop_no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")

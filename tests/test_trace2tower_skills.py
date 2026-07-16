@@ -172,7 +172,12 @@ def test_mid_renderer_preserves_builder_fields_and_rejects_illegal_grounding() -
     assert card.member_segment_ids == ("segment-fixed",)
     assert card.grounding_actions == (PrimitiveAction.GOTO,)
     assert runtime.calls[0][2]["tool_choice"] == "required"
-    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:mid:alfworld:v1"
+    assert "ALFWorld execution semantics" in runtime.calls[0][1][0]["content"]
+    assert "WebShop execution semantics" not in runtime.calls[0][1][0]["content"]
+    assert (
+        runtime.calls[0][2]["prompt_cache_key"]
+        == "trace2tower:mid:alfworld:trace2tower:v3"
+    )
 
     payload["grounding_actions"] = ["CLICK"]
     with pytest.raises(ValueError, match="outside the cluster"):
@@ -211,13 +216,21 @@ def test_high_renderer_preserves_path_id_and_mid_order() -> None:
         "name": "Complete navigation",
         "description": "Use for a known destination.",
         "procedure": ["Execute the child skill in order."],
+        "constraints": ["Confirm the destination before acting."],
     }
     runtime = FakeRuntime("render_high_skill", payload)
-    card, _ = asyncio.run(render_high_card(runtime, path, {"mid_fixed": child}))
+    card, _ = asyncio.run(
+        render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child})
+    )
     assert card.skill_id == path.path_id
     assert card.ordered_mid_ids == path.ordered_mid_ids
     assert runtime.calls[0][2]["tool_choice"] == "required"
-    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:high:v4"
+    assert (
+        runtime.calls[0][2]["prompt_cache_key"]
+        == "trace2tower:high:alfworld:trace2tower:task-v7"
+    )
+    assert "ALFWorld task-strategy semantics" in runtime.calls[0][1][0]["content"]
+    assert "WebShop task-strategy semantics" not in runtime.calls[0][1][0]["content"]
 
 
 def test_mid_renderer_keeps_a_stable_prefix_before_variable_evidence() -> None:
@@ -253,6 +266,133 @@ def test_mid_renderer_keeps_a_stable_prefix_before_variable_evidence() -> None:
     assert second_actions == ["GOTO", "PICK"]
     assert first.calls[0][2]["prompt_cache_key"] == second.calls[0][2]["prompt_cache_key"]
     assert first_messages[-1] != second_messages[-1]
+
+
+def test_mid_renderer_uses_event_proportions_and_excludes_rare_grounding() -> None:
+    dominant = tuple(
+        SegmentEvidence(
+            segment_id=f"goto-{index}",
+            trajectory_id=f"trajectory-{index}",
+            goal="move an object",
+            raw_actions=("go to counter",),
+            primitive_actions=(PrimitiveAction.GOTO,),
+            observation_before="before",
+            observation_after="after",
+            trajectory_score=float(index % 2 == 0),
+            event_type="GotoLocation",
+        )
+        for index in range(9)
+    )
+    rare = SegmentEvidence(
+        segment_id="heat-rare",
+        trajectory_id="trajectory-rare",
+        goal="heat an object",
+        raw_actions=("heat apple with microwave",),
+        primitive_actions=(PrimitiveAction.HEAT,),
+        observation_before="before",
+        observation_after="after",
+        trajectory_score=1.0,
+        event_type="HeatObject",
+    )
+    render_input = MidRenderInput(
+        cluster_id="mid_weighted",
+        member_segment_ids=tuple(item.segment_id for item in (*dominant, rare)),
+        segment_evidence=(*dominant, rare),
+        support_count=10,
+        primitive_action_distribution={"GOTO": 99, "HEAT": 1},
+    )
+    payload = {
+        "name": "Navigate",
+        "description": "Use when a destination is known.",
+        "procedure": ["Go to the destination."],
+        "constraints": ["Confirm the destination."],
+        "grounding_actions": ["GOTO"],
+    }
+    runtime = FakeRuntime("render_mid_skill", payload)
+
+    asyncio.run(render_mid_card(runtime, Benchmark.ALFWORLD, render_input))
+
+    profile = json.loads(runtime.calls[0][1][-1]["content"])
+    assert profile["event_type_distribution"] == {
+        "GotoLocation": 9,
+        "HeatObject": 1,
+    }
+    assert [item["raw_actions"] for item in profile["representative_examples"]].count(
+        ["heat apple with microwave"]
+    ) == 1
+    legal_actions = runtime.calls[0][2]["tools"][0]["function"]["parameters"][
+        "properties"
+    ]["grounding_actions"]["items"]["enum"]
+    assert legal_actions == ["GOTO"]
+
+
+def test_mid_renderer_receives_complete_trajectory_context() -> None:
+    payload = {
+        "name": "Navigate",
+        "description": "Use when a destination is known.",
+        "procedure": ["Go to the destination."],
+        "constraints": ["Use an available action."],
+        "grounding_actions": ["GOTO"],
+    }
+    runtime = FakeRuntime("render_mid_skill", payload)
+    context = {
+        "goal": "put an object away",
+        "trajectory_score": 1.0,
+        "ordered_mid_ids": ["mid_fixed", "mid_other"],
+        "ordered_events": ["GotoLocation", "PutObject"],
+        "ordered_actions": [
+            {"primitive_action": "GOTO", "raw_action": "go to counter"}
+        ],
+    }
+
+    asyncio.run(
+        render_mid_card(
+            runtime,
+            Benchmark.ALFWORLD,
+            mid_input(),
+            trajectory_contexts={"trajectory-fixed": context},
+        )
+    )
+
+    profile = json.loads(runtime.calls[0][1][-1]["content"])
+    assert profile["successful_trajectory_contexts"] == [context]
+    assert profile["unsuccessful_trajectory_contexts"] == []
+
+
+def test_high_renderer_does_not_send_builder_membership_ids() -> None:
+    child = MidSkillCard(
+        "mid_fixed",
+        tuple(f"segment-{index}" for index in range(100)),
+        "Navigate",
+        "Use when a target is known.",
+        ("Navigate.",),
+        ("Confirm the target.",),
+        (PrimitiveAction.GOTO,),
+    )
+    path = HighPath(
+        "high_fixed",
+        ("mid_fixed",),
+        1.0,
+        0.0,
+        1.0,
+        tuple(f"trajectory-{index}" for index in range(100)),
+    )
+    payload = {
+        "name": "Navigate",
+        "description": "Use for a known destination.",
+        "procedure": ["Go to the destination."],
+        "constraints": ["Confirm the destination."],
+    }
+    runtime = FakeRuntime("render_high_skill", payload)
+
+    asyncio.run(
+        render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child})
+    )
+
+    render_input = json.loads(runtime.calls[0][1][-1]["content"])
+    assert "member_segment_ids" not in render_input["child_mid_cards"][0]
+    assert "supporting_trajectory_ids" not in render_input
+    assert render_input["supporting_trajectory_count"] == 100
 
 
 def test_runtime_records_prompt_cache_usage() -> None:

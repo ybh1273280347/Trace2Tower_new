@@ -5,10 +5,17 @@ from dataclasses import replace
 
 import pytest
 
+from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import EmbeddingResult, LLMUsage
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster, PrimitiveAction
+from trace2tower.methods.trace2tower.graph_retrieval import TowerGraphProfile
+from trace2tower.methods.trace2tower.models import (
+    AlfworldEventType,
+    HighPath,
+    MidCluster,
+    PrimitiveAction,
+)
 from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
 from trace2tower.methods.trace2tower.retrieval import SkillEmbeddingIndex
 from trace2tower.methods.trace2tower.skills import HighSkillCard, LowSkill, MidSkillCard
@@ -136,18 +143,69 @@ def test_snapshot_rejects_support_outside_training_provenance() -> None:
 def test_provider_selects_from_complete_snapshot_and_reports_embedding_cost() -> None:
     class FakeRuntime:
         async def embed(self, texts) -> EmbeddingResult:
-            assert texts == ["goal", "goal\ninitial observation"]
+            assert texts in (["goal"], ["goal\ninitial observation"])
             return EmbeddingResult(
-                ((1.0, 0.0), (1.0, 0.0)),
+                ((1.0, 0.0),),
                 LLMUsage(23, None, None),
                 1,
             )
 
     provider = Trace2TowerSkillProvider(FakeRuntime(), complete_snapshot())
-    selection = asyncio.run(provider.select("goal", "initial observation"))
+    selection = asyncio.run(
+        provider.select(
+            "goal",
+            EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
+        )
+    )
     assert selection.skill_ids == ("high_ab", "mid_a", "mid_b")
-    assert selection.model_input_tokens == 23
+    assert selection.model_input_tokens == 46
     assert "Combined" in selection.context
+
+
+def test_provider_does_not_fill_low_context_without_an_accepted_mid() -> None:
+    class FakeRuntime:
+        async def embed(self, texts) -> EmbeddingResult:
+            assert texts == ["goal\ninitial observation"]
+            return EmbeddingResult(
+                ((-1.0, 0.0),),
+                LLMUsage(23, None, None),
+                1,
+            )
+
+    snapshot = complete_snapshot()
+    provider = Trace2TowerSkillProvider(
+        FakeRuntime(),
+        snapshot,
+        include_high=False,
+        direct_mid_similarity_threshold=0.99,
+        low_top_k=3,
+        graph_profile=TowerGraphProfile(
+            snapshot.snapshot_id,
+            Benchmark.ALFWORLD,
+            {
+                "mid_a": {AlfworldEventType.GOTO_LOCATION: 1},
+                "mid_b": {AlfworldEventType.GOTO_LOCATION: 1},
+            },
+        ),
+        mid_context_budget=2,
+    )
+    selection = asyncio.run(
+        provider.select_state(
+            "goal",
+            EnvironmentState(
+                "initial observation",
+                ("go to table",),
+                {},
+                False,
+                0.0,
+                False,
+                True,
+            ),
+        )
+    )
+
+    assert selection.skill_ids == ()
+    assert selection.context == ""
 
 
 def test_provider_applies_configured_high_similarity_threshold() -> None:
@@ -164,7 +222,12 @@ def test_provider_applies_configured_high_similarity_threshold() -> None:
         complete_snapshot(),
         high_similarity_threshold=0.8,
     )
-    selection = asyncio.run(provider.select("goal", "initial observation"))
+    selection = asyncio.run(
+        provider.select(
+            "goal",
+            EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
+        )
+    )
     assert selection.skill_ids == ("mid_a", "mid_b")
     assert "Combined" not in selection.context
 
@@ -183,6 +246,11 @@ def test_provider_can_disable_high_explicitly() -> None:
         complete_snapshot(),
         include_high=False,
     )
-    selection = asyncio.run(provider.select("goal", "initial observation"))
+    selection = asyncio.run(
+        provider.select(
+            "goal",
+            EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
+        )
+    )
     assert selection.skill_ids == ("mid_a", "mid_b")
     assert "Combined" not in selection.context

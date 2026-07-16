@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from trace2tower.agent import SkillSelection
+from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.retrieval import (
@@ -102,7 +103,7 @@ class SkillXProvider:
     async def select(
         self,
         task_goal: str,
-        initial_observation: str,
+        state: EnvironmentState,
     ) -> SkillSelection:
         retrieval, input_tokens = await self.retrieve(task_goal)
         return SkillSelection(

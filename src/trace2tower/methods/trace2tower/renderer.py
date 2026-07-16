@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from enum import StrEnum
 from statistics import fmean
@@ -14,6 +15,7 @@ from trace2tower.methods.trace2tower.skills import (
     HighSkillCard,
     MidRenderInput,
     MidSkillCard,
+    SegmentEvidence,
     legal_grounding_actions,
 )
 
@@ -22,12 +24,12 @@ class RendererStyle(StrEnum):
     TRACE2TOWER = "trace2tower"
     SKILLX = "skillx"
 
-MID_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower MidCluster into a concise reusable skill card. The cluster structure and evidence are authoritative. Your task is textual compression, not discovery, clustering, correction, scoring, planning across clusters, or evaluation.
+MID_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower MidCluster into a concise reusable execution skill. A Mid skill is one stable behavior phase discovered by contrastive spectral decomposition. It is not an atomic action and not an end-to-end task strategy.
 
 Ownership contract:
 - The builder owns cluster_id, skill_id, member_segment_ids, support_count, trajectory IDs, scores, event types, primitive counts, and every structural relationship. Never return or propose any of these fields.
 - You own only name, description, procedure, constraints, and grounding_actions. Return them through the single supplied function.
-- Treat every member as evidence about one recurring behavior, but do not claim that every detail appears in every member. Prefer the stable intersection of the evidence. Specific objects, receptacles, attributes, brands, colors, sizes, prices, and destinations are examples unless they are genuinely invariant.
+- Treat every member as evidence about one recurring behavior, but do not claim that every detail appears in every member. Prefer the stable operational intersection and generalize incidental values.
 - A positive trajectory score supports the observed behavior. A lower score is still evidence about what happened, but must not be turned into a claimed success or recommendation without corroboration.
 
 Evidence interpretation:
@@ -36,43 +38,52 @@ Evidence interpretation:
 - primitive_actions are deterministic Low-level labels assigned by code. They are the only possible grounding actions.
 - observation_before and observation_after show local preconditions and effects. Do not infer hidden state, unavailable actions, or causal effects that are not visible.
 - trajectory_score is the official final episode score. It is not a per-segment reward.
-- event_type, when present, is a deterministic WebShop event label and may guide the behavioral name.
+- event_type, when present, is a deterministic domain event label and may guide the behavioral name.
 - support_count and primitive_action_distribution describe the complete cluster even when individual evidence items differ.
+- successful_trajectory_contexts and unsuccessful_trajectory_contexts expose the complete event, Mid, and action sequence around representative local segments. Treat their contrast as first-class evidence: retain stable prerequisites, downstream effects, and completion checks from successful contexts; identify repeated actions, premature operations, missing prerequisites, and incomplete follow-through that are more characteristic of unsuccessful contexts.
 
 Card requirements:
 - name: a short action-oriented behavior label, preferably plain English and not an identifier. Do not include benchmark names, cluster numbers, support counts, or scores.
 - description: one or two sentences stating the observable applicability conditions. Describe when to use the behavior, not why Trace2Tower discovered it.
-- procedure: an ordered list of executable, environment-level steps. Each item must be an imperative instruction. Preserve necessary ordering from the evidence. Do not mention Mid, Low, High, clusters, segments, trajectories, embeddings, renderers, or evidence.
+- procedure: an ordered list of executable, environment-level steps. Each item must be an imperative instruction. Preserve necessary ordering from the local evidence and its position in complete successful trajectories. Do not mention Mid, Low, High, clusters, segments, trajectories, embeddings, renderers, or evidence.
 - constraints: a short list of operational preconditions, checks, or failure guards supported by observations and actions. Do not invent universal rules. Do not repeat the procedure as constraints.
 - grounding_actions: choose only from the enum exposed by the function schema. Include an action only when it is needed by the rendered procedure. An empty list is valid if the cluster contains no legal official primitive.
 
 Generalization rules:
-- Generalize names such as mug 1, fridge 1, ASINs, query strings, and option values into functional roles only when the role is evident.
-- Keep domain distinctions that change execution. Opening a closed receptacle, selecting a product option, inspecting attributes, navigating back, heating, cooling, cleaning, slicing, and purchasing are not interchangeable.
+- Generalize incidental entity names and values into functional roles only when the role is evident.
+- Keep distinctions that change execution, prerequisites, observable state, or completion.
 - Do not merge separate goals into a synthetic compound goal. If members show variants of one behavior, express the common behavior and place variant-specific conditions in constraints.
-- Do not add recovery steps unless failed or corrective evidence actually shows them.
-- Do not guarantee success, optimality, availability, price compliance, or product fit. Require verification when the evidence verifies something before acting.
+- Do not omit a stable prerequisite, state check, or completion check merely because it occurs immediately outside the local segment. Keep the card focused on the Mid behavior, but make it self-contained enough that another agent can apply it without rediscovering the required state.
+- Remove incidental exploration, repeated actions, and failed steps from the recommended procedure. Convert recurring unsuccessful behavior into concise guards. A guard should state the observable condition and corrective action, not merely warn that failure is possible.
+- Do not guarantee success, optimality, or availability. Require verification when successful evidence verifies something before acting.
 - Do not expose raw IDs or quote long observations. The card will be injected into another agent prompt, so every token should help execution.
-
-ALFWorld grounding semantics:
-- GOTO changes location; PICK acquires an object; PUT places a held object; OPEN and CLOSE change receptacle state; TOGGLE uses an appliance or switch; HEAT, CLEAN, COOL, and SLICE transform an object; INVENTORY checks held items; EXAMINE and LOOK inspect state.
-- Preserve prerequisites visible in evidence, such as navigating before manipulating, opening a closed container before taking from it, holding an object before putting it, and using an appropriate appliance or tool.
-- Do not invent an object, receptacle, tool, or action string. Use generic roles when cluster members differ.
-
-WebShop grounding semantics:
-- SEARCH formulates or refines a keyword query; CLICK covers result navigation, candidate selection, option selection, attribute inspection, backtracking, and purchase controls.
-- Distinguish these click purposes in procedure text even though they share one primitive label.
-- Verify requested attributes and selectable variants before purchase when the evidence does so. Do not claim a product satisfies an attribute that was not observed.
-- Treat a full score and a partial score differently. Partial reward can reveal a useful substep but does not prove the entire purchase strategy was correct.
 
 Output discipline:
 - Use the supplied function exactly once.
 - Return no prose outside the function call.
 - Use non-empty strings and non-empty procedure and constraints lists.
 - Keep the card compact enough for retrieval-time prompt injection.
+- Before finalizing, silently check reusability, correct ordering, missing critical prerequisites, and whether the instructions are directly actionable by another agent.
 - Do not return extra keys, IDs, membership, scores, support, explanations, confidence, citations, or alternative cards.
 - Before calling the function, silently check that every grounding action is allowed by the schema and occurs in the supplied primitive_action_distribution.
 """
+
+
+MID_BENCHMARK_INSTRUCTIONS = {
+    Benchmark.ALFWORLD: """
+ALFWorld execution semantics:
+- GOTO changes location; PICK acquires an object; PUT places a held object; OPEN and CLOSE change receptacle state; TOGGLE uses an appliance or switch; HEAT, CLEAN, COOL, and SLICE transform an object; INVENTORY checks held items; EXAMINE and LOOK inspect state.
+- Preserve visible prerequisites such as navigating before manipulating, opening a closed container before taking from it, holding an object before placing or transforming it, and using the required appliance or tool.
+- Do not invent an object, receptacle, tool, or action string. Use generic functional roles when examples use different numbered entities.
+""",
+    Benchmark.WEBSHOP: """
+WebShop execution semantics:
+- SEARCH formulates or refines a keyword query; CLICK covers result navigation, candidate selection, option selection, attribute inspection, backtracking, and purchase controls.
+- Distinguish these click purposes in procedure text even though they share one primitive label.
+- Verify requested attributes and selectable variants before purchase when successful evidence does so. Do not claim a product satisfies an unobserved attribute.
+- Partial reward can support a useful substep but does not establish a complete purchase strategy.
+""",
+}
 
 
 MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS = """
@@ -91,92 +102,104 @@ Diagnostic adapter contract:
 - The input is one fixed Trace2Tower Mid cluster. Its membership and mixed outcome evidence are immutable; do not discover, split, merge, filter, or relabel the cluster.
 - Treat the cluster evidence as the trajectory and extract exactly one reusable skill for the recurring subtask shared by its segments.
 - Preserve SkillX's generalization rules: use a generic action-oriented name, parameterize incidental values, keep the skill self-contained, exclude exploration and incorrect actions from the recommended procedure, and retain observed failure modes only as guards.
-- WebShop has only `search_action` and `click_action`; express executable behavior with these environment operations rather than Python code.
 - Return the result through the supplied function instead of `<skill>` tags. Map SkillX `document` to description and constraints, `content` to an imperative procedure, and `tools` to grounding_actions.
 - Return no IDs, scores, evidence metadata, or prose outside the function call.
 """
 
 
-HIGH_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower HighPath into concise strategy guidance. The builder has already mined and scored the path. Your task is to explain the reusable within-episode behavior represented by the fixed ordered path; you do not discover, edit, filter, reorder, merge, split, or score the path.
+HIGH_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower High structure into a compact task-level strategy. A High skill represents a successful composition of Mid-level behaviors and must guide an entire task from its initial state to its completion condition. It is injected once when the task starts, so it must never assume that an intermediate prerequisite has already been completed.
 
 Ownership contract:
-- The builder owns path_id, skill_id, ordered_mid_ids, child membership, positive_support, negative_support, contrastive_path_score, and supporting_trajectory_ids. Never return or propose these fields.
-- You own only name, description, and procedure. Return them through the single supplied function.
-- ordered_mid_ids is immutable. Preserve the supplied order of distinct path-local contributions, but do not create a separate procedure block merely to mention every child. When adjacent or repeated children overlap in the supporting actions, one concise procedure step may jointly represent them.
-- Supporting examples are the authoritative evidence for the overall task meaning and path-local action order. Child Mid cards are noisy local compressions that may describe more of a workflow than the child actually contributed in a supporting episode.
+- The builder owns path_id, skill_id, ordered_mid_ids, child membership, support values, scores, and provenance. Never return or propose these fields.
+- You own only name, description, procedure, and constraints. Return them through the supplied function.
+- The mined Mid path is a structural anchor, not the output boundary. Use complete successful trajectories to restore required behavior before and after the mined path so the rendered strategy is end to end.
+- Child Mid cards are local behavior descriptions. They may inform individual phases but must not determine the task-level scope.
 
-Input interpretation:
-- path_id is only a stable builder identifier and must not appear in prose.
-- ordered_mid_ids specifies execution order and must not be copied into output.
-- child_mid_cards contain each behavior's applicability, procedure, constraints, and Low grounding. Use their operational content without mentioning hierarchy.
-- supporting_examples contain real episode goals, path_steps aligned to the ordered child Mid IDs, and the flattened raw actions covered by this path. The path-local actions are authoritative for what this High may recommend. Goals only disambiguate object and action roles; they do not authorize adding goal-completion operations absent from the path-local actions. Extract only the behavior shared across examples. Never serialize distinct example goals as consecutive objectives in one plan.
-- positive_support is the fraction of full-success training trajectories containing this path; negative_support is the corresponding fraction among other trajectories.
-- contrastive_path_score ranks mined candidates. It is not a probability, confidence score, reward, or guarantee.
-- supporting_trajectory_ids establish provenance only and must never appear in the card.
+Contrastive evidence contract:
+- successful_examples contain complete trajectories that demonstrate the strategy or its structural anchor.
+- unsuccessful_examples are selected because they attempt the same task instance or objective but may omit the path, enter a later phase early, bind the wrong entity, repeat actions, or stop before completion.
+- Compare complete successful and unsuccessful sequences. Do not require a failure to contain the successful Mid path.
+- Extract the earliest stable divergence that separates successful execution from failure. Convert it into an explicit prerequisite, ordering rule, progress check, completion check, or recovery guard.
+- Absence is evidence: when failures consistently skip a behavior that successful trajectories perform, include the missing behavior in the strategy.
+- Never copy a failed action sequence into the recommended procedure.
 
 Card requirements:
-- name: a short strategy label describing the end-to-end behavioral sequence. Do not include IDs, levels, benchmarks, support, scores, or words such as cluster and path.
-- description: one or two sentences specifying observable applicability conditions for the full sequence. It must describe one episode objective pattern, not an aggregate of several supporting goals.
-- procedure: concise execution guidance that preserves the observed path-local action order. It may compress redundant wording between adjacent child cards. Do not add an operation solely because it appears in the episode goal or a broad child card when it is absent from the supporting path_steps.
+- name: a short task-strategy label. Do not include IDs, benchmark names, support, scores, or hierarchy terminology.
+- description: state the complete objective pattern for which the strategy applies. Do not phrase it as an intermediate-state condition such as already holding, already reaching, or already selecting something.
+- procedure: an ordered end-to-end checklist beginning with objective binding or initial discovery and ending with the observable completion action or signal. Preserve stable Mid composition order while restoring prerequisites and suffixes from successful complete trajectories.
+- constraints: concise failure guards and recovery rules justified by success/failure differences. State both the observable condition and the corrective action.
 
 Composition rules:
-- Preserve dependencies across children only when supported by their cards. A later child may consume state established by an earlier child, but do not invent that dependency.
-- If a child card overstates its local role relative to its aligned path_step, use the narrower role shown by that path_step while preserving its position in the sequence.
-- If adjacent or repeated child cards are variants or partially redundant, compress their observed contribution without turning each card into a separate end-to-end task. Shared actions such as pickup, lamp use, heating, cooling, cleaning, or final placement should appear once unless the path-local raw actions consistently repeat them.
-- When examples differ only in where an object is found or which receptacle is used, express that difference as a conditional choice before the shared downstream steps. Never serialize mutually exclusive variants as if both happened in sequence.
-- Do not repeat a transformation or placement merely because more than one child card mentions the same end-to-end action. The path-local raw actions decide whether repetition is real.
-- Do not complete the rest of an episode objective when the mined path is only a prefix, suffix, or middle fragment. For example, a path containing search and pickup but no lamp toggle must not recommend toggling the lamp merely because the goal mentions a lamp.
-- If children appear weakly related, use neutral sequential language rather than inventing a causal story or shared objective.
-- Carry forward safety checks and applicability constraints that materially affect execution.
-- Do not introduce Low actions absent from child cards, new object types, new product attributes, new destinations, new tools, new prices, or hidden environment state.
-- Do not guarantee success or optimality. High positive support and zero observed negative support are finite training evidence, not proof.
-- Do not mention training data, trajectories, rewards, support ratios, contrastive scores, or rendering.
-
-ALFWorld composition:
-- Maintain environment preconditions such as navigation, open state, object possession, appliance use, and destination availability.
-- Do not combine separate household objectives into a fabricated objective. When the children are merely sequential in observed behavior, describe the sequence literally and conservatively.
-- Avoid copying numbered entity names from child examples unless a distinction is essential.
-
-WebShop composition:
-- Preserve the usual distinctions among query formulation, result screening, product inspection, option selection, verification, backtracking, and purchase.
-- A purchase step must remain after relevant verification when that order is present.
-- A partial-reward pattern must not be presented as a proven complete strategy.
-- Do not turn a specific observed product into a general recommendation.
+- Bind the objective's required entities, quantities, attributes, transformations, and destination before acting when successful evidence does so.
+- Preserve dependencies across phases. Do not enter a later phase merely because its tool, location, control, or entity is visible.
+- Generalize incidental values but keep distinctions that change prerequisites, order, verification, or completion.
+- Remove exploration and repeated detours from the main procedure. Put necessary search and recovery discipline in constraints.
+- Include progress tracking for repeated subgoals when successful trajectories require it.
+- Do not stop at an intermediate state. End with the task's demonstrated completion action and require confirmation when evidence provides one.
+- Do not invent operations, entities, attributes, tools, destinations, or hidden state absent from the supplied evidence.
+- Do not mention training data, trajectories, failures, rewards, support, scores, paths, clusters, or rendering in the card.
 
 Output discipline:
 - Use the supplied function exactly once and return no prose outside it.
-- Return only name, description, and procedure, with non-empty strings and a non-empty procedure list.
-- Keep the result compact for retrieval-time injection.
-- Before calling the function, silently verify that every recommended operation is grounded in supporting path_steps, repeated operations are supported by actual repetition, procedure order follows the path, and no builder-owned field is returned.
+- Return only name, description, procedure, and constraints, all non-empty.
+- Keep the card compact enough for one-time task prompt injection.
+- Before calling the function, silently verify that the card starts from the initial task state, covers the full demonstrated chain, includes at least one contrast-derived guard, and ends at completion.
 """
+
+
+HIGH_BENCHMARK_INSTRUCTIONS = {
+    Benchmark.ALFWORLD: """
+ALFWorld task-strategy semantics:
+- Derive the ordered task chain from the evidence, typically locating the required object, acquiring it, applying every required state change, and placing or examining it at the destination.
+- Keep the goal object bound across every phase. Do not treat an incidental object at an appliance or destination as the target.
+- Treat available environment actions as authoritative state evidence. When a required action is unavailable, repair its missing prerequisite rather than repeating it or skipping ahead.
+- Preserve possession, receptacle state, appliance/tool, quantity, and final-placement prerequisites demonstrated by successful trajectories.
+- Do not waste the step budget revisiting checked locations or closing receptacles unless closure is required by the task or a later demonstrated action.
+""",
+    Benchmark.WEBSHOP: """
+WebShop task-strategy semantics:
+- Derive the complete chain from query formulation through candidate screening, product inspection, required option selection, final verification, and purchase.
+- Keep every requested attribute bound across search and verification. Do not substitute title similarity for observed compliance.
+- Treat visible page controls and selectable options as authoritative state evidence. Recover by revising the query, returning to the relevant page, or correcting options as demonstrated.
+- Purchase only after the required product attributes and selected variants have been verified.
+""",
+}
 
 
 SKILLX_HIGH_ADAPTER_INSTRUCTIONS = """
 
 Diagnostic adapter contract:
 - The input is one fixed Trace2Tower High path with immutable ordered Mid children and supporting examples. Do not discover, reorder, merge, split, filter, or score the path.
-- Apply SkillX plan-writing rules to the fixed path: describe natural reusable sub-goals, remove incidental exploration or failed actions, preserve necessary order, list only demonstrated WebShop operations, and keep the plan concise.
+- Apply SkillX plan-writing rules to the fixed path: describe natural reusable sub-goals, remove incidental exploration or failed actions, preserve necessary order, list only demonstrated environment operations, and keep the plan concise.
 - Return the plan through the supplied function instead of `<plan>` tags. Use name for a short plan label, description for applicability, and procedure for the ordered plan steps.
 - Return no IDs, scores, evidence metadata, or prose outside the function call.
 """
 
 
-def _mid_renderer_instructions(style: RendererStyle) -> str:
+def _mid_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
     if style is RendererStyle.TRACE2TOWER:
-        return MID_RENDERER_INSTRUCTIONS
+        return MID_RENDERER_INSTRUCTIONS + MID_BENCHMARK_INSTRUCTIONS[benchmark]
 
     from third_party.SkillX.prompts.skill_prompts import FUNCTIONAL_SKILL_PROMPT
 
-    return FUNCTIONAL_SKILL_PROMPT + SKILLX_MID_ADAPTER_INSTRUCTIONS
+    return (
+        FUNCTIONAL_SKILL_PROMPT
+        + SKILLX_MID_ADAPTER_INSTRUCTIONS
+        + MID_BENCHMARK_INSTRUCTIONS[benchmark]
+    )
 
 
-def _high_renderer_instructions(style: RendererStyle) -> str:
+def _high_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
     if style is RendererStyle.TRACE2TOWER:
-        return HIGH_RENDERER_INSTRUCTIONS
+        return HIGH_RENDERER_INSTRUCTIONS + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
 
     from third_party.SkillX.prompts.plan_prompts import PLAN_EXTRACTION_PROMPTS
 
-    return PLAN_EXTRACTION_PROMPTS["default"] + SKILLX_HIGH_ADAPTER_INSTRUCTIONS
+    return (
+        PLAN_EXTRACTION_PROMPTS["default"]
+        + SKILLX_HIGH_ADAPTER_INSTRUCTIONS
+        + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
+    )
 
 
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
@@ -214,6 +237,7 @@ async def render_mid_card(
     render_input: MidRenderInput,
     sibling_inputs: Sequence[MidRenderInput] = (),
     *,
+    trajectory_contexts: Mapping[str, Mapping[str, object]] = {},
     renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[MidSkillCard, ChatResult]:
     legal_actions = legal_grounding_actions(benchmark, render_input)
@@ -240,7 +264,7 @@ async def render_mid_card(
             {
                 "role": "system",
                 "content": (
-                    _mid_renderer_instructions(renderer_style)
+                    _mid_renderer_instructions(renderer_style, benchmark)
                     + (MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS if sibling_inputs else "")
                 ),
             },
@@ -249,13 +273,17 @@ async def render_mid_card(
                 "content": json.dumps(
                     (
                         {
-                            "target": _mid_render_profile(render_input),
+                            "target": _mid_render_profile(
+                                render_input,
+                                trajectory_contexts,
+                            ),
                             "sibling_profiles": [
-                                _mid_render_profile(item) for item in sibling_inputs
+                                _mid_render_profile(item, trajectory_contexts)
+                                for item in sibling_inputs
                             ],
                         }
                         if sibling_inputs
-                        else _mid_render_profile(render_input)
+                        else _mid_render_profile(render_input, trajectory_contexts)
                     ),
                     ensure_ascii=False,
                     sort_keys=True,
@@ -268,9 +296,9 @@ async def render_mid_card(
         temperature=0,
         max_output_tokens=1200,
         prompt_cache_key=(
-            f"trace2tower:mid:{benchmark.value}:{renderer_style}:contrastive-v2"
+            f"trace2tower:mid:{benchmark.value}:{renderer_style}:contrastive-v4"
             if sibling_inputs
-            else f"trace2tower:mid:{benchmark.value}:{renderer_style}:v1"
+            else f"trace2tower:mid:{benchmark.value}:{renderer_style}:v3"
         ),
     )
     payload = _tool_payload(
@@ -295,37 +323,25 @@ async def render_mid_card(
     )
 
 
-def _mid_render_profile(render_input: MidRenderInput) -> dict:
+def _mid_render_profile(
+    render_input: MidRenderInput,
+    trajectory_contexts: Mapping[str, Mapping[str, object]],
+) -> dict:
     scores = [item.trajectory_score for item in render_input.segment_evidence]
-    successful = sorted(
-        (item for item in render_input.segment_evidence if item.trajectory_score >= 0.999),
-        key=lambda item: item.segment_id,
+    event_counts = Counter(
+        item.event_type or "UNLABELED" for item in render_input.segment_evidence
     )
-    unsuccessful = sorted(
-        (item for item in render_input.segment_evidence if item.trajectory_score < 0.999),
-        key=lambda item: item.segment_id,
+    examples = _representative_mid_examples(render_input, event_counts, limit=8)
+    context_trajectory_ids = tuple(
+        dict.fromkeys(item.trajectory_id for item in examples)
     )
-    examples = [*successful[:4], *unsuccessful[:4]]
-    if len(examples) < 8:
-        selected_ids = {item.segment_id for item in examples}
-        remaining = sorted(
-            (
-                item
-                for item in render_input.segment_evidence
-                if item.segment_id not in selected_ids
-            ),
-            key=lambda item: item.segment_id,
-        )
-        examples.extend(remaining[: 8 - len(examples)])
     return {
         "cluster_id": render_input.cluster_id,
         "support_count": render_input.support_count,
         "mean_trajectory_score": fmean(scores),
         "full_score_ratio": sum(score >= 0.999 for score in scores) / len(scores),
         "primitive_action_distribution": render_input.primitive_action_distribution,
-        "event_types": sorted(
-            {item.event_type for item in render_input.segment_evidence if item.event_type}
-        ),
+        "event_type_distribution": dict(sorted(event_counts.items())),
         "representative_examples": [
             {
                 "goal": item.goal,
@@ -336,15 +352,89 @@ def _mid_render_profile(render_input: MidRenderInput) -> dict:
             }
             for item in examples
         ],
+        "successful_trajectory_contexts": [
+            trajectory_contexts[trajectory_id]
+            for trajectory_id in context_trajectory_ids
+            if trajectory_id in trajectory_contexts
+            and float(trajectory_contexts[trajectory_id]["trajectory_score"]) >= 0.999
+        ],
+        "unsuccessful_trajectory_contexts": [
+            trajectory_contexts[trajectory_id]
+            for trajectory_id in context_trajectory_ids
+            if trajectory_id in trajectory_contexts
+            and float(trajectory_contexts[trajectory_id]["trajectory_score"]) < 0.999
+        ],
     }
+
+
+def _representative_mid_examples(
+    render_input: MidRenderInput,
+    event_counts: Counter[str],
+    *,
+    limit: int,
+) -> list[SegmentEvidence]:
+    if not render_input.segment_evidence or limit <= 0:
+        return []
+
+    total = len(render_input.segment_evidence)
+    quotas = {
+        event: min(count, int(count * limit / total))
+        for event, count in event_counts.items()
+    }
+    remaining = min(limit, total) - sum(quotas.values())
+    quota_order = sorted(
+        event_counts,
+        key=lambda event: (
+            -(event_counts[event] * limit / total - quotas[event]),
+            -event_counts[event],
+            event,
+        ),
+    )
+    for event in quota_order[:remaining]:
+        quotas[event] += 1
+
+    grouped = defaultdict(list)
+    for item in render_input.segment_evidence:
+        grouped[item.event_type or "UNLABELED"].append(item)
+
+    selected = []
+    for event in sorted(quotas, key=lambda value: (-quotas[value], value)):
+        successful = sorted(
+            (item for item in grouped[event] if item.trajectory_score >= 0.999),
+            key=lambda item: (item.trajectory_id, item.segment_id),
+        )
+        unsuccessful = sorted(
+            (item for item in grouped[event] if item.trajectory_score < 0.999),
+            key=lambda item: (item.trajectory_id, item.segment_id),
+        )
+        candidates = []
+        for index in range(max(len(successful), len(unsuccessful))):
+            if index < len(successful):
+                candidates.append(successful[index])
+            if index < len(unsuccessful):
+                candidates.append(unsuccessful[index])
+
+        seen_trajectories = set()
+        distinct = []
+        repeated = []
+        for item in candidates:
+            if item.trajectory_id in seen_trajectories:
+                repeated.append(item)
+            else:
+                distinct.append(item)
+                seen_trajectories.add(item.trajectory_id)
+        selected.extend((distinct + repeated)[: quotas[event]])
+    return selected
 
 
 async def render_high_card(
     runtime: CommonLLMRuntime,
+    benchmark: Benchmark,
     path: HighPath,
     child_mid_cards: Mapping[str, MidSkillCard],
     supporting_examples: Sequence[Mapping[str, object]] = (),
     *,
+    unsuccessful_examples: Sequence[Mapping[str, object]] = (),
     renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[HighSkillCard, ChatResult]:
     missing = set(path.ordered_mid_ids) - set(child_mid_cards)
@@ -354,30 +444,40 @@ async def render_high_card(
         "path_id": path.path_id,
         "ordered_mid_ids": path.ordered_mid_ids,
         "child_mid_cards": [
-            child_mid_cards[mid_id].to_record() for mid_id in path.ordered_mid_ids
+            {
+                "skill_id": child_mid_cards[mid_id].skill_id,
+                "name": child_mid_cards[mid_id].name,
+                "description": child_mid_cards[mid_id].description,
+                "procedure": child_mid_cards[mid_id].procedure,
+                "constraints": child_mid_cards[mid_id].constraints,
+                "grounding_actions": child_mid_cards[mid_id].grounding_actions,
+            }
+            for mid_id in path.ordered_mid_ids
         ],
         "positive_support": path.positive_support,
         "negative_support": path.negative_support,
         "contrastive_path_score": path.contrastive_score,
-        "supporting_trajectory_ids": path.supporting_trajectory_ids,
-        "supporting_examples": list(supporting_examples),
+        "supporting_trajectory_count": len(path.supporting_trajectory_ids),
+        "successful_examples": list(supporting_examples),
+        "unsuccessful_examples": list(unsuccessful_examples),
     }
     tool = _tool(
         "render_high_skill",
-        "Render applicability and execution guidance for the fixed Mid-skill path.",
+        "Render one end-to-end task strategy from the fixed Mid composition and contrastive trajectories.",
         {
             "name": _text_property("Short strategy name."),
-            "description": _text_property("When the strategy applies."),
-            "procedure": _string_array("Execution guidance preserving the supplied order."),
+            "description": _text_property("Complete objective pattern for this strategy."),
+            "procedure": _string_array("End-to-end execution checklist."),
+            "constraints": _string_array("Contrast-derived failure guards and recovery rules."),
         },
-        ["name", "description", "procedure"],
+        ["name", "description", "procedure", "constraints"],
     )
     result = await runtime.chat(
         ModelRole.RENDERER,
         [
             {
                 "role": "system",
-                "content": _high_renderer_instructions(renderer_style),
+                "content": _high_renderer_instructions(renderer_style, benchmark),
             },
             {
                 "role": "user",
@@ -393,10 +493,12 @@ async def render_high_card(
         tool_choice="required",
         temperature=0,
         max_output_tokens=1000,
-        prompt_cache_key=f"trace2tower:high:{renderer_style}:v4",
+        prompt_cache_key=f"trace2tower:high:{benchmark.value}:{renderer_style}:task-v7",
     )
     payload = _tool_payload(
-        result, "render_high_skill", {"name", "description", "procedure"}
+        result,
+        "render_high_skill",
+        {"name", "description", "procedure", "constraints"},
     )
     return (
         HighSkillCard(
@@ -405,6 +507,96 @@ async def render_high_card(
             name=_required_text(payload, "name"),
             description=_required_text(payload, "description"),
             procedure=_required_text_tuple(payload, "procedure"),
+            constraints=_required_text_tuple(payload, "constraints"),
+        ),
+        result,
+    )
+
+
+async def render_high_community_card(
+    runtime: CommonLLMRuntime,
+    benchmark: Benchmark,
+    community_id: str,
+    mid_cards: Sequence[MidSkillCard],
+    successful_contexts: Sequence[Mapping[str, object]],
+    unsuccessful_contexts: Sequence[Mapping[str, object]],
+    transition_summary: Mapping[str, object],
+) -> tuple[HighSkillCard, ChatResult]:
+    member_mid_ids = tuple(card.skill_id for card in mid_cards)
+    render_input = {
+        "community_mid_cards": [
+            {
+                "name": card.name,
+                "description": card.description,
+                "procedure": card.procedure,
+                "constraints": card.constraints,
+                "grounding_actions": card.grounding_actions,
+            }
+            for card in mid_cards
+        ],
+        "successful_complete_trajectories": list(successful_contexts),
+        "unsuccessful_complete_trajectories": list(unsuccessful_contexts),
+        "contrastive_transition_summary": transition_summary,
+    }
+    tool = _tool(
+        "render_high_skill",
+        "Render one end-to-end strategy shared by the supplied Mid transition community.",
+        {
+            "name": _text_property("Short strategy name."),
+            "description": _text_property("Complete objective patterns covered."),
+            "procedure": _string_array("End-to-end execution checklist."),
+            "constraints": _string_array("Contrast-derived failure guards and recovery rules."),
+        },
+        ["name", "description", "procedure", "constraints"],
+    )
+    result = await runtime.chat(
+        ModelRole.RENDERER,
+        [
+            {
+                "role": "system",
+                "content": (
+                    _high_renderer_instructions(RendererStyle.TRACE2TOWER, benchmark)
+                    + """
+
+Community induction contract:
+- The input is the complete Mid transition community, not one local path.
+- Induce one strategy containing only relations stable across successful task variants.
+- Use failed trajectories to remove brittle path-specific operations and add guards for target substitution, premature phase entry, repeated transformations, wasted search, and missing completion.
+- Express conditional objective variants inside one shared strategy; do not serialize mutually exclusive transformations as one mandatory sequence.
+- Prefer the shortest action allowed by current environment state. Repair a prerequisite only when the intended action is unavailable; do not add container or appliance operations merely because some trajectory used them.
+"""
+                ),
+            },
+            {
+                "role": "user",
+                "content": json.dumps(
+                    render_input,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ),
+            },
+        ],
+        tools=[tool],
+        tool_choice="required",
+        temperature=0,
+        max_output_tokens=1400,
+        prompt_cache_key=f"trace2tower:high:{benchmark.value}:community-v1",
+    )
+    payload = _tool_payload(
+        result,
+        "render_high_skill",
+        {"name", "description", "procedure", "constraints"},
+    )
+    return (
+        HighSkillCard(
+            community_id,
+            (),
+            _required_text(payload, "name"),
+            _required_text(payload, "description"),
+            _required_text_tuple(payload, "procedure"),
+            _required_text_tuple(payload, "constraints"),
+            member_mid_ids,
         ),
         result,
     )

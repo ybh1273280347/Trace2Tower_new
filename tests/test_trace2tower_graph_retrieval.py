@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import pytest
+
 from trace2tower.manifests import Benchmark
+from trace2tower.methods.trace2tower.alfworld_events import (
+    ALFWORLD_EXCLUSIVE_PATH_EVENTS,
+)
 from trace2tower.methods.trace2tower.graph_retrieval import (
     TowerGraphProfile,
     retrieve_tower_graph,
 )
 from trace2tower.methods.trace2tower.models import (
+    AlfworldEventType,
     HighPath,
     PrimitiveAction,
     WebShopEventType,
@@ -101,24 +107,178 @@ def test_graph_retrieval_uses_current_event_and_respects_total_mid_budget() -> N
         mid_context_budget=2,
     )
     assert result.graph_high_match.skill_id == "high_detail"
-    assert result.retrieval.context_skill_ids == (
-        "high_detail",
-        "mid_detail",
-        "mid_back",
-    )
+    assert result.retrieval.context_skill_ids == ("high_detail", "mid_detail")
 
 
 def test_webshop_page_inference_drives_applicable_events() -> None:
     assert infer_webshop_page_type("WebShop search page.") is WebShopPageType.SEARCH
-    assert (
-        infer_webshop_page_type("Search results page 1:\nitem")
-        is WebShopPageType.RESULTS
-    )
+    assert infer_webshop_page_type("Search results page 1:\nitem") is WebShopPageType.RESULTS
     assert infer_webshop_page_type("Product: item") is WebShopPageType.ITEM
     assert infer_webshop_page_type("Attributes:\n['x']") is WebShopPageType.ITEM_DETAIL
-    assert WebShopEventType.ATTRIBUTE_INSPECTION in webshop_applicable_events(
-        WebShopPageType.ITEM
-    )
+    assert WebShopEventType.ATTRIBUTE_INSPECTION in webshop_applicable_events(WebShopPageType.ITEM)
     assert WebShopEventType.ATTRIBUTE_INSPECTION not in webshop_applicable_events(
         WebShopPageType.RESULTS
     )
+
+
+def test_alfworld_graph_retrieval_supports_mid_only_fallback() -> None:
+    mids = {
+        "mid_pick": mid_card("mid_pick", "Pick up object"),
+        "mid_put": mid_card("mid_put", "Place object"),
+    }
+    profile = TowerGraphProfile(
+        "tower_alfworld",
+        Benchmark.ALFWORLD,
+        {
+            "mid_pick": {AlfworldEventType.PICKUP_OBJECT: 10},
+            "mid_put": {AlfworldEventType.PUT_OBJECT: 10},
+        },
+    )
+
+    result = retrieve_tower_graph(
+        (1.0, 0.0),
+        (0.0, 1.0),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex(
+            ("mid_pick", "mid_put"),
+            ((1.0, 0.0), (0.0, 1.0)),
+        ),
+        {},
+        mids,
+        {},
+        profile,
+        frozenset((AlfworldEventType.PUT_OBJECT,)),
+        mid_context_budget=1,
+    )
+
+    assert result.graph_high_match is None
+    assert result.retrieval.context_skill_ids == ("mid_put",)
+
+
+def test_graph_mid_retrieval_can_return_empty_below_similarity_threshold() -> None:
+    mids = {
+        "mid_pick": mid_card("mid_pick", "Pick up object"),
+        "mid_put": mid_card("mid_put", "Place object"),
+    }
+    profile = TowerGraphProfile(
+        "tower_alfworld",
+        Benchmark.ALFWORLD,
+        {
+            "mid_pick": {AlfworldEventType.PICKUP_OBJECT: 10},
+            "mid_put": {AlfworldEventType.PUT_OBJECT: 10},
+        },
+    )
+
+    result = retrieve_tower_graph(
+        (),
+        (1.0, 0.0),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex(
+            ("mid_pick", "mid_put"),
+            ((0.0, 1.0), (0.0, 1.0)),
+        ),
+        {},
+        mids,
+        {},
+        profile,
+        frozenset(
+            (
+                AlfworldEventType.PICKUP_OBJECT,
+                AlfworldEventType.PUT_OBJECT,
+            )
+        ),
+        mid_context_budget=2,
+        direct_mid_similarity_threshold=0.45,
+    )
+
+    assert result.retrieval.context_skill_ids == ()
+
+
+def test_alfworld_high_path_requires_exact_goal_event_coverage() -> None:
+    mids = {
+        "mid_move": mid_card("mid_move", "Move"),
+        "mid_clean": mid_card("mid_clean", "Clean"),
+        "mid_toggle": mid_card("mid_toggle", "Toggle"),
+    }
+    highs = {
+        "high_clean": HighSkillCard(
+            "high_clean",
+            ("mid_move", "mid_clean"),
+            "Move and clean",
+            "Use for cleaning.",
+            ("Move, then clean.",),
+        ),
+        "high_toggle": HighSkillCard(
+            "high_toggle",
+            ("mid_move", "mid_toggle"),
+            "Move and toggle",
+            "Use for a lamp.",
+            ("Move, then toggle.",),
+        ),
+    }
+    paths = {
+        skill_id: HighPath(
+            skill_id,
+            card.ordered_mid_ids,
+            0.5,
+            0.1,
+            0.4,
+            ("trajectory",),
+        )
+        for skill_id, card in highs.items()
+    }
+    profile = TowerGraphProfile(
+        "tower_alfworld",
+        Benchmark.ALFWORLD,
+        {
+            "mid_move": {AlfworldEventType.GOTO_LOCATION: 10},
+            "mid_clean": {AlfworldEventType.CLEAN_OBJECT: 10},
+            "mid_toggle": {AlfworldEventType.TOGGLE_OBJECT: 10},
+        },
+    )
+    arguments = (
+        (1.0, 0.0),
+        (1.0, 0.0),
+        SkillEmbeddingIndex(
+            ("high_clean", "high_toggle"),
+            ((0.8, 0.2), (1.0, 0.0)),
+        ),
+        SkillEmbeddingIndex(
+            ("mid_move", "mid_clean", "mid_toggle"),
+            ((1.0, 0.0), (0.8, 0.2), (0.9, 0.1)),
+        ),
+        highs,
+        mids,
+        paths,
+        profile,
+        frozenset(
+            (
+                AlfworldEventType.GOTO_LOCATION,
+                AlfworldEventType.CLEAN_OBJECT,
+            )
+        ),
+    )
+
+    clean = retrieve_tower_graph(
+        *arguments,
+        mid_context_budget=2,
+        required_path_events=frozenset((AlfworldEventType.CLEAN_OBJECT,)),
+        exclusive_path_events=ALFWORLD_EXCLUSIVE_PATH_EVENTS,
+    )
+    plain = retrieve_tower_graph(
+        *arguments,
+        mid_context_budget=2,
+        exclusive_path_events=ALFWORLD_EXCLUSIVE_PATH_EVENTS,
+    )
+
+    assert clean.graph_high_match.skill_id == "high_clean"
+    assert plain.graph_high_match is None
+
+
+def test_graph_profile_rejects_events_from_another_benchmark() -> None:
+    with pytest.raises(ValueError, match="event types do not match"):
+        TowerGraphProfile(
+            "tower_alfworld",
+            Benchmark.ALFWORLD,
+            {"mid": {WebShopEventType.QUERY_FORMULATION: 1}},
+        )

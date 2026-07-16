@@ -6,18 +6,13 @@ from collections import Counter
 from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.graph_retrieval import TowerGraphProfile
-from trace2tower.methods.trace2tower.models import WebShopEventType
+from trace2tower.methods.trace2tower.models import event_type_from_value
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
 
 
 def main(options: argparse.Namespace) -> int:
-    tower = TowerSnapshot.from_record(
-        json.loads(options.tower.read_text(encoding="utf-8"))
-    )
-    if tower.benchmark is not Benchmark.WEBSHOP:
-        raise ValueError("event-aware graph retrieval currently supports WebShop")
+    tower = TowerSnapshot.from_record(json.loads(options.tower.read_text(encoding="utf-8")))
     mid_by_segment = {
         segment_id: cluster.cluster_id
         for cluster in tower.mid_clusters
@@ -36,8 +31,8 @@ def main(options: argparse.Namespace) -> int:
                     continue
                 event = segment["event_type"]
                 if event is None:
-                    raise ValueError("WebShop graph profile requires event labels")
-                counts[mid_id][WebShopEventType(event)] += 1
+                    raise ValueError("graph profile requires domain event labels")
+                counts[mid_id][event_type_from_value(event)] += 1
                 seen_segment_ids.add(segment_id)
     if seen_segment_ids != set(mid_by_segment):
         raise ValueError("preprocessed data does not cover every Tower Mid segment")

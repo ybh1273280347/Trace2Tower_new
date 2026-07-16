@@ -1,0 +1,3106 @@
+{
+  "source_run": "artifacts\\runs\\alfworld-dev-v1-flash-operator-mid-graph-high-cap3-r0",
+  "tower": "artifacts\\trace2tower\\alfworld\\original-concept-v6\\p310\\tower.json",
+  "profile": "artifacts\\trace2tower\\alfworld\\original-concept-v6\\p310\\graph-retrieval-profile.json",
+  "tower_snapshot_id": "tower_88dcfc7c443a9805",
+  "embedding_text_count": 1185,
+  "counts": {
+    "steps": 2047,
+    "steps_with_high": 2027,
+    "episodes": 139,
+    "old_initial_goal_operator_mid": 76,
+    "goal_operator_actionable_steps": 191,
+    "goal_operator_mid_retrieved_when_actionable": 177,
+    "operator_steps_without_high": 20
+  },
+  "initial_records": [
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_181023_216915",
+      "goal": "Place a chilled frying pan on the stove.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_181233_363875",
+      "goal": "Put two books on a desk.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_181531_703961",
+      "goal": "Put the yellow and blue jars on the black desk.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_182952_858723",
+      "goal": "Put two remotes on an ottoman.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to ottoman 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_190942_706186",
+      "goal": "Put a spray bottle on top of the toilet's water tank.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_192817_654400",
+      "goal": "Take the cup out of the microwave, put it in the fridge, back in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to microwave 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_192823_237997",
+      "goal": "Place a chilled cup on the table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_af563196b7a8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Chill an item, then carry it to its destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_195943_081289",
+      "goal": "Place a cool apple in the white bin.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_200927_069627",
+      "goal": "Put two cardboard boxes on the coffee table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to coffeetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_201106_979461",
+      "goal": "place clean soap on top of the toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_b139a3d738fc",
+        "mid_0005",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_c1ce2b11abdd",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and wash it at the sink",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_202340_749336",
+      "goal": "Put away clean soap.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_202601_548273",
+      "goal": "Examine the keys under the light of the table lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Light the lamp, then inspect the lit area",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_205324_559361",
+      "goal": "cool off a white plate",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_210937_878489",
+      "goal": "Take the apple from the table, put it in the refrigerator, take it out, heat the apple in the microwave",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_bb9fd9b69539",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to diningtable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_215856_374127",
+      "goal": "Put a chilled pan on the stove.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_234406_356490",
+      "goal": "Put an egg in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_001129_214240",
+      "goal": "To put two cards in a safe.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_012519_974044",
+      "goal": "Place two pans on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_024634_972453",
+      "goal": "Put a wet sponge on the metal rack.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_b139a3d738fc",
+        "mid_0005",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_033843_707544",
+      "goal": "Place spray bottles on the back of a toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_041436_588106",
+      "goal": "Place the wet soap on top of the toilet next to the other soaps.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_042856_259139",
+      "goal": "Move a book from a desk to a sofa.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sofa 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_054906_608944",
+      "goal": "To place the soap on the rack.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cart 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_060234_011675",
+      "goal": "Put a heated apple on the table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_2c6fa4d4d8c3",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_065232_689984",
+      "goal": "place two knifes in the kitchen drawer",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to drawer 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_074425_330493",
+      "goal": "Turn on a light with a box in hand.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_24c087e1e8e7",
+        "mid_0004",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_e2e1aa6e0efa",
+        "mid_0003",
+        "mid_0007"
+      ],
+      "selected_high_name": "Pick up the target, bring it to the lamp, and switch the lamp on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to sidetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_080903_889497",
+      "goal": "Put a wet towel in the cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0007",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_111251_461099",
+      "goal": "To take the toilet paper on top of the toilet and place it in a drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_114323_767231",
+      "goal": "Examine a CD by a lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Light the lamp, then inspect the lit area",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_114931_692464",
+      "goal": "put the green spray bottle into the drawer",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_122204_941737",
+      "goal": "Put the vases on the wooden shelf",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to shelf 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_144556_144188",
+      "goal": "Move the spray bottles to the cabinet under the sink.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_150418_457594",
+      "goal": "Turn on the desk lamp while holding a yellow disc",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_fdac08e27c3b",
+        "mid_0001",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Inspect the item or nearby surface, then go to the lamp and switch it on",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_154618_526741",
+      "goal": "Grab the disc from the shelf, turn on the lamp on the cabinet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_48902feb6a9d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_e2e1aa6e0efa",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Pick up the target, bring it to the lamp, and switch the lamp on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to shelf 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_164104_229696",
+      "goal": "move a box from the couch to the dresser",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sofa 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_165826_194855",
+      "goal": "Move two alarm clocks from the desk to the night stand.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_171639_045329",
+      "goal": "Move a bowl from a dining table to a coffee table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to diningtable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_173251_960848",
+      "goal": "Heat a glass and place it in the cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_bb9fd9b69539",
+        "mid_0002",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000",
+        "mid_0007"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_182211_592010",
+      "goal": "Put two watches on the tv stand.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to dresser 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_200154_378982",
+      "goal": "Put a wine bottle on the second from the bottom shelf, in the kitchen.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to shelf 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_201243_698086",
+      "goal": "Heat a tomato and place it on a table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_2c6fa4d4d8c3",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_201917_045715",
+      "goal": "Put two credit cards on a cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to dresser 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_222640_487432",
+      "goal": "Put a heated mug on the coffee machine.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to microwave 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_224451_655673",
+      "goal": "Carry a CD while turning on a lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_499b25538ddf",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_499b25538ddf",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Navigate to the lamp and switch it on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "look"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_230232_832893",
+      "goal": "Move two CDs to the bottom drawer of the desk.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_231206_512424",
+      "goal": "Put a chilled plate in a cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_233056_022802",
+      "goal": "Put a clean mug under the coffee maker.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_233817_198528",
+      "goal": "Take the blue cell phone from the dresser, put it on the bed",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to dresser 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_001247_096796",
+      "goal": "Warm a plate and place it on the table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_2c6fa4d4d8c3",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to microwave 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_014451_271080",
+      "goal": "cook the potato with microwave, put the potato in the refrigerator",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_024426_412044",
+      "goal": "Set a chilled bottle of wine on the table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_ef8fb95cc482",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, chill, and carry the item to its destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_033721_967359",
+      "goal": "Put a cooked tomato into the refrigerator.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_042713_075616",
+      "goal": "Place a chilled head of lettuce on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_050518_595510",
+      "goal": "Put a roll of toilet paper on the toilet paper holder.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toiletpaperhanger 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_050633_745514",
+      "goal": "move a magazine from the bed to the table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to bed 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_052007_212776",
+      "goal": "Place a rinsed knife inside a drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_052232_887934",
+      "goal": "Put a bottle on the back of a newspaper.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_053153_077977",
+      "goal": "Look at a pillow by the light of a lamp.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_fdac08e27c3b",
+        "mid_0003",
+        "mid_0001"
+      ],
+      "selected_high_name": "Inspect the item or nearby surface, then go to the lamp and switch it on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_054742_818364",
+      "goal": "Put a spray bottle in a garbage bin.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to garbagecan 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_055221_984342",
+      "goal": "Put a clean bar of soap under the sink.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_b139a3d738fc",
+        "mid_0005",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_c1ce2b11abdd",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and wash it at the sink",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_070946_578973",
+      "goal": "Put a heated white plate in a cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to countertop 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_100138_446072",
+      "goal": "place clean lettuce inside of the kitchen fridge",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_110131_524518",
+      "goal": "Move a bottle from the counter to the drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to countertop 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_121728_511866",
+      "goal": "Put a clean butter knife in a drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_122858_883968",
+      "goal": "Put an empty toilet paper roll on a toilet paper holder.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toiletpaperhanger 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_122951_021026",
+      "goal": "Place a heated egg on the kitchen island.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_124340_258012",
+      "goal": "Place a credit card on a chair.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_124829_632660",
+      "goal": "Put a tomato in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_125930_920681",
+      "goal": "Move two books from the bed to the desk.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to bed 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_132152_999725",
+      "goal": "Wash a fork and place inside kitchen drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_140701_251653",
+      "goal": "Get wash rag wet and put it away in drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0007"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to towelholder 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_144357_621068",
+      "goal": "Put a wet sponge on the counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_b139a3d738fc",
+        "mid_0005",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_150807_823817",
+      "goal": "Put a chilled apple in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_164236_518264",
+      "goal": "Move two spray bottles into a small grey bin.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to garbagecan 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_183331_203888",
+      "goal": "Put two spatulas away in a drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_184242_348366",
+      "goal": "Place a cooled mug on a coffee machine.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fd58336ddfb6",
+        "mid_0006",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_fd58336ddfb6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Chill the held item, then deliver it to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_201550_622420",
+      "goal": "Pick up a laptop and turn on a lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_e2e1aa6e0efa",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_e8371f1b9a49",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect or secure the target item, then switch on the nearby lamp",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_212725_836398",
+      "goal": "Put a clean plate on the counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_222555_651605",
+      "goal": "Place a chilled head of lettuce on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_230702_962704",
+      "goal": "Examine a bowl by the light of a desk lamp.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0003",
+        "mid_0007"
+      ],
+      "selected_high_name": "Light the lamp, then inspect the lit area",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_232648_241836",
+      "goal": "Put a chilled pan on a kitchen table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_233922_171295",
+      "goal": "Place a rinsed fork on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_b139a3d738fc",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Bring the held item to the sink and wash it",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_234112_645480",
+      "goal": "Put a cold egg in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_002804_564168",
+      "goal": "Place a spatula on the table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to drawer 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_004531_429065",
+      "goal": "Put a cold pot on a table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_010644_297017",
+      "goal": "Put the credit card in the drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_011341_436523",
+      "goal": "Heat and chill a potato.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "mid_0006",
+        "mid_0000",
+        "mid_0002"
+      ],
+      "new_context_skill_ids": [
+        "mid_0000",
+        "mid_0001",
+        "mid_0007"
+      ],
+      "selected_high_name": null,
+      "active_mid_id": null,
+      "active_mid_name": null,
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_012524_159092",
+      "goal": "Put a cold tomato in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_012550_586494",
+      "goal": "wash a tomato and put it on the counter",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_014639_335717",
+      "goal": "Move mug from coffee maker to microwave and heat, move to cabinet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to coffeemachine 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_020200_054379",
+      "goal": "place a microwaved tomato inside of the fridge",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to microwave 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_021000_274398",
+      "goal": "Place a remote control on a chair.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to coffeetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_032318_169393",
+      "goal": "Move a mug to a nightstand.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sidetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_032340_274147",
+      "goal": "Place a CD on a table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_044602_338962",
+      "goal": "Move two tissue boxes from the green cabinet counter top to the toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to countertop 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_044715_250790",
+      "goal": "look at the clock under the lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_fdac08e27c3b",
+        "mid_0003",
+        "mid_0001"
+      ],
+      "selected_high_name": "Inspect the item or nearby surface, then go to the lamp and switch it on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_044933_815840",
+      "goal": "put a chilled apple on a kitchen counter",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_045605_307949",
+      "goal": "Chill the bread from the counter in the fridge and put it to the left of the stove.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to countertop 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_051630_092360",
+      "goal": "Retrieve green vegetable from table, wash it in the sink, put it on the right side counter",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_051813_197569",
+      "goal": "Put one watch on the end tale.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sidetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_055248_059513",
+      "goal": "Put a candle on the back of a toilet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_055538_380023",
+      "goal": "To move two bars of soap to the black bin.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_055649_717880",
+      "goal": "Put two bars of soap into the trash can.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_062333_424779",
+      "goal": "place microwaved black mug in upper cabinet in between microwave and sink",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_063754_216554",
+      "goal": "Put a chilled tomato on the counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_063844_274181",
+      "goal": "Put a cool tomato on the counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_071128_012892",
+      "goal": "to grab a pencil from the night stand and place it on the dresser",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to night stand"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_075955_678702",
+      "goal": "put the spray bottle on the back of the toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_080302_174780",
+      "goal": "Put two rolls of toilet paper on the back of a toilet.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to toilet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_081908_677973",
+      "goal": "Put a candle on a rack.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to shelf 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_082320_103350",
+      "goal": "Place a tomato back in the refrigerator when done heating in the microwave.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_75cc6c7ba432",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_082934_483899",
+      "goal": "Put a frozen tomato in to garbage bin.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_ef8fb95cc482",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, chill, and carry the item to its destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_090729_088825",
+      "goal": "Put a heated mug down on a table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_2c6fa4d4d8c3",
+        "mid_0002",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_a74f47cce571",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Heat an item, carry it to the target location, and place it there",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sidetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_091246_807206",
+      "goal": "Place a vase on a coffee table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to coffeetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_091314_636733",
+      "goal": "cook an egg then put it back inside the fridge",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_105559_983897",
+      "goal": "wash the butter knife and put it back on the counter",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_111324_949106",
+      "goal": "Place a newspaper on a couch.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0001",
+        "mid_0000",
+        "mid_0003"
+      ],
+      "selected_high_name": "Inspect, take, confirm, and carry the item to the next location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sofa 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_112854_740612",
+      "goal": "Place a rinsed plate in the fridge.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_112912_154874",
+      "goal": "put chilled bowl in cabinet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_113054_894334",
+      "goal": "Place a pencil on a desk.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_113844_191747",
+      "goal": "Place a rinsed spoon on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_114508_617301",
+      "goal": "To wash an knife and place it on the kitchen table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_debbe6cf9bd8",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Wash then return the held item to its target location",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_120047_968274",
+      "goal": "Place a cell phone on a chair.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_121908_219603",
+      "goal": "Place a clean ladle on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_124425_112757",
+      "goal": "Place a clean knife in a drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_150719_492274",
+      "goal": "take the bowl to the lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_6617439a85f0",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_e2e1aa6e0efa",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Pick up the target, bring it to the lamp, and switch the lamp on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_150916_682139",
+      "goal": "Carry a purple pillow while turning on a lamp",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_6617439a85f0",
+        "mid_0004",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_fdac08e27c3b",
+        "mid_0003",
+        "mid_0001"
+      ],
+      "selected_high_name": "Inspect the item or nearby surface, then go to the lamp and switch it on",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "go to desk 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_152837_739016",
+      "goal": "Put the mug on the dresser with the television.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to dresser 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_153609_373481",
+      "goal": "move the remote from the table to the couch",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_fb62f4c808d4",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to coffeetable 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_164840_568811",
+      "goal": "get ladle, wash it, return it to wooden table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0294e21b0960",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_287c671a33d6",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve, carry to the sink, and wash the target item",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to drawer 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_183724_205399",
+      "goal": "Put a clean large metal spoon on the round white table.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_193045_208933",
+      "goal": "Examine a statue by the light of a small lamp.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_24c087e1e8e7",
+        "mid_0004",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_336bbc58917d",
+        "mid_0003",
+        "mid_0000"
+      ],
+      "selected_high_name": "Light the lamp, then inspect the lit area",
+      "active_mid_id": "mid_0003",
+      "active_mid_name": "Inspect the current location or held item for confirmation",
+      "first_action": "look"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190910_112922_368384",
+      "goal": "Place a soap container on a counter.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190910_155319_795672",
+      "goal": "Move tissues from counter to toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to countertop 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190910_173916_331859",
+      "goal": "Put a chilled tomato in the microwave",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_0cbb7229d5c6",
+        "mid_0006",
+        "mid_0003"
+      ],
+      "new_context_skill_ids": [
+        "high_5b84125c5048",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Retrieve an item and chill it in the fridge",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to fridge 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190910_222914_814642",
+      "goal": "Put the green spray bottles on the toilet",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to cabinet 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190911_101248_326533",
+      "goal": "Place the two newsletters in a tv drawer.",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "inventory"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190911_131350_027076",
+      "goal": "put clean spoon on the table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0005",
+        "mid_0001"
+      ],
+      "new_context_skill_ids": [
+        "high_749ae522bcf9",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Clean then return the item to its required destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sinkbasin 1"
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190918_184236_557252",
+      "goal": "place a knife on the microwave oven table",
+      "admissible_event_types": [
+        "GotoLocation",
+        "Scan"
+      ],
+      "old_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "new_context_skill_ids": [
+        "high_f98523129b00",
+        "mid_0001",
+        "mid_0000"
+      ],
+      "selected_high_name": "Close, check the next location, collect the item if present, then head to the destination",
+      "active_mid_id": "mid_0001",
+      "active_mid_name": "Navigate to the next task-relevant location",
+      "first_action": "go to sidetable 1"
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from trace2tower.agent import SkillSelection
+from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.global_e2e.models import GlobalE2ESkillLibrary
 from trace2tower.methods.global_e2e.retrieval import retrieve_global_e2e_skill
@@ -27,9 +28,9 @@ class GlobalE2ESkillProvider:
     async def select(
         self,
         task_goal: str,
-        initial_observation: str,
+        state: EnvironmentState,
     ) -> SkillSelection:
-        embedding = await self.runtime.embed([f"{task_goal}\n{initial_observation}"])
+        embedding = await self.runtime.embed([f"{task_goal}\n{state.observation}"])
         retrieval = retrieve_global_e2e_skill(
             embedding.vectors[0],
             self.library.index,

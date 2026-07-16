@@ -312,7 +312,12 @@ async def main(options: argparse.Namespace) -> int:
             ):
                 high_cards[path.path_id] = old_high_cards[path.path_id]
                 continue
-            card, result = await render_high_card(runtime, path, mid_cards)
+            card, result = await render_high_card(
+                runtime,
+                old_tower.benchmark,
+                path,
+                mid_cards,
+            )
             high_cards[path.path_id] = card
             render_usage.append({"skill_id": card.skill_id, **asdict(result.usage)})
             write_json(

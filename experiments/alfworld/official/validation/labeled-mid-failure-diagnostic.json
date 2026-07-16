@@ -1,0 +1,60 @@
+{
+  "diagnostic_set": "three-signal-v9-mid-injected-failures",
+  "source_run": "alfworld-dev-v1-flash-high-mid-three-signal-v9-first10-r0",
+  "tasks": [
+    {
+      "task_goal": "Put a chilled pan on the stove.",
+      "target_action_name": "pan",
+      "destination_action_name": "stoveburner",
+      "transformation_mid_id": "mid_0006"
+    },
+    {
+      "task_goal": "Put a clean mug under the coffee maker.",
+      "target_action_name": "mug",
+      "destination_action_name": "coffeemachine",
+      "transformation_mid_id": "mid_0005"
+    },
+    {
+      "task_goal": "Place a rinsed fork on a counter.",
+      "target_action_name": "fork",
+      "destination_action_name": "countertop",
+      "transformation_mid_id": "mid_0005"
+    },
+    {
+      "task_goal": "Put a cold pot on a table.",
+      "target_action_name": "pot",
+      "destination_action_name": "diningtable",
+      "transformation_mid_id": "mid_0006"
+    },
+    {
+      "task_goal": "put a chilled apple on a kitchen counter",
+      "target_action_name": "apple",
+      "destination_action_name": "countertop",
+      "transformation_mid_id": "mid_0006"
+    },
+    {
+      "task_goal": "Place a rinsed spoon on a counter.",
+      "target_action_name": "ladle",
+      "destination_action_name": "countertop",
+      "transformation_mid_id": "mid_0005"
+    },
+    {
+      "task_goal": "Place a clean ladle on a counter.",
+      "target_action_name": "ladle",
+      "destination_action_name": "countertop",
+      "transformation_mid_id": "mid_0005"
+    },
+    {
+      "task_goal": "Put a clean large metal spoon on the round white table.",
+      "target_action_name": "ladle",
+      "destination_action_name": "diningtable",
+      "transformation_mid_id": "mid_0005"
+    },
+    {
+      "task_goal": "put clean spoon on the table",
+      "target_action_name": "ladle",
+      "destination_action_name": "diningtable",
+      "transformation_mid_id": "mid_0005"
+    }
+  ]
+}

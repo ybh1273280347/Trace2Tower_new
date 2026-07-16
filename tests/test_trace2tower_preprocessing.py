@@ -13,7 +13,15 @@ from trace2tower.methods.trace2tower.action_parser import (
     parse_alfworld_action,
     parse_webshop_action,
 )
+from trace2tower.methods.trace2tower.alfworld_events import (
+    alfworld_applicable_events,
+    alfworld_goal_events,
+    alfworld_segment_signature,
+    classify_alfworld_transitions,
+    segment_alfworld_trajectory,
+)
 from trace2tower.methods.trace2tower.models import (
+    AlfworldEventType,
     PrimitiveAction,
     SegmentInstance,
     StepTransition,
@@ -24,8 +32,8 @@ from trace2tower.methods.trace2tower.segmentation import (
     calibrate_segmentation_penalty,
     segment_boundaries,
 )
-from trace2tower.methods.trace2tower.transitions import build_transitions
 from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
+from trace2tower.methods.trace2tower.transitions import build_transitions
 from trace2tower.methods.trace2tower.webshop_events import (
     WebShopEventClassifier,
     classify_webshop_steps,
@@ -59,11 +67,118 @@ def test_parse_alfworld_official_commands(action: str, expected: PrimitiveAction
 
 
 def test_action_parsers_reject_wrong_tool_or_argument() -> None:
-    assert parse_alfworld_action("take_action", {"action": "looking glass"}) is PrimitiveAction.INVALID
+    assert (
+        parse_alfworld_action("take_action", {"action": "looking glass"}) is PrimitiveAction.INVALID
+    )
     assert parse_alfworld_action("click_action", {"action": "look"}) is PrimitiveAction.INVALID
     assert parse_webshop_action("search_action", {"keywords": "rug"}) is PrimitiveAction.SEARCH
     assert parse_webshop_action("click_action", {"value": "Buy Now"}) is PrimitiveAction.CLICK
     assert parse_webshop_action("click_action", {"keywords": "rug"}) is PrimitiveAction.INVALID
+
+
+def alfworld_step(index: int, action: str) -> StepRecord:
+    return StepRecord(
+        step_index=index,
+        observation=f"before-{index}",
+        action_name="take_action",
+        action_arguments={"action": action},
+        next_observation=f"after-{index}",
+        reward=0,
+        done=False,
+        valid_action=True,
+        admissible_actions=(),
+        clickable_types={},
+    )
+
+
+def test_alfworld_uses_official_high_level_events_and_compact_signatures() -> None:
+    steps = (
+        alfworld_step(0, "go to countertop 1"),
+        alfworld_step(1, "go to fridge 2"),
+        alfworld_step(2, "open fridge 2"),
+        alfworld_step(3, "take apple 1 from fridge 2"),
+        alfworld_step(4, "heat apple 1 with microwave 1"),
+        alfworld_step(5, "put apple 1 in/on countertop 1"),
+    )
+    trajectory = EpisodeTrajectory(
+        run_id="test-run",
+        benchmark=Benchmark.ALFWORLD,
+        split=ExperimentSplit.TRAIN,
+        method=MethodName.NO_SKILL,
+        sample_id="alfworld:train:trial",
+        repeat_id=0,
+        task_goal="put a hot apple on a countertop",
+        steps=steps,
+        primary_score=1,
+        finish_reason=FinishReason.COMPLETED,
+    )
+    transitions = build_transitions(trajectory)
+
+    assert classify_alfworld_transitions(transitions) == (
+        AlfworldEventType.GOTO_LOCATION,
+        AlfworldEventType.GOTO_LOCATION,
+        AlfworldEventType.OPEN_OBJECT,
+        AlfworldEventType.PICKUP_OBJECT,
+        AlfworldEventType.HEAT_OBJECT,
+        AlfworldEventType.PUT_OBJECT,
+    )
+    segments = segment_alfworld_trajectory(trajectory, transitions)
+    assert [(segment.event_type, segment.start_step, segment.end_step) for segment in segments] == [
+        (AlfworldEventType.GOTO_LOCATION, 0, 1),
+        (AlfworldEventType.OPEN_OBJECT, 2, 2),
+        (AlfworldEventType.PICKUP_OBJECT, 3, 3),
+        (AlfworldEventType.HEAT_OBJECT, 4, 4),
+        (AlfworldEventType.PUT_OBJECT, 5, 5),
+    ]
+    signature = alfworld_segment_signature(segments[0])
+    assert signature == (
+        "Event: GotoLocation\nLength: 2\n"
+        "Actions: GO_TO(receptacle) -> GO_TO(receptacle)"
+    )
+    assert "countertop" not in signature
+    assert "fridge" not in signature
+    assert trajectory.task_goal not in signature
+    assert "before-0" not in signature
+    assert SegmentInstance.from_record(segments[0].to_record()) == segments[0]
+
+
+def test_alfworld_current_state_limits_applicable_events() -> None:
+    searching = alfworld_applicable_events(
+        (
+            "go to countertop 1",
+            "take apple 1 from countertop 1",
+            "look",
+        )
+    )
+    ready_to_clean = alfworld_applicable_events(
+        (
+            "go to sinkbasin 1",
+            "clean apple 1 with sinkbasin 1",
+            "put apple 1 in sinkbasin 1",
+        )
+    )
+
+    assert AlfworldEventType.PICKUP_OBJECT in searching
+    assert AlfworldEventType.PUT_OBJECT not in searching
+    assert AlfworldEventType.CLEAN_OBJECT not in searching
+    assert AlfworldEventType.PUT_OBJECT in ready_to_clean
+    assert AlfworldEventType.CLEAN_OBJECT in ready_to_clean
+    assert AlfworldEventType.PICKUP_OBJECT not in ready_to_clean
+
+
+@pytest.mark.parametrize(
+    ("goal", "event"),
+    (
+        ("wash a knife and put it on the table", AlfworldEventType.CLEAN_OBJECT),
+        ("place a wet soap on the toilet", AlfworldEventType.CLEAN_OBJECT),
+        ("put a microwaved tomato in the fridge", AlfworldEventType.HEAT_OBJECT),
+        ("put a chilled pan on the stove", AlfworldEventType.COOL_OBJECT),
+        ("cut an apple and place it on a plate", AlfworldEventType.SLICE_OBJECT),
+        ("inspect a mug under the lamp", AlfworldEventType.TOGGLE_OBJECT),
+    ),
+)
+def test_alfworld_goal_event_synonyms(goal: str, event: AlfworldEventType) -> None:
+    assert event in alfworld_goal_events(goal)
 
 
 def webshop_step(
@@ -91,11 +206,15 @@ def test_webshop_event_priority_and_page_state() -> None:
         webshop_step(0, "search_action", {"keywords": "blue rug"}),
         webshop_step(1, "search_action", {"keywords": "blue round rug"}),
         webshop_step(2, "click_action", {"value": "next >"}, {"next >": ClickableKind.BUTTON}),
-        webshop_step(3, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}),
+        webshop_step(
+            3, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}
+        ),
         webshop_step(4, "click_action", {"value": "blue"}, {"blue": ClickableKind.OPTION}),
         webshop_step(5, "click_action", {"value": "Features"}, {"Features": ClickableKind.BUTTON}),
         webshop_step(6, "click_action", {"value": "< prev"}, {"< prev": ClickableKind.BUTTON}),
-        webshop_step(7, "click_action", {"value": "Back to Search"}, {"Back to Search": ClickableKind.BUTTON}),
+        webshop_step(
+            7, "click_action", {"value": "Back to Search"}, {"Back to Search": ClickableKind.BUTTON}
+        ),
         webshop_step(8, "search_action", {"keywords": "rug"}),
         webshop_step(9, "click_action", {"value": "B087654321"}),
         webshop_step(10, "click_action", {"value": "Buy Now"}, {"Buy Now": ClickableKind.BUTTON}),
@@ -125,16 +244,24 @@ def test_webshop_dom_types_override_fallback_and_other_click_keeps_page() -> Non
     )
     assert classifier.classify(other) is WebShopEventType.OTHER_CLICK
     assert classifier.page is WebShopPageType.RESULTS
-    assert classifier.classify(webshop_step(1, "click_action", {"value": "< prev"})) is WebShopEventType.RESULT_NAVIGATION
+    assert (
+        classifier.classify(webshop_step(1, "click_action", {"value": "< prev"}))
+        is WebShopEventType.RESULT_NAVIGATION
+    )
 
     unknown = WebShopEventClassifier(WebShopPageType.UNKNOWN, searched=True)
-    assert unknown.classify(webshop_step(0, "click_action", {"value": "B012345678"})) is WebShopEventType.CANDIDATE_SELECTION
+    assert (
+        unknown.classify(webshop_step(0, "click_action", {"value": "B012345678"}))
+        is WebShopEventType.CANDIDATE_SELECTION
+    )
 
 
 def test_webshop_consecutive_events_merge_with_closed_boundaries() -> None:
     steps = (
         webshop_step(0, "search_action", {"keywords": "blue shirt"}),
-        webshop_step(1, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}),
+        webshop_step(
+            1, "click_action", {"value": "B012345678"}, {"B012345678": ClickableKind.PRODUCT_LINK}
+        ),
         webshop_step(2, "click_action", {"value": "blue"}, {"blue": ClickableKind.OPTION}),
         webshop_step(3, "click_action", {"value": "large"}, {"large": ClickableKind.OPTION}),
         webshop_step(4, "click_action", {"value": "Buy Now"}, {"Buy Now": ClickableKind.BUTTON}),

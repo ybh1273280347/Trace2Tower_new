@@ -8,31 +8,54 @@ from pathlib import Path
 import numpy as np
 import yaml
 from scipy import sparse
+from scipy.sparse.csgraph import connected_components
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
+from trace2tower.manifests import Benchmark
+from trace2tower.methods.trace2tower.alfworld_events import (
+    ALFWORLD_EXCLUSIVE_PATH_EVENTS,
+)
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.graph import build_graph, ordered_segment_groups
 from trace2tower.methods.trace2tower.models import SegmentInstance
 from trace2tower.methods.trace2tower.spectral import (
     semantic_only_clustering,
+    separate_exclusive_event_clusters,
     spectral_clustering,
 )
+
+
+def load_segment_groups(
+    path: Path,
+) -> tuple[Benchmark, tuple[tuple[SegmentInstance, ...], ...]]:
+    benchmark = None
+    groups = []
+    with path.open(encoding="utf-8") as input_file:
+        for line in input_file:
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            current_benchmark = Benchmark(record["benchmark"])
+            if benchmark is not None and current_benchmark is not benchmark:
+                raise ValueError("preprocessed graph input mixes benchmarks")
+            benchmark = current_benchmark
+            groups.append(
+                tuple(SegmentInstance.from_record(segment) for segment in record["segments"])
+            )
+    if benchmark is None:
+        raise ValueError("graph input contains no trajectories")
+    return benchmark, tuple(groups)
 
 
 def main(options: argparse.Namespace) -> int:
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
-    records = [
-        json.loads(line) for line in options.input.read_text(encoding="utf-8").splitlines() if line
-    ]
-    groups = tuple(
-        tuple(SegmentInstance.from_record(segment) for segment in record["segments"])
-        for record in records
-    )
+    benchmark, groups = load_segment_groups(options.input)
     ordered_groups = ordered_segment_groups(groups)
     segments = tuple(segment for group in ordered_groups for segment in group)
     invocation = {
         "input": options.input.as_posix(),
+        "benchmark": benchmark.value,
         "config": options.config.as_posix(),
         "output_dir": options.output_dir.as_posix(),
         "full_report": options.full_report.as_posix() if options.full_report else None,
@@ -62,6 +85,13 @@ def main(options: argparse.Namespace) -> int:
     else:
         graph = build_graph(ordered_groups, config)
         clustering = spectral_clustering(graph, config)
+        spectral_cluster_count = clustering.cluster_count
+        if benchmark is Benchmark.ALFWORLD:
+            clustering = separate_exclusive_event_clusters(
+                clustering,
+                graph,
+                ALFWORLD_EXCLUSIVE_PATH_EVENTS,
+            )
         for name in (
             "semantic",
             "transition",
@@ -87,16 +117,27 @@ def main(options: argparse.Namespace) -> int:
         {"clusters": [cluster.to_record() for cluster in clustering.clusters]},
     )
     cluster_sizes = Counter(clustering.labels)
+    event_distribution = Counter(
+        segment.event_type.value for segment in segments if segment.event_type is not None
+    )
     report = {
         **invocation,
         "method": config.method.value,
         "cluster_count": clustering.cluster_count,
+        "spectral_cluster_count": (
+            spectral_cluster_count if not config.semantic_only else clustering.cluster_count
+        ),
         "cluster_sizes": dict(sorted(cluster_sizes.items())),
         "eigenvalues": list(clustering.eigenvalues),
         "neighbor_count": graph.neighbor_count if graph else None,
         "edge_count": graph.edge_count if graph else None,
         "transition_edge_count": graph.transition_edge_count if graph else None,
         "cross_event_edge_count": graph.cross_event_edge_count if graph else None,
+        "event_distribution": dict(sorted(event_distribution.items())),
+        "transition_weight_count": (len(np.unique(graph.transition.data)) if graph else None),
+        "connected_component_count": (
+            connected_components(abs(graph.adjacency), directed=False)[0] if graph else None
+        ),
         "rho_min": float(graph.rho.min()) if graph else None,
         "rho_max": float(graph.rho.max()) if graph else None,
         "positive_adjacency_entries": int((graph.adjacency.data > 0).sum()) if graph else None,

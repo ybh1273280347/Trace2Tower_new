@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.graph import GraphComponents
-from trace2tower.methods.trace2tower.models import MidCluster
+from trace2tower.methods.trace2tower.models import EventType, MidCluster
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,6 +105,36 @@ def semantic_only_clustering(
     )
 
 
+def separate_exclusive_event_clusters(
+    clustering: ClusteringResult,
+    graph: GraphComponents,
+    exclusive_events: frozenset[EventType],
+) -> ClusteringResult:
+    if not exclusive_events:
+        return clustering
+
+    group_labels = {}
+    labels = []
+    for spectral_label, event in zip(clustering.labels, graph.event_types, strict=True):
+        # 排他目标 operator 必须拥有独立正文；其余节点继续保留谱图学到的角色。
+        group = (
+            ("event", event.value)
+            if event in exclusive_events
+            else ("spectral", str(spectral_label))
+        )
+        if group not in group_labels:
+            group_labels[group] = len(group_labels)
+        labels.append(group_labels[group])
+
+    return _clustering_result(
+        graph.segment_ids,
+        graph.segment_embeddings,
+        labels,
+        clustering.eigenvalues,
+        clustering.representation,
+    )
+
+
 def cluster_representation(
     segment_ids: tuple[str, ...],
     segment_embeddings: np.ndarray,
@@ -123,9 +153,26 @@ def cluster_representation(
             max_iter=300,
         ).fit_predict(representation)
 
+    return _clustering_result(
+        segment_ids,
+        segment_embeddings,
+        labels,
+        eigenvalues,
+        representation,
+    )
+
+
+def _clustering_result(
+    segment_ids: tuple[str, ...],
+    segment_embeddings: np.ndarray,
+    labels,
+    eigenvalues: tuple[float, ...],
+    representation: np.ndarray,
+) -> ClusteringResult:
+    unique_labels = sorted(set(int(label) for label in labels))
     members = {
         label: tuple(index for index, current_label in enumerate(labels) if current_label == label)
-        for label in range(cluster_count)
+        for label in unique_labels
     }
     ordered_labels = sorted(
         members,
@@ -134,7 +181,7 @@ def cluster_representation(
     canonical = {label: index for index, label in enumerate(ordered_labels)}
     canonical_labels = tuple(canonical[int(label)] for label in labels)
     clusters = []
-    for cluster_index in range(cluster_count):
+    for cluster_index in range(len(ordered_labels)):
         indices = [index for index, label in enumerate(canonical_labels) if label == cluster_index]
         centroid = tuple(np.mean(segment_embeddings[indices], axis=0).tolist())
         clusters.append(
@@ -145,7 +192,7 @@ def cluster_representation(
             )
         )
     return ClusteringResult(
-        cluster_count=cluster_count,
+        cluster_count=len(ordered_labels),
         labels=canonical_labels,
         eigenvalues=eigenvalues,
         representation=representation,

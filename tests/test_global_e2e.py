@@ -4,6 +4,7 @@ import asyncio
 
 import pytest
 
+from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import EmbeddingResult, LLMUsage
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.global_e2e.models import (
@@ -68,7 +69,10 @@ def test_provider_injects_exactly_one_end_to_end_skill() -> None:
             return EmbeddingResult(((1.0, 0.0),), LLMUsage(11, None, None), 1)
 
     selection = asyncio.run(
-        GlobalE2ESkillProvider(FakeRuntime(), library()).select("goal", "initial")
+        GlobalE2ESkillProvider(FakeRuntime(), library()).select(
+            "goal",
+            EnvironmentState("initial", (), {}, False, 0.0, False, True),
+        )
     )
     assert selection.skill_ids == ("global_a",)
     assert selection.model_input_tokens == 11

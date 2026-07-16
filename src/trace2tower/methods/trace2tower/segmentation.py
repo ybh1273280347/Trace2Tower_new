@@ -4,12 +4,7 @@ import math
 from statistics import median
 from typing import Sequence
 
-from trace2tower.methods.trace2tower.models import (
-    SegmentInstance,
-    SegmentationCalibration,
-    StepTransition,
-)
-from trace2tower.trajectory import EpisodeTrajectory
+from trace2tower.methods.trace2tower.models import SegmentationCalibration
 
 
 def segment_boundaries(
@@ -173,46 +168,3 @@ def calibrate_segmentation_penalty(
         trajectory_count=len(sequences),
         segment_count=len(lengths),
     )
-
-
-def segment_alfworld_trajectory(
-    trajectory: EpisodeTrajectory,
-    transitions: Sequence[StepTransition],
-    embeddings: Sequence[Sequence[float]],
-    *,
-    penalty: float,
-    max_segment_length: int = 6,
-) -> tuple[SegmentInstance, ...]:
-    if len(transitions) != len(trajectory.steps) or len(embeddings) != len(transitions):
-        raise ValueError("trajectory, transitions, and embeddings must align")
-    segments = []
-    for start, end in segment_boundaries(
-        embeddings,
-        penalty=penalty,
-        max_segment_length=max_segment_length,
-    ):
-        segment_vectors = embeddings[start : end + 1]
-        embedding = tuple(
-            sum(vector[index] for vector in segment_vectors) / len(segment_vectors)
-            for index in range(len(segment_vectors[0]))
-        )
-        segments.append(
-            SegmentInstance(
-                segment_id=f"{trajectory.trajectory_id}:segment:{start}-{end}",
-                trajectory_id=trajectory.trajectory_id,
-                start_step=start,
-                end_step=end,
-                transition_ids=tuple(
-                    transition.transition_id for transition in transitions[start : end + 1]
-                ),
-                embedding=embedding,
-                trajectory_score=trajectory.primary_score,
-                event_type=None,
-                raw_actions=tuple(
-                    transition.raw_action for transition in transitions[start : end + 1]
-                ),
-                observation_before=transitions[start].observation_before,
-                observation_after=transitions[end].observation_after,
-            )
-        )
-    return tuple(segments)

@@ -37,7 +37,7 @@ class SkillSelection:
             raise ValueError("skill selection token counts must be non-negative")
 
 
-SkillProvider = Callable[[str, str], Awaitable[SkillSelection]]
+SkillProvider = Callable[[str, EnvironmentState], Awaitable[SkillSelection]]
 
 
 class AgentEvaluator:
@@ -71,11 +71,14 @@ class AgentEvaluator:
         skill_ids: tuple[str, ...] = (),
         skill_provider: SkillProvider | None = None,
         refresh_skill_each_step: bool = False,
+        state_skill_provider: SkillProvider | None = None,
     ) -> EpisodeResult:
         if skill_provider is not None and (skill_context or skill_ids):
             raise ValueError("skill_provider cannot be combined with precomputed skills")
         if refresh_skill_each_step and skill_provider is None:
             raise ValueError("dynamic skill retrieval requires a provider")
+        if refresh_skill_each_step and state_skill_provider is not None:
+            raise ValueError("use one dynamic skill retrieval contract")
         started = time.perf_counter()
         episode = await environment.reset(entry)
         state = episode.state
@@ -87,11 +90,12 @@ class AgentEvaluator:
             selection = (
                 await skill_provider(
                     episode.task_goal,
-                    state.observation,
+                    state,
                 )
                 if skill_provider and not refresh_skill_each_step
                 else SkillSelection(skill_ids, skill_context or "")
             )
+            task_selection = selection
             input_tokens = selection.model_input_tokens or 0
             output_tokens = selection.model_output_tokens or 0
             chat_input_tokens = 0
@@ -121,19 +125,48 @@ class AgentEvaluator:
                 },
             ]
             for step_index in range(max_steps):
-                if refresh_skill_each_step:
-                    selection = await skill_provider(
+                dynamic_context = ""
+                dynamic_provider = (
+                    state_skill_provider
+                    if state_skill_provider is not None
+                    else skill_provider if refresh_skill_each_step else None
+                )
+                if dynamic_provider is not None:
+                    state_selection = await dynamic_provider(
                         episode.task_goal,
-                        state.observation,
+                        state,
                     )
-                    if selection.model_input_tokens is None:
+                    if state_selection.model_input_tokens is None:
                         input_usage_available = False
                     else:
-                        input_tokens += selection.model_input_tokens
-                    if selection.model_output_tokens is None:
+                        input_tokens += state_selection.model_input_tokens
+                    if state_selection.model_output_tokens is None:
                         output_usage_available = False
                     else:
-                        output_tokens += selection.model_output_tokens
+                        output_tokens += state_selection.model_output_tokens
+                    dynamic_context = state_selection.context
+                    selection = (
+                        state_selection
+                        if refresh_skill_each_step
+                        else SkillSelection(
+                            tuple(
+                                dict.fromkeys(
+                                    (*task_selection.skill_ids, *state_selection.skill_ids)
+                                )
+                            ),
+                            state_selection.context or task_selection.context,
+                            state_selection.model_input_tokens,
+                            state_selection.model_output_tokens,
+                            tuple(
+                                dict.fromkeys(
+                                    (
+                                        *task_selection.context_skill_ids,
+                                        *state_selection.context_skill_ids,
+                                    )
+                                )
+                            ),
+                        )
+                    )
                     selected_skill_ids.extend(
                         skill_id
                         for skill_id in selection.skill_ids
@@ -144,18 +177,25 @@ class AgentEvaluator:
                         for skill_id in selection.context_skill_ids
                         if skill_id not in context_skill_ids
                     )
-                    if selection.context:
-                        injected_contexts.append(selection.context)
+                    if dynamic_context:
+                        injected_contexts.append(dynamic_context)
                 call_messages = messages
-                if refresh_skill_each_step and selection.context:
+                if dynamic_context:
+                    heading = (
+                        "# Current Phase Skills\n\n"
+                        "The task-level strategy in the initial prompt remains authoritative. "
+                        "Use these Mid-level procedures and Low-level action templates only "
+                        "to execute the current phase; never let them change the bound target, "
+                        "skip a prerequisite, reorder the task strategy, or replace its "
+                        "completion condition.\n\n"
+                        if state_skill_provider is not None
+                        else "# Retrieved Skills for the Current State\n\n"
+                    )
                     call_messages = [
                         *messages,
                         {
                             "role": "user",
-                            "content": (
-                                "# Retrieved Experience for the Current State\n\n"
-                                f"{selection.context}"
-                            ),
+                            "content": f"{heading}{dynamic_context}",
                         },
                     ]
                 llm_result = await self.runtime.chat(

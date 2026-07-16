@@ -75,9 +75,10 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
         0,
     )
 
-    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def select(task_goal: str, state: EnvironmentState) -> SkillSelection:
         assert task_goal == "buy the matching item"
-        assert initial_observation == "initial page"
+        assert state.observation == "initial page"
+        assert state.admissible_actions == ("Buy Now",)
         return SkillSelection(
             ("high_a", "mid_a"),
             "retrieved context",
@@ -128,7 +129,7 @@ def test_agent_chat_cost_does_not_include_retrieval_embedding_tokens(tmp_path: P
         0,
     )
 
-    async def select(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def select(task_goal: str, state: EnvironmentState) -> SkillSelection:
         return SkillSelection(("mid_a",), "retrieved context", 7, 0)
 
     result = asyncio.run(
@@ -145,6 +146,66 @@ def test_agent_chat_cost_does_not_include_retrieval_embedding_tokens(tmp_path: P
     )
     assert result.input_tokens == 17
     assert result.chat_input_tokens + result.chat_output_tokens == 12
+
+
+def test_agent_injects_task_skill_once_and_refreshes_only_state_skills(
+    tmp_path: Path,
+) -> None:
+    runtime = FakeRuntime()
+    evaluator = AgentEvaluator(
+        runtime,
+        TrajectoryWriter(tmp_path / "episodes"),
+        temperature=0,
+        max_output_tokens=128,
+    )
+    entry = ManifestEntry(
+        Benchmark.WEBSHOP,
+        ExperimentSplit.TEST,
+        "webshop:0",
+        0,
+        "goals",
+        0,
+    )
+    task_calls = 0
+    state_calls = 0
+
+    async def select_task(task_goal: str, state: EnvironmentState) -> SkillSelection:
+        nonlocal task_calls
+        task_calls += 1
+        return SkillSelection(("high_a",), "end-to-end task strategy", 3, 0)
+
+    async def select_state(task_goal: str, state: EnvironmentState) -> SkillSelection:
+        nonlocal state_calls
+        state_calls += 1
+        return SkillSelection(
+            ("mid_a", "low:CLICK"),
+            "current stage and action template",
+            5,
+            0,
+        )
+
+    result = asyncio.run(
+        evaluator.run_episode(
+            entry=entry,
+            environment=FakeEnvironment(),
+            run_id="split-lifecycle-smoke",
+            method=MethodName.TRACE2TOWER,
+            skill_context=None,
+            shard_id=0,
+            max_steps=1,
+            skill_provider=select_task,
+            state_skill_provider=select_state,
+        )
+    )
+
+    assert task_calls == 1
+    assert state_calls == 1
+    assert result.skill_ids == ("high_a", "mid_a", "low:CLICK")
+    assert result.skill_context_chars == len("end-to-end task strategy") + len(
+        "current stage and action template"
+    )
+    assert "end-to-end task strategy" in runtime.messages[1]["content"]
+    assert "current stage and action template" in runtime.messages[2]["content"]
 
 
 def test_agent_can_use_explicit_renderer_endpoint_role(tmp_path: Path) -> None:
@@ -195,7 +256,7 @@ def test_agent_closes_environment_when_skill_selection_fails(tmp_path: Path) -> 
         0,
     )
 
-    async def fail_selection(task_goal: str, initial_observation: str) -> SkillSelection:
+    async def fail_selection(task_goal: str, state: EnvironmentState) -> SkillSelection:
         raise RuntimeError("selection failed")
 
     with pytest.raises(RuntimeError, match="selection failed"):

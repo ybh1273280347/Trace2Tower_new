@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
+from trace2tower.methods.trace2tower.skills import HighSkillCard, LowSkill, MidSkillCard
 from trace2tower.semantic_index import SkillEmbeddingIndex, SkillMatch, diverse_search
 
 
@@ -83,7 +83,7 @@ def retrieve_tower(
         else None
     )
     high_card = high_cards[high_match.skill_id] if high_match else None
-    if high_card and not set(high_card.ordered_mid_ids) <= set(mid_cards):
+    if high_card and not set(high_card.child_mid_ids) <= set(mid_cards):
         raise ValueError("retrieved High card references missing child Mid cards")
     if direct_mid_candidate_top_k is None:
         direct_mid_matches = mid_index.search(
@@ -119,7 +119,7 @@ def retrieve_tower(
         direct_mid_deduplicated = stages.deduplicated
         direct_mid_matches = stages.selected
     direct_mid_ids = tuple(match.skill_id for match in direct_mid_matches)
-    ordered_mid_ids = (*high_card.ordered_mid_ids, *direct_mid_ids) if high_card else direct_mid_ids
+    ordered_mid_ids = (*high_card.child_mid_ids, *direct_mid_ids) if high_card else direct_mid_ids
     unique_mid_ids = tuple(dict.fromkeys(ordered_mid_ids))
     selected_mid_cards = tuple(mid_cards[mid_id] for mid_id in unique_mid_ids)
     context_mid_ids = (
@@ -150,7 +150,9 @@ def retrieve_tower(
 
 
 def format_tower_context(
-    high_card: HighSkillCard | None, mid_cards: Sequence[MidSkillCard]
+    high_card: HighSkillCard | None,
+    mid_cards: Sequence[MidSkillCard],
+    low_skills: Sequence[LowSkill] = (),
 ) -> str:
     sections = []
     if high_card:
@@ -160,6 +162,7 @@ def format_tower_context(
                 high_card.name,
                 high_card.description,
                 high_card.procedure,
+                high_card.constraints,
             )
         )
     sections.extend(
@@ -172,6 +175,14 @@ def format_tower_context(
         )
         for card in mid_cards
     )
+    if low_skills:
+        sections.append(
+            "## Action Templates\n"
+            + "\n".join(
+                f"- {skill.primitive_action.value}: `{skill.action_template}`"
+                for skill in low_skills
+            )
+        )
     return "\n\n".join(sections)
 
 
@@ -180,7 +191,9 @@ def mid_card_text(card: MidSkillCard) -> str:
 
 
 def high_card_text(card: HighSkillCard) -> str:
-    return "\n".join((card.name, card.description, *card.procedure))
+    return "\n".join(
+        (card.name, card.description, *card.procedure, *card.constraints)
+    )
 
 
 def _format_card(

@@ -23,6 +23,21 @@ class PrimitiveAction(StrEnum):
     INVALID = "INVALID"
 
 
+class AlfworldEventType(StrEnum):
+    GOTO_LOCATION = "GotoLocation"
+    PICKUP_OBJECT = "PickupObject"
+    PUT_OBJECT = "PutObject"
+    OPEN_OBJECT = "OpenObject"
+    CLOSE_OBJECT = "CloseObject"
+    TOGGLE_OBJECT = "ToggleObject"
+    SLICE_OBJECT = "SliceObject"
+    CLEAN_OBJECT = "CleanObject"
+    HEAT_OBJECT = "HeatObject"
+    COOL_OBJECT = "CoolObject"
+    SCAN = "Scan"
+    INVALID_ACTION = "InvalidAction"
+
+
 class WebShopPageType(StrEnum):
     SEARCH = "SEARCH"
     RESULTS = "RESULTS"
@@ -43,6 +58,16 @@ class WebShopEventType(StrEnum):
     SEARCH_BACKTRACKING = "SEARCH_BACKTRACKING"
     PURCHASE_DECISION = "PURCHASE_DECISION"
     OTHER_CLICK = "OTHER_CLICK"
+
+
+EventType = AlfworldEventType | WebShopEventType
+
+
+def event_type_from_value(value: str) -> EventType:
+    try:
+        return AlfworldEventType(value)
+    except ValueError:
+        return WebShopEventType(value)
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,7 +109,7 @@ class SegmentInstance:
     transition_ids: tuple[str, ...]
     embedding: tuple[float, ...]
     trajectory_score: float
-    event_type: WebShopEventType | None
+    event_type: EventType | None
     raw_actions: tuple[str, ...]
     observation_before: str
     observation_after: str
@@ -103,7 +128,7 @@ class SegmentInstance:
             transition_ids=tuple(record["transition_ids"]),
             embedding=tuple(float(value) for value in record["embedding"]),
             trajectory_score=float(record["trajectory_score"]),
-            event_type=WebShopEventType(event_type) if event_type is not None else None,
+            event_type=event_type_from_value(event_type) if event_type is not None else None,
             raw_actions=tuple(record["raw_actions"]),
             observation_before=str(record["observation_before"]),
             observation_after=str(record["observation_after"]),
@@ -157,5 +182,25 @@ class HighPath:
             positive_support=float(record["positive_support"]),
             negative_support=float(record["negative_support"]),
             contrastive_score=float(record["contrastive_score"]),
+            supporting_trajectory_ids=tuple(record["supporting_trajectory_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class HighCommunity:
+    community_id: str
+    member_mid_ids: tuple[str, ...]
+    member_path_ids: tuple[str, ...]
+    supporting_trajectory_ids: tuple[str, ...]
+
+    def to_record(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_record(cls, record: dict) -> HighCommunity:
+        return cls(
+            community_id=str(record["community_id"]),
+            member_mid_ids=tuple(record["member_mid_ids"]),
+            member_path_ids=tuple(record["member_path_ids"]),
             supporting_trajectory_ids=tuple(record["supporting_trajectory_ids"]),
         )

@@ -4,6 +4,7 @@ import asyncio
 
 import pytest
 
+from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import EmbeddingResult, LLMUsage
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.skillx.models import (
@@ -94,7 +95,12 @@ def test_provider_reproduces_plan_then_per_step_skill_retrieval() -> None:
         skills_per_step=4,
         max_skills=10,
     )
-    selection = asyncio.run(provider.select("buy a rug", "search page"))
+    selection = asyncio.run(
+        provider.select(
+            "buy a rug",
+            EnvironmentState("search page", (), {}, False, 0.0, False, True),
+        )
+    )
     assert selection.skill_ids == (
         "skillx_plan_one",
         "skillx_search",

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster
+from trace2tower.methods.trace2tower.models import HighCommunity, HighPath, MidCluster
 from trace2tower.methods.trace2tower.retrieval import SkillEmbeddingIndex
 from trace2tower.methods.trace2tower.skills import (
     HighSkillCard,
@@ -21,6 +21,7 @@ from trace2tower.methods.trace2tower.skills import (
 class TowerVersion(StrEnum):
     V0 = "v0"
     V1 = "v1"
+    V2 = "v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +62,7 @@ class TowerSnapshot:
     high_index: SkillEmbeddingIndex
     mid_coverage_complete: bool
     high_coverage_complete: bool
+    high_communities: tuple[HighCommunity, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.training_trajectory_ids or len(set(self.training_trajectory_ids)) != len(
@@ -70,6 +72,9 @@ class TowerSnapshot:
         training_ids = set(self.training_trajectory_ids)
         clusters = {cluster.cluster_id: cluster for cluster in self.mid_clusters}
         paths = {path.path_id: path for path in self.high_paths}
+        communities = {
+            community.community_id: community for community in self.high_communities
+        }
         mid_cards = {card.skill_id: card for card in self.mid_cards}
         high_cards = {card.skill_id: card for card in self.high_cards}
         if any(
@@ -77,13 +82,19 @@ class TowerSnapshot:
             for items, mapping in (
                 (self.mid_clusters, clusters),
                 (self.high_paths, paths),
+                (self.high_communities, communities),
                 (self.mid_cards, mid_cards),
                 (self.high_cards, high_cards),
             )
         ):
             raise ValueError("tower structure contains duplicate stable IDs")
-        if set(mid_cards) - set(clusters) or set(high_cards) - set(paths):
+        if set(mid_cards) - set(clusters):
             raise ValueError("tower cards reference unknown structure")
+        if self.version is TowerVersion.V2:
+            if not communities or set(high_cards) - set(communities):
+                raise ValueError("Tower v2 High cards require known High communities")
+        elif communities or set(high_cards) - set(paths):
+            raise ValueError("legacy Tower High cards require known High paths")
         if any(
             segment_id.rsplit(":segment:", 1)[0] not in training_ids
             for cluster in self.mid_clusters
@@ -92,6 +103,13 @@ class TowerSnapshot:
             raise ValueError("Mid clusters contain segments outside training provenance")
         if any(not set(path.supporting_trajectory_ids) <= training_ids for path in self.high_paths):
             raise ValueError("High paths contain support outside training provenance")
+        if any(
+            not set(community.member_mid_ids) <= set(clusters)
+            or not set(community.member_path_ids) <= set(paths)
+            or not set(community.supporting_trajectory_ids) <= training_ids
+            for community in self.high_communities
+        ):
+            raise ValueError("High communities reference unknown Tower evidence")
         if any(
             len(path.ordered_mid_ids) < 2
             or len(path.ordered_mid_ids) > self.config.max_high_path_length
@@ -103,9 +121,14 @@ class TowerSnapshot:
             if card.member_segment_ids != clusters[skill_id].member_segment_ids:
                 raise ValueError(f"Mid card membership differs from cluster: {skill_id}")
         for skill_id, card in high_cards.items():
-            if card.ordered_mid_ids != paths[skill_id].ordered_mid_ids:
+            if self.version is TowerVersion.V2:
+                if card.member_mid_ids != communities[skill_id].member_mid_ids:
+                    raise ValueError(f"High card membership differs from community: {skill_id}")
+                if card.ordered_mid_ids:
+                    raise ValueError(f"Tower v2 High card cannot claim one fixed path: {skill_id}")
+            elif card.ordered_mid_ids != paths[skill_id].ordered_mid_ids:
                 raise ValueError(f"High card order differs from path: {skill_id}")
-            if not set(card.ordered_mid_ids) <= set(mid_cards):
+            if not set(card.child_mid_ids) <= set(mid_cards):
                 raise ValueError(f"High card has missing child Mid cards: {skill_id}")
         if set(self.mid_index.skill_ids) != set(mid_cards):
             raise ValueError("Mid index and cards differ")
@@ -114,7 +137,9 @@ class TowerSnapshot:
         if not self.mid_index.text_hashes or (self.high_cards and not self.high_index.text_hashes):
             raise ValueError("formal tower indexes require card text hashes")
         expected_mid_coverage = set(mid_cards) == set(clusters)
-        expected_high_coverage = set(high_cards) == set(paths)
+        expected_high_coverage = set(high_cards) == (
+            set(communities) if self.version is TowerVersion.V2 else set(paths)
+        )
         if self.mid_coverage_complete != expected_mid_coverage:
             raise ValueError("Mid coverage flag disagrees with snapshot contents")
         if self.high_coverage_complete != expected_high_coverage:
@@ -133,7 +158,7 @@ class TowerSnapshot:
             raise ValueError("formal execution requires complete Mid and High coverage")
 
     def content_record(self) -> dict:
-        return {
+        record = {
             "version": self.version,
             "benchmark": self.benchmark,
             "config": self.config.to_record(),
@@ -149,6 +174,11 @@ class TowerSnapshot:
             "mid_coverage_complete": self.mid_coverage_complete,
             "high_coverage_complete": self.high_coverage_complete,
         }
+        if self.version is TowerVersion.V2:
+            record["high_communities"] = [
+                community.to_record() for community in self.high_communities
+            ]
+        return record
 
     def to_record(self) -> dict:
         return {"snapshot_id": self.snapshot_id, **self.content_record()}
@@ -171,6 +201,10 @@ class TowerSnapshot:
             high_index=SkillEmbeddingIndex.from_record(record["high_index"]),
             mid_coverage_complete=bool(record["mid_coverage_complete"]),
             high_coverage_complete=bool(record["high_coverage_complete"]),
+            high_communities=tuple(
+                HighCommunity.from_record(item)
+                for item in record.get("high_communities", ())
+            ),
         )
 
 
@@ -188,6 +222,7 @@ def build_tower_snapshot(
     high_cards: tuple[HighSkillCard, ...],
     mid_index: SkillEmbeddingIndex,
     high_index: SkillEmbeddingIndex,
+    high_communities: tuple[HighCommunity, ...] = (),
 ) -> TowerSnapshot:
     snapshot = TowerSnapshot(
         snapshot_id="",
@@ -206,7 +241,14 @@ def build_tower_snapshot(
         mid_coverage_complete={card.skill_id for card in mid_cards}
         == {cluster.cluster_id for cluster in mid_clusters},
         high_coverage_complete={card.skill_id for card in high_cards}
-        == {path.path_id for path in high_paths},
+        == (
+            {community.community_id for community in high_communities}
+            if version is TowerVersion.V2
+            else {path.path_id for path in high_paths}
+        ),
+        high_communities=tuple(
+            sorted(high_communities, key=lambda item: item.community_id)
+        ),
     )
     return replace(
         snapshot,

@@ -5,11 +5,11 @@ import json
 from pathlib import Path
 
 import yaml
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.manifests import Benchmark, ExperimentSplit
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster
+from trace2tower.methods.trace2tower.models import HighCommunity, HighPath, MidCluster
 from trace2tower.methods.trace2tower.retrieval import SkillEmbeddingIndex
 from trace2tower.methods.trace2tower.skills import LOW_SKILLS, HighSkillCard, MidSkillCard
 from trace2tower.methods.trace2tower.tower import (
@@ -20,12 +20,26 @@ from trace2tower.methods.trace2tower.tower import (
 )
 
 
+def load_training_provenance(path: Path) -> list[dict]:
+    records = []
+    with path.open(encoding="utf-8") as input_file:
+        for line in input_file:
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            records.append(
+                {
+                    "split": record.get("split"),
+                    "trajectory_method": record.get("trajectory_method"),
+                    "benchmark": record.get("benchmark"),
+                    "trajectory_id": record.get("trajectory_id"),
+                }
+            )
+    return records
+
+
 def main(options: argparse.Namespace) -> int:
-    records = [
-        json.loads(line)
-        for line in options.input.read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+    records = load_training_provenance(options.input)
     if any(record.get("split") != ExperimentSplit.TRAIN for record in records):
         raise ValueError("Tower snapshots may only use explicit training trajectories")
     trajectory_methods = {record.get("trajectory_method") for record in records}
@@ -36,6 +50,11 @@ def main(options: argparse.Namespace) -> int:
         "trace2tower",
     }:
         raise ValueError("Tower v1 accepts only No-Skill and prior-Tower feedback")
+    if options.version is TowerVersion.V2 and not trajectory_methods <= {
+        "no_skill",
+        "trace2tower",
+    }:
+        raise ValueError("Tower v2 accepts only No-Skill and prior-Tower feedback")
     if any(record["benchmark"] != options.benchmark for record in records):
         raise ValueError("preprocessed benchmark does not match snapshot benchmark")
     cluster_payload = json.loads(options.clusters.read_text(encoding="utf-8"))
@@ -69,6 +88,10 @@ def main(options: argparse.Namespace) -> int:
         ),
         mid_index=SkillEmbeddingIndex.from_record(index_payload["mid_index"]),
         high_index=SkillEmbeddingIndex.from_record(index_payload["high_index"]),
+        high_communities=tuple(
+            HighCommunity.from_record(item)
+            for item in path_payload.get("communities", ())
+        ),
     )
     snapshot.require_complete()
     write_json(options.output, snapshot.to_record())

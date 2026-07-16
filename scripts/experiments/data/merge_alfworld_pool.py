@@ -4,7 +4,11 @@ import argparse
 import json
 from pathlib import Path
 
-from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
+from trace2tower.trajectory import (
+    EpisodeTrajectory,
+    TrajectoryReader,
+    write_trajectory_jsonl,
+)
 
 
 def read_run(root: Path) -> tuple:
@@ -15,9 +19,37 @@ def read_run(root: Path) -> tuple:
     )
 
 
+def deduplicate_trajectories(
+    trajectories: tuple[EpisodeTrajectory, ...],
+) -> tuple[tuple[EpisodeTrajectory, ...], dict]:
+    selected = {}
+    duplicate_keys = set()
+    score_disagreements = 0
+    step_disagreements = 0
+    for trajectory in trajectories:
+        key = (trajectory.sample_id, trajectory.repeat_id)
+        existing = selected.get(key)
+        if existing is None:
+            selected[key] = trajectory
+            continue
+        duplicate_keys.add(key)
+        score_disagreements += trajectory.primary_score != existing.primary_score
+        step_disagreements += len(trajectory.steps) != len(existing.steps)
+    return tuple(selected.values()), {
+        "raw_trajectory_count": len(trajectories),
+        "selected_trajectory_count": len(selected),
+        "duplicate_key_count": len(duplicate_keys),
+        "discarded_trajectory_count": len(trajectories) - len(selected),
+        "score_disagreement_count": score_disagreements,
+        "step_disagreement_count": step_disagreements,
+    }
+
+
 def main(options: argparse.Namespace) -> int:
     base = TrajectoryReader.read_jsonl(options.base_pool)
-    additions = read_run(options.additions_run)
+    additions, duplicate_audit = deduplicate_trajectories(
+        read_run(options.additions_run)
+    )
     trajectories = tuple(base) + tuple(additions)
     keys = [(trajectory.sample_id, trajectory.repeat_id) for trajectory in trajectories]
     if len(keys) != len(set(keys)):
@@ -51,6 +83,7 @@ def main(options: argparse.Namespace) -> int:
     report = {
         "base_pool": options.base_pool.as_posix(),
         "additions_run": options.additions_run.as_posix(),
+        "additions_duplicate_audit": duplicate_audit,
         "full_manifest": options.full_manifest.as_posix(),
         "repeat_ids": sorted(expected_repeats),
         "task_count": len(expected_ids),

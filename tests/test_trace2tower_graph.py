@@ -1,16 +1,28 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 import yaml
 from scipy import sparse
+from sklearn.neighbors import NearestNeighbors
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.graph import GraphComponents, build_graph
-from trace2tower.methods.trace2tower.models import SegmentInstance, WebShopEventType
+from trace2tower.methods.trace2tower.graph import (
+    GraphComponents,
+    _nearest_neighbors,
+    build_graph,
+)
+from trace2tower.methods.trace2tower.models import (
+    AlfworldEventType,
+    SegmentInstance,
+    WebShopEventType,
+)
 from trace2tower.methods.trace2tower.spectral import (
     cluster_representation,
     semantic_only_clustering,
+    separate_exclusive_event_clusters,
     spectral_clustering,
 )
 from trace2tower.results import MethodName
@@ -38,7 +50,7 @@ def segment(
     step: int,
     embedding: tuple[float, ...],
     score: float,
-    event_type: WebShopEventType | None = None,
+    event_type: WebShopEventType | None = WebShopEventType.QUERY_FORMULATION,
 ) -> SegmentInstance:
     return SegmentInstance(
         segment_id=segment_id,
@@ -126,6 +138,18 @@ def test_observed_transitions_connect_different_event_types() -> None:
     assert graph.adjacency[2, 3] < 0
 
 
+def test_transition_graph_rejects_unlabeled_segments() -> None:
+    groups = (
+        (
+            segment("s0", "t0", 0, (1.0, 0.0), 1.0, None),
+            segment("s1", "t0", 1, (0.0, 1.0), 1.0, None),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="requires domain event labels"):
+        build_graph(groups, config())
+
+
 def test_config_rejects_event_stratification_as_non_algorithmic() -> None:
     record = config().to_record()
     record["event_type_stratification"] = True
@@ -141,6 +165,28 @@ def test_zero_degree_laplacian_is_finite() -> None:
     assert graph.edge_count == 0
     assert np.allclose(graph.laplacian.toarray(), ((1.0,),))
     assert np.isfinite(graph.laplacian.data).all()
+
+
+def test_nearest_neighbor_batches_match_one_shot_query() -> None:
+    generator = np.random.default_rng(42)
+    values = generator.normal(size=(257, 8))
+    values /= np.linalg.norm(values, axis=1, keepdims=True)
+    expected = (
+        NearestNeighbors(
+            n_neighbors=6,
+            metric="cosine",
+            algorithm="brute",
+        )
+        .fit(values)
+        .kneighbors(values, return_distance=False)
+    )
+
+    actual = _nearest_neighbors(values, neighbor_count=5)
+
+    assert len(actual) == len(values)
+    for source, targets in enumerate(expected):
+        without_self = [target for target in targets if target != source][:5]
+        assert actual[source].tolist() == without_self
 
 
 def two_block_graph() -> GraphComponents:
@@ -212,3 +258,33 @@ def test_kmeans_partition_is_invariant_to_eigenvector_sign_flip() -> None:
         (),
     )
     assert original.labels == flipped.labels
+
+
+def test_exclusive_events_get_operator_clusters_without_merging_other_roles() -> None:
+    graph = two_block_graph()
+    graph = replace(
+        graph,
+        event_types=(
+            AlfworldEventType.GOTO_LOCATION,
+            AlfworldEventType.GOTO_LOCATION,
+            AlfworldEventType.CLEAN_OBJECT,
+            AlfworldEventType.CLEAN_OBJECT,
+            AlfworldEventType.GOTO_LOCATION,
+            AlfworldEventType.GOTO_LOCATION,
+            AlfworldEventType.CLEAN_OBJECT,
+            AlfworldEventType.CLEAN_OBJECT,
+        ),
+    )
+    spectral = spectral_clustering(graph, config())
+
+    refined = separate_exclusive_event_clusters(
+        spectral,
+        graph,
+        frozenset((AlfworldEventType.CLEAN_OBJECT,)),
+    )
+
+    memberships = {frozenset(cluster.member_segment_ids) for cluster in refined.clusters}
+    assert refined.cluster_count == 3
+    assert frozenset(("s2", "s3", "s6", "s7")) in memberships
+    assert frozenset(("s0", "s1")) in memberships
+    assert frozenset(("s4", "s5")) in memberships

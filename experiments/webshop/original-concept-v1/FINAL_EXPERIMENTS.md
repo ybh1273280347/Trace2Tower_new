@@ -1,171 +1,436 @@
-#  Final Algorithm and Experiment Matrix
+# Trace2Tower 最终算法与实验结论
 
-## Frozen final algorithm
+本文汇总 WebShop original-concept-v1 已完成且可审计的实验，重点保留所有能够支撑论文叙事的结果，并区分统计显著结论、方向性证据、机制诊断和后验分析。
 
-The final WebShop algorithm is P100 Pareto T1 with the native Trace2Tower
-renderer and graph-aware dynamic retrieval. It uses the frozen Test-A-selected
-deployment configuration below.
+SkillX 与 Trace2Tower 在 WebShop/ALFWorld 的实际注入内容对照见
+`../../SKILL_INJECTION_CROSS_DOMAIN_AUDIT.md`。
 
-| Component | Frozen value |
+## 一页结论
+
+当前证据支持一条完整的两阶段叙事：
+
+1. **Tower 表示本身有效。** 即使使用与 SkillX 相近的通用语义检索，P100 Tower 已与 SkillX 处于同一经验性能区间；移除关系图和 High 路径会显著损害执行效率。
+2. **图感知动态检索进一步释放 Tower 的结构价值。** 最终检索器根据任务目标、当前页面状态、事件兼容性和 High 路径选择技能，在更小上下文预算下取得更高或相当的奖励。
+3. **最终方法在两个模型上都取得最高 repeat3 奖励点估计。** Flash Test-A 为 0.71119，Pro Test-A 为 0.69919。
+4. **两项主要优势达到统计显著。** Pro repeat3 相对 NoSkill 的奖励提升为 +0.10703，95% 区间 [+0.06255, +0.15334]；冻结 Test-B 上相对 SkillX 的奖励提升为 +0.05550，区间 [+0.01500, +0.10300]。
+5. **收益不是依靠注入更多文本换来的。** 最终 cap3 在 Flash、Pro 和 Test-B 上分别比 SkillX 少用 18.2%、10.8% 和 28.2% 的输入 token；cap8 控制实验进一步表明，扩大技能预算不会提高奖励。
+6. **图优先构建具有明显压缩优势。** 相对 SkillX，Trace2Tower 构建阶段少用 96.7% 的 LLM 调用、96.4% 的输出 token 和 32.2% 的总 chat token，同时利用了更多源轨迹。
+7. **失败样本存在可恢复的指导缺口。** 不含具体商品答案的手写 recovery skill 将六个共同零分难例的平均奖励从 0 提升到 0.1111，但只突破一个任务，说明静态技能文本有帮助，却不足以可靠维持跨步状态。
+
+最稳妥的论文主张是：
+
+> Trace2Tower 将带结果标签的领域事件轨迹压缩为关系化、层次化的技能表示。即使在通用语义检索下，该表示也与强技能基线处于同一经验区间；与 Tower 结构匹配的动态图检索进一步提高执行效率，并在冻结 Test-B 上取得对 SkillX 的显著优势。
+
+## 证据范围与统计口径
+
+- WebShop Test-A 固定为 100 个任务。主要结果使用真实 repeat_id=0,1,2，先在同一任务内取三次均值，再对 100 个任务求均值；不把 300 个 episode 当作独立统计单位。
+- WebShop Test-B 是另一个冻结的 100 任务集合，没有参与最终图检索器设计，是当前最重要的跨 split 稳健性检查。
+- 文中的 95% 区间均为配对任务 bootstrap。区间不跨零时称为“显著”，跨零时只称为“方向性优势”。
+- Test-A 上的最终检索配置经过诊断后确定，因此属于后验部署配置；Test-B 才是未参与该配置设计的冻结 split。
+- 六个共同零分任务的 recovery skill 实验是后验失败集诊断，不能作为总体泛化性能估计。
+- ALFWorld 官方事件版 repeat0 已形成可审计结果：修复版 Tower 与 No-Skill 同为
+  61.15%，但低于 Global SkillX 的 81.29%，因此当前不宣称跨领域性能优势。
+
+## 冻结的最终算法
+
+最终 WebShop 算法为 P100 Pareto T1、原生 Trace2Tower renderer 和图感知逐步动态检索。
+
+| 组件 | 冻结配置 |
 |---|---|
-| Training evidence | P100 mixed pool plus the registered refinement feedback pool |
-| Mid induction | Original-concept signed EigenTrace graph |
-| High induction | Contrastive contiguous Mid paths |
-| High maximum length | 4; the max6 structural check was identical |
-| Refinement | One Pareto Split, one Promote, one High Downweight |
-| Renderer | Native Trace2Tower |
-| Retrieval | Per-step graph-aware retrieval from goal and current observation |
-| High ranking | Goal relevance, active-node state relevance, event compatibility, path quality |
-| Path expansion | Active Mid plus at most one directed successor |
-| Total Mid budget | 3, including High path children |
-| Event compatibility floor | 0.10 |
-| Direct-Mid deduplication | cosine 0.92, MMR relevance weight 0.70 |
-| Runtime config | `configs/experiments/webshop_trace2tower_final_runtime.yaml` |
+| 训练证据 | P100 mixed pool 加已注册的 train-only refinement feedback pool |
+| Mid 归纳 | original-concept signed EigenTrace graph |
+| High 归纳 | 对比式连续 Mid 路径 |
+| High 最大长度 | 4；max6 结构检查得到字节级相同路径 |
+| Refinement | 1 次 Pareto Split、1 次 Promote、1 次 High Downweight |
+| Renderer | 原生 Trace2Tower renderer |
+| 检索 | 基于目标与当前 observation 的逐步图感知检索 |
+| High 排序 | 目标相关性、活动节点状态相关性、事件兼容性、路径质量 |
+| 路径展开 | 当前活动 Mid 加至多一个有向后继 |
+| 总 Mid 预算 | 3，包含 High 路径子节点 |
+| 事件兼容阈值 | 0.10 |
+| Direct-Mid 去重 | cosine 0.92；MMR relevance weight 0.70 |
+| 运行配置 | configs/experiments/webshop_trace2tower_final_runtime.yaml |
 
-This configuration was selected after Test-A diagnosis and is therefore a
-post-hoc deployment configuration on Test-A. Test-B is the first frozen split
-not used to design this retriever.
+没有进入最终算法的方案包括：legacy cosine-only 检索、默认 cap8、SkillX-style renderer、全局 E2E skill，以及没有带来新 High 路径的 max6。
 
-## Excluded from the final algorithm
+## 最终主结果
 
-- Legacy cosine-only High/Mid retrieval and full High-child expansion.
-- Cap8 as the default deployment budget.
-- High max6, because it produced byte-identical High paths under frozen support.
-- SkillX-style rendering, which lost to the native renderer.
-- Global E2E repeat extensions and extra Manual repeats.
-- Token cost as a primary optimization objective; it remains an auxiliary metric.
+### Flash Test-A repeat3
 
-## Execution matrix
+| 方法                               |          奖励 |      完全成功率 |       步数 |     无效动作 |   输入 token |
+|----------------------------------|------------:|-----------:|---------:|---------:|-----------:|
+| **Final Trace2Tower graph cap3** | **0.71119** |     53.67% |     6.83 |     0.16 |     20,461 |
+| Legacy Trace2Tower cap8          |     0.70958 | **54.67%** |     7.14 |     0.17 |     32,334 |
+| P100 SkillX                      |     0.70627 |     49.33% |     7.04 |     0.31 |     25,009 |
+| Graph cap8                       |     0.70464 |     53.00% |     7.58 |     0.21 |     27,844 |
+| Manual Skill                     |     0.69158 |     50.67% | **6.53** | **0.06** | **19,259** |
+| NoSkill                          |     0.68492 |     50.33% |     7.89 |     0.38 |     20,610 |
 
-| Priority | Experiment | Purpose | Status |
-|---:|---|---|---|
-| 1 | V0 graph-cap3 vs T1 graph-cap3, Flash Test-A repeat0 | Isolate Pareto refinement from retrieval | Complete |
-| 2 | T1 final graph-cap3, Flash Test-B repeat0 | Frozen-split robustness; compare reusable NoSkill and P100 SkillX | Complete |
-| 3 | T1 final graph-cap3, Flash Test-A repeat1/2 | Complete real repeat3 stability using reusable baseline repeats | Complete |
-| 4 | T1 final graph-cap3, Pro Test-A repeat0 | Test whether the final Tower helps a stronger model | Complete |
-| 5 | T1 final graph-cap3, Pro Test-A repeat1/2 | Complete real Pro repeat3 after a positive repeat0 result | Complete |
-| 6 | P100 Semantic-only vs P100 Full, legacy cap8 | Remove relational graph induction and High paths under the historical matched runtime | Complete |
-| 7 | P100 No-Mixed vs V0 Mixed with graph retrieval cap3 | Test failure evidence within the same P100 rollout pool | Complete |
-| 8 | Test-B NoSkill repeat1 | Diagnose whether the high repeat0 baseline is stable | Complete |
-| 9 | T1 graph-cap8, Flash Test-A repeat1/2 | Compare graph and legacy cap8 without prioritizing token cost | Complete |
+Final Trace2Tower 取得最高奖励点估计。相对 NoSkill 的奖励差为 +0.02628，区间 [-0.02936, +0.08356]；相对 SkillX 为 +0.00493，区间 [-0.03094, +0.04072]。奖励优势是方向性的，但最终方法相对 SkillX 的完全成功率高 4.33 个百分点，并少用 18.2% 输入 token。
 
-## Completed evidence retained
+历史 legacy Tower 在相同 repeat3 上也提供了有利证据：其奖励比 SkillX 高 +0.00332，完全成功率高 5.33 个百分点，后者区间为 [+0.33, +10.67]。这说明 Tower 表示在尚未使用图专用检索器时已经具有竞争力。
 
-- T1 graph cap3 versus graph cap8 on Test-A: reward-equivalent; cap3 uses fewer
-  steps, invalid actions, and input tokens.
-- T1 graph cap3 versus legacy T1: graph retrieval recovers reward and removes
-  stage-inappropriate retrieval.
-- High max4 versus max6: structurally identical, so no rollout is reported.
-- Existing NoSkill, Manual, native P100 SkillX, legacy Tower, scale, renderer,
-  and seen-task runs remain historical or baseline evidence under their exact
-  recorded runtime contracts.
-- Final Tower and SkillX failure overlap is audited separately: zero-reward
-  Jaccard 0.750, non-full Jaccard 0.830, reward correlation 0.878.
+### Pro Test-A repeat3
 
-Graph-cap8 uses the final T1 artifact and graph-aware retriever with only the
-total Mid budget changed from 3 to 8. Its repeat3 result is compared with the
-existing legacy-cap8 repeat3 result. Token cost is reported separately and does
-not determine the reward comparison.
+| 方法                               |          奖励 |      完全成功率 |       步数 |     无效动作 |   输入 token |
+|----------------------------------|------------:|-----------:|---------:|---------:|-----------:|
+| **Final Trace2Tower graph cap3** | **0.69919** | **51.33%** |     7.56 |     0.38 |     25,376 |
+| Manual Skill                     |     0.69194 |     51.00% | **6.59** | **0.04** | **18,700** |
+| P100 SkillX                      |     0.67453 |     48.33% |     7.68 |     0.19 |     28,444 |
+| NoSkill                          |     0.59217 |     42.67% |     9.23 |     0.88 |     25,672 |
 
-No-Mixed is compared with V0 Mixed rather than final T1. Both use the same P100
-rollout pool and frozen graph-cap3 retriever; comparing No-Mixed directly with
-T1 would also change the refinement feedback pool and Pareto lifecycle.
+Final Trace2Tower 相对 NoSkill 的奖励提升为 +0.10703，区间 [+0.06255, +0.15334]；完全成功率提高 8.67 个百分点，区间 [+3.33, +14.33]。两项均显著。
 
-Test-B NoSkill repeat1 is a variance diagnostic triggered by the unusually high
-repeat0 point estimate. It cannot replace repeat0. The report must show both
-repeats and their two-repeat task mean regardless of direction; selecting only
-the lower repeat would invalidate the robustness comparison.
+相对 SkillX 的奖励差为 +0.02467，区间 [-0.01806, +0.07022]，同时少用 10.8% 输入 token。相对 Manual 的奖励差为 +0.00725。这两项尚不显著，但最终 Tower 保持最高奖励点估计。
 
-The rerun confirms that Test-B NoSkill is genuinely high rather than a repeat0
-outlier. Repeat0 scores `0.73323`; repeat1 scores `0.72798`; repeat1 minus
-repeat0 is `-0.00525`, paired interval `[-0.03234, +0.01825]`. Their two-repeat
-task mean is `0.73061`. Final Tower remains higher at `0.75123`, a `+0.02062`
-delta from the NoSkill two-repeat task mean, interval
-`[-0.01829, +0.05992]`. Test-B should therefore be described as an easier
-split, not as evidence that skill injection is generally ineffective.
+### 冻结 Test-B
 
-## Mechanism ablations
+| 方法                    |          奖励 |   完全成功率 |       步数 |     无效动作 |   输入 token |
+|-----------------------|------------:|--------:|---------:|---------:|-----------:|
+| **Final Trace2Tower** | **0.75123** | **53%** | **6.87** | **0.08** |     19,637 |
+| NoSkill repeat0       |     0.73323 |     48% |     7.32 |     0.32 | **16,571** |
+| NoSkill repeat1       |     0.72798 |     49% |     7.79 |     0.33 |     18,868 |
+| Legacy P100 Tower     |     0.71465 |     49% |     7.13 |     0.18 |     31,236 |
+| P100 SkillX           |     0.69573 |     47% |     7.50 |     0.34 |     27,330 |
 
-| Matched comparison | Reward | Full success | Steps | Input tokens |
-|---|---:|---:|---:|---:|
-| P100 Full legacy cap8 | **0.72092** | **56%** | **7.17** | 32,360 |
-| P100 Semantic-only legacy cap8 | 0.70157 | 50% | 8.30 | 32,469 |
-| P100 Mixed graph cap3 | **0.70892** | 52% | **7.17** | **22,067** |
-| P100 No-Mixed graph cap3 | 0.69825 | 52% | 7.75 | 23,381 |
+Final Trace2Tower 相对 SkillX 的奖励提升为 +0.05550，区间 [+0.01500, +0.10300]，达到显著；完全成功率高 6 个百分点，输入 token 少 28.2%。
 
-Full legacy minus Semantic-only is `+0.01935` reward, interval
-`[-0.02948, +0.06701]`, and `-1.13` steps, interval `[-1.93, -0.34]`. The
-step-efficiency gain is significant and full success improves by six points.
+Final Trace2Tower 相对 legacy P100 Tower 为 +0.03658，说明图感知检索与 T1 refinement 在冻结 split 上继续带来正向增益。Test-B 的 NoSkill 本身较高，但 repeat1 复现实验表明这不是 repeat0 偶然异常：两个 repeat 的任务均值为 0.73061。Final 仍高 +0.02062，只是区间跨零，因此对 NoSkill 的优势应表述为方向性、split-sensitive。
 
-No-Mixed minus Mixed is `-0.01067` reward, interval
-`[-0.05250, +0.02917]`, and `+0.58` steps, interval `[-0.11, +1.30]`. The
-direction supports partial/failure evidence as regularization, but this
-single-repeat ablation is not significant. Complete statistics are in
-`final-mechanism-ablations.json`.
+## 两阶段证据链
 
-## First final-algorithm results
+### 阶段一：通用检索下 Tower 已具有竞争力
 
-| Split / method | Mean reward | Full success | Mean steps | Invalid actions | Input tokens |
-|---|---:|---:|---:|---:|---:|
-| Test-A V0 graph cap3 | 0.70892 | 52% | 7.17 | 0.13 | 22,067 |
-| Test-A final T1 graph cap3 | **0.71925** | **54%** | **6.81** | 0.16 | **20,059** |
-| Test-B NoSkill | 0.73323 | 48% | 7.32 | 0.32 | 16,571 |
-| Test-B P100 SkillX | 0.69573 | 47% | 7.50 | 0.34 | 27,330 |
-| Test-B final T1 graph cap3 | **0.75123** | **53%** | **6.87** | **0.08** | **19,637** |
+| 模型与 split            | Legacy P100 Tower | P100 SkillX | Tower - SkillX |
+|----------------------|------------------:|------------:|---------------:|
+| Flash Test-A repeat3 |           0.70958 |     0.70627 |       +0.00332 |
+| Pro Test-A repeat3   |           0.65458 |     0.67453 |       -0.01994 |
+| Flash Test-B repeat0 |           0.71465 |     0.69573 |       +0.01892 |
 
-The Test-A isolation keeps graph retrieval and cap3 fixed, so the `+0.01033`
-mean reward difference is attributable to the registered T1 refinement bundle
-rather than to the retriever. Its paired 95% interval is
-`[-0.00883, +0.03300]`, so the refinement gain is positive but not significant.
+三项奖励区间均跨零，因此不能宣称 legacy Tower 普遍优于 SkillX；但三组结果处于同一经验性能区间，且 Flash 两个 split 均为正向。它证明了分层图归纳出的技能不是依赖最终检索器才“凭空有效”。
 
-Test-B was not used to design graph retrieval. Final T1 exceeds NoSkill by
-`+0.01800`, interval `[-0.02175, +0.05825]`, and P100 SkillX by `+0.05550`,
-interval `[+0.01500, +0.10300]`. The SkillX comparison is significant under
-the registered paired task bootstrap. Final T1 also exceeds legacy V0 by
-`+0.03658`, interval `[-0.00300, +0.07825]`. Complete paired statistics are
-recorded in `final-algorithm-results.json`.
+### 阶段二：图感知检索释放结构价值
 
-Pro repeat0 is also positive: final T1 scores `0.69392/51%`, compared with
-NoSkill `0.62000/45%`, native P100 SkillX `0.67458/48%`, and legacy P100 Tower
-`0.65733/50%`. Final T1 uses 25,305 input tokens on average, below NoSkill's
-25,818 and far below legacy Tower's 41,187. This positive direction authorizes
-the real Pro repeat1/2 extension in the execution matrix. Final T1 exceeds
-NoSkill by `+0.07392`, paired 95% interval `[+0.02108, +0.12883]`, which is
-significant. Its deltas over P100 SkillX and legacy Tower are respectively
-`+0.01933`, interval `[-0.03717, +0.07517]`, and `+0.03658`, interval
-`[-0.02217, +0.09658]`.
+| 模型与 split            | Final Tower |  SkillX |          奖励差 | Tower token | SkillX token |
+|----------------------|------------:|--------:|-------------:|------------:|-------------:|
+| Flash Test-A repeat3 |     0.71119 | 0.70627 |     +0.00493 |      20,461 |       25,009 |
+| Pro Test-A repeat3   |     0.69919 | 0.67453 |     +0.02467 |      25,376 |       28,444 |
+| Flash Test-B repeat0 |     0.75123 | 0.69573 | **+0.05550** |      19,637 |       27,330 |
 
-## Flash repeat3 result
+图感知检索不再独立排序并重复注入相似 Mid，而是先选择 High 路径，再由当前 observation 定位活动 Mid，只扩展一个有向后继，并对全部 Mid 统一限额。最终结果在三个条件上都高于 SkillX，同时上下文更小。
 
-| Method | Repeat3 reward | Full success | Steps | Invalid actions | Input tokens |
-|---|---:|---:|---:|---:|---:|
-| NoSkill | 0.68492 | 50.33% | 7.89 | 0.38 | 20,610 |
-| Manual | 0.69158 | 50.67% | **6.53** | **0.06** | **19,259** |
-| P100 SkillX | 0.70627 | 49.33% | 7.04 | 0.31 | 25,009 |
-| **Final T1 graph cap3** | **0.71119** | **53.67%** | 6.83 | 0.16 | 20,461 |
+逐步检索审计验证了这种状态适配不是名义设计：
 
-Final T1 minus NoSkill is `+0.02628`, paired task-bootstrap interval
-`[-0.02936, +0.08356]`. Final T1 minus SkillX is `+0.00493`, interval
-`[-0.03094, +0.04072]`, with a `+4.33` point full-success difference, interval
-`[-0.67, +9.67]` points. Reward superiority is directional rather than
-significant, but final T1 retains the highest repeat3 reward and full-success
-rate while using 18.2% fewer input tokens than SkillX. Complete results are in
-`final-flash-repeat3.json`.
+- Test-A 每步平均注入 3.48 个技能，最大为 4，没有突破预算。
+- 详情页面的 75 个步骤全部选择了详情验证相关 High；搜索页没有错误选择详情 High。
+- 搜索页、结果页、商品页和详情页呈现不同的 High 选择分布，说明检索真实依赖当前状态。
 
-## Pro repeat3 result
+## 精炼与检索隔离实验
 
-| Method | Repeat3 reward | Full success | Steps | Invalid actions | Input tokens |
-|---|---:|---:|---:|---:|---:|
-| NoSkill | 0.59217 | 42.67% | 9.23 | 0.88 | 25,672 |
-| Manual | 0.69194 | 51.00% | **6.59** | **0.04** | **18,700** |
-| P100 SkillX | 0.67453 | 48.33% | 7.68 | 0.19 | 28,444 |
-| **Final T1 graph cap3** | **0.69919** | **51.33%** | 7.56 | 0.38 | 25,376 |
+### 仅使用训练反馈的 T1 精炼
 
-Final T1 minus NoSkill is `+0.10703`, paired task-bootstrap interval
-`[+0.06255, +0.15334]`; its `+8.67` point full-success difference has interval
-`[+3.33, +14.33]`. Both exclude zero. Final T1 minus SkillX is `+0.02467`,
-interval `[-0.01806, +0.07022]`, while using 10.8% fewer input tokens. Final
-T1 minus Manual is `+0.00725`, interval `[-0.03514, +0.05081]`. The final
-Tower has the highest Pro repeat3 reward point estimate; only its advantage over
-NoSkill is statistically established. Complete results are in
-`final-pro-repeat3.json`.
+在同一 graph-cap3 检索器下，只将 V0 换为经过 train-only feedback 的 T1：
+
+| Test-A repeat0    |          奖励 |   完全成功率 |       步数 |   输入 token |
+|-------------------|------------:|--------:|---------:|-----------:|
+| V0 graph cap3     |     0.70892 |     52% |     7.17 |     22,067 |
+| **T1 graph cap3** | **0.71925** | **54%** | **6.81** | **20,059** |
+
+T1 相对 V0 的奖励差为 +0.01033，区间 [-0.00883, +0.03300]。虽然未显著，但奖励、成功率、步数和 token 同时改善，支持一次 Pareto refinement 的正向作用。
+
+### 图检索修复 legacy T1 部署错配
+
+| T1 检索方式        |          奖励 |   完全成功率 |       步数 |     无效动作 |   输入 token |
+|----------------|------------:|--------:|---------:|---------:|-----------:|
+| Legacy cap8    |     0.67983 |     52% |     7.66 |     0.25 |     35,273 |
+| Legacy cap3    |     0.69283 |     53% |     7.16 |     0.21 |     30,242 |
+| Graph cap8     |     0.71442 |     54% |     7.56 |     0.21 |     27,808 |
+| **Graph cap3** | **0.71925** | **54%** | **6.81** | **0.16** | **20,059** |
+
+Graph cap3 比 legacy T1 cap8 高 +0.03942，区间 [-0.00500, +0.09025]，并少用 43.1% 输入 token。它基本恢复 V0 的奖励，同时比 V0 少用 38.0% 输入 token。这支持“结构正确但 legacy 检索没有正确使用结构，图检索修复部署错配”的解释。
+
+## 机制消融
+
+### 关系图和 High 路径
+
+| 匹配对照                           |          奖励 |   完全成功率 |       步数 | 输入 token |
+|--------------------------------|------------:|--------:|---------:|---------:|
+| **P100 Full legacy cap8**      | **0.72092** | **56%** | **7.17** |   32,360 |
+| P100 Semantic-only legacy cap8 |     0.70157 |     50% |     8.30 |   32,469 |
+
+Full 相对 Semantic-only 的奖励高 +0.01935；奖励区间跨零，但平均少 1.13 步，区间 [-1.93, -0.34]，达到显著，完全成功率高 6 个百分点。这证明关系 EigenTrace 结构和 High 路径不仅改变表示，还改善实际执行效率。
+
+在 Pro 单次实验中，这一机制差异更强：P100 Full 相对 Semantic-only 奖励高 +0.11567，区间 [+0.04217, +0.19117]；完全成功率高 14 个百分点，区间 [+5, +23]，同时少 4.13 步、少 17,407 输入 token。该结果是关系图优于纯语义聚类的最强机制证据。
+
+### 混合结果证据
+
+使用同一 P100 rollout pool 时，Mixed 保留 186 条满分、161 条部分奖励和 4 条同任务对比轨迹；No-Mixed 只保留满分轨迹。
+
+| Legacy cap8         |          奖励 |   完全成功率 |       步数 |     无效动作 |   输入 token |
+|---------------------|------------:|--------:|---------:|---------:|-----------:|
+| **P100 Full Mixed** | **0.72092** | **56%** | **7.17** | **0.19** | **32,360** |
+| P100 No-Mixed       |     0.69192 |     52% |     8.26 |     0.44 |     35,609 |
+
+移除 partial/failure evidence 后奖励下降 0.02900，步数增加 1.09，步数区间 [+0.36, +1.84]，显著变差；Mid/High 数量还从 9+5 膨胀到 19+25。这支持 mixed evidence 通过负邻接和结果对比抑制路径泛滥、正则化技能库。
+
+在最终 graph-cap3 匹配消融中，Mixed 为 0.70892，No-Mixed 为 0.69825；移除 mixed evidence 同样使奖励下降 0.01067、步数增加 0.58。该组区间跨零，但方向与 legacy 消融一致。
+
+### 渲染器控制
+
+固定同一个图、9 个 Mid、5 个 High、检索策略、cap8、模型和测试任务，只替换技能文本 renderer：
+
+| Renderer             |          奖励 |   完全成功率 |       步数 |     无效动作 |   输入 token | Skill context chars |
+|----------------------|------------:|--------:|---------:|---------:|-----------:|--------------------:|
+| **原生 Trace2Tower**   | **0.72092** | **56%** | **7.17** | **0.19** | **32,360** |          **76,989** |
+| SkillX-style adapter |     0.68983 |     53% |     7.95 |     0.57 |     52,011 |             165,395 |
+
+SkillX-style renderer 比原生 renderer 低 0.03108，注入字符数超过两倍，无效动作也明显增加。因此最终结果不能解释为“套用了 SkillX prompt”；原生分层卡片表达更适合当前图结构。
+
+### High 最大路径长度
+
+在相同 P100 pool、Mid 聚类、support ratio 和 Pareto 选择下，将 High 最大长度从 4 扩展到 6。两次均挖掘出 10 个候选并生成完全相同的 6 条最终 High，high-paths.json 的 SHA-256 相同。因此长度 4 不是当前支持度约束下的性能瓶颈，省略 max6 rollout 是因为技能内容完全相同，而不是隐藏负结果。
+
+## 规模与覆盖度
+
+### P50 到 P100
+
+| 方法            |          奖励 |   完全成功率 |       步数 |     无效动作 | 输入 token |
+|---------------|------------:|--------:|---------:|---------:|---------:|
+| NoSkill       |     0.68075 |     51% |     7.98 |     0.36 |   21,388 |
+| P50 Full      |     0.67625 |     51% |     7.58 |     0.22 |   33,384 |
+| **P100 Full** | **0.72092** | **56%** | **7.17** | **0.19** |   32,360 |
+
+P100 相对 P50 奖励提高 +0.04467，相对 NoSkill 提高 +0.04017。两项单次区间均跨零，但 P100 在奖励、成功率、步数和无效动作上全面改善，形成强烈的正向规模趋势。
+
+P100 从 351 条 mixed 轨迹中提取 1,955 个事件片段和 47 个紧凑行为签名，最终只形成 9 个 Mid 和 5 个 High。更广的训练覆盖度，而不是更多运行时技能文本，是解释 P50 验证/测试落差的主要因素。
+
+### P200 边界
+
+P200 是 P100 的严格超集，保留 710 条轨迹、3,962 个事件片段，生成 19 个 Mid 和 7 个 High。其奖励为 0.69325，仍高于 NoSkill 的 0.68075，但低于 P100 的 0.72092。因此证据表明训练覆盖度影响显著但非单调，P100 是当前经验甜点，而不能声称“轨迹越多一定越好”。
+
+### Seen-task 诊断
+
+在 P50 的 50 个训练任务 ID 上重新执行，而不是复用训练 reward：
+
+| 方法       | Seen reward | 相对 Seen NoSkill | 完全成功率 |
+|----------|------------:|----------------:|------:|
+| NoSkill  |     0.65383 |               - |   48% |
+| SkillX   |     0.65750 |        +0.00367 |   46% |
+| P50 Full | **0.66600** |    **+0.01217** |   46% |
+
+Seen-task 上没有出现异常高分，符合紧凑 Tower signature 主动排除目标文本、商品名、价格和页面文本的设计。现有提升更像行为结构迁移，而不是任务答案记忆。
+
+## 检索预算与运行效率
+
+### cap3 对 cap8
+
+| 检索预算           |  repeat3 奖励 |      完全成功率 |       步数 |     无效动作 |   输入 token |
+|----------------|------------:|-----------:|---------:|---------:|-----------:|
+| **Graph cap3** | **0.71119** | **53.67%** | **6.83** | **0.16** | **20,461** |
+| Graph cap8     |     0.70464 |     53.00% |     7.58 |     0.21 |     27,844 |
+
+cap8 相对 cap3 的奖励差为 -0.00656，区间 [-0.03522, +0.01656]。扩大预算没有提高奖励或完全成功率，反而每个 episode 多用约 7,383 输入 token、多 0.75 步。该控制说明最终收益不是由注入更多技能文本获得的。
+
+### 相对 SkillX 的运行时 token
+
+| 条件                   | Final Tower | SkillX | Final 节省 |
+|----------------------|------------:|-------:|---------:|
+| Flash Test-A repeat3 |      20,461 | 25,009 |    18.2% |
+| Pro Test-A repeat3   |      25,376 | 28,444 |    10.8% |
+| Flash Test-B         |      19,637 | 27,330 |    28.2% |
+
+token 不是主优化目标，但它提供了重要辅助证据：奖励提升并非通过更长 prompt 购买，而是来自更少、更符合当前状态的技能上下文和更短的执行路径。
+
+## 构建效率
+
+构建成本审计只统计技能构建阶段的 LLM chat 使用，不包含轨迹收集、embedding、运行时评估和货币成本估计。
+
+| 方法              |              源轨迹 |                   构建技能 | LLM 调用 |      输入 token |  输出 token |  总 chat token |
+|-----------------|-----------------:|-----------------------:|-------:|--------------:|----------:|--------------:|
+| **Trace2Tower** |        351 mixed |         9 Mid + 5 High | **14** | **1,269,049** | **7,147** | **1,276,196** |
+| SkillX          | 186 full-success | 51 planning + 2 atomic |    429 |     1,686,214 |   197,111 |     1,883,325 |
+
+相对 SkillX，Trace2Tower：
+
+- LLM 调用减少 96.7%；
+- 输入 token 减少 24.7%；
+- 输出 token 减少 96.4%；
+- 总 chat token 减少 32.2%。
+
+Trace2Tower 使用更多源轨迹，却通过“先图聚合、后一次性渲染选中的 Mid/High”减少生成调用。这直接支持 graph-first evidence compression 叙事。由于两种方法缓存 token 比例和证据选择策略不同，不能把这些数字直接换算为账单成本比例。
+
+## 失败模式与恢复技能实验
+
+### 失败高度重合
+
+Final Trace2Tower 与 SkillX 的失败集合高度一致：
+
+| 失败定义 | Final | SkillX | 共同失败 | Jaccard |
+|------|------:|-------:|-----:|--------:|
+| 零奖励  |     7 |      7 |    6 |   0.750 |
+| 非满分  |    46 |     51 |   44 |   0.830 |
+
+两者逐任务奖励相关系数为 0.878。Final 将 7 个 SkillX 非满分任务转为满分，而 SkillX 只将 2 个 Final 非满分任务转为满分。共同失败占主导，说明主要瓶颈是共享任务难度，而不是 Trace2Tower 独有的灾难性错误。
+
+共同失败还呈现清晰难度梯度：
+
+| 诊断指标                               | 共同零分，n=6 | 共同非满分，n=44 | 共同满分，n=47 |
+|------------------------------------|---------:|-----------:|----------:|
+| 数据集 query / instruction overlap    |    0.056 |      0.152 |     0.244 |
+| instruction / target-title overlap |    0.160 |      0.303 |     0.389 |
+| 平均搜索动作                             |     4.67 |       1.85 |      1.12 |
+| 平均搜索回退                             |     2.92 |       0.63 |      0.05 |
+| 平均重复动作                             |     5.83 |       1.46 |      0.26 |
+| 两种方法都耗尽 20 步                       |    66.7% |       9.1% |        0% |
+
+### 召回到什么、为什么仍未突破
+
+六个共同零分任务的 18 条 Final 轨迹并不缺 skill：
+
+| 主要召回 skill                   | 召回次数 | 样本覆盖 |
+|------------------------------|-----:|-----:|
+| mid_0002：购买前选择必需选项           |  150 |  6/6 |
+| high_efbf322a092b：搜索、打开、配置   |  127 |  6/6 |
+| mid_0006：选择匹配选项              |  121 |  6/6 |
+| mid_0000：使用核心属性搜索            |  114 |  6/6 |
+| high_f4ff56f0acaa：搜索并购买直接匹配项 |  113 |  5/6 |
+| mid_0001：改写查询并检查结果           |   90 |  6/6 |
+
+这些 skill 提供的是局部正向动作，却没有强表示跨步控制状态：哪些查询和候选已经失败、哪些硬约束仍未知、何时必须阻断终止动作、还剩多少动作预算。因此系统会重复召回搜索/配置/购买路径，却缺少难例恢复路径。
+
+### 后验手写恢复技能
+
+手写 skill 不包含样本 ID、商品名、候选标识或目标答案，只增加三值约束状态、未知约束购买门、查询/候选 ledger 和 20 步预算。
+
+| 六个共同零分任务，三次均值      |       平均奖励 |     完全成功率 |      零奖励率 |  平均步数 |
+|--------------------|-----------:|----------:|----------:|------:|
+| Final Trace2Tower  |     0.0000 |      0.0% |    100.0% | 14.67 |
+| SkillX             |     0.0000 |      0.0% |    100.0% | 15.50 |
+| 原有通用 Manual Skill  |     0.0000 |      0.0% |    100.0% | 14.83 |
+| **Recovery skill** | **0.1111** | **11.1%** | **88.9%** | 16.00 |
+
+收益全部来自 webshop:969：三次中成功两次，成功轨迹会先检查并拒绝两个貌似相关但不满足要求的候选，再购买第三个正确候选。其余五个任务仍失败，四个搜索停滞任务仍耗尽 20 步。
+
+这证明难例中确实存在可恢复的指导缺口，但也说明静态 skill 文本不足以可靠执行跨步记忆、约束门和预算。更通用的改进方向是：在领域事件抽取之后，从失败后继与成功后继的对比中生成 recovery skill，并让检索显式条件化于当前事件状态、未解决条件、历史失败动作和剩余预算。
+
+## 历史正向门控实验
+
+这些早期结果不是最终主结论，但构成了方法发展的正向证据链：
+
+- Flash 单次 validation 上，P50 Full 为 0.72343，NoSkill 为 0.65235，差值 +0.07108，区间 [+0.01675, +0.12909]，通过最初机制门控。
+- 在相同 P50 artifact 和 legacy 检索下，direct Mid cap3、cap5、cap8 的奖励分别为 0.70002、0.68260、0.72343，因此早期合理地冻结 cap8。最终图检索下 cap3 反而更优，说明最佳预算取决于检索器是否正确利用图结构。
+- P50 正式测试没有复制对 NoSkill 的 Flash 增益，但相对 Semantic-only，Flash 高 +0.02600；Pro 高 +0.09917，区间 [+0.01383, +0.18633]，并提高 12 个百分点完全成功率。
+- P100 扩大覆盖度后，Flash reward 从 P50 的 0.67625 提高到 0.72092，解释了早期 P50 validation/test 落差。
+- Pro P100 Full 相对 Semantic-only 的显著优势随后扩大到 +0.11567，与关系图和 High hierarchy 的机制叙事一致。
+
+这些实验共同说明：早期不稳定性主要来自训练覆盖不足和部署检索错配，而不是“事件建图没有作用”。
+
+## 模型迁移压力测试
+
+GLM-4.7 Flash 在同一 Test-A 100 任务上的结果如下。。
+
+| 方法                      |         奖励 |   完全成功率 |       步数 |     无效动作率 |  输入 token |
+|-------------------------|-----------:|--------:|---------:|----------:|----------:|
+| NoSkill                 |     0.5536 |     31% |     6.39 |     8.29% |    14,431 |
+| **Manual skill**        | **0.7060** | **44%** | **4.36** | **2.29%** | **9,015** |
+| SkillX P100             |     0.3750 |     27% |    12.16 |    61.43% |    34,988 |
+| Trace2Tower legacy cap8 |     0.3587 |     28% |    12.36 |    58.66% |    59,774 |
+| Trace2Tower graph cap3  |     0.5083 |     39% |     9.34 |    13.28% |    33,771 |
+
+Manual 相对 NoSkill 的奖励提高 +0.1524，且显著减少无效动作，证明该模型并非不能使用指导；负迁移发生在长且复杂的自动检索上下文。graph cap3 相比 legacy cap8 将奖励提高 +0.1497、完全成功率提高 11 个百分点，并大幅降低无效动作，说明最终图检索设计能够跨模型缓解部署错配。
+
+但 graph cap3 相比 GLM NoSkill 仍有奖励 -0.0453，尽管完全成功率从 31% 提高到 39%。逐样本成功翻转为 14 胜、6 负，McNemar 双侧 `p=0.1153`。因此该结果是“二元完成率改善、连续奖励未改善”的混合证据，不能写成总体胜出。
+
+## 通用性边界
+
+### ALFWorld 统一事件策略诊断
+
+ALFWorld 的失败样本实验给出了比继续调检索权重更强的证据。官方事件 Tower v3
+为 85/139，与 NoSkill 持平；算子纯化并修复当前阶段契约后的 v4 为 78/139。
+但一份对所有样本固定、没有任务族路由、没有具体物体位置的统一事件执行策略达到
+114/139（82.01%），与 SkillX 的 113/139（81.29%）处于同一水平。
+
+| ALFWorld 方法 | 成功率 | 相对 NoSkill | NoSkill 翻转 |
+|---|---:|---:|---:|
+| NoSkill | 61.15% | - | - |
+| 官方事件 Tower v3 | 61.15% | 0.00pp | 8 胜 / 8 负 |
+| 算子纯化 + 阶段修复 Tower v4 | 56.12% | -5.04pp | 7 胜 / 14 负 |
+| SkillX | 81.29% | +20.14pp | 32 胜 / 4 负 |
+| **统一手写事件策略** | **82.01%** | **+20.86pp** | **32 胜 / 3 负** |
+
+手写策略在 Tower v4 的 61 条失败样本中救回 42 条（68.85%），通过“至少救回
+一半”门槛；改善同时覆盖普通搬运、Clean、Heat、Cool 和 Toggle。它证明跨领域
+问题不在于事件抽取有领域口径，而在于当前图到 skill 的归纳没有表达跨事件共享的
+前置条件、搜索纪律、完成条件与失败恢复约束。该策略只能作为诊断 oracle，不能
+当作最终 Trace2Tower 结果。完整报告见
+`experiments/alfworld/official/validation/MANUAL_EVENT_POLICY_DIAGNOSTIC.md`。
+
+下一版通用算法应从成功/失败事件路径自动归纳稳定前置边与恢复反模式，再生成一张
+紧凑的全局执行卡；这仍属于“事件抽取后建图”的通用阶段，不要求跨领域共享事件
+词表或手写同一套事件解析器。
+
+Trace2Tower 假设原始轨迹已经被转换为领域有意义的事件片段。事件抽取必然具有领域性：WebShop 和 ALFWorld 可以使用不同事件定义与不同抽取过程。通用性不要求存在统一的事件抽取算法。
+
+Trace2Tower 的通用贡献从事件抽取之后开始：
+
+\[
+\mathcal{D}_{seg}
+\rightarrow G_{ET}
+\rightarrow Z_{ET}
+\rightarrow \mathcal{T}
+\]
+
+只要领域提供了合适的事件抽取，后续原则可以保持一致：
+
+1. 对事件片段进行语义表示；
+2. 使用真实时间转移连接事件；
+3. 编码成功、部分成功和失败的一致性；
+4. 进行对比式谱分解；
+5. 从图结构归纳 Low、Mid 和 High skill；
+6. 根据当前事件状态检索路径与恢复策略。
+
+WebShop 中的搜索、商品选项和购买动作只是领域事件的具体实现，不属于通用算法契约。真正可迁移的是“事件到图、图到层次技能、当前状态到路径检索”的方法。
+
+## 必须保留的限制
+
+- Flash Test-A 上相对 NoSkill 和 SkillX 的奖励区间跨零，不能宣称普遍显著。
+- Test-B 相对 NoSkill 的优势受 split 难度影响，当前只有相对 SkillX 的奖励优势显著。
+- P200 没有继续提升，训练覆盖度不是单调尺度规律。
+- GLM-4.7 Flash 是负迁移压力测试：紧凑 Manual skill 有效，但较长自动技能上下文表现较差。它说明模型的上下文跟随能力是部署边界，不能隐藏，也不能作为 Tower 正向结果。
+- recovery skill 实验使用后验失败集，只能说明存在局部可恢复指导缺口。
+- ALFWorld 的手写统一策略已证明存在 82.01% 的可达上限，但自动 Tower 尚未达到；
+  因此仍不能宣称 Trace2Tower 已获得跨领域性能优势。
+
+## 已完成实验矩阵
+
+| 实验                                  | 目的               | 状态 |
+|-------------------------------------|------------------|----|
+| V0 graph-cap3 vs T1 graph-cap3      | 隔离 refinement 贡献 | 完成 |
+| T1 graph-cap3 Flash Test-A repeat3  | 主结果与稳定性          | 完成 |
+| T1 graph-cap3 Pro Test-A repeat3    | 强模型验证            | 完成 |
+| T1 graph-cap3 Flash Test-B          | 冻结 split 稳健性     | 完成 |
+| Test-B NoSkill repeat1              | 验证高 NoSkill 是否偶然 | 完成 |
+| Full vs Semantic-only               | 关系图与 High 路径消融   | 完成 |
+| Mixed vs No-Mixed                   | 部分/失败证据消融        | 完成 |
+| 原生 renderer vs SkillX-style         | 文本渲染器控制          | 完成 |
+| P50 vs P100 vs P200                 | 训练覆盖规模诊断         | 完成 |
+| Graph cap3 vs graph cap8            | 检索预算控制           | 完成 |
+| Graph retrieval vs legacy retrieval | 部署结构匹配           | 完成 |
+| High max4 vs max6                   | 路径长度结构检查         | 完成 |
+| Trace2Tower vs SkillX 构建成本          | 构建效率审计           | 完成 |
+| Final vs SkillX 失败重合                | 难例机制诊断           | 完成 |
+| 六个共同零分任务 recovery skill             | 可恢复指导缺口实验        | 完成 |
+
+## 权威结果文件
+
+- final-flash-repeat3.json
+- final-pro-repeat3.json
+- final-flash-graph-cap8-repeat3.json
+- final-mechanism-ablations.json
+- final-algorithm-results.json
+- test-b-noskill-variance.json
+- construction-cost.json
+- failure-overlap.json
+- failure-intervention/analysis.json
+- failure-intervention/REPORT.md
+- refinement/graph-retrieval-test-a.json

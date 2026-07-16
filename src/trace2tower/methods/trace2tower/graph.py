@@ -10,13 +10,13 @@ from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import SegmentInstance, WebShopEventType
+from trace2tower.methods.trace2tower.models import EventType, SegmentInstance
 
 
 @dataclass(frozen=True, slots=True)
 class GraphComponents:
     segment_ids: tuple[str, ...]
-    event_types: tuple[WebShopEventType | None, ...]
+    event_types: tuple[EventType | None, ...]
     segment_embeddings: np.ndarray
     rho: np.ndarray
     semantic: sparse.csr_matrix
@@ -43,6 +43,8 @@ def build_graph(
     segments = tuple(segment for group in groups for segment in group)
     if not segments:
         raise ValueError("graph construction requires segments")
+    if any(segment.event_type is None for segment in segments):
+        raise ValueError("transition-aware graph requires domain event labels")
     dimension = len(segments[0].embedding)
     if dimension == 0 or any(len(segment.embedding) != dimension for segment in segments):
         raise ValueError("all segment embeddings must have one fixed nonzero dimension")
@@ -212,16 +214,24 @@ def _nearest_neighbors(values: np.ndarray, neighbor_count: int) -> tuple[np.ndar
         return tuple(np.empty(0, dtype=np.int64) for _ in range(len(values)))
     model = NearestNeighbors(
         n_neighbors=min(neighbor_count + 1, len(values)),
-        metric="cosine",
+        # 输入已单位归一化，两种距离给出相同近邻顺序；欧氏距离避免
+        # sklearn 为每批查询复制完整参考矩阵再次归一化。
+        metric="euclidean",
         algorithm="brute",
     ).fit(values)
-    raw_neighbors = model.kneighbors(values, return_distance=False)
-    return tuple(
-        np.asarray([target for target in targets if target != source][:neighbor_count])
-        for source, targets in enumerate(raw_neighbors)
-    )
+    neighbors = []
+    query_batch_size = 128
+    for start in range(0, len(values), query_batch_size):
+        batch = values[start : start + query_batch_size]
+        raw_neighbors = model.kneighbors(batch, return_distance=False)
+        neighbors.extend(
+            np.asarray([target for target in targets if target != start + offset][:neighbor_count])
+            for offset, targets in enumerate(raw_neighbors)
+        )
+    return tuple(neighbors)
 
 
 def _transition_key(segment: SegmentInstance) -> str:
-    # WebShop 事件标签用于统计经验转移概率，不参与连边或聚类约束。
-    return segment.event_type.value if segment.event_type else segment.segment_id
+    if segment.event_type is None:
+        raise ValueError("transition-aware graph requires domain event labels")
+    return segment.event_type.value

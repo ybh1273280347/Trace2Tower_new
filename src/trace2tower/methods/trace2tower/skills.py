@@ -115,9 +115,25 @@ class HighSkillCard:
     name: str
     description: str
     procedure: tuple[str, ...]
+    constraints: tuple[str, ...] = ()
+    member_mid_ids: tuple[str, ...] = ()
+
+    @property
+    def child_mid_ids(self) -> tuple[str, ...]:
+        return self.member_mid_ids or self.ordered_mid_ids
 
     def to_record(self) -> dict:
-        return asdict(self)
+        record = {
+            "skill_id": self.skill_id,
+            "ordered_mid_ids": self.ordered_mid_ids,
+            "name": self.name,
+            "description": self.description,
+            "procedure": self.procedure,
+            "constraints": self.constraints,
+        }
+        if self.member_mid_ids:
+            record["member_mid_ids"] = self.member_mid_ids
+        return record
 
     @classmethod
     def from_record(cls, record: Mapping) -> HighSkillCard:
@@ -127,6 +143,8 @@ class HighSkillCard:
             name=str(record["name"]),
             description=str(record["description"]),
             procedure=tuple(record["procedure"]),
+            constraints=tuple(record.get("constraints", ())),
+            member_mid_ids=tuple(record.get("member_mid_ids", ())),
         )
 
 
@@ -201,9 +219,11 @@ def legal_grounding_actions(
     benchmark: Benchmark, render_input: MidRenderInput
 ) -> tuple[PrimitiveAction, ...]:
     official_actions = {skill.primitive_action for skill in LOW_SKILLS[benchmark]}
+    action_count = sum(render_input.primitive_action_distribution.values())
     return tuple(
         action
         for action in PrimitiveAction
         if action in official_actions
-        and render_input.primitive_action_distribution.get(action.value, 0) > 0
+        and render_input.primitive_action_distribution.get(action.value, 0)
+        >= action_count * 0.05
     )

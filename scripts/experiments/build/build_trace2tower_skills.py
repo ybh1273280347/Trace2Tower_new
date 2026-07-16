@@ -29,6 +29,20 @@ from trace2tower.methods.trace2tower.skills import (
 )
 
 
+def load_skill_records(path: Path) -> list[dict]:
+    records = []
+    with path.open(encoding="utf-8") as input_file:
+        for line in input_file:
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            # Skill 渲染与 High 挖掘不消费向量，读取时释放它以避免大池内存峰值。
+            for segment in record["segments"]:
+                segment["embedding"] = ()
+            records.append(record)
+    return records
+
+
 def write_rendered_cards(
     output: Path,
     mid_cards: dict[str, MidSkillCard],
@@ -49,7 +63,10 @@ def build_high_render_examples(
     records: list[dict],
     clusters: tuple[MidCluster, ...],
     path,
+    trajectory_contexts: dict[str, dict],
     *,
+    successful: bool,
+    success_threshold: float,
     limit: int = 8,
 ) -> tuple[dict, ...]:
     segment_to_mid = {
@@ -58,10 +75,40 @@ def build_high_render_examples(
         for segment_id in cluster.member_segment_ids
     }
     records_by_id = {record["trajectory_id"]: record for record in records}
+    supporting_records = [
+        records_by_id[trajectory_id] for trajectory_id in path.supporting_trajectory_ids
+    ]
+    supporting_sample_ids = {record["sample_id"] for record in supporting_records}
+    supporting_goals = {
+        next(
+            transition["goal"]
+            for transition in record["transitions"]
+            if transition.get("goal")
+        )
+        for record in supporting_records
+    }
+    candidates = supporting_records if successful else sorted(
+        (
+            record
+            for record in records
+            if float(record["primary_score"]) < success_threshold
+            and (
+                record["sample_id"] in supporting_sample_ids
+                or any(
+                    transition.get("goal") in supporting_goals
+                    for transition in record["transitions"]
+                )
+            )
+        ),
+        key=lambda item: (
+            item["sample_id"] not in supporting_sample_ids,
+            item["trajectory_id"],
+        ),
+    )
     examples = []
     seen_samples = set()
-    for trajectory_id in path.supporting_trajectory_ids:
-        record = records_by_id[trajectory_id]
+    for record in candidates:
+        trajectory_id = record["trajectory_id"]
         sample_id = record["sample_id"]
         if sample_id in seen_samples:
             continue
@@ -73,30 +120,75 @@ def build_high_render_examples(
             else:
                 groups.append([mid_id, list(segment["raw_actions"])])
         ordered_mid_ids = tuple(group[0] for group in groups)
-        start = next(
-            index
-            for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
-            if ordered_mid_ids[index : index + len(path.ordered_mid_ids)] == path.ordered_mid_ids
-        )
-        path_groups = groups[start : start + len(path.ordered_mid_ids)]
-        actions = [action for _, group_actions in path_groups for action in group_actions]
         goal = next(
             transition["goal"] for transition in record["transitions"] if transition.get("goal")
         )
-        examples.append(
-            {
-                "goal": goal,
-                "path_steps": [
-                    {"mid_id": mid_id, "raw_actions": group_actions}
-                    for mid_id, group_actions in path_groups
-                ],
-                "raw_actions": actions,
-            }
-        )
+        if successful:
+            start = next((
+                index
+                for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
+                if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
+                == path.ordered_mid_ids
+            ), None)
+            if start is None:
+                continue
+            path_groups = groups[start : start + len(path.ordered_mid_ids)]
+            examples.append(
+                {
+                    "goal": goal,
+                    "structural_anchor_steps": [
+                        {"mid_id": mid_id, "raw_actions": group_actions}
+                        for mid_id, group_actions in path_groups
+                    ],
+                    "complete_trajectory": trajectory_contexts[trajectory_id],
+                }
+            )
+        else:
+            # 失败轨迹不需要复现成功路径；缺失和提前跳转正是对比证据。
+            examples.append(
+                {
+                    "goal": goal,
+                    "observed_mid_sequence": ordered_mid_ids,
+                    "complete_trajectory": trajectory_contexts[trajectory_id],
+                }
+            )
         seen_samples.add(sample_id)
         if len(examples) >= limit:
             break
     return tuple(examples)
+
+
+def build_trajectory_render_contexts(
+    records: list[dict],
+    clusters: tuple[MidCluster, ...],
+) -> dict[str, dict]:
+    segment_to_mid = {
+        segment_id: cluster.cluster_id
+        for cluster in clusters
+        for segment_id in cluster.member_segment_ids
+    }
+    contexts = {}
+    for record in records:
+        transitions = sorted(record["transitions"], key=lambda item: item["step_index"])
+        segments = sorted(record["segments"], key=lambda item: item["start_step"])
+        contexts[record["trajectory_id"]] = {
+            "goal": next(
+                transition["goal"] for transition in transitions if transition.get("goal")
+            ),
+            "trajectory_score": record["primary_score"],
+            "ordered_mid_ids": [
+                segment_to_mid[segment["segment_id"]] for segment in segments
+            ],
+            "ordered_events": [segment["event_type"] for segment in segments],
+            "ordered_actions": [
+                {
+                    "primitive_action": transition["primitive_action"],
+                    "raw_action": transition["raw_action"],
+                }
+                for transition in transitions
+            ],
+        }
+    return contexts
 
 
 async def main(options: argparse.Namespace) -> int:
@@ -107,9 +199,7 @@ async def main(options: argparse.Namespace) -> int:
     load_dotenv(options.env)
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
-    records = [
-        json.loads(line) for line in options.input.read_text(encoding="utf-8").splitlines() if line
-    ]
+    records = load_skill_records(options.input)
     cluster_records = json.loads(options.clusters.read_text(encoding="utf-8"))["clusters"]
     clusters = tuple(
         MidCluster(
@@ -120,6 +210,7 @@ async def main(options: argparse.Namespace) -> int:
         for item in cluster_records
     )
     mid_inputs = build_mid_render_inputs(records, clusters)
+    trajectory_contexts = build_trajectory_render_contexts(records, clusters)
     high_paths = (
         ()
         if config.semantic_only
@@ -237,6 +328,7 @@ async def main(options: argparse.Namespace) -> int:
                         runtime,
                         options.benchmark,
                         inputs_by_id[mid_id],
+                        trajectory_contexts=trajectory_contexts,
                         renderer_style=options.renderer_style,
                     )
                     for mid_id in missing_mid_ids
@@ -256,9 +348,25 @@ async def main(options: argparse.Namespace) -> int:
                 *(
                     render_high_card(
                         runtime,
+                        options.benchmark,
                         path,
                         mid_cards,
-                        build_high_render_examples(records, clusters, path),
+                        build_high_render_examples(
+                            records,
+                            clusters,
+                            path,
+                            trajectory_contexts,
+                            successful=True,
+                            success_threshold=config.success_threshold,
+                        ),
+                        unsuccessful_examples=build_high_render_examples(
+                            records,
+                            clusters,
+                            path,
+                            trajectory_contexts,
+                            successful=False,
+                            success_threshold=config.success_threshold,
+                        ),
                         renderer_style=options.renderer_style,
                     )
                     for path in missing_paths
