@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -8,6 +9,14 @@ import pyarrow.parquet as parquet
 
 from trace2tower.benchmarks.models import EnvironmentState, EpisodeStart
 from trace2tower.manifests import Benchmark, ManifestEntry
+
+
+_TASK_GOAL_RE = re.compile(r"(?im)^Your task is to:\s*(.+)$")
+
+
+def parse_alfworld_observation_goal(observation: str) -> str:
+    match = _TASK_GOAL_RE.search(observation)
+    return " ".join(match.group(1).split()) if match else ""
 
 
 class AlfworldEnvironment:
@@ -49,7 +58,11 @@ class AlfworldEnvironment:
         payload = response.json()
         self.session_id = payload["session_id"]
         self.current_state = self._state(payload, True)
-        return EpisodeStart(task_goal=item["goal_text"], state=self.current_state)
+        task_goal = parse_alfworld_observation_goal(payload["observation"])
+        return EpisodeStart(
+            task_goal=task_goal or item["goal_text"],
+            state=self.current_state,
+        )
 
     async def execute(self, tool_name: str, arguments: dict[str, Any]) -> EnvironmentState:
         if tool_name != "take_action" or not isinstance(arguments.get("action"), str):

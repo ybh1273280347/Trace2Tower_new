@@ -33,6 +33,9 @@ from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.trace2tower.labeled_mid_provider import (
     LabeledMidDiagnosticProvider,
 )
+from trace2tower.methods.trace2tower.object_conditioned_provider import (
+    ObjectConditionedHighProvider,
+)
 from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
 from trace2tower.methods.trace2tower.three_signal_provider import (
     ThreeSignalTrace2TowerSkillProvider,
@@ -190,13 +193,25 @@ def create_provider(
             "graph",
             "labeled_mid_diagnostic",
             "three_signal_graph",
+            "object_conditioned_high",
         }:
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
         graph = retrieval_strategy == "graph"
         labeled_mid_diagnostic = retrieval_strategy == "labeled_mid_diagnostic"
         three_signal_graph = retrieval_strategy == "three_signal_graph"
+        object_conditioned_high = retrieval_strategy == "object_conditioned_high"
         hierarchical = method_config.get("retrieval_contract") == "hierarchical"
+        if object_conditioned_high:
+            return ObjectConditionedHighProvider.from_path(
+                runtime,
+                artifact.path,
+                profile_path=Path(method_config["object_conditioned_profile"]),
+                similarity_threshold=float(method_config["high_similarity_threshold"]),
+                allow_query_conditioning=bool(
+                    method_config.get("allow_query_conditioning", False)
+                ),
+            )
         common_kwargs = {
             "include_high": (
                 int(method_config["high_top_k"]) == 1
@@ -475,7 +490,10 @@ async def main(options: argparse.Namespace) -> int:
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_contract") == "hierarchical":
+        if method_config.get("retrieval_strategy") == "object_conditioned_high":
+            if options.direct_mid_top_k is not None:
+                raise ValueError("object-conditioned High does not accept Mid caps")
+        elif method_config.get("retrieval_contract") == "hierarchical":
             limits = tuple(
                 int(method_config[field])
                 for field in ("high_top_k", "mid_top_k", "low_top_k")

@@ -1,0 +1,1484 @@
+{
+  "input": "artifacts\\trajectories\\alfworld\\alfworld-pool-v1-pro-expanded.jsonl",
+  "trajectory_count": 1240,
+  "successful_count": 850,
+  "failed_count": 390,
+  "success_threshold": 0.999,
+  "min_support_ratio": 0.02,
+  "minimum_support": 24,
+  "successful_by_transformation": {
+    "HEAT": 110,
+    "NONE": 310,
+    "TOGGLE": 158,
+    "CLEAN": 147,
+    "COOL": 125
+  },
+  "top_exact_object_conditioned_prototypes": [
+    {
+      "key": "TOGGLE | pillow | ('bed',) | ()",
+      "support": 28,
+      "ratio": 0.03294117647058824
+    },
+    {
+      "key": "TOGGLE | cd | ('desk',) | ()",
+      "support": 17,
+      "ratio": 0.02
+    },
+    {
+      "key": "NONE | candle | ('countertop',) | ('drawer',)",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "HEAT | egg | ('countertop',) | ('garbagecan',)",
+      "support": 9,
+      "ratio": 0.010588235294117647
+    },
+    {
+      "key": "TOGGLE | alarmclock | ('desk',) | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "HEAT | egg | ('fridge',) | ('garbagecan',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "HEAT | potato | ('fridge',) | ('garbagecan',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | pot | ('stoveburner',) | ('stoveburner',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | book | ('desk',) | ('bed',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | bowl | ('desk',) | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | keychain | ('armchair',) | ('sofa',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | fork | ('countertop',) | ('drawer',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | spraybottle | ('countertop',) | ('toilet',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | alarmclock | ('shelf',) | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | book | ('bed',) | ('desk',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | alarmclock | ('sidetable',) | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | pan | ('stoveburner',) | ('diningtable',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | knife | ('countertop',) | ('drawer',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "COOL | lettuce | ('diningtable',) | ('diningtable',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "HEAT | apple | ('diningtable',) | ('sidetable',)",
+      "support": 6,
+      "ratio": 0.007058823529411765
+    },
+    {
+      "key": "HEAT | mug | ('coffeemachine', 'microwave') | ('microwave', 'coffeemachine')",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "HEAT | mug | ('countertop',) | ('coffeemachine',)",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "HEAT | tomato | ('countertop',) | ('diningtable',)",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "NONE | cd | ('drawer',) | ('safe',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | potato | ('fridge',) | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | spatula | ('drawer',) | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | mug | ('cabinet',) | ('coffeemachine',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | cloth | ('cart',) | ('cart',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | handtowel | ('handtowelholder', 'sinkbasin') | ('sinkbasin', 'cabinet')",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "TOGGLE | creditcard | ('desk',) | ()",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | apple | ('countertop',) | ('fridge',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | statue | ('sidetable', 'coffeetable') | ('diningtable',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | bread | ('countertop',) | ('toaster', 'garbagecan')",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "TOGGLE | newspaper | ('sofa',) | ()",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "COOL | pot | ('stoveburner',) | ('cabinet',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | lettuce | ('fridge',) | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "COOL | winebottle | ('countertop',) | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "COOL | mug | ('shelf',) | ('coffeemachine',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | cup | ('countertop',) | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | potato | ('fridge',) | ('microwave',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | wateringcan | ('coffeetable',) | ('shelf',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | toiletpaper | ('toiletpaperhanger',) | ('garbagecan',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "TOGGLE | statue | ('dresser',) | ()",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | apple | ('fridge',) | ('garbagecan',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | newspaper | ('sidetable', 'sofa') | ('armchair',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | butterknife | ('diningtable',) | ('diningtable',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "COOL | pan | ('countertop', 'stoveburner') | ('stoveburner',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | toiletpaper | ('toiletpaperhanger', 'countertop') | ('drawer',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | cup | ('microwave',) | ('microwave',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | pan | ('stoveburner',) | ('stoveburner',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    }
+  ],
+  "top_relaxed_object_conditioned_prototypes": [
+    {
+      "key": "TOGGLE | pillow | ()",
+      "support": 36,
+      "ratio": 0.042352941176470586
+    },
+    {
+      "key": "TOGGLE | alarmclock | ()",
+      "support": 24,
+      "ratio": 0.02823529411764706
+    },
+    {
+      "key": "HEAT | egg | ('garbagecan',)",
+      "support": 19,
+      "ratio": 0.02235294117647059
+    },
+    {
+      "key": "TOGGLE | cd | ()",
+      "support": 17,
+      "ratio": 0.02
+    },
+    {
+      "key": "HEAT | mug | ('coffeemachine',)",
+      "support": 13,
+      "ratio": 0.015294117647058824
+    },
+    {
+      "key": "NONE | toiletpaper | ('toiletpaperhanger',)",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "NONE | spraybottle | ('garbagecan',)",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "COOL | pan | ('diningtable',)",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "NONE | candle | ('drawer',)",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "HEAT | potato | ('garbagecan',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | creditcard | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | pot | ('stoveburner',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | statue | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | book | ('bed',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | toiletpaper | ('drawer',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | cup | ('microwave',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | mug | ('cabinet',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | kettle | ('cabinet',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | lettuce | ('garbagecan',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | bowl | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | keychain | ('sofa',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | fork | ('drawer',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | spraybottle | ('toilet',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | candle | ('cabinet',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | kettle | ('diningtable',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "HEAT | egg | ('countertop',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | statue | ('coffeetable',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | box | ()",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | book | ('desk',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | soapbar | ('countertop',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | spoon | ('drawer',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | lettuce | ('diningtable',)",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "HEAT | apple | ('sidetable',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "NONE | soapbottle | ('toilet',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "CLEAN | knife | ('drawer',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "NONE | tissuebox | ('drawer',)",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "HEAT | mug | ('microwave', 'coffeemachine')",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "HEAT | tomato | ('diningtable',)",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "HEAT | mug | ('cabinet',)",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "TOGGLE | book | ()",
+      "support": 5,
+      "ratio": 0.0058823529411764705
+    },
+    {
+      "key": "NONE | cd | ('safe',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | potato | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | spatula | ('countertop',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | cloth | ('cart',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | handtowel | ('sinkbasin', 'cabinet')",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "CLEAN | apple | ('fridge',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "NONE | statue | ('diningtable',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "HEAT | bread | ('toaster', 'garbagecan')",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "TOGGLE | newspaper | ()",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    },
+    {
+      "key": "COOL | pot | ('cabinet',)",
+      "support": 4,
+      "ratio": 0.004705882352941176
+    }
+  ],
+  "top_object_communities": [
+    {
+      "key": "TOGGLE | pillow",
+      "support": 36,
+      "ratio": 0.042352941176470586
+    },
+    {
+      "key": "HEAT | egg",
+      "support": 32,
+      "ratio": 0.03764705882352941
+    },
+    {
+      "key": "NONE | spraybottle",
+      "support": 32,
+      "ratio": 0.03764705882352941
+    },
+    {
+      "key": "TOGGLE | alarmclock",
+      "support": 28,
+      "ratio": 0.03294117647058824
+    },
+    {
+      "key": "NONE | candle",
+      "support": 28,
+      "ratio": 0.03294117647058824
+    },
+    {
+      "key": "HEAT | mug",
+      "support": 26,
+      "ratio": 0.03058823529411765
+    },
+    {
+      "key": "TOGGLE | cd",
+      "support": 24,
+      "ratio": 0.02823529411764706
+    },
+    {
+      "key": "NONE | toiletpaper",
+      "support": 24,
+      "ratio": 0.02823529411764706
+    },
+    {
+      "key": "NONE | statue",
+      "support": 20,
+      "ratio": 0.023529411764705882
+    },
+    {
+      "key": "NONE | book",
+      "support": 20,
+      "ratio": 0.023529411764705882
+    },
+    {
+      "key": "COOL | pan",
+      "support": 20,
+      "ratio": 0.023529411764705882
+    },
+    {
+      "key": "CLEAN | kettle",
+      "support": 20,
+      "ratio": 0.023529411764705882
+    },
+    {
+      "key": "COOL | lettuce",
+      "support": 20,
+      "ratio": 0.023529411764705882
+    },
+    {
+      "key": "HEAT | apple",
+      "support": 19,
+      "ratio": 0.02235294117647059
+    },
+    {
+      "key": "NONE | cellphone",
+      "support": 17,
+      "ratio": 0.02
+    },
+    {
+      "key": "COOL | pot",
+      "support": 16,
+      "ratio": 0.018823529411764704
+    },
+    {
+      "key": "NONE | keychain",
+      "support": 16,
+      "ratio": 0.018823529411764704
+    },
+    {
+      "key": "CLEAN | soapbar",
+      "support": 16,
+      "ratio": 0.018823529411764704
+    },
+    {
+      "key": "NONE | tissuebox",
+      "support": 15,
+      "ratio": 0.01764705882352941
+    },
+    {
+      "key": "NONE | soapbottle",
+      "support": 15,
+      "ratio": 0.01764705882352941
+    },
+    {
+      "key": "COOL | cup",
+      "support": 14,
+      "ratio": 0.01647058823529412
+    },
+    {
+      "key": "CLEAN | cup",
+      "support": 13,
+      "ratio": 0.015294117647058824
+    },
+    {
+      "key": "HEAT | potato",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "NONE | handtowel",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "COOL | mug",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "CLEAN | fork",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "TOGGLE | bowl",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "CLEAN | spoon",
+      "support": 12,
+      "ratio": 0.01411764705882353
+    },
+    {
+      "key": "CLEAN | cloth",
+      "support": 11,
+      "ratio": 0.012941176470588235
+    },
+    {
+      "key": "COOL | tomato",
+      "support": 11,
+      "ratio": 0.012941176470588235
+    },
+    {
+      "key": "NONE | cd",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | creditcard",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | statue",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | newspaper",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | butterknife",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | alarmclock",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | bowl",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | lettuce",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | apple",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | watch",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | remotecontrol",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "TOGGLE | box",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | cloth",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "CLEAN | ladle",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "COOL | bowl",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "NONE | vase",
+      "support": 8,
+      "ratio": 0.009411764705882352
+    },
+    {
+      "key": "HEAT | tomato",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "TOGGLE | laptop",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "CLEAN | knife",
+      "support": 7,
+      "ratio": 0.00823529411764706
+    },
+    {
+      "key": "HEAT | plate",
+      "support": 6,
+      "ratio": 0.007058823529411765
+    }
+  ],
+  "supported_relaxed_prototypes": {
+    "TOGGLE | alarmclock | ()": [
+      "alfworld:train:no_skill:alfworld:train:trial_T20190906_180754_637797:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190906_180754_637797:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190906_180754_637797:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190906_180754_637797:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_174157_650656:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_174157_650656:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_174157_650656:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_174157_650656:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082347_537952:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082347_537952:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082347_537952:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082347_537952:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082405_485362:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082405_485362:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082405_485362:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_082405_485362:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_212905_950861:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_212905_950861:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_212905_950861:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_212905_950861:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_044736_929512:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_044736_929512:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_044736_929512:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_044736_929512:3"
+    ],
+    "TOGGLE | pillow | ()": [
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_220638_188496:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_220638_188496:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_220638_188496:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_220638_188496:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_224200_196003:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_224200_196003:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_224200_196003:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190907_224200_196003:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113820_480741:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113820_480741:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113820_480741:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113820_480741:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113843_792729:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113843_792729:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113843_792729:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_113843_792729:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114608_138013:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114608_138013:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114608_138013:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114608_138013:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114619_968426:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114619_968426:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114619_968426:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_114619_968426:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_155728_431043:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_155728_431043:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_155728_431043:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_155728_431043:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_234505_182882:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_234505_182882:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_234505_182882:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190908_234505_182882:3",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_043253_098401:0",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_043253_098401:1",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_043253_098401:2",
+      "alfworld:train:no_skill:alfworld:train:trial_T20190909_043253_098401:3"
+    ]
+  },
+  "supported_object_communities": {
+    "TOGGLE | alarmclock": {
+      "support": 28,
+      "ratio": 0.03294117647058824,
+      "sources": {
+        "desk": 12,
+        "shelf": 8,
+        "dresser": 4,
+        "sidetable": 8
+      },
+      "devices": {
+        "desklamp": 28
+      },
+      "destinations": {
+        "desk": 4
+      },
+      "canonical_goal_examples": [
+        "examine the alarmclock with the desklamp.",
+        "look at alarmclock under the desklamp."
+      ]
+    },
+    "HEAT | mug": {
+      "support": 26,
+      "ratio": 0.03058823529411765,
+      "sources": {
+        "cabinet": 4,
+        "coffeemachine": 13,
+        "microwave": 8,
+        "countertop": 8,
+        "shelf": 1
+      },
+      "devices": {
+        "microwave": 26
+      },
+      "destinations": {
+        "coffeemachine": 18,
+        "microwave": 8,
+        "cabinet": 5
+      },
+      "canonical_goal_examples": [
+        "heat some mug and put it in coffeemachine.",
+        "put a hot mug in coffeemachine.",
+        "heat some mug and put it in cabinet.",
+        "put a hot mug in cabinet."
+      ]
+    },
+    "HEAT | egg": {
+      "support": 32,
+      "ratio": 0.03764705882352941,
+      "sources": {
+        "fridge": 12,
+        "countertop": 17,
+        "garbagecan": 2,
+        "diningtable": 1
+      },
+      "devices": {
+        "microwave": 32
+      },
+      "destinations": {
+        "garbagecan": 19,
+        "sidetable": 1,
+        "countertop": 8,
+        "fridge": 4
+      },
+      "canonical_goal_examples": [
+        "heat some egg and put it in garbagecan.",
+        "heat some egg and put it in sidetable.",
+        "heat some egg and put it in countertop.",
+        "heat some egg and put it in fridge.",
+        "put a hot egg in garbagecan.",
+        "put a hot egg in countertop."
+      ]
+    },
+    "TOGGLE | cd": {
+      "support": 24,
+      "ratio": 0.02823529411764706,
+      "sources": {
+        "desk": 24,
+        "sidetable": 4
+      },
+      "devices": {
+        "desklamp": 24
+      },
+      "destinations": {
+        "sidetable": 4,
+        "shelf": 2,
+        "desk": 3
+      },
+      "canonical_goal_examples": [
+        "examine the cd with the desklamp."
+      ]
+    },
+    "NONE | toiletpaper": {
+      "support": 24,
+      "ratio": 0.02823529411764706,
+      "sources": {
+        "toiletpaperhanger": 8,
+        "countertop": 8,
+        "dresser": 4,
+        "toilet": 4,
+        "shelf": 4
+      },
+      "devices": {},
+      "destinations": {
+        "garbagecan": 4,
+        "drawer": 8,
+        "toiletpaperhanger": 12
+      },
+      "canonical_goal_examples": [
+        "put some toiletpaper on garbagecan.",
+        "find two toiletpaper and put them in drawer.",
+        "put some toiletpaper on toiletpaperhanger."
+      ]
+    },
+    "TOGGLE | pillow": {
+      "support": 36,
+      "ratio": 0.042352941176470586,
+      "sources": {
+        "armchair": 4,
+        "bed": 28,
+        "sofa": 4
+      },
+      "devices": {
+        "desklamp": 36
+      },
+      "destinations": {},
+      "canonical_goal_examples": [
+        "examine the pillow with the desklamp.",
+        "look at pillow under the desklamp."
+      ]
+    },
+    "NONE | spraybottle": {
+      "support": 32,
+      "ratio": 0.03764705882352941,
+      "sources": {
+        "countertop": 20,
+        "sidetable": 4,
+        "toilet": 7,
+        "garbagecan": 1,
+        "cabinet": 4
+      },
+      "devices": {},
+      "destinations": {
+        "toilet": 12,
+        "garbagecan": 12,
+        "cabinet": 4,
+        "drawer": 8
+      },
+      "canonical_goal_examples": [
+        "put some spraybottle on toilet.",
+        "put two spraybottle in garbagecan.",
+        "put a spraybottle in cabinet.",
+        "find two spraybottle and put them in garbagecan.",
+        "put two spraybottle in drawer.",
+        "put some spraybottle on drawer.",
+        "put a spraybottle in garbagecan."
+      ]
+    },
+    "NONE | candle": {
+      "support": 28,
+      "ratio": 0.03294117647058824,
+      "sources": {
+        "shelf": 4,
+        "toilet": 4,
+        "countertop": 20
+      },
+      "devices": {},
+      "destinations": {
+        "toilet": 4,
+        "cabinet": 8,
+        "drawer": 12,
+        "towelholder": 4,
+        "cart": 4
+      },
+      "canonical_goal_examples": [
+        "put some candle on toilet.",
+        "put some candle on cabinet.",
+        "find two candle and put them in cabinet.",
+        "put two candle in drawer.",
+        "put a candle in cart.",
+        "put a candle in drawer."
+      ]
+    }
+  },
+  "distinct_exact_prototypes": 205,
+  "distinct_relaxed_prototypes": 170,
+  "failure_examples": [
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171701_034036:0",
+      "canonical_goal": "put a hot tomato in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "EXAMINE",
+        "INVENTORY"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171701_034036:1",
+      "canonical_goal": "put a hot tomato in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "EXAMINE"
+      ],
+      "target_count": 2
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171701_034036:2",
+      "canonical_goal": "put a hot tomato in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "EXAMINE",
+        "INVENTORY"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171701_034036:3",
+      "canonical_goal": "put a hot tomato in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "EXAMINE"
+      ],
+      "target_count": 2
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171745_518642:0",
+      "canonical_goal": "heat some tomato and put it in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "EXAMINE",
+        "INVENTORY"
+      ],
+      "target_count": 2
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171745_518642:1",
+      "canonical_goal": "heat some tomato and put it in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "INVENTORY",
+        "EXAMINE"
+      ],
+      "target_count": 2
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_171745_518642:2",
+      "canonical_goal": "heat some tomato and put it in garbagecan.",
+      "target_object": "tomato",
+      "source_receptacles": [
+        "fridge",
+        "microwave",
+        "garbagecan"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "microwave",
+        "garbagecan"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "PUT",
+        "HEAT",
+        "CLOSE",
+        "INVENTORY",
+        "LOOK",
+        "EXAMINE"
+      ],
+      "target_count": 2
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180223_908386:0",
+      "canonical_goal": "put two watch in dresser.",
+      "target_object": "watch",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "dresser"
+      ],
+      "event_chain": [
+        "GOTO",
+        "LOOK",
+        "EXAMINE",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180223_908386:1",
+      "canonical_goal": "put two watch in dresser.",
+      "target_object": "watch",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "dresser"
+      ],
+      "event_chain": [
+        "GOTO",
+        "LOOK",
+        "EXAMINE",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180223_908386:2",
+      "canonical_goal": "put two watch in dresser.",
+      "target_object": "watch",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "dresser"
+      ],
+      "event_chain": [
+        "GOTO",
+        "LOOK",
+        "EXAMINE",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180223_908386:3",
+      "canonical_goal": "put two watch in dresser.",
+      "target_object": "watch",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "dresser"
+      ],
+      "event_chain": [
+        "GOTO",
+        "LOOK",
+        "EXAMINE",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180551_516948:0",
+      "canonical_goal": "put a hot potato in countertop.",
+      "target_object": "potato",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "countertop"
+      ],
+      "event_chain": [
+        "LOOK",
+        "INVENTORY",
+        "GOTO",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180551_516948:1",
+      "canonical_goal": "put a hot potato in countertop.",
+      "target_object": "potato",
+      "source_receptacles": [
+        "countertop"
+      ],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "countertop"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "EXAMINE",
+        "PICK",
+        "INVENTORY",
+        "LOOK",
+        "PUT"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180551_516948:2",
+      "canonical_goal": "put a hot potato in countertop.",
+      "target_object": "potato",
+      "source_receptacles": [],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "countertop"
+      ],
+      "event_chain": [
+        "LOOK",
+        "INVENTORY",
+        "GOTO",
+        "OPEN"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180551_516948:3",
+      "canonical_goal": "put a hot potato in countertop.",
+      "target_object": "potato",
+      "source_receptacles": [
+        "countertop"
+      ],
+      "transformation": "NONE",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "countertop"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "EXAMINE",
+        "PICK",
+        "INVENTORY",
+        "LOOK",
+        "PUT"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_180710_251060:2",
+      "canonical_goal": "heat some apple and put it in sidetable.",
+      "target_object": "apple",
+      "source_receptacles": [
+        "diningtable"
+      ],
+      "transformation": "HEAT",
+      "transformation_devices": [
+        "microwave"
+      ],
+      "destination_receptacles": [
+        "sidetable"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "EXAMINE",
+        "PICK",
+        "INVENTORY",
+        "LOOK",
+        "PUT",
+        "HEAT"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_184001_800149:0",
+      "canonical_goal": "cool some bread and put it in diningtable.",
+      "target_object": "bread",
+      "source_receptacles": [],
+      "transformation": "COOL",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "diningtable"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "INVENTORY",
+        "COOL",
+        "PUT",
+        "LOOK",
+        "EXAMINE"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_184001_800149:1",
+      "canonical_goal": "cool some bread and put it in diningtable.",
+      "target_object": "bread",
+      "source_receptacles": [],
+      "transformation": "COOL",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "diningtable"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "EXAMINE",
+        "PICK",
+        "INVENTORY",
+        "CLOSE",
+        "COOL",
+        "PUT"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_184001_800149:2",
+      "canonical_goal": "cool some bread and put it in diningtable.",
+      "target_object": "bread",
+      "source_receptacles": [],
+      "transformation": "COOL",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "diningtable"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "INVENTORY",
+        "COOL",
+        "PUT",
+        "LOOK",
+        "EXAMINE"
+      ],
+      "target_count": 1
+    },
+    {
+      "trajectory_id": "alfworld:train:no_skill:alfworld:train:trial_T20190906_184001_800149:3",
+      "canonical_goal": "cool some bread and put it in diningtable.",
+      "target_object": "bread",
+      "source_receptacles": [],
+      "transformation": "COOL",
+      "transformation_devices": [],
+      "destination_receptacles": [
+        "diningtable"
+      ],
+      "event_chain": [
+        "GOTO",
+        "OPEN",
+        "PICK",
+        "INVENTORY",
+        "COOL",
+        "PUT",
+        "LOOK",
+        "EXAMINE"
+      ],
+      "target_count": 1
+    }
+  ]
+}

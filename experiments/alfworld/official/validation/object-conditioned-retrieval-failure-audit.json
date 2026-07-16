@@ -1,0 +1,484 @@
+{
+  "sample_count": 9,
+  "external_query_exact_matches": 1,
+  "canonical_query_exact_matches": 2,
+  "structured_query_exact_matches": 4,
+  "rows": [
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190906_215856_374127",
+      "external_goal": "Put a chilled pan on the stove.",
+      "canonical_goal": "cool some pan and put it in stoveburner.",
+      "expected_target": "pan",
+      "expected_destination": "stoveburner",
+      "query_structure": {
+        "target_object": "pan",
+        "transformation": "COOL",
+        "destination": "stoveburner"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_69ac5b82582a",
+        "score": 0.868167974606729,
+        "canonical_goal": "cool some pan and put it in stoveburner.",
+        "exact_canonical_match": true
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_69ac5b82582a",
+        "score": 0.9999999559882798,
+        "canonical_goal": "cool some pan and put it in stoveburner.",
+        "exact_canonical_match": true
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_69ac5b82582a",
+        "score": 0.9999999559882798,
+        "canonical_goal": "cool some pan and put it in stoveburner.",
+        "prototype": {
+          "canonical_goal": "cool some pan and put it in stoveburner.",
+          "target_object": "pan",
+          "source_receptacles": [
+            "countertop",
+            "stoveburner"
+          ],
+          "transformation": "COOL",
+          "transformation_devices": [
+            "fridge"
+          ],
+          "destination_receptacles": [
+            "stoveburner"
+          ],
+          "event_chain": [
+            "GOTO",
+            "LOOK",
+            "INVENTORY",
+            "PICK",
+            "PUT",
+            "EXAMINE",
+            "COOL"
+          ],
+          "target_count": 2
+        },
+        "exact_structure_match": true
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190907_233056_022802",
+      "external_goal": "Put a clean mug under the coffee maker.",
+      "canonical_goal": "clean some mug and put it in coffeemachine.",
+      "expected_target": "mug",
+      "expected_destination": "coffeemachine",
+      "query_structure": {
+        "target_object": "mug",
+        "transformation": "CLEAN",
+        "destination": "coffeemachine"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_e7599c7334ca",
+        "score": 0.8980551278777537,
+        "canonical_goal": "put a cool mug in coffeemachine.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_e7599c7334ca",
+        "score": 0.8972717702683797,
+        "canonical_goal": "put a cool mug in coffeemachine.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_e7599c7334ca",
+        "score": 0.8972717702683797,
+        "canonical_goal": "put a cool mug in coffeemachine.",
+        "prototype": {
+          "canonical_goal": "put a cool mug in coffeemachine.",
+          "target_object": "mug",
+          "source_receptacles": [
+            "shelf"
+          ],
+          "transformation": "COOL",
+          "transformation_devices": [
+            "fridge"
+          ],
+          "destination_receptacles": [
+            "coffeemachine"
+          ],
+          "event_chain": [
+            "GOTO",
+            "OPEN",
+            "CLOSE",
+            "PICK",
+            "COOL",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": false
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190908_233922_171295",
+      "external_goal": "Place a rinsed fork on a counter.",
+      "canonical_goal": "put a clean fork in countertop.",
+      "expected_target": "fork",
+      "expected_destination": "countertop",
+      "query_structure": {
+        "target_object": "fork",
+        "transformation": "CLEAN",
+        "destination": "countertop"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_d02b848382a9",
+        "score": 0.7866834203941836,
+        "canonical_goal": "clean some fork and put it in diningtable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_d02b848382a9",
+        "score": 0.8804127857967343,
+        "canonical_goal": "clean some fork and put it in diningtable.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_d02b848382a9",
+        "score": 0.8804127857967343,
+        "canonical_goal": "clean some fork and put it in diningtable.",
+        "prototype": {
+          "canonical_goal": "clean some fork and put it in diningtable.",
+          "target_object": "fork",
+          "source_receptacles": [
+            "diningtable"
+          ],
+          "transformation": "CLEAN",
+          "transformation_devices": [
+            "sinkbasin"
+          ],
+          "destination_receptacles": [
+            "diningtable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "OPEN",
+            "PICK",
+            "CLEAN",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": false
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_004531_429065",
+      "external_goal": "Put a cold pot on a table.",
+      "canonical_goal": "put a cool pot in diningtable.",
+      "expected_target": "pot",
+      "expected_destination": "diningtable",
+      "query_structure": {
+        "target_object": "pot",
+        "transformation": "COOL",
+        "destination": "diningtable"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_7c729a5ebcda",
+        "score": 0.8169317940116294,
+        "canonical_goal": "cool some pot and put it in diningtable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_7c729a5ebcda",
+        "score": 0.9313960277128851,
+        "canonical_goal": "cool some pot and put it in diningtable.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_7c729a5ebcda",
+        "score": 0.9313960277128851,
+        "canonical_goal": "cool some pot and put it in diningtable.",
+        "prototype": {
+          "canonical_goal": "cool some pot and put it in diningtable.",
+          "target_object": "pot",
+          "source_receptacles": [
+            "stoveburner"
+          ],
+          "transformation": "COOL",
+          "transformation_devices": [
+            "fridge"
+          ],
+          "destination_receptacles": [
+            "diningtable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "OPEN",
+            "PICK",
+            "COOL",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": true
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_044933_815840",
+      "external_goal": "put a chilled apple on a kitchen counter",
+      "canonical_goal": "cool some apple and put it in countertop.",
+      "expected_target": "apple",
+      "expected_destination": "countertop",
+      "query_structure": {
+        "target_object": "apple",
+        "transformation": "COOL",
+        "destination": "countertop"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_f42034201d85",
+        "score": 0.8498982241002698,
+        "canonical_goal": "put a cool apple in sidetable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_f42034201d85",
+        "score": 0.8682331641529606,
+        "canonical_goal": "put a cool apple in sidetable.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_f42034201d85",
+        "score": 0.8682331641529606,
+        "canonical_goal": "put a cool apple in sidetable.",
+        "prototype": {
+          "canonical_goal": "put a cool apple in sidetable.",
+          "target_object": "apple",
+          "source_receptacles": [
+            "sidetable"
+          ],
+          "transformation": "COOL",
+          "transformation_devices": [
+            "fridge"
+          ],
+          "destination_receptacles": [
+            "sidetable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "OPEN",
+            "PICK",
+            "COOL",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": false
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_113844_191747",
+      "external_goal": "Place a rinsed spoon on a counter.",
+      "canonical_goal": "clean some ladle and put it in countertop.",
+      "expected_target": "ladle",
+      "expected_destination": "countertop",
+      "query_structure": {
+        "target_object": "ladle",
+        "transformation": "CLEAN",
+        "destination": "countertop"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_c84f454183d7",
+        "score": 0.8206307659600051,
+        "canonical_goal": "clean some spatula and put it in countertop.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_ddb6a5132ab0",
+        "score": 0.9244780171392585,
+        "canonical_goal": "clean some ladle and put it in cabinet.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_ddb6a5132ab0",
+        "score": 0.9244780171392585,
+        "canonical_goal": "clean some ladle and put it in cabinet.",
+        "prototype": {
+          "canonical_goal": "clean some ladle and put it in cabinet.",
+          "target_object": "ladle",
+          "source_receptacles": [
+            "countertop"
+          ],
+          "transformation": "CLEAN",
+          "transformation_devices": [
+            "sinkbasin"
+          ],
+          "destination_receptacles": [
+            "cabinet"
+          ],
+          "event_chain": [
+            "GOTO",
+            "LOOK",
+            "PICK",
+            "CLEAN",
+            "OPEN",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": false
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_121908_219603",
+      "external_goal": "Place a clean ladle on a counter.",
+      "canonical_goal": "put a clean ladle in countertop.",
+      "expected_target": "ladle",
+      "expected_destination": "countertop",
+      "query_structure": {
+        "target_object": "ladle",
+        "transformation": "CLEAN",
+        "destination": "countertop"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.8453700870248354,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.9128450887261701,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.9128450887261701,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "prototype": {
+          "canonical_goal": "put a clean ladle in diningtable.",
+          "target_object": "ladle",
+          "source_receptacles": [
+            "countertop"
+          ],
+          "transformation": "CLEAN",
+          "transformation_devices": [
+            "sinkbasin"
+          ],
+          "destination_receptacles": [
+            "diningtable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "LOOK",
+            "INVENTORY",
+            "PICK",
+            "CLEAN",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": false
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190909_183724_205399",
+      "external_goal": "Put a clean large metal spoon on the round white table.",
+      "canonical_goal": "put a clean ladle in diningtable.",
+      "expected_target": "ladle",
+      "expected_destination": "diningtable",
+      "query_structure": {
+        "target_object": "ladle",
+        "transformation": "CLEAN",
+        "destination": "diningtable"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_114dd4f79502",
+        "score": 0.8461664950186698,
+        "canonical_goal": "put a clean spoon in diningtable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.9999999631036802,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "exact_canonical_match": true
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.9999999631036802,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "prototype": {
+          "canonical_goal": "put a clean ladle in diningtable.",
+          "target_object": "ladle",
+          "source_receptacles": [
+            "countertop"
+          ],
+          "transformation": "CLEAN",
+          "transformation_devices": [
+            "sinkbasin"
+          ],
+          "destination_receptacles": [
+            "diningtable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "LOOK",
+            "INVENTORY",
+            "PICK",
+            "CLEAN",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": true
+      }
+    },
+    {
+      "sample_id": "alfworld:valid_seen:trial_T20190911_131350_027076",
+      "external_goal": "put clean spoon on the table",
+      "canonical_goal": "clean some ladle and put it in diningtable.",
+      "expected_target": "ladle",
+      "expected_destination": "diningtable",
+      "query_structure": {
+        "target_object": "ladle",
+        "transformation": "CLEAN",
+        "destination": "diningtable"
+      },
+      "external_query_retrieval": {
+        "skill_id": "high_task_114dd4f79502",
+        "score": 0.9531874025052401,
+        "canonical_goal": "put a clean spoon in diningtable.",
+        "exact_canonical_match": false
+      },
+      "canonical_query_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.961165632624601,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "exact_canonical_match": false
+      },
+      "structured_canonical_retrieval": {
+        "skill_id": "high_task_3e8308c89abd",
+        "score": 0.961165632624601,
+        "canonical_goal": "put a clean ladle in diningtable.",
+        "prototype": {
+          "canonical_goal": "put a clean ladle in diningtable.",
+          "target_object": "ladle",
+          "source_receptacles": [
+            "countertop"
+          ],
+          "transformation": "CLEAN",
+          "transformation_devices": [
+            "sinkbasin"
+          ],
+          "destination_receptacles": [
+            "diningtable"
+          ],
+          "event_chain": [
+            "GOTO",
+            "LOOK",
+            "INVENTORY",
+            "PICK",
+            "CLEAN",
+            "PUT"
+          ],
+          "target_count": 1
+        },
+        "exact_structure_match": true
+      }
+    }
+  ]
+}

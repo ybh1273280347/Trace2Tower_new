@@ -187,3 +187,63 @@ Mid 检索。
 `experiments/alfworld/official/validation/labeled-mid-failure-diagnostic.json`。
 在线运行：
 `artifacts/runs/alfworld-dev-v1-flash-high-labeled-mid-v10-nine-failures-r0/`。
+
+## 对象条件化 High 诊断（v11）
+
+v9 的五张 High 卡虽然覆盖了搬运、加热、照明、清洗和冷却的端到端事件链，
+但渲染内容把训练社区中的对象、来源和目的地全部泛化为 `target item`、
+`named destination` 和 `relevant fixture`。这不是社区发现本身要求的抽象，
+而是渲染契约丢失了具体任务条件。离线审计据此增加对象条件化层：只消除
+`ladle 2` 之类实例编号，保留 `ladle`、`sinkbasin`、`countertop`、变换事件和
+数量关系。
+
+P310 的 850 条成功轨迹包含 179 个 canonical goal；其中 160 个目标至少有 4 条
+成功支持，共覆盖 813/850（95.65%）成功轨迹。若把事件、对象、来源和目的地
+全部硬编码为社区 ID，会碎成 205 个原型；若以 canonical goal 形成具体任务
+子社区，则训练池的 repeat 支持足以构建 160 张任务卡。因此正确实现不是回到
+五张高度抽象的任务族卡，也不是把每个场景实例切成独立簇，而是保留事件图的
+Mid 结构，并在 High 社区内保存可检索的具体任务原型。
+
+检索键与注入内容也必须拆分。v11 只对 160 条 canonical goal 建 High 索引，
+具体执行卡仍保留完整动作链和失败约束；索引总计仅消耗 1,533 embedding input
+tokens。对 9 条人工 Mid 仍失败的难例，纯语义 Top-1 即使使用 canonical goal，
+仍会把 `clean mug` 召回成 `cool mug`，或把 `countertop` 召回成
+`diningtable/cabinet`。结构门控后，目标对象匹配 9/9，对象与官方事件同时匹配
+8/9，目的地匹配 5/9，三者完全匹配 4/9。正式门控因此要求对象、事件和目的地
+完全兼容，语义相似度只在兼容卡之间排序；无兼容卡时不得注入错误具体卡。
+
+实验还定位并修复了 ALFWorld 适配器错误：环境 reset observation 已给出真实
+`Your task is to:`，但旧实现仍把 parquet 的外部 `goal_text` 作为主任务提示。
+三条噪声样本的外部标题写 `spoon/large metal spoon`，真实任务和动作词表使用
+`ladle`。仅让检索使用 canonical goal 仍会被主提示中的错误 `spoon` 压制；
+修复后，ALFWorld 统一使用 reset observation 的 canonical goal，解析失败才回退
+外部标题。该修复对所有方法一致，不是 Tower 特判。
+
+在线结果如下。九条样本此前在 v9 三信号 Mid 与人工 Mid 下均为 0/9：
+
+| v11 条件 | 样本数 | 成功数 | 结果 |
+|---|---:|---:|---:|
+| 对象 + 事件 + 目的地有完全匹配具体社区 | 4 | 4 | 100.00% |
+| 无完整三元组，按同对象/同事件链查询时绑定具体目标 | 5 | 1 | 20.00% |
+| 合计 | 9 | 5 | 55.56% |
+
+完全匹配的 4 条分别为 `cool pan -> stoveburner`、`cool pot -> diningtable`，以及
+两条 `clean ladle -> diningtable`，全部成功。后两条原本受外部 `spoon` 噪声
+影响，canonical 主任务修复后均正确拿取、清洗并放置 ladle。fallback 唯一成功
+为 `clean mug -> coffeemachine`；其余 4 条都在 20 步内搜索耗尽，没有再次执行
+错误变换或错误目的地。这说明任务绑定问题已经得到实质修复，剩余瓶颈是社区
+没有提供足够可靠的对象来源先验，而不是需要重新把技能抽象成 functional role。
+
+这组 5/9 是算法诊断，不直接替代旧 NoSkill、Manual、SkillX 的正式横向结果。
+原因是 ALFWorld 主任务文本契约已经从脏外部标题修正为环境 canonical goal；最终
+测试必须让所有 baseline 使用同一适配器后重跑，才能进行公平比较。
+
+离线产物：
+
+- `experiments/alfworld/official/validation/object-conditioned-community-audit.json`
+- `experiments/alfworld/official/validation/object-conditioned-retrieval-failure-audit.json`
+
+在线运行：
+
+- `artifacts/runs/alfworld-dev-v1-flash-object-conditioned-high-v11-canonical-exact4-r0/`
+- `artifacts/runs/alfworld-dev-v1-flash-object-conditioned-bound-high-v11-fallback5-r0/`
