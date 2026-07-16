@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -38,6 +39,7 @@ from trace2tower.methods.trace2tower.webshop_events import (
     WebShopEventClassifier,
     classify_webshop_steps,
     segment_webshop_trajectory,
+    webshop_entity_signature,
     webshop_segment_signature,
 )
 from trace2tower.results import FinishReason, MethodName
@@ -323,6 +325,45 @@ def test_webshop_consecutive_events_merge_with_closed_boundaries() -> None:
     assert "SELECT_OPTION(value=blue" in signature
     assert "SELECT_OPTION(value=large" in signature
     assert "Next event: PURCHASE_DECISION" in signature
+
+
+def test_webshop_entity_signature_centers_product_and_constraints() -> None:
+    segment = SegmentInstance(
+        segment_id="entity-segment",
+        trajectory_id="entity-trajectory",
+        start_step=0,
+        end_step=0,
+        transition_ids=("transition",),
+        embedding=(1.0, 0.0),
+        trajectory_score=1.0,
+        event_type=WebShopEventType.OPTION_SELECTION,
+        raw_actions=(
+            json.dumps({"name": "click_action", "arguments": {"value": "blue"}}),
+        ),
+        observation_before=(
+            "Product: Blue Travel Mug\n"
+            "Price: $19.99\n"
+            "Options:\n"
+            "- color: blue, red"
+        ),
+        observation_after=(
+            "Product: Blue Travel Mug\n"
+            "Price: $19.99\n"
+            "Selected: {'color': 'blue'}"
+        ),
+    )
+
+    signature = webshop_entity_signature(
+        segment,
+        goal="buy a blue travel mug under 25 dollars",
+        previous_event=WebShopEventType.CANDIDATE_SELECTION,
+        next_event=WebShopEventType.PURCHASE_DECISION,
+    )
+
+    assert "Target product and constraints: buy a blue travel mug under 25 dollars" in signature
+    assert "PRODUCT title=blue travel mug" in signature
+    assert "options=color=blue, red" in signature
+    assert "Entity relation: configure candidate product variant" in signature
 
 
 def test_change_point_dp_uses_semantic_groups_and_maximum_length() -> None:

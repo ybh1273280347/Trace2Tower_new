@@ -25,8 +25,10 @@ from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
 from trace2tower.methods.trace2tower.transitions import build_transitions
 from trace2tower.methods.trace2tower.webshop_events import (
     segment_webshop_trajectory,
+    webshop_entity_signature,
     webshop_segment_signature,
 )
+from trace2tower.methods.trace2tower.models import WebShopSignatureMode
 from trace2tower.trajectory import TrajectoryReader
 
 
@@ -62,6 +64,11 @@ async def main(options: argparse.Namespace) -> None:
         "output": options.output.as_posix(),
         "embedding_concurrency": options.embedding_concurrency,
         "dry_run": options.dry_run,
+        "webshop_signature_mode": (
+            options.webshop_signature_mode.value
+            if benchmark is Benchmark.WEBSHOP
+            else None
+        ),
     }
     print(yaml.safe_dump({"common": common, "invocation": invocation}))
     if options.dry_run:
@@ -111,10 +118,15 @@ async def main(options: argparse.Namespace) -> None:
                 )
     else:
         texts = []
+        signature_builder = (
+            webshop_entity_signature
+            if options.webshop_signature_mode is WebShopSignatureMode.PRODUCT_ENTITY
+            else webshop_segment_signature
+        )
         for trajectory, segments in zip(trajectories, segment_groups, strict=True):
             for index, segment in enumerate(segments):
                 texts.append(
-                    webshop_segment_signature(
+                    signature_builder(
                         segment,
                         goal=trajectory.task_goal,
                         previous_event=(segments[index - 1].event_type if index else None),
@@ -188,7 +200,10 @@ async def main(options: argparse.Namespace) -> None:
         "embedding_model": os.environ["EMBEDDING_MODEL"],
         "embedding_dimension": common["embedding_dimension"],
         "embedding_input": (
-            "task_entity_event_context_signature"
+            "task_product_entity_signature"
+            if benchmark is Benchmark.WEBSHOP
+            and options.webshop_signature_mode is WebShopSignatureMode.PRODUCT_ENTITY
+            else "task_entity_event_context_signature"
             if benchmark in (Benchmark.ALFWORLD, Benchmark.WEBSHOP)
             else "compact_event_segment_signature"
         ),
@@ -215,5 +230,11 @@ if __name__ == "__main__":
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     parser.add_argument("--embedding-concurrency", type=int)
+    parser.add_argument(
+        "--webshop-signature-mode",
+        type=WebShopSignatureMode,
+        choices=tuple(WebShopSignatureMode),
+        default=WebShopSignatureMode.EVENT_CONTEXT,
+    )
     parser.add_argument("--dry-run", action="store_true")
     asyncio.run(main(parser.parse_args()))

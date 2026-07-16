@@ -232,6 +232,27 @@ tower PC、iPhone case 被召回为 screen protector、curtains 被召回为 hai
 而 5 个救回样本的商品类别均匹配。ALFWorld 的 High 则主要提供可跨对象迁移的长程
 程序骨架，因此同样的 Top-K 计划在该数据集上更容易产生正向增量。
 
+### v7 商品实体中心图诊断
+
+为验证“商品本身作为建模核心”，在同一历史 P200 上将 WebShop 签名改为商品标题、
+价格、选项和目标约束为主语，事件只保留为实体关系，并恢复全局语义邻居。该表示得到
+70 个 Mid、15 个 High，跨事件边增加到 9,560，但 High 路径复用显著下降。
+
+| WebShop Test-A | reward | 完全成功率 | 平均步数 | 无效动作 | 输入 token |
+|---|---:|---:|---:|---:|---:|
+| NoSkill | 0.68075 | 51% | 7.98 | 0.36 | 21,388 |
+| v6 连续残差图 | 0.67417 | 50% | 9.15 | 0.23 | 39,106 |
+| v7 商品实体中心图 | 0.65333 | 46% | 9.75 | 0.21 | 40,968 |
+
+v7 相对 v6 的配对 reward 差为 -0.02083，95% 区间 [-0.08050, +0.03900]；相对
+NoSkill 为 -0.02742，区间 [-0.08375, +0.02817]。原先的商品类别错配仍会出现，
+同时 101 条 High 降为 15 条，说明把完整商品上下文直接作为 embedding 核心会过度
+碎片化实体，破坏 High 的跨样本流程复用。v7 保留为实体中心消融，不作为部署版本。
+
+当前更合理的方向不是“流程”或“商品”二选一，而是双层表示：Mid 使用商品实体和
+属性约束进行对象条件化，High 仍从关系图中的可复用行为结构归纳；商品实体负责绑定
+候选与约束，流程关系负责跨商品复用。该方向尚未完成新的全量实验。
+
 ## 机制消融
 
 ### 关系图和 High 路径
@@ -570,6 +591,7 @@ WebShop 中的搜索、商品选项和购买动作只是领域事件的具体实
 | WebShop 连续残差 v6 P100/P200 图             | 连续边权算法修复         | 完成 |
 | WebShop v6 P200 Test-A                      | 覆盖度与正式效果验证       | 完成 |
 | WebShop v6 validation/Test-B                | 跨 split 泛化审计          | 完成 |
+| WebShop v7 商品实体中心图 Test-A            | 商品核心表示诊断          | 完成（未采用） |
 | Top-3 High → GPT-5.4 pseudo-High           | 对齐运行时计划改写能力      | 完成 |
 | pseudo-High 步骤召回 + Mid self-filter         | 控制具体 Mid 噪声      | 完成 |
 | ALFWorld hard35 与 manual-gap6              | 后验失败机制门控         | 完成 |
@@ -598,3 +620,5 @@ WebShop 中的搜索、商品选项和购买动作只是领域事件的具体实
 - `continuous-graph-v6-split-audit.json`
 - `artifacts/runs/webshop-validation-flash-entity-graph-v6-p200-continuous-r0/`
 - `artifacts/runs/webshop-test-b-flash-entity-graph-v6-p200-continuous-r0/`
+- `artifacts/trace2tower/webshop/original-concept-v7/p200/tower.json`
+- `artifacts/runs/webshop-test-a-flash-entity-graph-v7-product-entity-r0/`

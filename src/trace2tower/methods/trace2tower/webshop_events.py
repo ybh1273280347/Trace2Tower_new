@@ -16,6 +16,9 @@ from trace2tower.trajectory import EpisodeTrajectory, StepRecord
 
 DETAIL_VALUES = {"description", "features", "reviews", "attributes"}
 ASIN_PATTERN = re.compile(r"^[A-Za-z0-9]{8,16}$")
+RESULT_ENTITY_PATTERN = re.compile(
+    r"^(?P<asin>[A-Za-z0-9]{8,16})\s*\|\s*(?P<title>.*?)\s*\|\s*(?P<price>.+)$"
+)
 
 
 def infer_webshop_page_type(observation: str) -> WebShopPageType:
@@ -276,6 +279,84 @@ def webshop_segment_signature(
             f"Page after: {after_context}",
         )
     )
+
+
+def webshop_entity_signature(
+    segment: SegmentInstance,
+    *,
+    goal: str = "",
+    previous_event: WebShopEventType | None = None,
+    next_event: WebShopEventType | None = None,
+) -> str:
+    """用商品实体和约束状态表达片段，事件只作为实体关系保留。"""
+    if segment.event_type is None:
+        raise ValueError("WebShop entity signature requires an event type")
+    relation = {
+        WebShopEventType.QUERY_FORMULATION: "formulate search for target product",
+        WebShopEventType.QUERY_REFINEMENT: "refine search for target product",
+        WebShopEventType.RESULT_NAVIGATION: "navigate candidate product set",
+        WebShopEventType.CANDIDATE_SELECTION: "open candidate product",
+        WebShopEventType.OPTION_SELECTION: "configure candidate product variant",
+        WebShopEventType.ATTRIBUTE_INSPECTION: "verify candidate product attributes",
+        WebShopEventType.DETAIL_BACKTRACKING: "return to candidate product",
+        WebShopEventType.SEARCH_BACKTRACKING: "return to target product search",
+        WebShopEventType.PURCHASE_DECISION: "purchase verified product",
+        WebShopEventType.OTHER_CLICK: "interact with product state",
+    }[segment.event_type]
+    return "\n".join(
+        (
+            f"Target product and constraints: {_normalize_text(goal)}",
+            f"Observed entity before: {_product_entity_context(segment.observation_before)}",
+            f"Observed entity after: {_product_entity_context(segment.observation_after)}",
+            f"Entity relation: {relation}",
+            f"Previous relation: {previous_event.value if previous_event else 'START'}",
+            f"Next relation: {next_event.value if next_event else 'END'}",
+            f"Actions: {' -> '.join(segment.raw_actions)}",
+        )
+    )
+
+
+def _product_entity_context(observation: str) -> str:
+    lines = tuple(line.strip() for line in observation.splitlines() if line.strip())
+    if not lines:
+        return "EMPTY"
+    if lines[0].casefold() == "webshop search page.":
+        return "SEARCH_SPACE"
+    products = []
+    title = ""
+    price = ""
+    options = []
+    selected = ""
+    for line in lines:
+        lowered = line.casefold()
+        if lowered.startswith("product:"):
+            title = _normalize_text(line.split(":", 1)[1])
+        elif lowered.startswith("price:"):
+            price = _normalize_text(line.split(":", 1)[1])
+        elif lowered.startswith("selected:"):
+            selected = _normalize_text(line.split(":", 1)[1])
+        elif line.startswith("- ") and ":" in line:
+            name, values = line[2:].split(":", 1)
+            options.append(f"{_normalize_text(name)}={_normalize_text(values)[:160]}")
+        else:
+            match = RESULT_ENTITY_PATTERN.match(line)
+            if match:
+                products.append(
+                    f"{_normalize_text(match.group('title'))}"
+                    f" price={_normalize_text(match.group('price'))[:40]}"
+                )
+    if title:
+        context = [f"PRODUCT title={title[:240]}"]
+        if price:
+            context.append(f"price={price[:40]}")
+        if options:
+            context.append("options=" + "; ".join(options[:6]))
+        if selected:
+            context.append(f"selected={selected[:160]}")
+        return " | ".join(context)
+    if products:
+        return "RESULT_SET " + " || ".join(products[:5])
+    return infer_webshop_page_type(observation).value
 
 
 def _compact_page_context(observation: str) -> str:

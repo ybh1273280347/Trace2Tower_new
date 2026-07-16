@@ -60,6 +60,11 @@ class WebShopEventType(StrEnum):
     OTHER_CLICK = "OTHER_CLICK"
 
 
+class WebShopSignatureMode(StrEnum):
+    EVENT_CONTEXT = "event_context"
+    PRODUCT_ENTITY = "product_entity"
+
+
 class HighPathDiscovery(StrEnum):
     CONTRASTIVE_SUBSEQUENCE = "contrastive_subsequence"
     GOAL_CONDITIONED_TRAJECTORY = "goal_conditioned_trajectory"
