@@ -274,6 +274,12 @@ Low 0`：
 叙事更有潜力，但完全成功率未提升、输入增加约 10,046 token，不能升级为主结果。
 完整记录见 `decision-state-v8-test-a.json`。
 
+同一 snapshot 的 validation repeat0 为 reward 0.68725、完全成功率 47%、平均步数
+7.90；NoSkill 为 0.65235、47%、7.69。配对 reward 差 +0.03490，95% 区间
+[-0.03190, +0.10717]。Test-A 与 validation 的点估计同向，但区间均跨零，且 v8
+在 validation 上平均多 0.21 步、无效动作多 0.10，当前只能记录为 split-sensitive
+正向信号，不能宣称稳定泛化。
+
 ### 双层表示前置实验：手写决策执行卡
 
 在实现双层 renderer 之前，先用一张独立的手写 WebShop skill 验证“全局端到端指导

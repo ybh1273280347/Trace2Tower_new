@@ -48,5 +48,23 @@
     "mean_invalid_action_difference": 0.02,
     "mean_input_token_difference": 10046.24
   },
+  "validation_repeat0": {
+    "run_id": "webshop-validation-flash-decision-state-v8-p200-r0",
+    "baseline_run_id": "webshop-original-concept-v1-validation-flash-noskill-r1",
+    "episodes": 100,
+    "mean_reward": 0.68725,
+    "baseline_mean_reward": 0.65235,
+    "mean_reward_difference": 0.03490,
+    "reward_confidence_interval_95": [-0.0319008333, 0.1071683333],
+    "full_success_rate": 0.47,
+    "baseline_full_success_rate": 0.47,
+    "full_success_confidence_interval_95": [-0.07, 0.07],
+    "mean_steps": 7.90,
+    "baseline_mean_steps": 7.69,
+    "mean_invalid_actions": 0.40,
+    "baseline_mean_invalid_actions": 0.30,
+    "mean_input_tokens": 28997.54,
+    "baseline_mean_input_tokens": 19572.0
+  },
   "conclusion": "Decision-tree High cards avoid the previous linear rendering collapse and produce a positive mean-reward point estimate with twice as many zero-score rescues as regressions. The confidence interval crosses zero and full success does not improve, so v8 is promising representation evidence rather than a new main result."
 }
