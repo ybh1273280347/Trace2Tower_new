@@ -80,7 +80,7 @@ def test_extract_plain_move_without_transformation() -> None:
     assert prototype.destination_receptacles == ("safe",)
 
 
-def test_extract_light_task_as_object_conditioned_toggle() -> None:
+def test_extract_light_task_as_toggle_prototype() -> None:
     prototype = extract_task_prototype(
         {
             "steps": [

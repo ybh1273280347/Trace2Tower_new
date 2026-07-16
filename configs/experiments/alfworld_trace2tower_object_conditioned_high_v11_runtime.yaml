@@ -1,5 +1,0 @@
-method: trace2tower
-retrieval_strategy: object_conditioned_high
-high_similarity_threshold: -1.0
-object_conditioned_profile: artifacts/trace2tower/alfworld/original-concept-v11/p310/high-structure.json
-

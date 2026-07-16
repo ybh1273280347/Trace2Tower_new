@@ -33,9 +33,11 @@ from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.trace2tower.labeled_mid_provider import (
     LabeledMidDiagnosticProvider,
 )
-from trace2tower.methods.trace2tower.object_conditioned_provider import (
-    ObjectConditionedHighProvider,
+from trace2tower.methods.trace2tower.task_adapter_factory import task_adapter_for
+from trace2tower.methods.trace2tower.task_conditioned_provider import (
+    TaskConditionedHighProvider,
 )
+from trace2tower.methods.trace2tower.task_conditioning import TaskCompatibility
 from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
 from trace2tower.methods.trace2tower.three_signal_provider import (
     ThreeSignalTrace2TowerSkillProvider,
@@ -193,23 +195,24 @@ def create_provider(
             "graph",
             "labeled_mid_diagnostic",
             "three_signal_graph",
-            "object_conditioned_high",
+            "task_conditioned_high",
         }:
             raise ValueError("unknown Tower retrieval strategy")
         diverse = retrieval_strategy == "diverse"
         graph = retrieval_strategy == "graph"
         labeled_mid_diagnostic = retrieval_strategy == "labeled_mid_diagnostic"
         three_signal_graph = retrieval_strategy == "three_signal_graph"
-        object_conditioned_high = retrieval_strategy == "object_conditioned_high"
+        task_conditioned_high = retrieval_strategy == "task_conditioned_high"
         hierarchical = method_config.get("retrieval_contract") == "hierarchical"
-        if object_conditioned_high:
-            return ObjectConditionedHighProvider.from_path(
+        if task_conditioned_high:
+            return TaskConditionedHighProvider.from_path(
                 runtime,
                 artifact.path,
-                profile_path=Path(method_config["object_conditioned_profile"]),
+                profile_path=Path(method_config["task_condition_profile"]),
+                adapter=task_adapter_for(artifact.benchmark),
                 similarity_threshold=float(method_config["high_similarity_threshold"]),
-                allow_query_conditioning=bool(
-                    method_config.get("allow_query_conditioning", False)
+                minimum_compatibility=TaskCompatibility(
+                    method_config["minimum_task_compatibility"]
                 ),
             )
         common_kwargs = {
@@ -490,9 +493,9 @@ async def main(options: argparse.Namespace) -> int:
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_strategy") == "object_conditioned_high":
+        if method_config.get("retrieval_strategy") == "task_conditioned_high":
             if options.direct_mid_top_k is not None:
-                raise ValueError("object-conditioned High does not accept Mid caps")
+                raise ValueError("task-conditioned High does not accept Mid caps")
         elif method_config.get("retrieval_contract") == "hierarchical":
             limits = tuple(
                 int(method_config[field])

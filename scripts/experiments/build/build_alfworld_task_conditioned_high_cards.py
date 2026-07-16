@@ -9,12 +9,17 @@ from pathlib import Path
 from trace2tower.methods.trace2tower.alfworld_task_prototypes import (
     extract_task_prototype,
 )
+from trace2tower.methods.trace2tower.alfworld_task_adapter import AlfworldTaskAdapter
 from trace2tower.methods.trace2tower.models import (
     AlfworldEventType,
     HighCommunity,
     PrimitiveAction,
 )
 from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
+from trace2tower.methods.trace2tower.task_conditioning import (
+    SkillTaskCondition,
+    TaskConditionProfile,
+)
 
 
 def _normalized_action(action: str) -> str:
@@ -65,6 +70,7 @@ def _event_community(structure: dict) -> dict[AlfworldEventType | None, dict]:
 
 
 def main(options: argparse.Namespace) -> int:
+    adapter = AlfworldTaskAdapter()
     groups: dict[str, list[dict]] = defaultdict(list)
     with options.trajectories.open(encoding="utf-8") as source:
         for line in source:
@@ -89,6 +95,7 @@ def main(options: argparse.Namespace) -> int:
     high_cards = []
     communities = []
     discovery = []
+    task_conditions = []
     for goal, records in sorted(groups.items()):
         if len(records) < options.min_support:
             continue
@@ -122,6 +129,12 @@ def main(options: argparse.Namespace) -> int:
                 ),
             )
         )
+        task_conditions.append(
+            SkillTaskCondition(
+                community_id,
+                adapter.profile_condition(prototype.to_record()),
+            )
+        )
         discovery.append(
             {
                 "community_id": community_id,
@@ -151,12 +164,16 @@ def main(options: argparse.Namespace) -> int:
             "paths": structure["paths"],
             "communities": [community.to_record() for community in communities],
             "discovery": {
-                "contract": "canonical_goal_object_conditioned_diagnostic_v1",
+                "contract": "domain_task_condition_v1",
                 "min_support": options.min_support,
                 "community_count": len(communities),
                 "communities": discovery,
             },
         },
+    )
+    _write_json(
+        options.output_profile,
+        TaskConditionProfile(adapter.domain, tuple(task_conditions)).to_record(),
     )
     print(
         json.dumps(
@@ -181,6 +198,7 @@ if __name__ == "__main__":
     parser.add_argument("--base-structure", type=Path, required=True)
     parser.add_argument("--output-cards", type=Path, required=True)
     parser.add_argument("--output-structure", type=Path, required=True)
+    parser.add_argument("--output-profile", type=Path, required=True)
     parser.add_argument("--min-support", type=int, default=4)
     parser.add_argument("--success-threshold", type=float, default=0.999)
     raise SystemExit(main(parser.parse_args()))

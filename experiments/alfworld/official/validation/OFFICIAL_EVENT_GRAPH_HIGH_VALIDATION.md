@@ -247,3 +247,8 @@ tokens。对 9 条人工 Mid 仍失败的难例，纯语义 Top-1 即使使用 c
 
 - `artifacts/runs/alfworld-dev-v1-flash-object-conditioned-high-v11-canonical-exact4-r0/`
 - `artifacts/runs/alfworld-dev-v1-flash-object-conditioned-bound-high-v11-fallback5-r0/`
+
+上述 v11 诊断随后已迁移到统一 `DomainTaskAdapter + TaskConditionProfile` 接口。
+ALFWorld 对象、事件和目的地仅存在于领域适配器，核心 provider 和检索器不读取这些
+字段；WebShop 已使用同一接口完成真实 P100 T1 快照加载和在线冒烟。统一契约与
+跨域边界见 `experiments/TASK_CONDITIONING_INTERFACE.md`。
