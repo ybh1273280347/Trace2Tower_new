@@ -105,3 +105,9 @@ v8 相对 NoSkill 的配对 reward 差为 +0.01992，95% 区间
 47%。因此 Test-A 和 validation 的奖励点估计方向一致，但两个区间都跨零，且 v8
 平均步数和无效动作略高。当前应称为 split-sensitive 的正向奖励信号，不能称为稳定
 泛化优势。
+
+后续实际注入审计见 `V8_SKILL_INJECTION_AUDIT.md`。核心问题是 v8 将单个训练任务
+渲染为具体 High，却以 `high_similarity_threshold=-1.0` 强制给所有测试任务分配一张
+High；错误 High 的 child Mid 又会绕过 direct Mid 门槛优先注入。旧图卡片虽然来自
+错误的流程聚类，但内容实体中立，错误召回的危害更低。这解释了具体 v8 skill 为何
+反而弱于旧图 skill。

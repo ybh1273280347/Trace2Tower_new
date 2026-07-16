@@ -280,6 +280,14 @@ Low 0`：
 在 validation 上平均多 0.21 步、无效动作多 0.10，当前只能记录为 split-sensitive
 正向信号，不能宣称稳定泛化。
 
+后续注入审计定位了 v8 低于旧 graph-cap3 的直接原因。29 张 v8 High 都绑定一个具体
+训练任务，但 runtime 使用 `high_similarity_threshold=-1.0`，导致每个测试任务都被
+强制分配一张具体 High。错误 High 的 child Mid 又会仅凭事件兼容优先占用 Mid 预算。
+最大回退样本中出现了 jeans→dress shirt、perfume→lotion、curtains→rug、smoothie
+mix→jerky、spa chair→sandals 等明确错绑。旧图卡片虽然来自错误聚类，却是实体中立
+的 search/option/verify scaffold，错误召回不会覆盖当前商品目标，因此反而更稳。完整
+证据和联网对照见 `V8_SKILL_INJECTION_AUDIT.md`。
+
 ### 双层表示前置实验：手写决策执行卡
 
 在实现双层 renderer 之前，先用一张独立的手写 WebShop skill 验证“全局端到端指导
