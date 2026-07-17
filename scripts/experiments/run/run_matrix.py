@@ -36,6 +36,7 @@ from trace2tower.methods.trace2tower.artifacts.tower import TowerSnapshot
 from trace2tower.methods.trace2tower.inference.plan_rewrite import (
     PlanRewriteTrace2TowerProvider,
 )
+from trace2tower.methods.trace2tower.deployment_optimization.policy import DeploymentPolicy
 from trace2tower.methods.trace2tower.inference.provider import (
     HighToMidSkillProvider,
 )
@@ -163,6 +164,10 @@ def create_provider(
         if contract == "plan_rewrite":
             if artifact.benchmark is not Benchmark.ALFWORLD:
                 raise ValueError("plan_rewrite is the frozen ALFWorld runtime contract")
+            policy_path = method_config.get("deployment_policy")
+            policy = DeploymentPolicy.from_path(Path(policy_path)) if policy_path else None
+            if policy is not None and policy.snapshot_id != artifact.artifact_id:
+                raise ValueError("deployment policy targets a different Tower snapshot")
             return PlanRewriteTrace2TowerProvider.from_path(
                 runtime,
                 artifact.path,
@@ -176,6 +181,7 @@ def create_provider(
                 ),
                 rewrite_model_role=ModelRole(method_config["rewrite_model_role"]),
                 rewrite_max_output_tokens=int(method_config["rewrite_max_output_tokens"]),
+                high_score_penalties=(policy.score_penalties if policy else None),
             )
         if contract != "high_to_mid":
             raise ValueError("unsupported Tower retrieval contract")

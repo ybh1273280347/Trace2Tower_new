@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from trace2tower.benchmarks.models import EnvironmentState
@@ -50,6 +51,7 @@ class PlanRewriteTrace2TowerProvider:
         expose_reference_mid_evidence: bool,
         rewrite_model_role: ModelRole,
         rewrite_max_output_tokens: int,
+        high_score_penalties: Mapping[str, float] | None = None,
     ):
         snapshot.require_complete()
         if not 1 <= reference_high_top_k <= len(snapshot.high_cards):
@@ -64,6 +66,11 @@ class PlanRewriteTrace2TowerProvider:
             raise ValueError("Mid similarity threshold must be in [-1, 1]")
         if rewrite_model_role is ModelRole.EMBEDDING:
             raise ValueError("plan rewrite requires a chat model role")
+        penalties = dict(high_score_penalties or {})
+        if set(penalties) - {card.skill_id for card in snapshot.high_cards} or any(
+            penalty < 0 for penalty in penalties.values()
+        ):
+            raise ValueError("plan rewrite High score penalties are invalid")
         self.runtime = runtime
         self.snapshot = snapshot
         self.adapter = AlfworldPlanRewriteAdapter()
@@ -75,6 +82,7 @@ class PlanRewriteTrace2TowerProvider:
         self.expose_reference_mid_evidence = expose_reference_mid_evidence
         self.rewrite_model_role = rewrite_model_role
         self.rewrite_max_output_tokens = rewrite_max_output_tokens
+        self.high_score_penalties = penalties
         self.high_cards = {card.skill_id: card for card in snapshot.high_cards}
         self.mid_cards = {card.skill_id: card for card in snapshot.mid_cards}
 
@@ -89,7 +97,9 @@ class PlanRewriteTrace2TowerProvider:
         references = tuple(
             self.high_cards[match.skill_id]
             for match in self.snapshot.high_index.search(
-                embedding.vectors[0], self.reference_high_top_k
+                embedding.vectors[0],
+                self.reference_high_top_k,
+                score_penalties=self.high_score_penalties,
             )
             if match.cosine_similarity >= self.high_similarity_threshold
         )
