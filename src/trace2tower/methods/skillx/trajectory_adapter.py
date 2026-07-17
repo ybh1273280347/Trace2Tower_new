@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from trace2tower.trajectory import EpisodeTrajectory
+from trace2tower.core.trajectory import EpisodeTrajectory
 
 
 def adapt_trajectory(trajectory: EpisodeTrajectory) -> dict:
@@ -19,8 +19,7 @@ def adapt_trajectory(trajectory: EpisodeTrajectory) -> dict:
         {
             "role": "user",
             "content": (
-                f"Task:\n{trajectory.task_goal}\n\n"
-                f"Observation:\n{trajectory.steps[0].observation}"
+                f"Task:\n{trajectory.task_goal}\n\nObservation:\n{trajectory.steps[0].observation}"
             ),
         },
     ]

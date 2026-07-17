@@ -1,27 +1,39 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from trace2tower.benchmarks.models import ClickableKind
-from trace2tower.llm_runtime import LLMUsage
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.methods.trace2tower.action_parser import (
+from trace2tower.components.llm_runtime import LLMUsage
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import FinishReason, MethodName
+from trace2tower.core.trajectory import EpisodeTrajectory, StepRecord
+from trace2tower.methods.trace2tower.adapters.alfworld.actions import (
     parse_alfworld_action,
-    parse_webshop_action,
 )
-from trace2tower.methods.trace2tower.alfworld_events import (
+from trace2tower.methods.trace2tower.adapters.alfworld.events import (
     alfworld_applicable_events,
     alfworld_goal_events,
     alfworld_segment_signature,
     classify_alfworld_transitions,
     segment_alfworld_trajectory,
 )
-from trace2tower.methods.trace2tower.models import (
+from trace2tower.methods.trace2tower.adapters.transitions import (
+    build_benchmark_transitions,
+)
+from trace2tower.methods.trace2tower.adapters.webshop.actions import (
+    parse_webshop_action,
+)
+from trace2tower.methods.trace2tower.adapters.webshop.events import (
+    WebShopEventClassifier,
+    classify_webshop_steps,
+    segment_webshop_trajectory,
+    webshop_segment_signature,
+)
+from trace2tower.methods.trace2tower.core.models import (
     AlfworldEventType,
     PrimitiveAction,
     SegmentInstance,
@@ -29,20 +41,11 @@ from trace2tower.methods.trace2tower.models import (
     WebShopEventType,
     WebShopPageType,
 )
-from trace2tower.methods.trace2tower.segmentation import (
+from trace2tower.methods.trace2tower.preprocessing.segmentation import (
     calibrate_segmentation_penalty,
     segment_boundaries,
 )
-from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
-from trace2tower.methods.trace2tower.transitions import build_transitions
-from trace2tower.methods.trace2tower.webshop_events import (
-    WebShopEventClassifier,
-    classify_webshop_steps,
-    segment_webshop_trajectory,
-    webshop_segment_signature,
-)
-from trace2tower.results import FinishReason, MethodName
-from trace2tower.trajectory import EpisodeTrajectory, StepRecord
+from trace2tower.methods.trace2tower.preprocessing.transition_encoder import TransitionEncoder
 
 
 @pytest.mark.parametrize(
@@ -114,7 +117,7 @@ def test_alfworld_uses_official_events_and_task_entity_signatures() -> None:
         primary_score=1,
         finish_reason=FinishReason.COMPLETED,
     )
-    transitions = build_transitions(trajectory)
+    transitions = build_benchmark_transitions(trajectory)
 
     assert classify_alfworld_transitions(transitions) == (
         AlfworldEventType.GOTO_LOCATION,
@@ -286,7 +289,7 @@ def test_webshop_consecutive_events_merge_with_closed_boundaries() -> None:
         primary_score=1,
         finish_reason=FinishReason.COMPLETED,
     )
-    transitions = build_transitions(trajectory)
+    transitions = build_benchmark_transitions(trajectory)
     segments = segment_webshop_trajectory(
         trajectory,
         transitions,

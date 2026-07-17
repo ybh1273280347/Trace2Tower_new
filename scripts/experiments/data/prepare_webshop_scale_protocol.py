@@ -8,22 +8,14 @@ from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
 
-
 POOL_SIZES = (50, 100, 200)
 TRAIN_REPEAT_IDS = (0, 1, 2, 3)
 EVALUATION_REPEAT_IDS = (0, 1, 2)
 
 
 def read_manifest(path: Path, expected_split: str) -> list[str]:
-    rows = [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line
-    ]
-    if any(
-        row["benchmark"] != "webshop" or row["split"] != expected_split
-        for row in rows
-    ):
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    if any(row["benchmark"] != "webshop" or row["split"] != expected_split for row in rows):
         raise ValueError(f"{path} is not a WebShop {expected_split} manifest")
     sample_ids = [str(row["sample_id"]) for row in rows]
     if len(sample_ids) != len(set(sample_ids)):
@@ -72,9 +64,7 @@ def main(options: argparse.Namespace) -> int:
             "repeat_ids": list(TRAIN_REPEAT_IDS),
             "train_selection_seed": options.train_seed,
             "p50_source_audit": options.p50_audit.as_posix(),
-            "p50_source_audit_sha256": hashlib.sha256(
-                options.p50_audit.read_bytes()
-            ).hexdigest(),
+            "p50_source_audit_sha256": hashlib.sha256(options.p50_audit.read_bytes()).hexdigest(),
             "pools": {
                 name: {
                     "task_count": size,
@@ -143,8 +133,7 @@ if __name__ == "__main__":
         "--p50-audit",
         type=Path,
         default=Path(
-            "artifacts/trajectories/webshop/multirepeat/"
-            "webshop-flash50-repeat4-pool-v1.audit.json"
+            "artifacts/trajectories/webshop/multirepeat/webshop-flash50-repeat4-pool-v1.audit.json"
         ),
     )
     parser.add_argument(

@@ -13,42 +13,39 @@ import yaml
 from dotenv import load_dotenv
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json, write_yaml
-from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-from trace2tower.manifests import (
+from trace2tower.components.agent import AgentEvaluator
+from trace2tower.components.llm_runtime import CommonLLMRuntime, ModelRole
+from trace2tower.core.manifests import (
     Benchmark,
     ExperimentSplit,
     ManifestEntry,
     expand_manifest_repeats,
     read_manifest,
 )
-from trace2tower.methods.global_e2e.models import GlobalE2ESkillLibrary
-from trace2tower.methods.global_e2e.provider import GlobalE2ESkillProvider
-from trace2tower.methods.manual_skill.provider import ManualSkillProvider
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryWriter
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
+from trace2tower.experiments.result_writer import EpisodeResultWriter
+from trace2tower.experiments.runner import run_shard
+from trace2tower.methods.expert_crafted import ExpertCraftedSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
-from trace2tower.methods.trace2tower.high_to_mid_provider import (
+from trace2tower.methods.trace2tower.artifacts.tower import TowerSnapshot
+from trace2tower.methods.trace2tower.inference.provider import (
     HighToMidSkillProvider,
 )
-from trace2tower.methods.trace2tower.tower import TowerSnapshot
-from trace2tower.results import EpisodeResultWriter, MethodName
-from trace2tower.runner import run_shard
-from trace2tower.trajectory import TrajectoryWriter
 
 EXECUTABLE_METHODS = (
     MethodName.NO_SKILL,
-    MethodName.MANUAL_SKILL,
-    MethodName.GLOBAL_E2E_GPT,
     MethodName.SKILLX,
+    MethodName.EXPERT_CRAFTED_SKILLS,
     MethodName.TRACE2TOWER,
 )
 METHOD_CONFIG_FILES = {
     MethodName.NO_SKILL: "webshop_no_skill.yaml",
-    MethodName.MANUAL_SKILL: "webshop_manual_skill.yaml",
-    MethodName.GLOBAL_E2E_GPT: "webshop_global_e2e.yaml",
+    MethodName.EXPERT_CRAFTED_SKILLS: "webshop_expert_crafted_skills.yaml",
     MethodName.SKILLX: "webshop_skillx.yaml",
     MethodName.TRACE2TOWER: "webshop_trace2tower_alfworld_isomorphic_runtime.yaml",
 }
@@ -84,9 +81,7 @@ def parse_shard_ids(value: str, num_shards: int) -> tuple[int, ...]:
     if value == "all":
         return tuple(range(num_shards))
     shard_ids = tuple(sorted({int(item) for item in value.split(",")}))
-    if not shard_ids or any(
-        shard_id < 0 or shard_id >= num_shards for shard_id in shard_ids
-    ):
+    if not shard_ids or any(shard_id < 0 or shard_id >= num_shards for shard_id in shard_ids):
         raise ValueError(f"shard IDs must be in [0, {num_shards})")
     return shard_ids
 
@@ -99,9 +94,7 @@ def parse_benchmark_paths(
     for value in values:
         benchmark_name, separator, raw_path = value.partition("=")
         if not separator or not raw_path:
-            raise ValueError(
-                f"expected BENCHMARK=PATH {assignment_name} assignment: {value}"
-            )
+            raise ValueError(f"expected BENCHMARK=PATH {assignment_name} assignment: {value}")
         benchmark = Benchmark(benchmark_name)
         if benchmark in paths:
             raise ValueError(f"duplicate {assignment_name} assignment for {benchmark}")
@@ -115,11 +108,7 @@ def load_method_artifact(
     path: Path,
 ) -> MethodArtifact:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if method is MethodName.GLOBAL_E2E_GPT:
-        library = GlobalE2ESkillLibrary.from_record(payload)
-        artifact_benchmark = library.benchmark
-        artifact_id = library.library_id
-    elif method is MethodName.SKILLX:
+    if method is MethodName.SKILLX:
         library = SkillXExecutionLibrary.from_record(payload)
         artifact_benchmark = library.benchmark
         artifact_id = library.library_id
@@ -150,8 +139,6 @@ def create_provider(
     artifact: MethodArtifact,
     method_config: dict,
 ):
-    if artifact.method is MethodName.GLOBAL_E2E_GPT:
-        return GlobalE2ESkillProvider.from_path(runtime, artifact.path)
     if artifact.method is MethodName.SKILLX:
         schemas = environment_type(artifact.benchmark).tool_schemas
         allowed_tools = {schema["function"]["name"] for schema in schemas}
@@ -214,14 +201,7 @@ async def run_matrix_shard(
     episode_semaphore: asyncio.Semaphore | None,
 ) -> dict:
     shard_name = f"shard-{shard_id:02d}"
-    run_dir = (
-        Path(common["runs_dir"])
-        / options.run_id
-        / benchmark
-        / split
-        / method
-        / shard_name
-    )
+    run_dir = Path(common["runs_dir"]) / options.run_id / benchmark / split / method / shard_name
     writer = (
         DryRunWriter()
         if options.dry_run
@@ -231,6 +211,7 @@ async def run_matrix_shard(
     )
 
     if runtime is None:
+
         async def unavailable_executor(entry, current_shard_id):
             raise RuntimeError("dry-run executor must not be called")
 
@@ -284,12 +265,12 @@ async def run_matrix_shard(
             skill_provider=(
                 provider.select_task
                 if provider and method in TOWER_ARTIFACT_METHODS
-                else provider.select if provider else None
+                else provider.select
+                if provider
+                else None
             ),
             state_skill_provider=(
-                provider.select_state
-                if provider and method in TOWER_ARTIFACT_METHODS
-                else None
+                provider.select_state if provider and method in TOWER_ARTIFACT_METHODS else None
             ),
         )
 
@@ -307,9 +288,7 @@ async def run_matrix_shard(
     result_path = run_dir / "results.jsonl"
     error_path = run_dir / "errors.jsonl"
     official_result_count = (
-        len(result_path.read_text(encoding="utf-8").splitlines())
-        if result_path.exists()
-        else 0
+        len(result_path.read_text(encoding="utf-8").splitlines()) if result_path.exists() else 0
     )
     metadata = {
         "run_id": options.run_id,
@@ -323,15 +302,11 @@ async def run_matrix_shard(
         "manifest_path": manifest_path.as_posix(),
         "result_path": result_path.as_posix(),
         "result_sha256": (
-            hashlib.sha256(result_path.read_bytes()).hexdigest()
-            if result_path.exists()
-            else None
+            hashlib.sha256(result_path.read_bytes()).hexdigest() if result_path.exists() else None
         ),
         "official_result_count": official_result_count,
         "error_attempt_count": (
-            len(error_path.read_text(encoding="utf-8").splitlines())
-            if error_path.exists()
-            else 0
+            len(error_path.read_text(encoding="utf-8").splitlines()) if error_path.exists() else 0
         ),
         "trajectory_count": len(tuple((run_dir / "trajectories").glob("*.json"))),
         "invocation_summary": asdict(summary),
@@ -343,19 +318,13 @@ async def run_matrix_shard(
 async def main(options: argparse.Namespace) -> int:
     method = MethodName(options.method)
     split = ExperimentSplit(options.split)
-    benchmarks = (
-        tuple(Benchmark)
-        if options.benchmark == "all"
-        else (Benchmark(options.benchmark),)
-    )
+    benchmarks = tuple(Benchmark) if options.benchmark == "all" else (Benchmark(options.benchmark),)
     common = load_yaml(options.config_root / "common.yaml")
     benchmark_configs = {
-        benchmark: load_yaml(options.config_root / f"{benchmark}.yaml")
-        for benchmark in benchmarks
+        benchmark: load_yaml(options.config_root / f"{benchmark}.yaml") for benchmark in benchmarks
     }
     method_config = load_yaml(
-        getattr(options, "method_config", None)
-        or options.config_root / METHOD_CONFIG_FILES[method]
+        getattr(options, "method_config", None) or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
         if method_config.get("retrieval_contract") != "high_to_mid":
@@ -376,28 +345,26 @@ async def main(options: argparse.Namespace) -> int:
         )
         for benchmark in benchmarks
     }
-    manual_skill = None
+    expert_crafted_skills = None
     if method is MethodName.NO_SKILL:
         if artifact_paths:
             raise ValueError("No-Skill does not accept method artifacts")
         artifacts = {}
-    elif method is MethodName.MANUAL_SKILL:
+    elif method is MethodName.EXPERT_CRAFTED_SKILLS:
         if artifact_paths:
-            raise ValueError("Manual Skill does not accept method artifacts")
-        if options.fixed_skill_context_file is None:
-            raise ValueError("Manual Skill requires --fixed-skill-context-file")
-        manual_skill = ManualSkillProvider.from_path(
-            options.fixed_skill_id,
-            options.fixed_skill_context_file,
+            raise ValueError("Expert-Crafted Skills do not accept method artifacts")
+        if options.expert_crafted_context_file is None:
+            raise ValueError("Expert-Crafted Skills require --expert-crafted-context-file")
+        expert_crafted_skills = ExpertCraftedSkillProvider.from_path(
+            options.expert_crafted_skill_id,
+            options.expert_crafted_context_file,
         )
         artifacts = {}
     else:
         if set(artifact_paths) != set(benchmarks):
             raise ValueError("every selected benchmark requires one method artifact")
         artifacts = {
-            benchmark: load_method_artifact(
-                benchmark, method, artifact_paths[benchmark]
-            )
+            benchmark: load_method_artifact(benchmark, method, artifact_paths[benchmark])
             for benchmark in benchmarks
         }
     entries_by_benchmark = {
@@ -410,14 +377,11 @@ async def main(options: argparse.Namespace) -> int:
     }
     resolved_config = {
         "common": common,
-        "benchmarks": {
-            benchmark.value: benchmark_configs[benchmark] for benchmark in benchmarks
-        },
+        "benchmarks": {benchmark.value: benchmark_configs[benchmark] for benchmark in benchmarks},
         "method": method_config,
         "agent_model": agent_model,
         "artifacts": {
-            benchmark.value: artifact.to_record()
-            for benchmark, artifact in artifacts.items()
+            benchmark.value: artifact.to_record() for benchmark, artifact in artifacts.items()
         },
         "manifests": {
             benchmark.value: {
@@ -431,13 +395,11 @@ async def main(options: argparse.Namespace) -> int:
     }
     if options.agent_endpoint_role != ModelRole.AGENT:
         resolved_config["agent_endpoint_role"] = options.agent_endpoint_role
-    if manual_skill is not None:
-        resolved_config["manual_skill"] = {
-            "skill_id": manual_skill.skill_id,
-            "path": options.fixed_skill_context_file.as_posix(),
-            "sha256": hashlib.sha256(
-                options.fixed_skill_context_file.read_bytes()
-            ).hexdigest(),
+    if expert_crafted_skills is not None:
+        resolved_config["expert_crafted_skills"] = {
+            "skill_id": expert_crafted_skills.skill_id,
+            "path": options.expert_crafted_context_file.as_posix(),
+            "sha256": hashlib.sha256(options.expert_crafted_context_file.read_bytes()).hexdigest(),
         }
     if options.repeat_id:
         resolved_config["selection"] = {
@@ -508,8 +470,8 @@ async def main(options: argparse.Namespace) -> int:
         retry_base_seconds=common["retry_base_seconds"],
     )
     providers = (
-        {benchmark: manual_skill for benchmark in benchmarks}
-        if manual_skill is not None
+        {benchmark: expert_crafted_skills for benchmark in benchmarks}
+        if expert_crafted_skills is not None
         else {
             benchmark: create_provider(
                 runtime,
@@ -556,13 +518,11 @@ async def main(options: argparse.Namespace) -> int:
         "benchmark": benchmarks[0].value if len(benchmarks) == 1 else None,
         "sample_ids": list(options.sample_id),
         "artifacts": {
-            benchmark.value: artifact.to_record()
-            for benchmark, artifact in artifacts.items()
+            benchmark.value: artifact.to_record() for benchmark, artifact in artifacts.items()
         },
         "snapshot_id": (
             next(iter(artifacts.values())).artifact_id
-            if len(artifacts) == 1
-            and method in TOWER_ARTIFACT_METHODS
+            if len(artifacts) == 1 and method in TOWER_ARTIFACT_METHODS
             else None
         ),
         "shard_ids": list(shard_ids),
@@ -598,8 +558,11 @@ if __name__ == "__main__":
     parser.add_argument("--alfworld-server-url")
     parser.add_argument("--episode-concurrency", type=int)
     parser.add_argument("--api-concurrency", type=int)
-    parser.add_argument("--fixed-skill-context-file", type=Path)
-    parser.add_argument("--fixed-skill-id", default="manual_webshop_constraint_v1")
+    parser.add_argument("--expert-crafted-context-file", type=Path)
+    parser.add_argument(
+        "--expert-crafted-skill-id",
+        default="expert_crafted_webshop_constraint_v1",
+    )
     parser.add_argument(
         "--agent-endpoint-role",
         choices=(ModelRole.AGENT.value, ModelRole.RENDERER.value),

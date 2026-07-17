@@ -8,30 +8,29 @@ import yaml
 from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
 
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.graph import (
+from trace2tower.methods.trace2tower.core.config import TowerBuildMethod, Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import (
+    AlfworldEventType,
+    SegmentInstance,
+    WebShopEventType,
+)
+from trace2tower.methods.trace2tower.eigen_trace.graph import (
     GraphComponents,
     _nearest_neighbors,
     build_graph,
     embedding_node_groups,
 )
-from trace2tower.methods.trace2tower.models import (
-    AlfworldEventType,
-    SegmentInstance,
-    WebShopEventType,
-)
-from trace2tower.methods.trace2tower.spectral import (
+from trace2tower.methods.trace2tower.eigen_trace.spectral import (
     cluster_representation,
     semantic_only_clustering,
     separate_exclusive_event_clusters,
     spectral_clustering,
 )
-from trace2tower.results import MethodName
 
 
 def config(**overrides) -> Trace2TowerConfig:
     values = {
-        "method": MethodName.TRACE2TOWER,
+        "method": TowerBuildMethod.TRACE2TOWER,
         "semantic_only": False,
         "use_transition_edge": True,
         "use_outcome_edge": True,
@@ -127,9 +126,7 @@ def test_semantic_only_clustering_expands_collapsed_embedding_nodes() -> None:
     assert len(clustering.labels) == 2
     assert sorted(len(cluster.member_segment_ids) for cluster in clustering.clusters) == [1, 3]
     assert {
-        segment_id
-        for cluster in clustering.clusters
-        for segment_id in cluster.member_segment_ids
+        segment_id for cluster in clustering.clusters for segment_id in cluster.member_segment_ids
     } == {"s0", "s1", "s2", "s3"}
 
 

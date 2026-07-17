@@ -59,27 +59,37 @@ def main() -> int:
                 embedding_client.embeddings.create(
                     model=setting("EMBEDDING_MODEL"),
                     input=["Trace2Tower endpoint probe"],
-                ).data[0].embedding
+                )
+                .data[0]
+                .embedding
             ),
         ),
         run_probe(
             "agent",
-            lambda: agent_client.chat.completions.create(
-                model=setting("AGENT_MODEL"),
-                messages=[{"role": "user", "content": "Reply with OK only."}],
-                max_tokens=8,
-                temperature=0,
-                extra_body={"thinking": {"type": setting("AGENT_THINKING")}},
-            ).choices[0].message.content,
+            lambda: (
+                agent_client.chat.completions.create(
+                    model=setting("AGENT_MODEL"),
+                    messages=[{"role": "user", "content": "Reply with OK only."}],
+                    max_tokens=8,
+                    temperature=0,
+                    extra_body={"thinking": {"type": setting("AGENT_THINKING")}},
+                )
+                .choices[0]
+                .message.content
+            ),
         ),
         run_probe(
             "renderer",
-            lambda: renderer_client.chat.completions.create(
-                model=setting("RENDERER_MODEL"),
-                messages=[{"role": "user", "content": "Reply with OK only."}],
-                max_completion_tokens=8,
-                reasoning_effort=setting("RENDERER_REASONING_EFFORT"),
-            ).choices[0].message.content,
+            lambda: (
+                renderer_client.chat.completions.create(
+                    model=setting("RENDERER_MODEL"),
+                    messages=[{"role": "user", "content": "Reply with OK only."}],
+                    max_completion_tokens=8,
+                    reasoning_effort=setting("RENDERER_REASONING_EFFORT"),
+                )
+                .choices[0]
+                .message.content
+            ),
         ),
     ]
     print(json.dumps(probes, ensure_ascii=False, indent=2))
@@ -88,4 +98,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

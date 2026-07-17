@@ -11,15 +11,18 @@ import yaml
 from dotenv import load_dotenv
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.segmentation import (
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.core.trajectory import TrajectoryReader
+from trace2tower.methods.trace2tower.adapters.transitions import (
+    build_benchmark_transitions,
+)
+from trace2tower.methods.trace2tower.preprocessing.segmentation import (
     calibrate_segmentation_penalty,
     segment_boundaries,
 )
-from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
-from trace2tower.methods.trace2tower.transitions import build_transitions, transition_text
-from trace2tower.trajectory import TrajectoryReader
+from trace2tower.methods.trace2tower.preprocessing.transition_encoder import TransitionEncoder
+from trace2tower.methods.trace2tower.preprocessing.transitions import transition_text
 
 
 async def main(options: argparse.Namespace) -> None:
@@ -36,7 +39,7 @@ async def main(options: argparse.Namespace) -> None:
         if trajectory.benchmark is Benchmark.ALFWORLD
     )
     transition_groups = tuple(
-        build_transitions(trajectory) for trajectory in trajectories
+        build_benchmark_transitions(trajectory) for trajectory in trajectories
     )
     invocation = {
         "trajectory_glob": options.trajectory_glob,
@@ -68,11 +71,7 @@ async def main(options: argparse.Namespace) -> None:
         dimension=common["embedding_dimension"],
         batch_size=common["embedding_batch_size"],
     )
-    texts = [
-        transition_text(transition)
-        for group in transition_groups
-        for transition in group
-    ]
+    texts = [transition_text(transition) for group in transition_groups for transition in group]
     try:
         vectors = await encoder.embed(texts)
     finally:

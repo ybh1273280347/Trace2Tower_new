@@ -8,6 +8,5 @@ def test_parse_alfworld_observation_goal_uses_environment_task() -> None:
         "Your task is to: clean some ladle and put it in countertop.\n"
     )
     assert (
-        parse_alfworld_observation_goal(observation)
-        == "clean some ladle and put it in countertop."
+        parse_alfworld_observation_goal(observation) == "clean some ladle and put it in countertop."
     )

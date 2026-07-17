@@ -11,9 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def main() -> int:
     alfworld_manifest = json.loads(
-        (ROOT / "third_party/AgentBench/data/alfworld/train_valid.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "third_party/AgentBench/data/alfworld/train_valid.json").read_text(encoding="utf-8")
     )
     manifest_paths = [path for group in alfworld_manifest.values() for path in group]
     games_root = ROOT / "Datasets/alfworld/games/games"

@@ -7,17 +7,17 @@ from pathlib import Path
 import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import HighCommunity, HighPath, MidCluster
-from trace2tower.semantic_index import SkillEmbeddingIndex
-from trace2tower.methods.trace2tower.skills import LOW_SKILLS, HighSkillCard, MidSkillCard
-from trace2tower.methods.trace2tower.tower import (
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.methods.trace2tower.artifacts.tower import (
     TowerSourceHashes,
     TowerVersion,
     build_tower_snapshot,
     sha256_file,
 )
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import HighCommunity, HighPath, MidCluster
+from trace2tower.methods.trace2tower.induction.skills import LOW_SKILLS, HighSkillCard, MidSkillCard
 
 
 def load_training_provenance(path: Path) -> list[dict]:
@@ -74,23 +74,14 @@ def main(options: argparse.Namespace) -> int:
             retrieval_index=sha256_file(options.index),
         ),
         low_skills=LOW_SKILLS[options.benchmark],
-        mid_clusters=tuple(
-            MidCluster.from_record(item) for item in cluster_payload["clusters"]
-        ),
-        high_paths=tuple(
-            HighPath.from_record(item) for item in path_payload["paths"]
-        ),
-        mid_cards=tuple(
-            MidSkillCard.from_record(item) for item in card_payload["mid_cards"]
-        ),
-        high_cards=tuple(
-            HighSkillCard.from_record(item) for item in card_payload["high_cards"]
-        ),
+        mid_clusters=tuple(MidCluster.from_record(item) for item in cluster_payload["clusters"]),
+        high_paths=tuple(HighPath.from_record(item) for item in path_payload["paths"]),
+        mid_cards=tuple(MidSkillCard.from_record(item) for item in card_payload["mid_cards"]),
+        high_cards=tuple(HighSkillCard.from_record(item) for item in card_payload["high_cards"]),
         mid_index=SkillEmbeddingIndex.from_record(index_payload["mid_index"]),
         high_index=SkillEmbeddingIndex.from_record(index_payload["high_index"]),
         high_communities=tuple(
-            HighCommunity.from_record(item)
-            for item in path_payload.get("communities", ())
+            HighCommunity.from_record(item) for item in path_payload.get("communities", ())
         ),
     )
     snapshot.require_complete()

@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-
 from scripts.experiments.run import extend_no_skill_pool
 
 

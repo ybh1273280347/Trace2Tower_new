@@ -38,8 +38,7 @@ def paired_comparison(
         }
     success_differences = np.array(
         [
-            (treatment[key]["primary_score"] >= 0.999)
-            - (control[key]["primary_score"] >= 0.999)
+            (treatment[key]["primary_score"] >= 0.999) - (control[key]["primary_score"] >= 0.999)
             for key in keys
         ],
         dtype=np.float64,
@@ -87,7 +86,10 @@ def main() -> int:
                 "variable": "mixed partial/failure evidence",
             },
             "legacy_full_minus_semantic": {
-                "shared": "P100 mixed pool, nine Mid clusters, native renderer, legacy retrieval cap8",
+                "shared": (
+                    "P100 mixed pool, nine Mid clusters, native renderer, "
+                    "legacy retrieval cap8"
+                ),
                 "variable": "signed relational EigenTrace graph and High induction",
             },
         },

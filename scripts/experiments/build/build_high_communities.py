@@ -14,13 +14,13 @@ from scripts.experiments.build.build_trace2tower_skills import (
     load_skill_records,
 )
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.high_communities import discover_high_communities
-from trace2tower.methods.trace2tower.high_paths import trajectory_mid_sequences
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster
-from trace2tower.methods.trace2tower.renderer import render_high_community_card
-from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.core.models import HighPath, MidCluster
+from trace2tower.methods.trace2tower.induction.high_communities import discover_high_communities
+from trace2tower.methods.trace2tower.induction.high_paths import trajectory_mid_sequences
+from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, MidSkillCard
+from trace2tower.methods.trace2tower.rendering.renderer import render_high_community_card
 
 
 def _representatives(contexts: list[dict], limit: int = 8) -> tuple[dict, ...]:
@@ -29,9 +29,7 @@ def _representatives(contexts: list[dict], limit: int = 8) -> tuple[dict, ...]:
         by_sequence.setdefault(tuple(context["ordered_mid_ids"]), context)
     selected = list(by_sequence.values())
     selected_ids = {context["trajectory_id"] for context in selected}
-    selected.extend(
-        context for context in contexts if context["trajectory_id"] not in selected_ids
-    )
+    selected.extend(context for context in contexts if context["trajectory_id"] not in selected_ids)
     return tuple(selected[:limit])
 
 
@@ -112,9 +110,7 @@ async def main(options: argparse.Namespace) -> int:
             member_transitions = {
                 transition
                 for context in successful
-                for transition in zip(
-                    context["ordered_mid_ids"], context["ordered_mid_ids"][1:]
-                )
+                for transition in zip(context["ordered_mid_ids"], context["ordered_mid_ids"][1:])
             }
             unsuccessful = sorted(
                 (

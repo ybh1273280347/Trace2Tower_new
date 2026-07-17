@@ -86,8 +86,10 @@ def main() -> int:
             "Both methods use gpt-5.4 for skill construction.",
             "Trace2Tower renders Mid and High cards after deterministic graph construction.",
             "SkillX usage covers upstream extraction, validation, planning, and merging.",
-            "The evidence sets differ: Trace2Tower uses mixed trajectories while SkillX uses full-success trajectories.",
-            "Cached-token prices are provider-specific, so token usage does not prove a billing-cost ratio.",
+            "The evidence sets differ: Trace2Tower uses mixed trajectories while SkillX "
+            "uses full-success trajectories.",
+            "Cached-token prices are provider-specific, so token usage does not prove "
+            "a billing-cost ratio.",
         ],
         "sources": {
             "trace2tower_cards": options.tower_cards.as_posix(),
@@ -106,9 +108,7 @@ def main() -> int:
             "atomic_skill_count": skillx_report["statistics"]["atomic_skills"],
             "llm_usage": skillx_usage,
         },
-        "trace2tower_relative_to_skillx": relative_usage(
-            tower_usage, skillx_usage
-        ),
+        "trace2tower_relative_to_skillx": relative_usage(tower_usage, skillx_usage),
     }
     options.output.parent.mkdir(parents=True, exist_ok=True)
     options.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

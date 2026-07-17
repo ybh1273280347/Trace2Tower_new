@@ -10,19 +10,19 @@ from pathlib import Path
 
 import yaml
 
-from trace2tower.evaluation import (
-    ConstructionCost,
-    aggregate_method,
-    paired_bootstrap,
-    unresolved_failures,
-)
-from trace2tower.manifests import (
+from trace2tower.core.manifests import (
     Benchmark,
     ExperimentSplit,
     expand_manifest_repeats,
     read_manifest,
 )
-from trace2tower.results import EpisodeResult, MethodName
+from trace2tower.core.results import EpisodeResult, MethodName
+from trace2tower.experiments.evaluation import (
+    ConstructionCost,
+    aggregate_method,
+    paired_bootstrap,
+    unresolved_failures,
+)
 
 
 def assignments(values: list[str]) -> dict[MethodName, list[Path]]:
@@ -54,10 +54,7 @@ def read_jsonl(paths: list[Path]) -> tuple[dict, ...]:
 
 
 def sha256_files(paths: list[Path]) -> dict[str, str]:
-    return {
-        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in paths
-    }
+    return {path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -101,8 +98,7 @@ def main(options: argparse.Namespace) -> int:
     if not entries:
         raise ValueError("evaluation selection is empty")
     selected_keys = {
-        (entry.benchmark, entry.split, entry.sample_id, entry.repeat_id)
-        for entry in entries
+        (entry.benchmark, entry.split, entry.sample_id, entry.repeat_id) for entry in entries
     }
 
     result_paths = assignments(options.results)
@@ -125,9 +121,7 @@ def main(options: argparse.Namespace) -> int:
             in selected_keys
         )
     costs = {
-        method: ConstructionCost.from_record(
-            json.loads(paths[0].read_text(encoding="utf-8"))
-        )
+        method: ConstructionCost.from_record(json.loads(paths[0].read_text(encoding="utf-8")))
         for method, paths in construction_paths.items()
     }
     if not set(costs) <= set(results_by_method):
@@ -166,9 +160,7 @@ def main(options: argparse.Namespace) -> int:
                 ).to_record()
             )
 
-    all_results = tuple(
-        result for results in results_by_method.values() for result in results
-    )
+    all_results = tuple(result for results in results_by_method.values() for result in results)
     if not set(error_paths) <= set(results_by_method):
         raise ValueError("errors were provided for an unevaluated method")
     all_errors = []
@@ -188,28 +180,22 @@ def main(options: argparse.Namespace) -> int:
             in selected_keys
         )
     failures = unresolved_failures(all_errors, all_results)
-    source_hashes = {
-        method.value: sha256_files(paths) for method, paths in result_paths.items()
-    }
+    source_hashes = {method.value: sha256_files(paths) for method, paths in result_paths.items()}
     report = {
         "benchmark": benchmark.value,
         "split": split.value,
         "manifest_sha256": hashlib.sha256(options.manifest.read_bytes()).hexdigest(),
         "evaluation_config": config,
-        "evaluation_config_sha256": hashlib.sha256(
-            options.config.read_bytes()
-        ).hexdigest(),
+        "evaluation_config_sha256": hashlib.sha256(options.config.read_bytes()).hexdigest(),
         "selected_sample_ids": sorted({entry.sample_id for entry in entries}),
         "selected_repeat_ids": sorted({entry.repeat_id for entry in entries}),
         "expected_episode_count": len(entries),
         "result_source_hashes": source_hashes,
         "error_source_hashes": {
-            method.value: sha256_files(paths)
-            for method, paths in error_paths.items()
+            method.value: sha256_files(paths) for method, paths in error_paths.items()
         },
         "construction_cost_source_hashes": {
-            method.value: sha256_files(paths)
-            for method, paths in construction_paths.items()
+            method.value: sha256_files(paths) for method, paths in construction_paths.items()
         },
         "audits": audits,
         "methods": aggregates,
@@ -250,15 +236,14 @@ def render_markdown(report: dict, pairwise: list[dict]) -> str:
         lines.extend(
             (
                 "",
-                "| Candidate vs No-Skill | Reward difference | Reward 95% CI | Full-success difference | Success 95% CI | Episodes | Tasks |",
+                "| Candidate vs No-Skill | Reward difference | Reward 95% CI | "
+                "Full-success difference | Success 95% CI | Episodes | Tasks |",
                 "|---|---:|---:|---:|---:|---:|---:|",
             )
         )
         for comparison in pairwise:
             lower, upper = comparison["confidence_interval"]
-            success_lower, success_upper = comparison[
-                "full_success_rate_confidence_interval"
-            ]
+            success_lower, success_upper = comparison["full_success_rate_confidence_interval"]
             lines.append(
                 f"| {comparison['candidate_method']} | "
                 f"{comparison['mean_difference']:.6f} | "

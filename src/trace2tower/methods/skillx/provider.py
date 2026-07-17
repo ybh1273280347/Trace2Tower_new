@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from trace2tower.agent import SkillSelection
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.llm_runtime import CommonLLMRuntime
+from trace2tower.components.agent import SkillSelection
+from trace2tower.components.llm_runtime import CommonLLMRuntime
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.native_inference import (
     SKILLX_COMMIT,
@@ -45,9 +45,7 @@ class SkillXProvider:
             raise ValueError("SkillX rewrite switch must be boolean")
         if library.skillx_commit != SKILLX_COMMIT:
             raise ValueError("SkillX library was not built by the frozen native commit")
-        unknown_tools = {
-            tool for skill in library.skills for tool in skill.tools
-        } - allowed_tools
+        unknown_tools = {tool for skill in library.skills for tool in skill.tools} - allowed_tools
         if unknown_tools:
             raise ValueError(f"SkillX library references unavailable tools: {unknown_tools}")
         self.runtime = runtime
@@ -123,12 +121,8 @@ class SkillXProvider:
             max_skills=self.max_skills,
         )
         selected_ids = {candidate.skill_id for candidate in selected.skills}
-        selected_skills = tuple(
-            skill for skill in raw_skills if skill.skill_id in selected_ids
-        )
-        selected_matches = tuple(
-            match for match in raw_matches if match.skill_id in selected_ids
-        )
+        selected_skills = tuple(skill for skill in raw_skills if skill.skill_id in selected_ids)
+        selected_matches = tuple(match for match in raw_matches if match.skill_id in selected_ids)
         retrieval = SkillXRetrieval(
             source_plan,
             source_plan_match,
@@ -159,9 +153,7 @@ class SkillXProvider:
             if retrieval.source_plan and retrieval.injected_plan
             else ()
         )
-        context_skill_ids = context_plan_ids + tuple(
-            skill.skill_id for skill in retrieval.skills
-        )
+        context_skill_ids = context_plan_ids + tuple(skill.skill_id for skill in retrieval.skills)
         return SkillSelection(
             retrieval.skill_ids,
             retrieval.context,

@@ -8,9 +8,9 @@ from pathlib import Path
 import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import MethodName
-from trace2tower.trajectory import (
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import (
     EpisodeTrajectory,
     TrajectoryReader,
     write_trajectory_jsonl,
@@ -44,17 +44,13 @@ def main(options: argparse.Namespace) -> int:
         or trajectory.method is not MethodName.TRACE2TOWER
         for trajectory in conditioned
     ):
-        raise ValueError(
-            "conditioned refinement pool must contain train Trace2Tower trajectories"
-        )
+        raise ValueError("conditioned refinement pool must contain train Trace2Tower trajectories")
 
     report_keys = {
         (item["sample_id"], int(item["repeat_id"]))
         for item in report["audit"]["paired_episode_keys"]
     }
-    trajectory_keys = {
-        (trajectory.sample_id, trajectory.repeat_id) for trajectory in conditioned
-    }
+    trajectory_keys = {(trajectory.sample_id, trajectory.repeat_id) for trajectory in conditioned}
     if len(trajectory_keys) != len(conditioned) or trajectory_keys != report_keys:
         raise ValueError("conditioned trajectories differ from audited exposure keys")
     expected_run_ids = set(report["execution_contract"]["skill_run_ids"])

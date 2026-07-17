@@ -72,9 +72,7 @@ def summarize(rows: dict[tuple[str, int], dict]) -> dict:
     return {
         "task_count": len(values),
         "mean_reward": float(np.mean([row["primary_score"] for row in values])),
-        "full_success_rate": float(
-            np.mean([row["primary_score"] >= 0.999 for row in values])
-        ),
+        "full_success_rate": float(np.mean([row["primary_score"] >= 0.999 for row in values])),
         "mean_steps": float(np.mean([row["steps"] for row in values])),
         "mean_invalid_actions": float(np.mean([row["invalid_actions"] for row in values])),
         "mean_input_tokens": float(np.mean([row["input_tokens"] for row in values])),
@@ -99,9 +97,7 @@ def main() -> int:
     ordered_keys = tuple(sorted(keys))
     structural_scores = np.array([structural[key]["primary_score"] for key in ordered_keys])
     noskill_scores = np.array([noskill[key]["primary_score"] for key in ordered_keys])
-    previous_scores = np.array(
-        [previous_tower[key]["primary_score"] for key in ordered_keys]
-    )
+    previous_scores = np.array([previous_tower[key]["primary_score"] for key in ordered_keys])
     payload = {
         "protocol_id": "webshop-test-a-refinement-v1",
         "split": "test",

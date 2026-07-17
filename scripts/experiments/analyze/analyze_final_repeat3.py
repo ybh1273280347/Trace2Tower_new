@@ -51,16 +51,10 @@ def metric_summary(rows: dict[tuple[str, int], dict]) -> dict:
         sample_rows = [rows[(sample_id, repeat_id)] for repeat_id in (0, 1, 2)]
         task_metrics[sample_id] = {
             "reward": float(np.mean([row["primary_score"] for row in sample_rows])),
-            "full_success": float(
-                np.mean([row["primary_score"] >= 0.999 for row in sample_rows])
-            ),
+            "full_success": float(np.mean([row["primary_score"] >= 0.999 for row in sample_rows])),
             "steps": float(np.mean([row["steps"] for row in sample_rows])),
-            "invalid_actions": float(
-                np.mean([row["invalid_actions"] for row in sample_rows])
-            ),
-            "input_tokens": float(
-                np.mean([row["input_tokens"] for row in sample_rows])
-            ),
+            "invalid_actions": float(np.mean([row["invalid_actions"] for row in sample_rows])),
+            "input_tokens": float(np.mean([row["input_tokens"] for row in sample_rows])),
         }
     return {
         "repeat_summaries": repeat_summaries,
@@ -80,9 +74,7 @@ def metric_summary(rows: dict[tuple[str, int], dict]) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--protocol-id", default="webshop-final-graph-cap3-repeat3-v1"
-    )
+    parser.add_argument("--protocol-id", default="webshop-final-graph-cap3-repeat3-v1")
     parser.add_argument("--model", required=True)
     parser.add_argument("--run", action="append", type=parse_run, required=True)
     parser.add_argument("--final-method", default="final_t1")
@@ -114,8 +106,7 @@ def main() -> int:
         )
         success_differences = np.array(
             [
-                final_tasks[sample_id]["full_success"]
-                - other_tasks[sample_id]["full_success"]
+                final_tasks[sample_id]["full_success"] - other_tasks[sample_id]["full_success"]
                 for sample_id in sorted(final_tasks)
             ]
         )

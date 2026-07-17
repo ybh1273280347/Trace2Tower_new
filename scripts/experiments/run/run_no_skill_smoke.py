@@ -7,15 +7,16 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, ManifestEntry, read_manifest
-from trace2tower.results import EpisodeResultWriter, MethodName
-from trace2tower.runner import run_shard
-from trace2tower.trajectory import TrajectoryWriter
+from trace2tower.components.agent import AgentEvaluator
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark, ManifestEntry, read_manifest
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryWriter
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
+from trace2tower.experiments.result_writer import EpisodeResultWriter
+from trace2tower.experiments.runner import run_shard
 
 
 def load_yaml(path: Path) -> dict:
@@ -32,9 +33,7 @@ async def run_benchmark(
 ) -> None:
     async def execute(current_entry: ManifestEntry, shard_id: int):
         if benchmark is Benchmark.ALFWORLD:
-            environment = AlfworldEnvironment(
-                Path(config["dataset_root"]), config["server_url"]
-            )
+            environment = AlfworldEnvironment(Path(config["dataset_root"]), config["server_url"])
         else:
             environment = WebShopEnvironment(
                 Path(config["dataset_root"]), Path(config["source_root"])
@@ -82,12 +81,8 @@ async def main(options: argparse.Namespace) -> None:
     try:
         for benchmark in (Benchmark.ALFWORLD, Benchmark.WEBSHOP):
             config = load_yaml(Path(f"configs/experiments/{benchmark}.yaml"))
-            entry = read_manifest(
-                Path(common["manifests_dir"]) / f"{benchmark}_test.jsonl"
-            )[0]
-            await run_benchmark(
-                benchmark, entry, config, evaluator, writer, options.run_id
-            )
+            entry = read_manifest(Path(common["manifests_dir"]) / f"{benchmark}_test.jsonl")[0]
+            await run_benchmark(benchmark, entry, config, evaluator, writer, options.run_id)
     finally:
         await runtime.close()
 

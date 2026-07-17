@@ -9,8 +9,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-
+from trace2tower.components.llm_runtime import CommonLLMRuntime, ModelRole
 
 logger = logging.getLogger(__name__)
 
@@ -69,16 +68,12 @@ class SkillXLLMAdapter:
                     ModelRole.RENDERER,
                     converted,
                     temperature=self.temperature,
-                    max_output_tokens=int(
-                        kwargs.get("max_tokens", self.max_output_tokens)
-                    ),
+                    max_output_tokens=int(kwargs.get("max_tokens", self.max_output_tokens)),
                     prompt_cache_key=cache_key,
                 )
             except Exception as exc:
                 diagnostic = {
-                    "prompt_sha256": hashlib.sha256(
-                        system_prompt.encode()
-                    ).hexdigest(),
+                    "prompt_sha256": hashlib.sha256(system_prompt.encode()).hexdigest(),
                     "attempt": attempt + 1,
                     "exception_type": type(exc).__name__,
                     "message": str(exc),
@@ -118,9 +113,7 @@ class SkillXLLMAdapter:
             text = content or ""
             self.validation_diagnostics.append(
                 {
-                    "prompt_sha256": hashlib.sha256(
-                        system_prompt.encode()
-                    ).hexdigest(),
+                    "prompt_sha256": hashlib.sha256(system_prompt.encode()).hexdigest(),
                     "messages_sha256": hashlib.sha256(
                         json.dumps(
                             converted,
@@ -130,9 +123,7 @@ class SkillXLLMAdapter:
                         ).encode()
                     ).hexdigest(),
                     "attempt": attempt + 1,
-                    "max_output_tokens": int(
-                        kwargs.get("max_tokens", self.max_output_tokens)
-                    ),
+                    "max_output_tokens": int(kwargs.get("max_tokens", self.max_output_tokens)),
                     "finish_reason": result.finish_reason,
                     "output_tokens": result.usage.output_tokens,
                     "content_chars": len(text),

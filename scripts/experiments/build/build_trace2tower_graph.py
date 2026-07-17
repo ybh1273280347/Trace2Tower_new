@@ -11,18 +11,18 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.alfworld_events import (
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.adapters.alfworld.events import (
     ALFWORLD_EXCLUSIVE_PATH_EVENTS,
 )
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.graph import (
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import SegmentInstance, event_type_from_value
+from trace2tower.methods.trace2tower.eigen_trace.graph import (
     build_graph,
     embedding_node_groups,
     ordered_segment_groups,
 )
-from trace2tower.methods.trace2tower.models import SegmentInstance, event_type_from_value
-from trace2tower.methods.trace2tower.spectral import (
+from trace2tower.methods.trace2tower.eigen_trace.spectral import (
     semantic_only_clustering,
     separate_exclusive_event_clusters,
     spectral_clustering,
@@ -43,9 +43,7 @@ def load_segment_groups(
             if benchmark is not None and current_benchmark is not benchmark:
                 raise ValueError("preprocessed graph input mixes benchmarks")
             benchmark = current_benchmark
-            groups.append(
-                tuple(_compact_segment(segment) for segment in record["segments"])
-            )
+            groups.append(tuple(_compact_segment(segment) for segment in record["segments"]))
     if benchmark is None:
         raise ValueError("graph input contains no trajectories")
     return benchmark, tuple(groups)
@@ -151,8 +149,7 @@ def main(options: argparse.Namespace) -> int:
         {"clusters": [cluster.to_record() for cluster in clustering.clusters]},
     )
     cluster_sizes = {
-        index: len(cluster.member_segment_ids)
-        for index, cluster in enumerate(clustering.clusters)
+        index: len(cluster.member_segment_ids) for index, cluster in enumerate(clustering.clusters)
     }
     event_distribution = Counter(
         segment.event_type.value for segment in segments if segment.event_type is not None

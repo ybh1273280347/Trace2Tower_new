@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from trace2tower.agent import AgentEvaluator, SkillSelection
 from trace2tower.benchmarks.models import EnvironmentState, EpisodeStart
-from trace2tower.llm_runtime import ChatResult, LLMUsage, ModelRole, ToolCall
-from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
-from trace2tower.results import MethodName
-from trace2tower.trajectory import TrajectoryWriter
+from trace2tower.components.agent import AgentEvaluator, SkillSelection
+from trace2tower.components.llm_runtime import ChatResult, LLMUsage, ModelRole, ToolCall
+from trace2tower.core.manifests import Benchmark, ExperimentSplit, ManifestEntry
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryWriter
 
 
 class FakeRuntime:
@@ -25,9 +25,7 @@ class FakeRuntime:
         self.messages = messages
         return ChatResult(
             content=None,
-            tool_calls=(
-                ToolCall("call-1", "click_action", json.dumps({"value": "Buy Now"})),
-            ),
+            tool_calls=(ToolCall("call-1", "click_action", json.dumps({"value": "Buy Now"})),),
             usage=LLMUsage(10, 2, None),
             latency_ms=1,
         )
@@ -102,9 +100,7 @@ def test_agent_selects_skills_after_reset_and_records_selection_cost(tmp_path: P
     assert result.skill_ids == ("high_a", "mid_a")
     assert result.context_skill_ids == ("high_a",)
     assert result.skill_context_chars == len("retrieved context")
-    assert result.skill_context_sha256 == hashlib.sha256(
-        b"retrieved context"
-    ).hexdigest()
+    assert result.skill_context_sha256 == hashlib.sha256(b"retrieved context").hexdigest()
     assert result.input_tokens == 17
     assert result.output_tokens == 2
     assert result.chat_input_tokens == 10

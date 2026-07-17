@@ -5,8 +5,7 @@ import json
 from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.methods.trace2tower.webshop_branch_graph import DecisionSignal
-
+from trace2tower.methods.trace2tower.adapters.webshop.branch_graph import DecisionSignal
 
 STEP_TEXT = {
     DecisionSignal.QUERY_CONSTRAINED: (

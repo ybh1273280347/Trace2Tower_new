@@ -6,11 +6,11 @@ from collections import Counter
 from pathlib import Path
 
 import yaml
-from scripts.experiments.run.rollout_no_skill_train import write_json
 
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import MethodName
-from trace2tower.trajectory import (
+from scripts.experiments.run.rollout_no_skill_train import write_json
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import (
     EpisodeTrajectory,
     TrajectoryReader,
     write_trajectory_jsonl,
@@ -45,11 +45,7 @@ def validate_multirepeat_pool(
         if previous != trajectory.task_goal:
             raise ValueError("sample source contains conflicting task goals")
     sample_ids = tuple(sorted(source_goals))
-    expected = {
-        (sample_id, repeat_id)
-        for sample_id in sample_ids
-        for repeat_id in repeat_ids
-    }
+    expected = {(sample_id, repeat_id) for sample_id in sample_ids for repeat_id in repeat_ids}
     actual = {(trajectory.sample_id, trajectory.repeat_id) for trajectory in trajectories}
     if len(actual) != len(trajectories):
         raise ValueError("matrix trajectories contain duplicate episode keys")
@@ -86,11 +82,7 @@ def main(options: argparse.Namespace) -> int:
     repeat_ids = tuple(sorted(options.repeat_id))
     source = TrajectoryReader.read_jsonl(options.sample_source_pool)
     run_root = (
-        options.runs_dir
-        / options.run_id
-        / benchmark
-        / ExperimentSplit.TRAIN
-        / MethodName.NO_SKILL
+        options.runs_dir / options.run_id / benchmark / ExperimentSplit.TRAIN / MethodName.NO_SKILL
     )
     trajectories = read_matrix_trajectories(run_root)
     sample_ids = validate_multirepeat_pool(
@@ -122,9 +114,7 @@ def main(options: argparse.Namespace) -> int:
         "sample_source_pool_sha256": hashlib.sha256(
             options.sample_source_pool.read_bytes()
         ).hexdigest(),
-        "resolved_config_sha256": hashlib.sha256(
-            resolved_config_path.read_bytes()
-        ).hexdigest(),
+        "resolved_config_sha256": hashlib.sha256(resolved_config_path.read_bytes()).hexdigest(),
         "sample_count": len(sample_ids),
         "sample_ids": list(sample_ids),
         "repeat_ids": list(repeat_ids),

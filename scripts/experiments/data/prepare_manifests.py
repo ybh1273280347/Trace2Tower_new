@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from trace2tower.manifests import (
+from trace2tower.core.manifests import (
     Benchmark,
     ExperimentSplit,
     build_alfworld_manifests,

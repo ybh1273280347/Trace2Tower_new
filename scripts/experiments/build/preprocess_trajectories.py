@@ -14,20 +14,22 @@ import yaml
 from dotenv import load_dotenv
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.alfworld_events import (
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.core.trajectory import TrajectoryReader
+from trace2tower.methods.trace2tower.adapters.alfworld.events import (
     alfworld_goal_from_observation,
     alfworld_segment_signature,
     segment_alfworld_trajectory,
 )
-from trace2tower.methods.trace2tower.transition_encoder import TransitionEncoder
-from trace2tower.methods.trace2tower.transitions import build_transitions
-from trace2tower.methods.trace2tower.webshop_events import (
+from trace2tower.methods.trace2tower.adapters.transitions import (
+    build_benchmark_transitions,
+)
+from trace2tower.methods.trace2tower.adapters.webshop.events import (
     segment_webshop_trajectory,
     webshop_segment_signature,
 )
-from trace2tower.trajectory import TrajectoryReader
+from trace2tower.methods.trace2tower.preprocessing.transition_encoder import TransitionEncoder
 
 
 async def main(options: argparse.Namespace) -> None:
@@ -44,7 +46,9 @@ async def main(options: argparse.Namespace) -> None:
         for trajectory in TrajectoryReader.read_jsonl(path)
         if trajectory.benchmark is benchmark
     )
-    transition_groups = tuple(build_transitions(trajectory) for trajectory in trajectories)
+    transition_groups = tuple(
+        build_benchmark_transitions(trajectory) for trajectory in trajectories
+    )
     segment_groups = tuple(
         (
             segment_alfworld_trajectory(trajectory, transitions)
@@ -103,9 +107,7 @@ async def main(options: argparse.Namespace) -> None:
                         goal=goal,
                         previous_event=(segments[index - 1].event_type if index else None),
                         next_event=(
-                            segments[index + 1].event_type
-                            if index + 1 < len(segments)
-                            else None
+                            segments[index + 1].event_type if index + 1 < len(segments) else None
                         ),
                     )
                 )
@@ -119,9 +121,7 @@ async def main(options: argparse.Namespace) -> None:
                         goal=trajectory.task_goal,
                         previous_event=(segments[index - 1].event_type if index else None),
                         next_event=(
-                            segments[index + 1].event_type
-                            if index + 1 < len(segments)
-                            else None
+                            segments[index + 1].event_type if index + 1 < len(segments) else None
                         ),
                     )
                 )

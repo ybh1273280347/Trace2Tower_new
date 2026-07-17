@@ -12,7 +12,7 @@ from scripts.experiments.analyze.analyze_refinement_test import (
     read_first_completion,
     summarize,
 )
-from trace2tower.methods.trace2tower.webshop_events import infer_webshop_page_type
+from trace2tower.methods.trace2tower.adapters.webshop.events import infer_webshop_page_type
 
 
 def read_retrieval_audit(run_dir: Path) -> dict:
@@ -30,9 +30,7 @@ def read_retrieval_audit(run_dir: Path) -> dict:
             skill_ids = step.get("retrieved_context_skill_ids", ())
             context_counts.append(len(skill_ids))
             high_id = (
-                str(skill_ids[0])
-                if skill_ids and str(skill_ids[0]).startswith("high_")
-                else "none"
+                str(skill_ids[0]) if skill_ids and str(skill_ids[0]).startswith("high_") else "none"
             )
             page = infer_webshop_page_type(step["observation"]).value
             high_counts[high_id] += 1
@@ -44,8 +42,7 @@ def read_retrieval_audit(run_dir: Path) -> dict:
         "max_context_skill_count": max(context_counts),
         "high_selection_counts": dict(sorted(high_counts.items())),
         "high_selection_by_page": {
-            page: dict(sorted(counts.items()))
-            for page, counts in sorted(high_by_page.items())
+            page: dict(sorted(counts.items())) for page, counts in sorted(high_by_page.items())
         },
     }
 
@@ -118,12 +115,10 @@ def main() -> int:
         },
         "result_audits": audits,
         "rate_limit_error_attempts": {
-            name: count_error_attempts(run_paths[name])
-            for name in ("graph_cap3", "graph_cap8")
+            name: count_error_attempts(run_paths[name]) for name in ("graph_cap3", "graph_cap8")
         },
         "retrieval_audits": {
-            name: read_retrieval_audit(run_paths[name])
-            for name in ("graph_cap3", "graph_cap8")
+            name: read_retrieval_audit(run_paths[name]) for name in ("graph_cap3", "graph_cap8")
         },
     }
     options.output.parent.mkdir(parents=True, exist_ok=True)

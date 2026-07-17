@@ -5,8 +5,8 @@ import json
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, replace
 
-from trace2tower.manifests import Benchmark
-from trace2tower.semantic_index import SkillEmbeddingIndex
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
+from trace2tower.core.manifests import Benchmark
 
 
 @dataclass(frozen=True, slots=True)

@@ -7,18 +7,19 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
-from trace2tower.agent import AgentEvaluator
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, ExperimentSplit, read_manifest
+from trace2tower.components.agent import AgentEvaluator
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark, ExperimentSplit, read_manifest
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryWriter
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
+from trace2tower.experiments.result_writer import EpisodeResultWriter
+from trace2tower.experiments.runner import run_shard
 from trace2tower.methods.skillx.provider import SkillXProvider
-from trace2tower.results import EpisodeResultWriter, MethodName
-from trace2tower.runner import run_shard
-from trace2tower.trajectory import TrajectoryWriter
 
 
 def schema_names(schemas: tuple[dict, ...]) -> set[str]:
@@ -33,17 +34,14 @@ async def main(options: argparse.Namespace) -> int:
     entries = tuple(
         entry
         for entry in read_manifest(
-            Path(common["manifests_dir"])
-            / f"{options.benchmark}_{options.split}.jsonl"
+            Path(common["manifests_dir"]) / f"{options.benchmark}_{options.split}.jsonl"
         )
         if options.sample_id is None or entry.sample_id == options.sample_id
     )
     if not entries:
         raise ValueError("SkillX smoke sample is not present in the manifest")
     environment_type = (
-        AlfworldEnvironment
-        if options.benchmark is Benchmark.ALFWORLD
-        else WebShopEnvironment
+        AlfworldEnvironment if options.benchmark is Benchmark.ALFWORLD else WebShopEnvironment
     )
     runtime = CommonLLMRuntime(
         max_concurrency=common["global_api_concurrency"],

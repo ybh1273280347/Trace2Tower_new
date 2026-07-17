@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
+from trace2tower.core.trajectory import TrajectoryReader, write_trajectory_jsonl
 
 
 def main(options: argparse.Namespace) -> int:
@@ -12,9 +12,7 @@ def main(options: argparse.Namespace) -> int:
     expected_ids = set(protocol["trajectory_pool"]["sample_ids"])
     expected_repeats = set(protocol["trajectory_pool"]["repeat_ids"])
     expected_keys = {
-        (sample_id, repeat_id)
-        for sample_id in expected_ids
-        for repeat_id in expected_repeats
+        (sample_id, repeat_id) for sample_id in expected_ids for repeat_id in expected_repeats
     }
     for expansion_path in options.expansion:
         expansion = json.loads(expansion_path.read_text(encoding="utf-8"))
@@ -38,7 +36,9 @@ def main(options: argparse.Namespace) -> int:
             f"unexpected={len(keys - expected_keys)}"
         )
     successful = [trajectory for trajectory in trajectories if trajectory.primary_score == 1]
-    required_successes = int(protocol["trajectory_pool"].get("minimum_successful_trajectory_count", 0))
+    required_successes = int(
+        protocol["trajectory_pool"].get("minimum_successful_trajectory_count", 0)
+    )
     passed = len(successful) >= required_successes
     count = write_trajectory_jsonl(trajectories, options.output)
     report = {
@@ -65,5 +65,7 @@ if __name__ == "__main__":
     parser.add_argument("--additional-run-root", type=Path, action="append", default=[])
     parser.add_argument("--expansion", type=Path, action="append", default=[])
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--protocol", type=Path, default=Path("configs/experiments/alfworld_protocol.json"))
+    parser.add_argument(
+        "--protocol", type=Path, default=Path("configs/experiments/alfworld_protocol.json")
+    )
     raise SystemExit(main(parser.parse_args()))

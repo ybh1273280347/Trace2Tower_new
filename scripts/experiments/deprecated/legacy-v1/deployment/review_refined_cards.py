@@ -6,9 +6,9 @@ from collections import Counter
 from pathlib import Path
 from statistics import fmean
 
-from trace2tower.methods.trace2tower.models import SegmentInstance
-from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
-from trace2tower.methods.trace2tower.tower import TowerSnapshot
+from trace2tower.methods.trace2tower.core.models import SegmentInstance
+from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, MidSkillCard
+from trace2tower.methods.trace2tower.artifacts.tower import TowerSnapshot
 
 
 def format_mid(card: MidSkillCard) -> list[str]:

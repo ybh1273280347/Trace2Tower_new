@@ -3,15 +3,15 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
-from trace2tower.results import (
+from trace2tower.core.manifests import Benchmark, ExperimentSplit, ManifestEntry
+from trace2tower.core.results import (
     EpisodeResult,
-    EpisodeResultWriter,
     FinishReason,
     MethodName,
 )
-from trace2tower.runner import run_shard
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
+from trace2tower.experiments.result_writer import EpisodeResultWriter
+from trace2tower.experiments.runner import run_shard
 
 
 def make_result(entry: ManifestEntry, shard_id: int) -> EpisodeResult:

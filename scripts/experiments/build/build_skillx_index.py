@@ -7,12 +7,13 @@ import json
 from pathlib import Path
 
 import yaml
-from scripts.experiments.analyze.check_skillx_upstream import inspect_skillx
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
+from scripts.experiments.analyze.check_skillx_upstream import inspect_skillx
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
 from trace2tower.methods.skillx.models import (
     SkillXCard,
     SkillXExecutionLibrary,
@@ -22,7 +23,6 @@ from trace2tower.methods.skillx.models import (
     plan_text,
     skill_text,
 )
-from trace2tower.semantic_index import SkillEmbeddingIndex
 
 
 def parse_source_library(
@@ -55,8 +55,7 @@ def parse_source_library(
             if benchmark is Benchmark.ALFWORLD:
                 content = content.replace("apis.alfworld.take_action", "take_action")
                 tools = [
-                    "take_action" if tool == "apis.alfworld.take_action" else tool
-                    for tool in tools
+                    "take_action" if tool == "apis.alfworld.take_action" else tool for tool in tools
                 ]
             semantic = {
                 "name": record.get("name"),
@@ -161,9 +160,7 @@ async def main(options: argparse.Namespace) -> int:
     try:
         for offset in range(0, len(missing_ids), batch_size):
             batch_ids = missing_ids[offset : offset + batch_size]
-            result = await runtime.embed(
-                [text_by_id[skill_id] for skill_id in batch_ids]
-            )
+            result = await runtime.embed([text_by_id[skill_id] for skill_id in batch_ids])
             embedding_results.append(result)
             new_vectors.update(zip(batch_ids, result.vectors, strict=True))
             write_json(

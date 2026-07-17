@@ -10,11 +10,7 @@ from scripts.experiments.run.rollout_no_skill_train import write_json
 
 
 def read_ids(path: Path, split: str | None = None) -> set[str]:
-    rows = [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
     if split is not None and any(row["split"] != split for row in rows):
         raise ValueError(f"manifest {path} contains a non-{split} row")
     ids = {str(row["sample_id"]) for row in rows}
@@ -71,7 +67,10 @@ def main() -> int:
     candidates = sorted(train_ids - excluded_ids, key=lambda item: int(item.rsplit(":", 1)[1]))
     if len(candidates) < options.count:
         raise ValueError(f"only {len(candidates)} eligible train tasks remain")
-    selected = sorted(random.Random(options.seed).sample(candidates, options.count), key=lambda item: int(item.rsplit(":", 1)[1]))
+    selected = sorted(
+        random.Random(options.seed).sample(candidates, options.count),
+        key=lambda item: int(item.rsplit(":", 1)[1]),
+    )
     output_rows = [
         {
             "benchmark": "webshop",
@@ -97,7 +96,9 @@ def main() -> int:
         "task_count": len(selected),
         "repeat_ids": [0, 1, 2],
         "source_train_manifest": options.train_manifest.as_posix(),
-        "source_train_manifest_sha256": hashlib.sha256(options.train_manifest.read_bytes()).hexdigest(),
+        "source_train_manifest_sha256": hashlib.sha256(
+            options.train_manifest.read_bytes()
+        ).hexdigest(),
         "p100_audit": options.p100_audit.as_posix(),
         "excluded_manifests": {
             path: {"count": len(ids), "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}

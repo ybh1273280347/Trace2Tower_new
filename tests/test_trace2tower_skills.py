@@ -6,20 +6,20 @@ from types import SimpleNamespace
 
 import pytest
 
-from trace2tower.llm_runtime import ChatResult, CommonLLMRuntime, LLMUsage, ToolCall
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.high_paths import (
+from trace2tower.components.llm_runtime import ChatResult, CommonLLMRuntime, LLMUsage, ToolCall
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.core.models import HighPath, MidCluster, PrimitiveAction
+from trace2tower.methods.trace2tower.induction.high_paths import (
     compress_repeated_mid_ids,
     mine_high_paths,
 )
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster, PrimitiveAction
-from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
-from trace2tower.methods.trace2tower.skills import (
+from trace2tower.methods.trace2tower.induction.skills import (
     MidRenderInput,
     MidSkillCard,
     SegmentEvidence,
     build_mid_render_inputs,
 )
+from trace2tower.methods.trace2tower.rendering.renderer import render_high_card, render_mid_card
 
 
 def segment(segment_id: str, trajectory_id: str, step: int) -> dict:
@@ -41,8 +41,7 @@ def segment(segment_id: str, trajectory_id: str, step: int) -> dict:
 
 def record(trajectory_id: str, score: float, segment_ids: tuple[str, ...]) -> dict:
     segments = [
-        segment(segment_id, trajectory_id, index)
-        for index, segment_id in enumerate(segment_ids)
+        segment(segment_id, trajectory_id, index) for index, segment_id in enumerate(segment_ids)
     ]
     transitions = [
         {
@@ -175,10 +174,7 @@ def test_mid_renderer_preserves_builder_fields_and_rejects_illegal_grounding() -
     assert runtime.calls[0][2]["tool_choice"] == "required"
     assert "ALFWorld execution semantics" in runtime.calls[0][1][0]["content"]
     assert "WebShop execution semantics" not in runtime.calls[0][1][0]["content"]
-    assert (
-        runtime.calls[0][2]["prompt_cache_key"]
-        == "trace2tower:mid:alfworld:v3"
-    )
+    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:mid:alfworld:v3"
 
     payload["grounding_actions"] = ["CLICK"]
     with pytest.raises(ValueError, match="outside the cluster"):
@@ -220,16 +216,11 @@ def test_high_renderer_preserves_path_id_and_mid_order() -> None:
         "constraints": ["Confirm the destination before acting."],
     }
     runtime = FakeRuntime("render_high_skill", payload)
-    card, _ = asyncio.run(
-        render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child})
-    )
+    card, _ = asyncio.run(render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child}))
     assert card.skill_id == path.path_id
     assert card.ordered_mid_ids == path.ordered_mid_ids
     assert runtime.calls[0][2]["tool_choice"] == "required"
-    assert (
-        runtime.calls[0][2]["prompt_cache_key"]
-        == "trace2tower:high:alfworld:task-v7"
-    )
+    assert runtime.calls[0][2]["prompt_cache_key"] == "trace2tower:high:alfworld:task-v7"
     assert "ALFWorld task-strategy semantics" in runtime.calls[0][1][0]["content"]
     assert "WebShop task-strategy semantics" not in runtime.calls[0][1][0]["content"]
 
@@ -257,12 +248,12 @@ def test_mid_renderer_keeps_a_stable_prefix_before_variable_evidence() -> None:
     first_messages = first.calls[0][1]
     second_messages = second.calls[0][1]
     assert first_messages[0] == second_messages[0]
-    first_actions = first.calls[0][2]["tools"][0]["function"]["parameters"][
-        "properties"
-    ]["grounding_actions"]["items"]["enum"]
-    second_actions = second.calls[0][2]["tools"][0]["function"]["parameters"][
-        "properties"
-    ]["grounding_actions"]["items"]["enum"]
+    first_actions = first.calls[0][2]["tools"][0]["function"]["parameters"]["properties"][
+        "grounding_actions"
+    ]["items"]["enum"]
+    second_actions = second.calls[0][2]["tools"][0]["function"]["parameters"]["properties"][
+        "grounding_actions"
+    ]["items"]["enum"]
     assert first_actions == ["GOTO"]
     assert second_actions == ["GOTO", "PICK"]
     assert first.calls[0][2]["prompt_cache_key"] == second.calls[0][2]["prompt_cache_key"]
@@ -321,9 +312,9 @@ def test_mid_renderer_uses_event_proportions_and_excludes_rare_grounding() -> No
     assert [item["raw_actions"] for item in profile["representative_examples"]].count(
         ["heat apple with microwave"]
     ) == 1
-    legal_actions = runtime.calls[0][2]["tools"][0]["function"]["parameters"][
-        "properties"
-    ]["grounding_actions"]["items"]["enum"]
+    legal_actions = runtime.calls[0][2]["tools"][0]["function"]["parameters"]["properties"][
+        "grounding_actions"
+    ]["items"]["enum"]
     assert legal_actions == ["GOTO"]
 
 
@@ -341,9 +332,7 @@ def test_mid_renderer_receives_complete_trajectory_context() -> None:
         "trajectory_score": 1.0,
         "ordered_mid_ids": ["mid_fixed", "mid_other"],
         "ordered_events": ["GotoLocation", "PutObject"],
-        "ordered_actions": [
-            {"primitive_action": "GOTO", "raw_action": "go to counter"}
-        ],
+        "ordered_actions": [{"primitive_action": "GOTO", "raw_action": "go to counter"}],
     }
 
     asyncio.run(
@@ -386,9 +375,7 @@ def test_high_renderer_does_not_send_builder_membership_ids() -> None:
     }
     runtime = FakeRuntime("render_high_skill", payload)
 
-    asyncio.run(
-        render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child})
-    )
+    asyncio.run(render_high_card(runtime, Benchmark.ALFWORLD, path, {"mid_fixed": child}))
 
     render_input = json.loads(runtime.calls[0][1][-1]["content"])
     assert "member_segment_ids" not in render_input["child_mid_cards"][0]

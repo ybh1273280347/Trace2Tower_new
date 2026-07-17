@@ -5,30 +5,29 @@ from dataclasses import replace
 
 import pytest
 
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.llm_runtime import EmbeddingResult, LLMUsage, ModelRole
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.high_to_mid_provider import HighToMidSkillProvider
-from trace2tower.methods.trace2tower.models import (
-    HighPath,
-    MidCluster,
-    PrimitiveAction,
-)
-from trace2tower.methods.trace2tower.skills import HighSkillCard, LowSkill, MidSkillCard
-from trace2tower.methods.trace2tower.tower import (
+from trace2tower.components.llm_runtime import EmbeddingResult, LLMUsage, ModelRole
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.artifacts.tower import (
     TowerSnapshot,
     TowerSourceHashes,
     TowerVersion,
     build_tower_snapshot,
 )
-from trace2tower.results import MethodName
-from trace2tower.semantic_index import SkillEmbeddingIndex
+from trace2tower.methods.trace2tower.core.config import TowerBuildMethod, Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import (
+    HighPath,
+    MidCluster,
+    PrimitiveAction,
+)
+from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, LowSkill, MidSkillCard
+from trace2tower.methods.trace2tower.inference.provider import HighToMidSkillProvider
 
 
 def config() -> Trace2TowerConfig:
     return Trace2TowerConfig(
-        method=MethodName.TRACE2TOWER,
+        method=TowerBuildMethod.TRACE2TOWER,
         semantic_only=False,
         use_transition_edge=True,
         use_outcome_edge=True,
@@ -90,9 +89,7 @@ def complete_snapshot() -> TowerSnapshot:
         mid_index=SkillEmbeddingIndex(
             ("mid_a", "mid_b"), ((1.0, 0.0), (0.0, 1.0)), ("b" * 64, "c" * 64)
         ),
-        high_index=SkillEmbeddingIndex(
-            ("high_ab",), ((1.0, 1.0),), ("d" * 64,)
-        ),
+        high_index=SkillEmbeddingIndex(("high_ab",), ((1.0, 1.0),), ("d" * 64,)),
     )
 
 
@@ -131,9 +128,7 @@ def test_incomplete_snapshot_is_representable_but_not_formally_executable() -> N
 
 def test_snapshot_rejects_support_outside_training_provenance() -> None:
     snapshot = complete_snapshot()
-    invalid_path = replace(
-        snapshot.high_paths[0], supporting_trajectory_ids=("other-trajectory",)
-    )
+    invalid_path = replace(snapshot.high_paths[0], supporting_trajectory_ids=("other-trajectory",))
     with pytest.raises(ValueError, match="support outside training"):
         replace(snapshot, snapshot_id="", high_paths=(invalid_path,))
 

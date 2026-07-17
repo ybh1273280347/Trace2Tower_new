@@ -9,20 +9,19 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
-from trace2tower.llm_runtime import CommonLLMRuntime, EmbeddingResult, LLMUsage
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.skill_text import high_card_text, mid_card_text
-from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
-from trace2tower.semantic_index import SkillEmbeddingIndex
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
+from trace2tower.components.llm_runtime import CommonLLMRuntime, EmbeddingResult, LLMUsage
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, MidSkillCard
+from trace2tower.methods.trace2tower.inference.formatting import high_card_text, mid_card_text
 
 
 async def main(options: argparse.Namespace) -> int:
     load_dotenv(options.env)
     common = load_yaml(options.config_root / "common.yaml")
-    config_record = load_yaml(options.config)
-    config = Trace2TowerConfig.from_record(config_record)
+    Trace2TowerConfig.from_record(load_yaml(options.config))
     payload = json.loads(options.cards.read_text(encoding="utf-8"))
     mid_cards = tuple(MidSkillCard.from_record(item) for item in payload["mid_cards"])
     high_cards = tuple(HighSkillCard.from_record(item) for item in payload["high_cards"])
@@ -202,9 +201,7 @@ async def _embed_batches(
             input_tokens=_sum_usage(result.usage.input_tokens for result in results),
             output_tokens=_sum_usage(result.usage.output_tokens for result in results),
             billable_tokens=_sum_usage(result.usage.billable_tokens for result in results),
-            cached_input_tokens=_sum_usage(
-                result.usage.cached_input_tokens for result in results
-            ),
+            cached_input_tokens=_sum_usage(result.usage.cached_input_tokens for result in results),
             cache_write_input_tokens=_sum_usage(
                 result.usage.cache_write_input_tokens for result in results
             ),

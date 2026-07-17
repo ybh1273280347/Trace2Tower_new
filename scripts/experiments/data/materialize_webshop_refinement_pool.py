@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from trace2tower.trajectory import (
+from trace2tower.core.trajectory import (
     EpisodeTrajectory,
     TrajectoryReader,
     write_trajectory_jsonl,
@@ -42,9 +42,7 @@ def main() -> int:
         raise ValueError(f"NoSkill feedback is incomplete: {len(noskill)}")
     if len(tower) != options.expected_feedback_count:
         raise ValueError(f"Tower feedback is incomplete: {len(tower)}")
-    baseline_keys = {
-        (item.sample_id, item.repeat_id) for item in noskill
-    }
+    baseline_keys = {(item.sample_id, item.repeat_id) for item in noskill}
     tower_keys = {(item.sample_id, item.repeat_id) for item in tower}
     if baseline_keys != tower_keys:
         raise ValueError("NoSkill and Tower feedback keys are not identical")

@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from trace2tower.trajectory import (
+from trace2tower.core.trajectory import (
     EpisodeTrajectory,
     TrajectoryReader,
     write_trajectory_jsonl,
@@ -47,9 +47,7 @@ def deduplicate_trajectories(
 
 def main(options: argparse.Namespace) -> int:
     base = TrajectoryReader.read_jsonl(options.base_pool)
-    additions, duplicate_audit = deduplicate_trajectories(
-        read_run(options.additions_run)
-    )
+    additions, duplicate_audit = deduplicate_trajectories(read_run(options.additions_run))
     trajectories = tuple(base) + tuple(additions)
     keys = [(trajectory.sample_id, trajectory.repeat_id) for trajectory in trajectories]
     if len(keys) != len(set(keys)):
@@ -62,9 +60,7 @@ def main(options: argparse.Namespace) -> int:
     expected_repeats = set(options.repeat_id)
     observed = set(keys)
     expected = {
-        (sample_id, repeat_id)
-        for sample_id in expected_ids
-        for repeat_id in expected_repeats
+        (sample_id, repeat_id) for sample_id in expected_ids for repeat_id in expected_repeats
     }
     if observed != expected:
         raise ValueError(

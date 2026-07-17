@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 import yaml
+
 from scripts.experiments.run.rollout_no_skill_train import write_json
 
 EXPECTED_COMMIT = "36747f424a17ea041e476adf2ff976a206ec9c30"
@@ -55,9 +56,7 @@ def inspect_skillx(repository: Path) -> dict:
     if changed != set(LOCAL_PATCHES):
         raise ValueError(f"unexpected protected SkillX changes: {sorted(changed)}")
     base_hashes = {
-        path: hashlib.sha256(
-            git(repository, "show", f"HEAD:{path}", text=False)
-        ).hexdigest()
+        path: hashlib.sha256(git(repository, "show", f"HEAD:{path}", text=False)).hexdigest()
         for path in PROTECTED_FILES
     }
     hashes = {
@@ -82,9 +81,7 @@ def inspect_skillx(repository: Path) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--repository", type=Path, default=Path("third_party/SkillX")
-    )
+    parser.add_argument("--repository", type=Path, default=Path("third_party/SkillX"))
     parser.add_argument("--output", type=Path)
     options = parser.parse_args()
     report = inspect_skillx(options.repository)

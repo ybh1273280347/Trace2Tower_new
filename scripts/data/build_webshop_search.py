@@ -31,7 +31,8 @@ def main() -> int:
     )
     database.execute(
         "CREATE TABLE IF NOT EXISTS build_state ("
-        "source_path TEXT PRIMARY KEY, source_size INTEGER NOT NULL, indexed_lines INTEGER NOT NULL)"
+        "source_path TEXT PRIMARY KEY, source_size INTEGER NOT NULL, "
+        "indexed_lines INTEGER NOT NULL)"
     )
 
     source_path = str(options.source.resolve())

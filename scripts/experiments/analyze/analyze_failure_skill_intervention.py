@@ -19,9 +19,7 @@ def parse_run(value: str) -> tuple[str, Path]:
     return name, Path(raw_path)
 
 
-def load_method_rows(
-    paths: list[Path], sample_ids: tuple[str, ...]
-) -> dict[tuple[str, int], dict]:
+def load_method_rows(paths: list[Path], sample_ids: tuple[str, ...]) -> dict[tuple[str, int], dict]:
     rows = {}
     expected = {(sample_id, repeat_id) for sample_id in sample_ids for repeat_id in REPEAT_IDS}
     for path in paths:
@@ -66,13 +64,9 @@ def summarize_method(rows: dict[tuple[str, int], dict], sample_ids: tuple[str, .
             "full_success": float(
                 np.mean([float(row["primary_score"]) >= 0.999 for row in sample_rows])
             ),
-            "zero_rate": float(
-                np.mean([float(row["primary_score"]) == 0 for row in sample_rows])
-            ),
+            "zero_rate": float(np.mean([float(row["primary_score"]) == 0 for row in sample_rows])),
             "steps": float(np.mean([row["steps"] for row in sample_rows])),
-            "invalid_actions": float(
-                np.mean([row["invalid_actions"] for row in sample_rows])
-            ),
+            "invalid_actions": float(np.mean([row["invalid_actions"] for row in sample_rows])),
         }
     return {
         "aggregate": {
@@ -150,9 +144,7 @@ def trajectory_diagnostics(trajectories: dict[tuple[str, int], dict]) -> dict:
 def load_skill_names(path: Path) -> dict[str, str]:
     tower = json.loads(path.read_text(encoding="utf-8"))
     return {
-        card["skill_id"]: card["name"]
-        for key in ("mid_cards", "high_cards")
-        for card in tower[key]
+        card["skill_id"]: card["name"] for key in ("mid_cards", "high_cards") for card in tower[key]
     }
 
 
@@ -188,8 +180,7 @@ def markdown_report(payload: dict) -> str:
     display_methods = ("final_t1", "skillx", "generic_manual", "recovery_skill")
     for sample_id in sample_ids:
         values = [
-            summaries[method]["task_metrics"][sample_id]["reward"]
-            for method in display_methods
+            summaries[method]["task_metrics"][sample_id]["reward"] for method in display_methods
         ]
         lines.append(
             f"| {sample_id} | {values[0]:.4f} | {values[1]:.4f} | "
@@ -253,9 +244,7 @@ def markdown_report(payload: dict) -> str:
     for sample_id in sample_ids:
         diagnostics = payload["baseline_diagnostics"]["by_sample"][sample_id]
         pattern = (
-            "premature purchase"
-            if diagnostics["zero_reward_purchases"]
-            else "search exhaustion"
+            "premature purchase" if diagnostics["zero_reward_purchases"] else "search exhaustion"
         )
         lines.append(
             f"| {sample_id} | {pattern} | {diagnostics['repeated_exact_searches']} | "
@@ -327,8 +316,7 @@ def main() -> int:
         for method, paths in sorted(paths_by_method.items())
     }
     summaries = {
-        method: summarize_method(rows, sample_ids)
-        for method, rows in rows_by_method.items()
+        method: summarize_method(rows, sample_ids) for method, rows in rows_by_method.items()
     }
     intervention = summaries[options.intervention_method]
     comparisons = {

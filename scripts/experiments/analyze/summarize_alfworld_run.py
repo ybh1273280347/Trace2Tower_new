@@ -23,8 +23,11 @@ def summarize(rows: list[dict]) -> dict:
         "success_count": len(successful),
         "success_rate": len(successful) / len(rows),
         "mean_steps": fmean(int(row["steps"]) for row in rows),
-        "mean_success_steps": fmean(int(row["steps"]) for row in successful) if successful else None,
-        "invalid_action_rate": sum(int(row["invalid_actions"]) for row in rows) / max(total_steps, 1),
+        "mean_success_steps": fmean(int(row["steps"]) for row in successful)
+        if successful
+        else None,
+        "invalid_action_rate": sum(int(row["invalid_actions"]) for row in rows)
+        / max(total_steps, 1),
         "mean_input_tokens": fmean(int(row["input_tokens"]) for row in usage) if usage else None,
     }
 
@@ -47,7 +50,9 @@ def main(options: argparse.Namespace) -> int:
             ),
         }
     options.output.parent.mkdir(parents=True, exist_ok=True)
-    options.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    options.output.write_text(
+        json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(output, ensure_ascii=False, indent=2))
     return 0
 

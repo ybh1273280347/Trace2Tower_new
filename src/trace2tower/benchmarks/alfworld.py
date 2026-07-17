@@ -8,8 +8,7 @@ import httpx
 import pyarrow.parquet as parquet
 
 from trace2tower.benchmarks.models import EnvironmentState, EpisodeStart
-from trace2tower.manifests import Benchmark, ManifestEntry
-
+from trace2tower.core.manifests import Benchmark, ManifestEntry
 
 _TASK_GOAL_RE = re.compile(r"(?im)^Your task is to:\s*(.+)$")
 
@@ -82,9 +81,7 @@ class AlfworldEnvironment:
 
     async def close(self) -> None:
         if self.session_id is not None:
-            await self.client.post(
-                f"{self.server_url}/close", json={"session_id": self.session_id}
-            )
+            await self.client.post(f"{self.server_url}/close", json={"session_id": self.session_id})
             self.session_id = None
             self.current_state = None
         await self.client.aclose()

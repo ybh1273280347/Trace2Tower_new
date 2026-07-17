@@ -10,18 +10,13 @@ from statistics import fmean
 
 import numpy as np
 
-
 FULL_SUCCESS_THRESHOLD = 0.999
 BOOTSTRAP_SAMPLES = 10_000
 BOOTSTRAP_SEED = 20_260_715
 
 
 def read_jsonl(path: Path) -> list[dict]:
-    return [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
 
 
 def load_manifest(path: Path) -> set[tuple[str, int]]:
@@ -66,8 +61,7 @@ def load_run(
     success_disagreements = [
         record["sample_id"]
         for record in records
-        if bool(record["success"])
-        != (float(record["primary_score"]) >= FULL_SUCCESS_THRESHOLD)
+        if bool(record["success"]) != (float(record["primary_score"]) >= FULL_SUCCESS_THRESHOLD)
     ]
     if duplicate_keys or missing_keys or unexpected_keys or scope_errors or success_disagreements:
         raise ValueError(
@@ -112,9 +106,7 @@ def summarize(rows: dict[tuple[str, int], dict]) -> dict:
         "mean_steps": fmean(int(record["steps"]) for record in records),
         "mean_invalid_actions": fmean(int(record["invalid_actions"]) for record in records),
         "mean_input_tokens": fmean(int(record["input_tokens"]) for record in records),
-        "mean_skill_context_chars": fmean(
-            int(record["skill_context_chars"]) for record in records
-        ),
+        "mean_skill_context_chars": fmean(int(record["skill_context_chars"]) for record in records),
         "finish_reason_counts": dict(
             sorted(Counter(record["finish_reason"] for record in records).items())
         ),
@@ -151,9 +143,7 @@ def compare(
     if set(keys) != set(ablation):
         raise ValueError("paired comparison requires identical keys")
     full_success = np.asarray([bool(full[key]["success"]) for key in keys], dtype=float)
-    ablation_success = np.asarray(
-        [bool(ablation[key]["success"]) for key in keys], dtype=float
-    )
+    ablation_success = np.asarray([bool(ablation[key]["success"]) for key in keys], dtype=float)
     differences = full_success - ablation_success
     wins = int(np.sum(differences > 0))
     losses = int(np.sum(differences < 0))
@@ -169,17 +159,14 @@ def compare(
             int(full[key]["steps"]) - int(ablation[key]["steps"]) for key in keys
         ),
         "mean_invalid_action_difference": fmean(
-            int(full[key]["invalid_actions"])
-            - int(ablation[key]["invalid_actions"])
+            int(full[key]["invalid_actions"]) - int(ablation[key]["invalid_actions"])
             for key in keys
         ),
         "mean_input_token_difference": fmean(
-            int(full[key]["input_tokens"]) - int(ablation[key]["input_tokens"])
-            for key in keys
+            int(full[key]["input_tokens"]) - int(ablation[key]["input_tokens"]) for key in keys
         ),
         "mean_skill_context_char_difference": fmean(
-            int(full[key]["skill_context_chars"])
-            - int(ablation[key]["skill_context_chars"])
+            int(full[key]["skill_context_chars"]) - int(ablation[key]["skill_context_chars"])
             for key in keys
         ),
     }

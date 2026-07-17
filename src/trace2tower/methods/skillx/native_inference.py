@@ -6,8 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-
+from trace2tower.components.llm_runtime import CommonLLMRuntime, ModelRole
 
 SKILLX_COMMIT = "36747f424a17ea041e476adf2ff976a206ec9c30"
 _SKILLX_ROOT = Path(__file__).resolve().parents[4] / "third_party" / "SkillX-native-36747f4"
@@ -58,10 +57,7 @@ class NativeSkillXInference:
         reference_task: str,
         reference_plan: str,
     ) -> NativeRewriteResult:
-        reference_tasks = (
-            f"Task-1 {reference_task}:\n"
-            f"Reference plan:\n{reference_plan}\n\n"
-        )
+        reference_tasks = f"Task-1 {reference_task}:\nReference plan:\n{reference_plan}\n\n"
         messages = [
             {"role": "system", "content": PLAN_REWRITE_PROMPT},
             {
@@ -142,9 +138,9 @@ class NativeSkillXInference:
             output_tokens.append(result.usage.output_tokens)
             selected_names = _extract_skill_names(result.content or "")
             if selected_names:
-                selected = tuple(
-                    skill for skill in candidates if skill.name in selected_names
-                )[:max_skills]
+                selected = tuple(skill for skill in candidates if skill.name in selected_names)[
+                    :max_skills
+                ]
                 return NativeSelectionResult(
                     selected,
                     _sum_tokens(input_tokens),
@@ -180,9 +176,7 @@ def format_native_context(
         lines.append("Note: Skills are for reference only. Use the actual tools for execution.")
         sections.append("\n".join(lines))
     if plan:
-        sections.append(
-            f"# Reference Plan\n{plan}\n\nNote: Adapt the plan to the specific task."
-        )
+        sections.append(f"# Reference Plan\n{plan}\n\nNote: Adapt the plan to the specific task.")
     return "\n\n".join(sections)
 
 

@@ -32,15 +32,11 @@ def read_results(root: Path) -> dict[tuple[str, int], dict]:
     return rows
 
 
-def build_metrics(
-    baseline_root: Path, tower_root: Path
-) -> tuple[BundleMetrics, ...]:
+def build_metrics(baseline_root: Path, tower_root: Path) -> tuple[BundleMetrics, ...]:
     baseline = read_results(baseline_root)
     tower = read_results(tower_root)
     if set(baseline) != set(tower):
-        raise ValueError(
-            f"NoSkill/Tower key mismatch: baseline={len(baseline)} tower={len(tower)}"
-        )
+        raise ValueError(f"NoSkill/Tower key mismatch: baseline={len(baseline)} tower={len(tower)}")
     grouped: dict[str, list[tuple[dict, dict]]] = {}
     for key in sorted(baseline):
         record = tower[key]
@@ -60,9 +56,9 @@ def build_metrics(
             baseline_score = float(baseline_record["primary_score"])
             tower_score = float(tower_record["primary_score"])
             gain = tower_score - baseline_score
-            raw_step = (
-                int(baseline_record["steps"]) - int(tower_record["steps"])
-            ) / max(int(baseline_record["steps"]), 1)
+            raw_step = (int(baseline_record["steps"]) - int(tower_record["steps"])) / max(
+                int(baseline_record["steps"]), 1
+            )
             rewards.append(tower_score)
             gains.append(gain)
             step_savings.append(min(raw_step, 0.0) if gain < 0 else raw_step)
@@ -74,8 +70,7 @@ def build_metrics(
                 and tower_record.get("chat_output_tokens") is not None
             ):
                 chat_tokens.append(
-                    int(tower_record["chat_input_tokens"])
-                    + int(tower_record["chat_output_tokens"])
+                    int(tower_record["chat_input_tokens"]) + int(tower_record["chat_output_tokens"])
                 )
         metrics.append(
             BundleMetrics(
@@ -103,9 +98,7 @@ def dominates(left: BundleMetrics, right: BundleMetrics) -> bool:
         right.guarded_step_saving,
     )
     differences = tuple(a - b for a, b in zip(left_values, right_values, strict=True))
-    return all(value >= 0 for value in differences) and any(
-        value > 0 for value in differences
-    )
+    return all(value >= 0 for value in differences) and any(value > 0 for value in differences)
 
 
 def rank_fronts(metrics: tuple[BundleMetrics, ...]) -> tuple[BundleMetrics, ...]:
@@ -179,7 +172,10 @@ def main() -> int:
         "downweight": updates,
         "card_level_lifecycle": {
             "status": "disabled",
-            "reason": "Mid cards are co-injected inside High bundles and have no independent exposure",
+            "reason": (
+                "Mid cards are co-injected inside High bundles and have no "
+                "independent exposure"
+            ),
         },
     }
     options.output.parent.mkdir(parents=True, exist_ok=True)

@@ -6,23 +6,19 @@ from collections import Counter
 from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.methods.trace2tower.models import HighCommunity, MidCluster, PrimitiveAction
-from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
-from trace2tower.methods.trace2tower.webshop_branch_graph import WebShopBranchGraph
+from trace2tower.methods.trace2tower.adapters.webshop.branch_graph import WebShopBranchGraph
+from trace2tower.methods.trace2tower.core.models import HighCommunity, MidCluster, PrimitiveAction
+from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, MidSkillCard
 
 
 def main(options: argparse.Namespace) -> int:
-    graph = WebShopBranchGraph.from_record(
-        json.loads(options.graph.read_text(encoding="utf-8"))
-    )
+    graph = WebShopBranchGraph.from_record(json.loads(options.graph.read_text(encoding="utf-8")))
     clusters = tuple(
         MidCluster.from_record(item)
         for item in json.loads(options.clusters.read_text(encoding="utf-8"))["clusters"]
     )
     structure = json.loads(options.communities.read_text(encoding="utf-8"))
-    communities = tuple(
-        HighCommunity.from_record(item) for item in structure["communities"]
-    )
+    communities = tuple(HighCommunity.from_record(item) for item in structure["communities"])
     node_by_segment = {
         segment_id: node for node in graph.nodes for segment_id in node.member_segment_ids
     }
@@ -38,9 +34,7 @@ def main(options: argparse.Namespace) -> int:
         (mid_id for mid_id in signal_counts if mid_id != main_id),
         key=lambda mid_id: signal_counts[mid_id]["search_backtrack"],
     )
-    evidence_id = next(
-        mid_id for mid_id in signal_counts if mid_id not in {main_id, recovery_id}
-    )
+    evidence_id = next(mid_id for mid_id in signal_counts if mid_id not in {main_id, recovery_id})
     clusters_by_id = {cluster.cluster_id: cluster for cluster in clusters}
     cards = {
         main_id: MidSkillCard(
@@ -54,8 +48,10 @@ def main(options: argparse.Namespace) -> int:
                 "Click Buy Now once visible price and required selections satisfy the request.",
             ),
             (
-                "Do not infer a product property from another candidate or from title similarity alone.",
-                "If an exact requested option is unavailable, leave the candidate instead of substituting.",
+                "Do not infer a product property from another candidate or from title "
+                "similarity alone.",
+                "If an exact requested option is unavailable, leave the candidate "
+                "instead of substituting.",
             ),
             (PrimitiveAction.CLICK,),
         ),
@@ -65,8 +61,10 @@ def main(options: argparse.Namespace) -> int:
             "Search with constraints and resolve one missing fact",
             "Use at task start or when one required property remains unverified.",
             (
-                "Search with the product identity plus the most discriminative requested constraint.",
-                "Use one relevant detail view only for a required property that is still unresolved.",
+                "Search with the product identity plus the most discriminative "
+                "requested constraint.",
+                "Use one relevant detail view only for a required property that is "
+                "still unresolved.",
                 "Return to the same product page after reading that detail.",
             ),
             (
@@ -79,7 +77,8 @@ def main(options: argparse.Namespace) -> int:
             recovery_id,
             clusters_by_id[recovery_id].member_segment_ids,
             "Recover from a mismatched candidate or weak result set",
-            "Use only after the current candidate contradicts the request or no plausible result remains.",
+            "Use only after the current candidate contradicts the request or no "
+            "plausible result remains.",
             (
                 "Return to a page where search is available.",
                 "Revise the query with a missing identifying constraint rather than broadening it.",
@@ -87,23 +86,28 @@ def main(options: argparse.Namespace) -> int:
             ),
             (
                 "Do not repeat an identical query or reopen a rejected candidate.",
-                "Do not abandon a candidate merely because a detail view must return to its product page.",
+                "Do not abandon a candidate merely because a detail view must return "
+                "to its product page.",
             ),
             (PrimitiveAction.CLICK, PrimitiveAction.SEARCH),
         ),
     }
     procedure = (
-        "Search with the requested product identity plus the most discriminative requested attribute or variant.",
+        "Search with the requested product identity plus the most discriminative "
+        "requested attribute or variant.",
         "Open the best plausible result and use only the current product page as evidence.",
         "Select every requested variant exactly as shown and confirm the selected state.",
         "Click Buy Now as soon as visible price and required selections satisfy the request.",
     )
     common_guard = (
-        "Never claim that an unobserved product property is satisfied; inspect only a required unresolved property.",
+        "Never claim that an unobserved product property is satisfied; inspect only "
+        "a required unresolved property.",
     )
     recovery_guards = (
-        "After rejecting a candidate, search again with a missing identifying constraint rather than a broader query.",
-        "After reading a detail tab, return to the same product page unless the detail contradicts the request.",
+        "After rejecting a candidate, search again with a missing identifying "
+        "constraint rather than a broader query.",
+        "After reading a detail tab, return to the same product page unless the "
+        "detail contradicts the request.",
     )
     high_cards = []
     for community in communities:
@@ -118,9 +122,11 @@ def main(options: argparse.Namespace) -> int:
                     else "Search, verify, select, and buy directly"
                 ),
                 description=(
-                    "Use for shopping tasks whose search or candidate may require one targeted recovery."
+                    "Use for shopping tasks whose search or candidate may require one "
+                    "targeted recovery."
                     if recovery
-                    else "Use for shopping tasks that can proceed from a constrained search to a plausible candidate."
+                    else "Use for shopping tasks that can proceed from a constrained "
+                    "search to a plausible candidate."
                 ),
                 procedure=procedure,
                 constraints=common_guard + (recovery_guards if recovery else ()),

@@ -6,21 +6,22 @@ import json
 import os
 import tempfile
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
 
-from trace2tower.agent import AgentEvaluator
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.checkpoint import EpisodeCheckpoint
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, read_manifest
-from trace2tower.results import EpisodeResultWriter, MethodName
-from trace2tower.runner import run_shard
-from trace2tower.trajectory import TrajectoryWriter, materialize_trajectory_shard
+from trace2tower.components.agent import AgentEvaluator
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark, read_manifest
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryWriter, materialize_trajectory_shard
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
+from trace2tower.experiments.result_writer import EpisodeResultWriter
+from trace2tower.experiments.runner import run_shard
 
 
 def load_yaml(path: Path) -> dict:
@@ -63,17 +64,12 @@ async def collect_benchmark(
     manifest_path = Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl"
     entries = read_manifest(manifest_path)
     shard_name = f"shard-{options.shard_id:02d}"
-    run_dir = (
-        Path(common["runs_dir"])
-        / options.run_id
-        / benchmark
-        / "no_skill_train"
-        / shard_name
-    )
+    run_dir = Path(common["runs_dir"]) / options.run_id / benchmark / "no_skill_train" / shard_name
     checkpoint = EpisodeCheckpoint(run_dir / "results.jsonl", run_dir / "errors.jsonl")
     writer = EpisodeResultWriter(checkpoint)
 
     if runtime is None:
+
         async def unavailable_executor(entry, shard_id):
             raise RuntimeError("dry-run executor must not be called")
 
@@ -119,7 +115,7 @@ async def collect_benchmark(
             max_steps=benchmark_config["max_steps"],
         )
 
-    started_at = datetime.now(timezone.utc)
+    started_at = datetime.now(UTC)
     summary = await run_shard(
         entries,
         method=MethodName.NO_SKILL,
@@ -149,7 +145,7 @@ async def collect_benchmark(
         "trajectory_path": pool_path.as_posix(),
         "trajectory_count": trajectory_count,
         "started_at": started_at.isoformat(),
-        "finished_at": datetime.now(timezone.utc).isoformat(),
+        "finished_at": datetime.now(UTC).isoformat(),
         "invocation_summary": asdict(summary),
     }
     write_json(run_dir / "run-metadata.json", metadata)
@@ -159,15 +155,10 @@ async def collect_benchmark(
 async def main(options: argparse.Namespace) -> None:
     config_root = options.config_root
     common = load_yaml(config_root / "common.yaml")
-    configs = {
-        benchmark: load_yaml(config_root / f"{benchmark}.yaml")
-        for benchmark in Benchmark
-    }
+    configs = {benchmark: load_yaml(config_root / f"{benchmark}.yaml") for benchmark in Benchmark}
     resolved_config = {
         "common": common,
-        "benchmarks": {
-            benchmark.value: config for benchmark, config in configs.items()
-        },
+        "benchmarks": {benchmark.value: config for benchmark, config in configs.items()},
         "methods": {"no_skill": load_yaml(config_root / "webshop_no_skill.yaml")},
     }
     agent_model = options.agent_model or resolved_config["methods"]["no_skill"]["agent_model"]
@@ -186,9 +177,10 @@ async def main(options: argparse.Namespace) -> None:
     benchmarks = tuple(Benchmark) if options.benchmark == "all" else (Benchmark(options.benchmark),)
     if options.dry_run:
         for benchmark in benchmarks:
-            print(benchmark, await collect_benchmark(
-                benchmark, options, common, configs[benchmark], None
-            ))
+            print(
+                benchmark,
+                await collect_benchmark(benchmark, options, common, configs[benchmark], None),
+            )
         return
 
     load_dotenv(options.env)
@@ -202,9 +194,10 @@ async def main(options: argparse.Namespace) -> None:
     )
     try:
         for benchmark in benchmarks:
-            print(benchmark, await collect_benchmark(
-                benchmark, options, common, configs[benchmark], runtime
-            ))
+            print(
+                benchmark,
+                await collect_benchmark(benchmark, options, common, configs[benchmark], runtime),
+            )
     finally:
         await runtime.close()
 

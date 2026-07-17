@@ -1,1 +1,1 @@
-"""Trace2Tower deterministic preprocessing."""
+"""Trace2Tower method implementation."""

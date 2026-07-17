@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import pytest
 
-from trace2tower.evaluation import (
+from trace2tower.core.manifests import Benchmark, ExperimentSplit, ManifestEntry
+from trace2tower.core.results import EpisodeResult, FinishReason, MethodName
+from trace2tower.experiments.evaluation import (
     aggregate_method,
     audit_result_set,
     paired_bootstrap,
     unresolved_failures,
 )
-from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
-from trace2tower.results import EpisodeResult, FinishReason, MethodName
 
 
 def entry(index: int, benchmark: Benchmark = Benchmark.WEBSHOP) -> ManifestEntry:
@@ -170,12 +170,10 @@ def test_paired_bootstrap_is_deterministic_and_reports_optional_coverage() -> No
 
 def test_paired_bootstrap_clusters_repeats_by_sample() -> None:
     baseline = tuple(
-        result(0, MethodName.NO_SKILL, 0.0, repeat_id=repeat_id)
-        for repeat_id in range(3)
+        result(0, MethodName.NO_SKILL, 0.0, repeat_id=repeat_id) for repeat_id in range(3)
     ) + (result(1, MethodName.NO_SKILL, 1.0),)
     candidate = tuple(
-        result(0, MethodName.TRACE2TOWER, 1.0, repeat_id=repeat_id)
-        for repeat_id in range(3)
+        result(0, MethodName.TRACE2TOWER, 1.0, repeat_id=repeat_id) for repeat_id in range(3)
     ) + (result(1, MethodName.TRACE2TOWER, 0.0),)
     comparison = paired_bootstrap(
         baseline,

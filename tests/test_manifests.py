@@ -1,6 +1,6 @@
 import pytest
 
-from trace2tower.manifests import (
+from trace2tower.core.manifests import (
     Benchmark,
     ExperimentSplit,
     ManifestEntry,

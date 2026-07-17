@@ -48,9 +48,7 @@ def main() -> int:
     repeat1_scores = np.array(
         [repeat1[(sample_id, 1)]["primary_score"] for sample_id in sample_ids]
     )
-    tower_scores = np.array(
-        [tower[(sample_id, 0)]["primary_score"] for sample_id in sample_ids]
-    )
+    tower_scores = np.array([tower[(sample_id, 0)]["primary_score"] for sample_id in sample_ids])
     noskill_mean_scores = (repeat0_scores + repeat1_scores) / 2
 
     payload = {
@@ -64,9 +62,7 @@ def main() -> int:
         "summary": {
             "noskill_repeat0": summarize(repeat0),
             "noskill_repeat1": summarize(repeat1),
-            "noskill_two_repeat_task_mean_reward": float(
-                np.mean(noskill_mean_scores)
-            ),
+            "noskill_two_repeat_task_mean_reward": float(np.mean(noskill_mean_scores)),
             "final_tower_repeat0": summarize(tower),
         },
         "paired_deltas": {

@@ -8,17 +8,17 @@ from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
+
 from scripts.experiments.run.rollout_no_skill_train import (
     collect_benchmark,
     load_yaml,
     write_json,
 )
-
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, read_manifest, select_shard
-from trace2tower.results import MethodName
-from trace2tower.trajectory import TrajectoryReader
-from trace2tower.trajectory_pool import audit_training_shard
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark, read_manifest, select_shard
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryReader
+from trace2tower.data.trajectory_pool import audit_training_shard
 
 NO_SKILL_COMMON_FIELDS = (
     "manifests_dir",
@@ -60,8 +60,7 @@ def validate_extension_contract(
         base_config.get("agent_model") == agent_model,
         common_execution_contract(base_config.get("common", {}))
         == common_execution_contract(current_common),
-        base_config.get("benchmarks", {}).get(benchmark.value)
-        == current_benchmark_config,
+        base_config.get("benchmarks", {}).get(benchmark.value) == current_benchmark_config,
         base_config.get("method") == MethodName.NO_SKILL.value,
         int(pilot.get("shard_id", -1)) == shard_id,
         int(pilot.get("num_shards", -1)) == num_shards,
@@ -118,14 +117,10 @@ async def main(options: argparse.Namespace) -> int:
         target_count=options.target_episodes,
         pool_path=pool_path,
     )
-    entries = read_manifest(
-        Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl"
-    )
+    entries = read_manifest(Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl")
     shard_size = len(select_shard(entries, options.shard_id, options.num_shards))
     if options.target_episodes > shard_size:
-        raise ValueError(
-            f"target exceeds shard size: {options.target_episodes} > {shard_size}"
-        )
+        raise ValueError(f"target exceeds shard size: {options.target_episodes} > {shard_size}")
     before = audit_training_shard(
         entries,
         run_id=options.run_id,
@@ -140,9 +135,7 @@ async def main(options: argparse.Namespace) -> int:
     if not before.complete:
         raise ValueError("existing pilot prefix is incomplete; repair it before extension")
     extension_config = {
-        "base_resolved_config_sha256": hashlib.sha256(
-            base_config_path.read_bytes()
-        ).hexdigest(),
+        "base_resolved_config_sha256": hashlib.sha256(base_config_path.read_bytes()).hexdigest(),
         "run_id": options.run_id,
         "benchmark": benchmark.value,
         "method": MethodName.NO_SKILL.value,

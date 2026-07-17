@@ -15,10 +15,10 @@ from scripts.experiments.run.rollout_no_skill_train import (
     write_json,
     write_yaml,
 )
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
-from trace2tower.trajectory import TrajectoryReader
-from trace2tower.trajectory_quality import summarize_trajectory_quality
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.core.trajectory import TrajectoryReader
+from trace2tower.data.trajectory_quality import summarize_trajectory_quality
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -45,9 +45,7 @@ async def run_model(
     )
     resolved_config = {
         "common": common,
-        "benchmarks": {
-            benchmark.value: config for benchmark, config in configs.items()
-        },
+        "benchmarks": {benchmark.value: config for benchmark, config in configs.items()},
         "method": "no_skill",
         "agent_model": model,
         "pilot": {
@@ -64,11 +62,7 @@ async def run_model(
         retry_base_seconds=common["retry_base_seconds"],
     )
     episode_semaphore = asyncio.Semaphore(common["episode_concurrency"])
-    benchmarks = (
-        tuple(Benchmark)
-        if options.benchmark == "all"
-        else (Benchmark(options.benchmark),)
-    )
+    benchmarks = tuple(Benchmark) if options.benchmark == "all" else (Benchmark(options.benchmark),)
     try:
         await asyncio.gather(
             *(
@@ -124,15 +118,15 @@ async def run_model(
     }
 
 
-def paired_comparison(model_reports: dict[str, dict], common: dict, options: argparse.Namespace) -> dict:
+def paired_comparison(
+    model_reports: dict[str, dict], common: dict, options: argparse.Namespace
+) -> dict:
     scores = {}
     for model, report in model_reports.items():
         run_id = report["run_id"]
         model_scores = {}
         benchmarks = (
-            tuple(Benchmark)
-            if options.benchmark == "all"
-            else (Benchmark(options.benchmark),)
+            tuple(Benchmark) if options.benchmark == "all" else (Benchmark(options.benchmark),)
         )
         for benchmark in benchmarks:
             results_path = (
@@ -157,8 +151,7 @@ def paired_comparison(model_reports: dict[str, dict], common: dict, options: arg
         if set(baseline_scores) != set(challenger_scores):
             raise ValueError(f"paired episode keys differ for {benchmark}")
         differences = [
-            challenger_scores[key] - baseline_scores[key]
-            for key in sorted(baseline_scores)
+            challenger_scores[key] - baseline_scores[key] for key in sorted(baseline_scores)
         ]
         paired[benchmark.value] = {
             "challenger": challenger,
@@ -175,18 +168,21 @@ async def main(options: argparse.Namespace) -> None:
     load_dotenv(options.env)
     common = load_yaml(options.config_root / "common.yaml")
     configs = {
-        benchmark: load_yaml(options.config_root / f"{benchmark}.yaml")
-        for benchmark in Benchmark
+        benchmark: load_yaml(options.config_root / f"{benchmark}.yaml") for benchmark in Benchmark
     }
-    print(yaml.safe_dump({
-        "pilot_id": options.pilot_id,
-        "benchmark": options.benchmark,
-        "models": list(options.models),
-        "shard_id": options.shard_id,
-        "num_shards": options.num_shards,
-        "max_episodes_per_benchmark": options.max_episodes,
-        "agent_temperature": common["agent_temperature"],
-    }))
+    print(
+        yaml.safe_dump(
+            {
+                "pilot_id": options.pilot_id,
+                "benchmark": options.benchmark,
+                "models": list(options.models),
+                "shard_id": options.shard_id,
+                "num_shards": options.num_shards,
+                "max_episodes_per_benchmark": options.max_episodes,
+                "agent_temperature": common["agent_temperature"],
+            }
+        )
+    )
     reports = {}
     for model in options.models:
         reports[model] = await run_model(model, options, common, configs)

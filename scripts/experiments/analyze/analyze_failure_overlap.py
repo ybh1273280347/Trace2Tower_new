@@ -91,9 +91,7 @@ def main() -> int:
     for name, path in run_paths.items():
         run_rows, _ = read_first_completion(path)
         selected = {
-            sample_id: row
-            for (sample_id, repeat_id), row in run_rows.items()
-            if repeat_id == 0
+            sample_id: row for (sample_id, repeat_id), row in run_rows.items() if repeat_id == 0
         }
         if len(selected) != 100:
             raise ValueError(f"{name} must cover 100 repeat0 tasks")
@@ -104,9 +102,7 @@ def main() -> int:
     failures = {
         name: {
             "zero": {
-                sample_id
-                for sample_id, row in run_rows.items()
-                if float(row["primary_score"]) == 0
+                sample_id for sample_id, row in run_rows.items() if float(row["primary_score"]) == 0
             },
             "nonfull": {
                 sample_id
@@ -118,17 +114,13 @@ def main() -> int:
     }
     overlaps = {
         kind: {
-            f"final_vs_{name}": set_overlap(
-                failures["final"][kind], failures[name][kind]
-            )
+            f"final_vs_{name}": set_overlap(failures["final"][kind], failures[name][kind])
             for name in ("skillx", "legacy", "noskill")
         }
         for kind in ("zero", "nonfull")
     }
     sample_ids = tuple(sorted(rows["final"]))
-    final_scores = np.array(
-        [rows["final"][sample_id]["primary_score"] for sample_id in sample_ids]
-    )
+    final_scores = np.array([rows["final"][sample_id]["primary_score"] for sample_id in sample_ids])
     score_correlations = {
         name: float(
             np.corrcoef(
@@ -145,10 +137,8 @@ def main() -> int:
         "common_zero": failures["final"]["zero"] & failures["skillx"]["zero"],
         "final_only_zero": failures["final"]["zero"] - failures["skillx"]["zero"],
         "skillx_only_zero": failures["skillx"]["zero"] - failures["final"]["zero"],
-        "final_only_nonfull": failures["final"]["nonfull"]
-        - failures["skillx"]["nonfull"],
-        "skillx_only_nonfull": failures["skillx"]["nonfull"]
-        - failures["final"]["nonfull"],
+        "final_only_nonfull": failures["final"]["nonfull"] - failures["skillx"]["nonfull"],
+        "skillx_only_nonfull": failures["skillx"]["nonfull"] - failures["final"]["nonfull"],
     }
     category_records = {
         name: [
@@ -182,10 +172,15 @@ def main() -> int:
         "",
         "## Summary",
         "",
-        "| Failure definition | Final | SkillX | Intersection | Jaccard | Final covered | SkillX covered |",
+        "| Failure definition | Final | SkillX | Intersection | Jaccard | "
+        "Final covered | SkillX covered |",
         "|---|---:|---:|---:|---:|---:|---:|",
-        f"| Zero reward | {zero['left_count']} | {zero['right_count']} | {zero['intersection_count']} | {zero['jaccard']:.3f} | {zero['left_coverage']:.1%} | {zero['right_coverage']:.1%} |",
-        f"| Non-full reward | {nonfull['left_count']} | {nonfull['right_count']} | {nonfull['intersection_count']} | {nonfull['jaccard']:.3f} | {nonfull['left_coverage']:.1%} | {nonfull['right_coverage']:.1%} |",
+        f"| Zero reward | {zero['left_count']} | {zero['right_count']} | "
+        f"{zero['intersection_count']} | {zero['jaccard']:.3f} | "
+        f"{zero['left_coverage']:.1%} | {zero['right_coverage']:.1%} |",
+        f"| Non-full reward | {nonfull['left_count']} | {nonfull['right_count']} | "
+        f"{nonfull['intersection_count']} | {nonfull['jaccard']:.3f} | "
+        f"{nonfull['left_coverage']:.1%} | {nonfull['right_coverage']:.1%} |",
         "",
         f"Final/SkillX reward correlation is `{score_correlations['skillx']:.3f}`.",
         "",
@@ -197,16 +192,15 @@ def main() -> int:
     for record in category_records["common_zero"]:
         goal = record["task_goal"].replace("|", "\\|")
         lines.append(
-            f"| {record['sample_id']} | {goal} | {record['final_steps']} | {record['skillx_steps']} |"
+            f"| {record['sample_id']} | {goal} | {record['final_steps']} | "
+            f"{record['skillx_steps']} |"
         )
     lines.extend(("", "## Method-specific hard failures", ""))
     for name in ("final_only_zero", "skillx_only_zero"):
         lines.append(f"### {name}")
         lines.append("")
         for record in category_records[name]:
-            lines.append(
-                f"- `{record['sample_id']}`: {record['task_goal']}"
-            )
+            lines.append(f"- `{record['sample_id']}`: {record['task_goal']}")
         if not category_records[name]:
             lines.append("- None")
         lines.append("")

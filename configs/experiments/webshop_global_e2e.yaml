@@ -1,7 +1,0 @@
-method: global_e2e_gpt
-success_threshold: 0.999
-renderer_model: gpt-5.4
-renderer_max_concurrency: 1
-skill_count_min: 3
-skill_count_max: 6
-runtime_top_k: 1

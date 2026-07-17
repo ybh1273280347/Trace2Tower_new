@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 
-from trace2tower.methods.trace2tower.webshop_branch_graph import (
+from trace2tower.methods.trace2tower.adapters.webshop.branch_graph import (
     DecisionSignal,
     WebShopGoal,
     build_webshop_branch_graph,
     webshop_branch_graph_components,
 )
-from trace2tower.methods.trace2tower.webshop_policy_discovery import (
+from trace2tower.methods.trace2tower.adapters.webshop.policy_discovery import (
     discover_webshop_policy_subgraphs,
 )
 
@@ -37,7 +37,10 @@ def test_branch_graph_keeps_decisions_and_removes_product_identity() -> None:
                 segment(
                     0,
                     "QUERY_FORMULATION",
-                    {"name": "search_action", "arguments": {"keywords": "running shoes waterproof"}},
+                    {
+                        "name": "search_action",
+                        "arguments": {"keywords": "running shoes waterproof"},
+                    },
                     "WebShop search page.",
                     "Search results page 1:\nSHOE123 | Waterproof Running Shoes | $70.00",
                 ),
@@ -124,7 +127,10 @@ def test_policy_discovery_emits_success_backbone() -> None:
                 segment(
                     0,
                     "QUERY_FORMULATION",
-                    {"name": "search_action", "arguments": {"keywords": "running shoes waterproof"}},
+                    {
+                        "name": "search_action",
+                        "arguments": {"keywords": "running shoes waterproof"},
+                    },
                     "WebShop search page.",
                     "Search results page 1",
                 ),

@@ -10,22 +10,22 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from scripts.experiments.analyze.check_skillx_upstream import inspect_skillx
 from dotenv import load_dotenv
-from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
+from scripts.experiments.analyze.check_skillx_upstream import inspect_skillx
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark, ExperimentSplit
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import EpisodeTrajectory, TrajectoryReader
 from trace2tower.methods.skillx.embedding_adapter import SkillXEmbeddingAdapter
 from trace2tower.methods.skillx.llm_adapter import SkillXLLMAdapter
 from trace2tower.methods.skillx.trajectory_adapter import (
     adapt_tool_schemas,
     adapt_trajectory,
 )
-from trace2tower.results import MethodName
-from trace2tower.trajectory import EpisodeTrajectory, TrajectoryReader
 
 
 def canonical_sha256(value: object) -> str:
@@ -78,9 +78,7 @@ def tool_schemas_for(benchmark: Benchmark) -> dict[str, dict]:
 async def main(options: argparse.Namespace) -> int:
     report_path = options.output_dir / "report.json"
     if report_path.exists() and not options.force:
-        raise FileExistsError(
-            f"{report_path} already exists; pass --force to spend on a fresh run"
-        )
+        raise FileExistsError(f"{report_path} already exists; pass --force to spend on a fresh run")
     config = load_yaml(options.config)
     if config["method"] != "skillx":
         raise ValueError("SkillX minimal run requires the SkillX config")
@@ -107,13 +105,9 @@ async def main(options: argparse.Namespace) -> int:
             int(common["global_api_concurrency"]),
             int(config["max_concurrent"]),
         ),
-        max_attempts=int(
-            config.get("provider_max_attempts", common["provider_max_attempts"])
-        ),
+        max_attempts=int(config.get("provider_max_attempts", common["provider_max_attempts"])),
         timeout_seconds=float(
-            config.get(
-                "provider_timeout_seconds", common["provider_timeout_seconds"]
-            )
+            config.get("provider_timeout_seconds", common["provider_timeout_seconds"])
         ),
         retry_base_seconds=common["retry_base_seconds"],
     )
@@ -135,9 +129,7 @@ async def main(options: argparse.Namespace) -> int:
     }
     recovery_contract_path = options.output_dir / "recovery-contract.json"
     if recovery_contract_path.exists():
-        existing_contract = json.loads(
-            recovery_contract_path.read_text(encoding="utf-8")
-        )
+        existing_contract = json.loads(recovery_contract_path.read_text(encoding="utf-8"))
         if existing_contract != recovery_contract:
             raise ValueError("SkillX recovery contract differs from this invocation")
     else:
@@ -158,9 +150,7 @@ async def main(options: argparse.Namespace) -> int:
     pipeline.plan_extractor.max_retries = component_max_retries
     pipeline.skill_extractor.max_retries = component_max_retries
     if hasattr(pipeline.skill_extractor, "functional_extractor"):
-        pipeline.skill_extractor.functional_extractor.max_retries = (
-            component_max_retries
-        )
+        pipeline.skill_extractor.functional_extractor.max_retries = component_max_retries
     if hasattr(pipeline.skill_extractor, "atomic_extractor"):
         pipeline.skill_extractor.atomic_extractor.max_retries = component_max_retries
     started_at = datetime.now(UTC)

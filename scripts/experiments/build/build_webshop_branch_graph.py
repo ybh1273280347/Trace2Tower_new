@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.methods.trace2tower.webshop_branch_graph import (
+from trace2tower.methods.trace2tower.adapters.webshop.branch_graph import (
     build_webshop_branch_graph,
     load_webshop_goals,
 )

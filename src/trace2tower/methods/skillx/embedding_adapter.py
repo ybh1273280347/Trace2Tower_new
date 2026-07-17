@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from trace2tower.llm_runtime import CommonLLMRuntime
+from trace2tower.components.llm_runtime import CommonLLMRuntime
 
 
 class SkillXEmbeddingAdapter:

@@ -22,9 +22,7 @@ def analyze_scope(run_paths: dict[str, Path], comparisons: tuple[tuple[str, str]
     audits = {}
     for name, path in run_paths.items():
         run_rows, audits[name] = read_first_completion(path)
-        rows[name] = {
-            key: row for key, row in run_rows.items() if key[1] == 0
-        }
+        rows[name] = {key: row for key, row in run_rows.items() if key[1] == 0}
         audits[name]["selected_repeat_id"] = 0
         audits[name]["selected_key_count"] = len(rows[name])
     keys = set(next(iter(rows.values())))

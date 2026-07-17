@@ -5,23 +5,23 @@ from unittest.mock import ANY
 
 import pytest
 
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.llm_runtime import ChatResult, EmbeddingResult, LLMUsage, ModelRole
-from trace2tower.manifests import Benchmark
+from trace2tower.components.llm_runtime import ChatResult, EmbeddingResult, LLMUsage, ModelRole
+from trace2tower.core.manifests import Benchmark
 from trace2tower.methods.skillx.models import (
     SkillXCard,
     SkillXExecutionLibrary,
     SkillXPlan,
     build_execution_library,
 )
-from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.skillx.native_inference import (
     SKILLX_COMMIT,
     NativeSkillCandidate,
     NativeSkillXInference,
 )
+from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.skillx.retrieval import plan_steps
-from trace2tower.semantic_index import SkillEmbeddingIndex
 
 
 def library() -> SkillXExecutionLibrary:

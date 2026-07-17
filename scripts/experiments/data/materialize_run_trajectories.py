@@ -5,9 +5,9 @@ import hashlib
 import json
 from pathlib import Path
 
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import MethodName
-from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryReader, write_trajectory_jsonl
 
 
 def main(options: argparse.Namespace) -> int:
@@ -45,7 +45,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--benchmark", type=Benchmark, choices=tuple(Benchmark), required=True)
-    parser.add_argument("--split", type=ExperimentSplit, choices=tuple(ExperimentSplit), required=True)
+    parser.add_argument(
+        "--split", type=ExperimentSplit, choices=tuple(ExperimentSplit), required=True
+    )
     parser.add_argument("--method", type=MethodName, choices=tuple(MethodName), required=True)
     parser.add_argument("--output", type=Path, required=True)
     raise SystemExit(main(parser.parse_args()))

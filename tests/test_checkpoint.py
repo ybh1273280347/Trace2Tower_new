@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from trace2tower.checkpoint import EpisodeCheckpoint, EpisodeKey
+from trace2tower.core.results import EpisodeKey
+from trace2tower.experiments.checkpoint import EpisodeCheckpoint
 
 
 def result_for(key: EpisodeKey, primary_score: float) -> dict[str, object]:
@@ -42,4 +43,3 @@ def test_checkpoint_recovers_after_interrupted_append(tmp_path: Path) -> None:
     records = [json.loads(line) for line in results_path.read_text(encoding="utf-8").splitlines()]
     assert [record["sample_id"] for record in records] == ["1000", "1001"]
     assert "temporary provider timeout" in errors_path.read_text(encoding="utf-8")
-

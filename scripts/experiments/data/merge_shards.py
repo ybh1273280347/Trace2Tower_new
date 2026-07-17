@@ -7,10 +7,10 @@ import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from scripts.experiments.run.run_matrix import parse_shard_ids
-from trace2tower.manifests import Benchmark, read_manifest
-from trace2tower.results import MethodName
-from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
-from trace2tower.trajectory_pool import audit_training_shard
+from trace2tower.core.manifests import Benchmark, read_manifest
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import TrajectoryReader, write_trajectory_jsonl
+from trace2tower.data.trajectory_pool import audit_training_shard
 
 
 def main(options: argparse.Namespace) -> int:
@@ -31,9 +31,7 @@ def main(options: argparse.Namespace) -> int:
     }
     print(yaml.safe_dump({"common": common, "invocation": invocation}))
 
-    entries = read_manifest(
-        Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl"
-    )
+    entries = read_manifest(Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl")
     audits = []
     paths = []
     for shard_id in shard_ids:
@@ -69,9 +67,7 @@ def main(options: argparse.Namespace) -> int:
         return 1
 
     trajectories = [
-        trajectory
-        for path in paths
-        for trajectory in TrajectoryReader.read_jsonl(path)
+        trajectory for path in paths for trajectory in TrajectoryReader.read_jsonl(path)
     ]
     suffix = (
         "all"

@@ -7,18 +7,14 @@ import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from scripts.experiments.run.run_matrix import parse_shard_ids
-from trace2tower.manifests import Benchmark, read_manifest
-from trace2tower.results import MethodName
-from trace2tower.trajectory_pool import audit_training_shard
+from trace2tower.core.manifests import Benchmark, read_manifest
+from trace2tower.core.results import MethodName
+from trace2tower.data.trajectory_pool import audit_training_shard
 
 
 def main(options: argparse.Namespace) -> int:
     common = load_yaml(options.config_root / "common.yaml")
-    benchmarks = (
-        tuple(Benchmark)
-        if options.benchmark == "all"
-        else (Benchmark(options.benchmark),)
-    )
+    benchmarks = tuple(Benchmark) if options.benchmark == "all" else (Benchmark(options.benchmark),)
     shard_ids = parse_shard_ids(options.shard_id, options.num_shards)
     invocation = {
         "benchmark": options.benchmark,
@@ -34,9 +30,7 @@ def main(options: argparse.Namespace) -> int:
 
     audits = []
     for benchmark in benchmarks:
-        entries = read_manifest(
-            Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl"
-        )
+        entries = read_manifest(Path(common["manifests_dir"]) / f"{benchmark}_train.jsonl")
         for shard_id in shard_ids:
             shard_name = f"shard-{shard_id:02d}"
             audits.append(
@@ -71,9 +65,7 @@ def main(options: argparse.Namespace) -> int:
     }
     print(yaml.safe_dump(report, sort_keys=False))
     if not options.dry_run:
-        output = options.output or (
-            Path(common["runs_dir"]) / options.run_id / "completeness.json"
-        )
+        output = options.output or (Path(common["runs_dir"]) / options.run_id / "completeness.json")
         write_json(output, report)
     return 0 if report["complete"] else 1
 

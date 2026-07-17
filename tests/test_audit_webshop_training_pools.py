@@ -7,9 +7,9 @@ import pytest
 
 from scripts.experiments.data.audit_webshop_training_pools import audit_pool
 from trace2tower.benchmarks.models import ClickableKind
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import FinishReason, MethodName
-from trace2tower.trajectory import EpisodeTrajectory, StepRecord, write_trajectory_jsonl
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import FinishReason, MethodName
+from trace2tower.core.trajectory import EpisodeTrajectory, StepRecord, write_trajectory_jsonl
 
 
 def trajectory(sample_index: int, repeat_id: int) -> EpisodeTrajectory:

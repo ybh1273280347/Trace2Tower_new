@@ -3,8 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex, SkillMatch
 from trace2tower.methods.skillx.models import SkillXCard, SkillXPlan
-from trace2tower.semantic_index import SkillEmbeddingIndex, SkillMatch
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,9 +33,7 @@ def retrieve_plans(
     if set(index.skill_ids) != set(plans):
         raise ValueError("SkillX plan index and plan library differ")
     matches = tuple(
-        match
-        for match in index.search(query_vector, top_k)
-        if match.cosine_similarity >= threshold
+        match for match in index.search(query_vector, top_k) if match.cosine_similarity >= threshold
     )
     return tuple(plans[match.skill_id] for match in matches), matches
 

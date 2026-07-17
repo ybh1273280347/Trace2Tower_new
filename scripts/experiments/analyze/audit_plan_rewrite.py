@@ -8,11 +8,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-from trace2tower.methods.trace2tower.high_to_mid_provider import (
+from trace2tower.components.llm_runtime import CommonLLMRuntime, ModelRole
+from trace2tower.core.trajectory import TrajectoryReader
+from trace2tower.methods.trace2tower.inference.provider import (
     HighToMidSkillProvider,
 )
-from trace2tower.trajectory import TrajectoryReader
 
 
 async def main(options: argparse.Namespace) -> None:

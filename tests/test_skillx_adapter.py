@@ -9,16 +9,16 @@ import pytest
 
 from trace2tower.benchmarks.alfworld import AlfworldEnvironment
 from trace2tower.benchmarks.webshop import WebShopEnvironment
-from trace2tower.llm_runtime import ChatResult, EmbeddingResult, LLMUsage
-from trace2tower.manifests import Benchmark, ExperimentSplit
+from trace2tower.components.llm_runtime import ChatResult, EmbeddingResult, LLMUsage
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import FinishReason, MethodName
+from trace2tower.core.trajectory import EpisodeTrajectory, StepRecord
 from trace2tower.methods.skillx.embedding_adapter import SkillXEmbeddingAdapter
 from trace2tower.methods.skillx.llm_adapter import SkillXLLMAdapter
 from trace2tower.methods.skillx.trajectory_adapter import (
     adapt_tool_schemas,
     adapt_trajectory,
 )
-from trace2tower.results import FinishReason, MethodName
-from trace2tower.trajectory import EpisodeTrajectory, StepRecord
 
 
 def episode(benchmark: Benchmark, action_name: str, arguments: dict) -> EpisodeTrajectory:
@@ -173,9 +173,7 @@ def test_embedding_adapter_drives_pinned_upstream_dbscan() -> None:
         sys.path.insert(0, str(skillx_parent))
     from SkillX.clustering.dbscan import DBSCANClusterer
 
-    runtime = FakeEmbeddingRuntime(
-        ((1.0, 0.0), (0.999, 0.001), (0.0, 1.0))
-    )
+    runtime = FakeEmbeddingRuntime(((1.0, 0.0), (0.999, 0.001), (0.0, 1.0)))
     adapter = SkillXEmbeddingAdapter(runtime)
     clusterer = DBSCANClusterer(
         eps=0.1,

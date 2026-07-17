@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from trace2tower.benchmarks.models import ClickableKind, EnvironmentState, EpisodeStart
-from trace2tower.manifests import Benchmark, ManifestEntry
+from trace2tower.core.manifests import Benchmark, ManifestEntry
 
 
 class WebShopPage(StrEnum):
@@ -132,11 +132,7 @@ class WebShopEnvironment:
             self.current_state = self._purchase()
         elif self.page is WebShopPage.ITEM:
             option_name = next(
-                (
-                    name
-                    for name, options in self.product["options"].items()
-                    if value in options
-                ),
+                (name for name, options in self.product["options"].items() if value in options),
                 None,
             )
             if option_name is None:
@@ -227,7 +223,14 @@ class WebShopEnvironment:
             for value in options:
                 actions.append(value)
                 kinds[value] = ClickableKind.OPTION
-        for value in ("Description", "Features", "Reviews", "Attributes", "Buy Now", "Back to Search"):
+        for value in (
+            "Description",
+            "Features",
+            "Reviews",
+            "Attributes",
+            "Buy Now",
+            "Back to Search",
+        ):
             actions.append(value)
             kinds[value] = ClickableKind.BUTTON
         if self.selected_options:

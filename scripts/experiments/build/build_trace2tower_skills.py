@@ -11,18 +11,18 @@ import yaml
 from dotenv import load_dotenv
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.llm_runtime import CommonLLMRuntime
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.high_paths import mine_high_paths
-from trace2tower.methods.trace2tower.models import MidCluster
-from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
-from trace2tower.methods.trace2tower.skills import (
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import MidCluster
+from trace2tower.methods.trace2tower.induction.high_paths import mine_high_paths
+from trace2tower.methods.trace2tower.induction.skills import (
     LOW_SKILLS,
     HighSkillCard,
     MidSkillCard,
     build_mid_render_inputs,
 )
+from trace2tower.methods.trace2tower.rendering.renderer import render_high_card, render_mid_card
 
 
 def load_skill_records(path: Path) -> list[dict]:
@@ -76,30 +76,30 @@ def build_high_render_examples(
     ]
     supporting_sample_ids = {record["sample_id"] for record in supporting_records}
     supporting_goals = {
-        next(
-            transition["goal"]
-            for transition in record["transitions"]
-            if transition.get("goal")
-        )
+        next(transition["goal"] for transition in record["transitions"] if transition.get("goal"))
         for record in supporting_records
     }
-    candidates = supporting_records if successful else sorted(
-        (
-            record
-            for record in records
-            if float(record["primary_score"]) < success_threshold
-            and (
-                record["sample_id"] in supporting_sample_ids
-                or any(
-                    transition.get("goal") in supporting_goals
-                    for transition in record["transitions"]
+    candidates = (
+        supporting_records
+        if successful
+        else sorted(
+            (
+                record
+                for record in records
+                if float(record["primary_score"]) < success_threshold
+                and (
+                    record["sample_id"] in supporting_sample_ids
+                    or any(
+                        transition.get("goal") in supporting_goals
+                        for transition in record["transitions"]
+                    )
                 )
-            )
-        ),
-        key=lambda item: (
-            item["sample_id"] not in supporting_sample_ids,
-            item["trajectory_id"],
-        ),
+            ),
+            key=lambda item: (
+                item["sample_id"] not in supporting_sample_ids,
+                item["trajectory_id"],
+            ),
+        )
     )
     examples = []
     seen_samples = set()
@@ -120,12 +120,15 @@ def build_high_render_examples(
             transition["goal"] for transition in record["transitions"] if transition.get("goal")
         )
         if successful:
-            start = next((
-                index
-                for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
-                if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
-                == path.ordered_mid_ids
-            ), None)
+            start = next(
+                (
+                    index
+                    for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
+                    if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
+                    == path.ordered_mid_ids
+                ),
+                None,
+            )
             if start is None:
                 continue
             path_groups = groups[start : start + len(path.ordered_mid_ids)]
@@ -172,9 +175,7 @@ def build_trajectory_render_contexts(
                 transition["goal"] for transition in transitions if transition.get("goal")
             ),
             "trajectory_score": record["primary_score"],
-            "ordered_mid_ids": [
-                segment_to_mid[segment["segment_id"]] for segment in segments
-            ],
+            "ordered_mid_ids": [segment_to_mid[segment["segment_id"]] for segment in segments],
             "ordered_events": [segment["event_type"] for segment in segments],
             "ordered_actions": [
                 {

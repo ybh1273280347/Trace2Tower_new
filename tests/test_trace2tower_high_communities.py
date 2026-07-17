@@ -1,5 +1,5 @@
-from trace2tower.methods.trace2tower.high_communities import discover_high_communities
-from trace2tower.methods.trace2tower.models import HighPath, MidCluster
+from trace2tower.methods.trace2tower.core.models import MidCluster
+from trace2tower.methods.trace2tower.induction.high_communities import discover_high_communities
 
 
 def test_high_community_discovery_does_not_require_a_cluster_count() -> None:

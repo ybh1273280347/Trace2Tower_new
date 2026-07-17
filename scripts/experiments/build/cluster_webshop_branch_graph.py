@@ -9,19 +9,17 @@ import yaml
 from scipy import sparse
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
-from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.spectral import spectral_clustering
-from trace2tower.methods.trace2tower.webshop_branch_graph import (
+from trace2tower.methods.trace2tower.adapters.webshop.branch_graph import (
     WebShopBranchGraph,
     webshop_branch_graph_components,
 )
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.eigen_trace.spectral import spectral_clustering
 
 
 def main(options: argparse.Namespace) -> int:
     config = Trace2TowerConfig.from_record(load_yaml(options.config))
-    graph = WebShopBranchGraph.from_record(
-        json.loads(options.graph.read_text(encoding="utf-8"))
-    )
+    graph = WebShopBranchGraph.from_record(json.loads(options.graph.read_text(encoding="utf-8")))
     components = webshop_branch_graph_components(
         graph,
         failure_penalty=config.failure_penalty,
@@ -57,9 +55,7 @@ def main(options: argparse.Namespace) -> int:
         "edge_count": len(graph.edges),
         "observed_edge_count": sum(edge.support_count > 0 for edge in graph.edges),
         "mid_community_count": clustering.cluster_count,
-        "cluster_sizes": [
-            len(cluster.member_segment_ids) for cluster in clustering.clusters
-        ],
+        "cluster_sizes": [len(cluster.member_segment_ids) for cluster in clustering.clusters],
         "eigenvalues": clustering.eigenvalues,
     }
     write_json(options.output_dir / "report.json", report)

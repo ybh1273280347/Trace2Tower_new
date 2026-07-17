@@ -7,7 +7,7 @@ import random
 from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.manifests import (
+from trace2tower.core.manifests import (
     Benchmark,
     ExperimentSplit,
     ManifestEntry,
@@ -71,9 +71,7 @@ def main(options: argparse.Namespace) -> int:
             "sample_count": len(entries),
             "sample_ids": [entry.sample_id for entry in entries],
             "manifest": options.output_manifest.as_posix(),
-            "manifest_sha256": hashlib.sha256(
-                options.output_manifest.read_bytes()
-            ).hexdigest(),
+            "manifest_sha256": hashlib.sha256(options.output_manifest.read_bytes()).hexdigest(),
         },
     )
     return 0

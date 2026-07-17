@@ -6,36 +6,26 @@ from pathlib import Path
 import pytest
 
 from scripts.experiments.run import run_matrix
-from trace2tower.manifests import Benchmark, ExperimentSplit, ManifestEntry
-from trace2tower.methods.global_e2e.models import (
-    GlobalE2ESkillCard,
-    build_global_e2e_library,
-)
-from trace2tower.results import MethodName
-from trace2tower.semantic_index import SkillEmbeddingIndex
+from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
+from trace2tower.core.manifests import Benchmark, ExperimentSplit, ManifestEntry
+from trace2tower.core.results import MethodName
+from trace2tower.methods.skillx.models import build_execution_library
+from trace2tower.methods.skillx.native_inference import SKILLX_COMMIT
 
 
 def matrix_module():
     return run_matrix
 
 
-def global_e2e_library(benchmark: Benchmark):
-    trajectory_id = f"{benchmark}:train:no_skill:sample:0"
-    card = GlobalE2ESkillCard(
-        "global_one",
-        (trajectory_id,),
-        "Skill",
-        "Use when relevant.",
-        ("Act.",),
-        ("Check.",),
-    )
-    return build_global_e2e_library(
+def skillx_library(benchmark: Benchmark):
+    return build_execution_library(
         benchmark,
         "a" * 64,
-        "b" * 64,
-        (trajectory_id,),
-        (card,),
-        SkillEmbeddingIndex((card.skill_id,), ((1.0, 0.0),), ("c" * 64,)),
+        SKILLX_COMMIT,
+        (),
+        (),
+        SkillEmbeddingIndex((), ()),
+        SkillEmbeddingIndex((), ()),
     )
 
 
@@ -61,12 +51,12 @@ def test_benchmark_path_assignments_are_typed_and_unique() -> None:
 
 def test_method_artifact_binds_content_id_hash_and_benchmark(tmp_path: Path) -> None:
     load_method_artifact = matrix_module().load_method_artifact
-    library = global_e2e_library(Benchmark.WEBSHOP)
+    library = skillx_library(Benchmark.WEBSHOP)
     path = tmp_path / "library.json"
     path.write_text(json.dumps(library.to_record()), encoding="utf-8")
     artifact = load_method_artifact(
         Benchmark.WEBSHOP,
-        MethodName.GLOBAL_E2E_GPT,
+        MethodName.SKILLX,
         path,
     )
     assert artifact.artifact_id == library.library_id
@@ -74,7 +64,7 @@ def test_method_artifact_binds_content_id_hash_and_benchmark(tmp_path: Path) -> 
     with pytest.raises(ValueError, match="benchmark"):
         load_method_artifact(
             Benchmark.ALFWORLD,
-            MethodName.GLOBAL_E2E_GPT,
+            MethodName.SKILLX,
             path,
         )
 
@@ -92,9 +82,7 @@ def test_sample_selection_requires_every_requested_manifest_id() -> None:
         )
         for index in range(2)
     ]
-    assert [entry.sample_id for entry in select_entries(entries, ("webshop:1",))] == [
-        "webshop:1"
-    ]
+    assert [entry.sample_id for entry in select_entries(entries, ("webshop:1",))] == ["webshop:1"]
     with pytest.raises(ValueError, match="absent"):
         select_entries(entries, ("webshop:3",))
 

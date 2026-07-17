@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 
 from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_yaml
-from trace2tower.methods.trace2tower.tower import TowerSnapshot
+from trace2tower.methods.trace2tower.artifacts.tower import TowerSnapshot
 
 
 def main(options: argparse.Namespace) -> int:

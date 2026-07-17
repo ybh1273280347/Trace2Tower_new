@@ -5,7 +5,7 @@ import json
 
 from dotenv import load_dotenv
 
-from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
+from trace2tower.components.llm_runtime import CommonLLMRuntime, ModelRole
 
 
 async def probe() -> None:

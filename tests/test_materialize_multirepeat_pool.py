@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from pathlib import Path
 
 import pytest
-
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import FinishReason, MethodName
-from trace2tower.trajectory import EpisodeTrajectory
 
 from scripts.experiments.data.materialize_multirepeat_pool import (
     validate_multirepeat_pool,
 )
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import FinishReason, MethodName
+from trace2tower.core.trajectory import EpisodeTrajectory
 
 
 def trajectory(sample_id: str, repeat_id: int, run_id: str = "source") -> EpisodeTrajectory:

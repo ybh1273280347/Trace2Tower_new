@@ -7,9 +7,8 @@ from pathlib import Path
 
 import yaml
 
-from trace2tower.trajectory import TrajectoryReader, write_trajectory_jsonl
-
 from scripts.experiments.run.rollout_no_skill_train import write_json
+from trace2tower.core.trajectory import TrajectoryReader, write_trajectory_jsonl
 
 
 def main(options: argparse.Namespace) -> int:
@@ -56,7 +55,16 @@ def main(options: argparse.Namespace) -> int:
         "output_sha256": hashlib.sha256(options.output.read_bytes()).hexdigest(),
     }
     write_json(options.output.with_suffix(".audit.json"), report)
-    print(yaml.safe_dump({key: value for key, value in report.items() if key not in {"selection_reasons", "excluded_trajectory_ids"}}, sort_keys=False))
+    print(
+        yaml.safe_dump(
+            {
+                key: value
+                for key, value in report.items()
+                if key not in {"selection_reasons", "excluded_trajectory_ids"}
+            },
+            sort_keys=False,
+        )
+    )
     return 0
 
 

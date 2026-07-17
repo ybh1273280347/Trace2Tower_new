@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Protocol
 
-from trace2tower.manifests import Benchmark, ManifestEntry
+from trace2tower.core.manifests import Benchmark, ManifestEntry
 
 
 class ClickableKind(StrEnum):

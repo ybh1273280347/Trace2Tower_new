@@ -1,0 +1,2 @@
+{"benchmark":"webshop","split":"train","method":"no_skill","sample_id":"1000","repeat_id":0,"primary_score":0.5,"error":null}
+{"benchmark":"webshop","split":"train","method":"no_skill","sample_id":"1001","repeat_id":0,"primary_score":0.75,"error":null}

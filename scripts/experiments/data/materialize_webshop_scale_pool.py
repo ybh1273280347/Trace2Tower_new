@@ -6,14 +6,13 @@ import json
 from pathlib import Path
 
 from scripts.experiments.run.rollout_no_skill_train import write_json
-from trace2tower.manifests import Benchmark, ExperimentSplit
-from trace2tower.results import MethodName
-from trace2tower.trajectory import (
+from trace2tower.core.manifests import Benchmark, ExperimentSplit
+from trace2tower.core.results import MethodName
+from trace2tower.core.trajectory import (
     EpisodeTrajectory,
     TrajectoryReader,
     write_trajectory_jsonl,
 )
-
 
 RUN_IDS = {
     "p100": "webshop-scale-v1-flash-p100-add50",
@@ -36,9 +35,10 @@ def main(options: argparse.Namespace) -> int:
     pool = training["pools"][options.pool]
     repeat_ids = tuple(int(item) for item in training["repeat_ids"])
     p50_audit_path = Path(training["p50_source_audit"])
-    if hashlib.sha256(p50_audit_path.read_bytes()).hexdigest() != training[
-        "p50_source_audit_sha256"
-    ]:
+    if (
+        hashlib.sha256(p50_audit_path.read_bytes()).hexdigest()
+        != training["p50_source_audit_sha256"]
+    ):
         raise ValueError("P50 audit changed after scale protocol freeze")
 
     p50_audit = json.loads(p50_audit_path.read_text(encoding="utf-8"))
@@ -52,17 +52,14 @@ def main(options: argparse.Namespace) -> int:
         source_paths.append(options.runs_root / RUN_IDS["p200"])
 
     expected = {
-        (sample_id, repeat_id)
-        for sample_id in pool["sample_ids"]
-        for repeat_id in repeat_ids
+        (sample_id, repeat_id) for sample_id in pool["sample_ids"] for repeat_id in repeat_ids
     }
     actual = [(item.sample_id, item.repeat_id) for item in trajectories]
     if len(actual) != len(set(actual)) or set(actual) != expected:
         missing = sorted(expected - set(actual))
         unexpected = sorted(set(actual) - expected)
         raise ValueError(
-            f"{options.pool} coverage mismatch: missing={missing[:5]}, "
-            f"unexpected={unexpected[:5]}"
+            f"{options.pool} coverage mismatch: missing={missing[:5]}, unexpected={unexpected[:5]}"
         )
     if any(
         item.benchmark is not Benchmark.WEBSHOP
