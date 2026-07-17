@@ -51,6 +51,20 @@ class BundleParetoEstimate:
 
 
 @dataclass(frozen=True, slots=True)
+class FeedbackSummary:
+    task_count: int
+    no_skill_success_rate: float
+    tower_success_rate: float
+    paired_success_gain: float
+    paired_wins: int
+    paired_losses: int
+    paired_ties: int
+    no_skill_mean_steps: float
+    tower_mean_steps: float
+    guarded_step_saving: float
+
+
+@dataclass(frozen=True, slots=True)
 class LineageOverlap:
     old_mid_id: str
     new_mid_id: str

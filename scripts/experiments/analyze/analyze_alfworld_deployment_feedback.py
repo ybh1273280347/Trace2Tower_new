@@ -13,6 +13,7 @@ from trace2tower.core.manifests import expand_manifest_repeats, read_manifest
 from trace2tower.methods.trace2tower.deployment_optimization.feedback import (
     bootstrap_pareto,
     bundle_metrics,
+    feedback_summary,
     pair_feedback,
     read_no_skill_trajectories,
     read_results,
@@ -23,12 +24,13 @@ def main(options: argparse.Namespace) -> int:
     config = yaml.safe_load(options.config.read_text(encoding="utf-8"))
     manifest = expand_manifest_repeats(read_manifest(options.manifest), config["repeat_ids"])
     expected_keys = {(entry.sample_id, entry.repeat_id) for entry in manifest}
+    tower_runs = tuple(options.tower_run or (_default_tower_run(),))
     no_skill_results = read_no_skill_trajectories(
         options.no_skill_trajectories,
         sample_ids=frozenset(entry.sample_id for entry in manifest),
         repeat_ids=frozenset(config["repeat_ids"]),
     )
-    tower_results = read_results(options.tower_run)
+    tower_results = tuple(result for tower_run in tower_runs for result in read_results(tower_run))
     observed_no_skill = {(result.sample_id, result.repeat_id) for result in no_skill_results}
     observed_tower = {(result.sample_id, result.repeat_id) for result in tower_results}
     if observed_no_skill != expected_keys or observed_tower != expected_keys:
@@ -38,14 +40,14 @@ def main(options: argparse.Namespace) -> int:
             f"tower={len(observed_tower)}"
         )
 
-    tower_config = _read_resolved_config(options.tower_run)
     _audit_inputs(
-        tower_config,
+        tower_runs,
         options.manifest,
         options.no_skill_trajectories,
         config,
     )
     pairs = pair_feedback(no_skill_results, tower_results)
+    summary = feedback_summary(pairs)
     all_metrics = bundle_metrics(pairs)
     pareto_config = config["deployment_pareto"]
     bootstrap_config = config["bootstrap"]
@@ -93,9 +95,10 @@ def main(options: argparse.Namespace) -> int:
                 "sha256": hashlib.sha256(options.no_skill_trajectories.read_bytes()).hexdigest(),
                 "source": "reused_trajectory_pool",
             },
-            "tower_v0": _run_record(options.tower_run),
+            "tower_v0": [_run_record(tower_run) for tower_run in tower_runs],
         },
         "objectives": pareto_config["objectives"],
+        "summary": asdict(summary),
         "bootstrap": bootstrap_config,
         "bundles": [
             {
@@ -140,19 +143,44 @@ def _read_resolved_config(run_root: Path) -> dict:
 
 
 def _audit_inputs(
-    tower: dict,
+    tower_runs: tuple[Path, ...],
     manifest: Path,
     no_skill_trajectories: Path,
     experiment_config: dict,
 ) -> None:
-    manifest_hash = hashlib.sha256(manifest.read_bytes()).hexdigest()
-    if tower["agent_model"] != experiment_config["agent_model"]:
-        raise ValueError("Tower agent model differs from the deployment protocol")
-    if tower["manifests"]["alfworld"]["sha256"] != manifest_hash:
-        raise ValueError("Tower manifest differs from the deployment protocol")
-    artifact = tower["artifacts"]["alfworld"]
-    if artifact["artifact_id"] != experiment_config["base_snapshot_id"]:
-        raise ValueError("Tower feedback uses the wrong base snapshot")
+    expected_ids = {entry.sample_id for entry in read_manifest(manifest)}
+    run_manifest_ids = set()
+    for tower_run in tower_runs:
+        tower = _read_resolved_config(tower_run)
+        if tower["agent_model"] != experiment_config["agent_model"]:
+            raise ValueError("Tower agent model differs from the deployment protocol")
+        artifact = tower["artifacts"]["alfworld"]
+        if artifact["artifact_id"] != experiment_config["base_snapshot_id"]:
+            raise ValueError("Tower feedback uses the wrong base snapshot")
+        method = tower["method"]
+        if (
+            method.get("retrieval_contract") != "high_to_mid"
+            or method.get("rewrite_plan") is not True
+            or method.get("rewrite_model_role") != "renderer"
+        ):
+            raise ValueError("Tower feedback does not use the required rewrite contract")
+        if tower.get("selection", {}).get("repeat_ids") != experiment_config["repeat_ids"]:
+            raise ValueError("Tower run repeat selection differs from the deployment protocol")
+
+        resolved_manifest = tower["manifests"]["alfworld"]
+        resolved_path = Path(resolved_manifest["path"])
+        resolved_hash = hashlib.sha256(resolved_path.read_bytes()).hexdigest()
+        if resolved_hash != resolved_manifest["sha256"]:
+            raise ValueError("Tower run manifest hash does not match its resolved config")
+        current_ids = {entry.sample_id for entry in read_manifest(resolved_path)}
+        if run_manifest_ids & current_ids:
+            raise ValueError("Tower run manifests overlap")
+        run_manifest_ids.update(current_ids)
+    if run_manifest_ids != expected_ids:
+        raise ValueError(
+            "Tower run manifests do not exactly cover the analysis manifest: "
+            f"expected={len(expected_ids)}, observed={len(run_manifest_ids)}"
+        )
     trajectory_hash = hashlib.sha256(no_skill_trajectories.read_bytes()).hexdigest()
     if trajectory_hash != experiment_config["no_skill_trajectory_pool_sha256"]:
         raise ValueError("No-Skill trajectory pool differs from the deployment protocol")
@@ -166,6 +194,10 @@ def _run_record(run_root: Path) -> dict:
             path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in result_paths
         },
     }
+
+
+def _default_tower_run() -> Path:
+    return Path("artifacts/runs/alfworld-deployment-v1-feedback-tower-v0-r0")
 
 
 if __name__ == "__main__":
@@ -189,8 +221,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--tower-run",
+        action="append",
         type=Path,
-        default=Path("artifacts/runs/alfworld-deployment-v1-feedback-tower-v0-r3"),
+        default=None,
     )
     parser.add_argument(
         "--output",

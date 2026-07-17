@@ -12,6 +12,7 @@ from trace2tower.core.manifests import ManifestEntry, read_manifest, write_manif
 
 PARTITION_NAMES = ("deployment_feedback", "deployment_gate", "deployment_holdout")
 PILOT_NAME = "deployment_feedback_pilot"
+REMAINING_NAME = "deployment_feedback_remaining"
 
 
 def partition_train_tasks(
@@ -107,6 +108,21 @@ def main(options: argparse.Namespace) -> int:
             for family in {family for _, family in pilot}
         )
     )
+    pilot_ids = {entry.sample_id for entry, _ in pilot}
+    remaining = [
+        (entry, family)
+        for entry, family in partitions["deployment_feedback"]
+        if entry.sample_id not in pilot_ids
+    ]
+    remaining_path = options.output_dir / f"{REMAINING_NAME}.jsonl"
+    write_manifest(remaining_path, (entry for entry, _ in remaining))
+    manifest_paths[REMAINING_NAME] = remaining_path
+    family_counts[REMAINING_NAME] = dict(
+        sorted(
+            (family, sum(candidate_family == family for _, candidate_family in remaining))
+            for family in {family for _, family in remaining}
+        )
+    )
 
     intersections = {
         "feedback_gate": len(
@@ -128,18 +144,26 @@ def main(options: argparse.Namespace) -> int:
         "construction_task_count": len(construction_ids),
         "candidate_task_count": len(candidates),
         "repeat_ids": [0],
-        "pilot_is_feedback_subset": {entry.sample_id for entry, _ in pilot}
-        <= partition_ids["deployment_feedback"],
+        "pilot_is_feedback_subset": pilot_ids <= partition_ids["deployment_feedback"],
+        "pilot_remaining_intersection": len(
+            pilot_ids & {entry.sample_id for entry, _ in remaining}
+        ),
+        "pilot_remaining_cover_feedback": (pilot_ids | {entry.sample_id for entry, _ in remaining})
+        == partition_ids["deployment_feedback"],
         "partitions": {
             partition_name: {
                 "path": manifest_paths[partition_name].as_posix(),
                 "sha256": hashlib.sha256(manifest_paths[partition_name].read_bytes()).hexdigest(),
                 "task_count": (
-                    len(pilot) if partition_name == PILOT_NAME else len(partitions[partition_name])
+                    len(pilot)
+                    if partition_name == PILOT_NAME
+                    else len(remaining)
+                    if partition_name == REMAINING_NAME
+                    else len(partitions[partition_name])
                 ),
                 "task_family_counts": family_counts[partition_name],
             }
-            for partition_name in (*PARTITION_NAMES, PILOT_NAME)
+            for partition_name in (*PARTITION_NAMES, PILOT_NAME, REMAINING_NAME)
         },
         "intersections": intersections,
         "source_manifest": options.source_manifest.as_posix(),

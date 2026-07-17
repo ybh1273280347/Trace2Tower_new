@@ -7,6 +7,7 @@ from trace2tower.methods.trace2tower.core.models import MidCluster
 from trace2tower.methods.trace2tower.deployment_optimization.feedback import (
     bootstrap_pareto,
     bundle_metrics,
+    feedback_summary,
     pair_feedback,
     read_no_skill_trajectories,
 )
@@ -77,12 +78,19 @@ def test_feedback_uses_primary_high_and_does_not_reward_faster_failure() -> None
 
     pairs = pair_feedback(no_skill, tower)
     metrics = bundle_metrics(pairs)
+    summary = feedback_summary(pairs)
 
     assert {pair.primary_high_id for pair in pairs} == {"high_primary"}
     assert metrics[0].exposure_count == 2
     assert metrics[0].objectives.performance_level == 0.5
     assert metrics[0].objectives.paired_success_gain == 0.0
     assert metrics[0].objectives.guarded_step_saving == 0.2
+    assert summary.task_count == 2
+    assert summary.no_skill_success_rate == 0.5
+    assert summary.tower_success_rate == 0.5
+    assert summary.paired_wins == summary.paired_losses == 1
+    assert summary.paired_ties == 0
+    assert summary.guarded_step_saving == 0.2
 
 
 def test_bootstrap_pareto_is_task_clustered_and_deterministic() -> None:

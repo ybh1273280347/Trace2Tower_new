@@ -10,6 +10,7 @@ selection_seed: 20260717
 partitions:
   feedback_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback.jsonl
   feedback_pilot_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback_pilot.jsonl
+  feedback_remaining_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback_remaining.jsonl
   gate_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_gate.jsonl
   holdout_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_holdout.jsonl
 repeat_ids: [0]

@@ -15,6 +15,7 @@ from trace2tower.methods.trace2tower.deployment_optimization.models import (
     BundleMetrics,
     BundleParetoEstimate,
     DeploymentObjectives,
+    FeedbackSummary,
 )
 from trace2tower.methods.trace2tower.deployment_optimization.pareto import rank_fronts
 
@@ -138,6 +139,28 @@ def bundle_metrics(pairs: Iterable[FeedbackPair]) -> tuple[BundleMetrics, ...]:
     )
 
 
+def feedback_summary(pairs: Iterable[FeedbackPair]) -> FeedbackSummary:
+    selected = tuple(pairs)
+    if not selected:
+        raise ValueError("feedback contains no pairs")
+    no_skill_success = np.asarray([pair.no_skill_success for pair in selected], dtype=np.float64)
+    tower_success = np.asarray([pair.tower_success for pair in selected], dtype=np.float64)
+    no_skill_steps = np.asarray([pair.no_skill_steps for pair in selected], dtype=np.float64)
+    tower_steps = np.asarray([pair.tower_steps for pair in selected], dtype=np.float64)
+    return FeedbackSummary(
+        task_count=len(selected),
+        no_skill_success_rate=float(no_skill_success.mean()),
+        tower_success_rate=float(tower_success.mean()),
+        paired_success_gain=float((tower_success - no_skill_success).mean()),
+        paired_wins=sum(pair.tower_success > pair.no_skill_success for pair in selected),
+        paired_losses=sum(pair.tower_success < pair.no_skill_success for pair in selected),
+        paired_ties=sum(pair.tower_success == pair.no_skill_success for pair in selected),
+        no_skill_mean_steps=float(no_skill_steps.mean()),
+        tower_mean_steps=float(tower_steps.mean()),
+        guarded_step_saving=float(np.mean([_guarded_step(pair) for pair in selected])),
+    )
+
+
 def bootstrap_pareto(
     pairs: Iterable[FeedbackPair],
     *,
@@ -245,18 +268,17 @@ def _measure_bundle(primary_high_id: str, pairs: list[FeedbackPair]) -> BundleMe
         [int(pair.tower_success) - int(pair.no_skill_success) for pair in pairs],
         dtype=np.float64,
     )
-    guarded_steps = []
-    for pair in pairs:
-        raw_step = (pair.no_skill_steps - pair.tower_steps) / max(pair.no_skill_steps, 1)
-        guarded_steps.append(
-            min(raw_step, 0.0) if pair.tower_success < pair.no_skill_success else raw_step
-        )
     return BundleMetrics(
         primary_high_id=primary_high_id,
         exposure_count=len(pairs),
         objectives=DeploymentObjectives(
             performance_level=float(success.mean()),
             paired_success_gain=float(paired_gain.mean()),
-            guarded_step_saving=float(np.mean(guarded_steps)),
+            guarded_step_saving=float(np.mean([_guarded_step(pair) for pair in pairs])),
         ),
     )
+
+
+def _guarded_step(pair: FeedbackPair) -> float:
+    raw_step = (pair.no_skill_steps - pair.tower_steps) / max(pair.no_skill_steps, 1)
+    return min(raw_step, 0.0) if pair.tower_success < pair.no_skill_success else raw_step
