@@ -14,7 +14,12 @@ from trace2tower.methods.trace2tower.deployment_optimization.models import (
 def build_mid_lineage(
     old_clusters: Iterable[MidCluster],
     new_clusters: Iterable[MidCluster],
+    *,
+    min_old_retention: float = 0.0,
+    min_new_historical_purity: float = 0.0,
 ) -> tuple[LineageComponent, ...]:
+    if not 0 <= min_old_retention <= 1 or not 0 <= min_new_historical_purity <= 1:
+        raise ValueError("lineage overlap thresholds must be in [0, 1]")
     old_members = _member_sets(old_clusters, "old")
     new_members = _member_sets(new_clusters, "new")
     old_to_new = defaultdict(set)
@@ -25,14 +30,21 @@ def build_mid_lineage(
             shared = old_segment_ids & new_segment_ids
             if not shared:
                 continue
+            old_retention = len(shared) / len(old_segment_ids)
+            new_historical_purity = len(shared) / len(new_segment_ids)
+            if (
+                old_retention < min_old_retention
+                and new_historical_purity < min_new_historical_purity
+            ):
+                continue
             old_to_new[old_mid_id].add(new_mid_id)
             new_to_old[new_mid_id].add(old_mid_id)
             overlaps[(old_mid_id, new_mid_id)] = LineageOverlap(
                 old_mid_id=old_mid_id,
                 new_mid_id=new_mid_id,
                 shared_member_count=len(shared),
-                old_retention=len(shared) / len(old_segment_ids),
-                new_historical_purity=len(shared) / len(new_segment_ids),
+                old_retention=old_retention,
+                new_historical_purity=new_historical_purity,
             )
 
     components = []

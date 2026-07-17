@@ -3,6 +3,9 @@
 状态：实验阶段 1 已启动；manifest、反馈指标、Pareto 和 lineage 核心已开始实现，尚未
 接入活动推理策略。
 
+本轮反馈已冻结为 450 个 task、`repeat_id=0`。正式 Tower 反馈使用恢复后的
+`plan_rewrite/budgeted_v2` 合同；清理期 `high_to_mid` 结果已隔离为无效诊断。
+
 ## 1. 目标与边界
 
 本实验验证部署反馈能否在不使用模型微调的前提下，持续改进 Trace2Tower 的外部技能
@@ -126,6 +129,10 @@ one old -> none         disappeared_mid
 Centroid similarity 只能作为 overlap 相同情况下的 tie-break 和 drift 诊断，不能单独产生
 Split 或 Merge。完全由新增 segment 组成的 Mid 是 `new_mid`，不能伪装为历史 continuation。
 
+第一轮显著 overlap 边冻结为：`old_retention >= 0.20` 或
+`new_historical_purity >= 0.20`。阈值在读取部署 reward 前按 overlap 分布冻结，用于排除少量
+segment 造成的偶然连通，不使用 task family 或人工任务桶。
+
 ## 5. 双层 Pareto
 
 ### 5.1 结构 Pareto
@@ -141,6 +148,10 @@ spectral_compactness_gain
 
 no-op 向量固定为 `(0, 0, 0)`。合法候选必须在三个维度均不低于 no-op，并至少一个维度
 严格提高。原始值、增量、支配关系和局部 lineage component 都必须进入报告。
+
+第一轮指标定义冻结为：历史 segment 上的二元 outcome purity、event-type purity，以及
+按候选分区重算 centroid 后的平均 cosine compactness。三者均按 segment 加权；新增 feedback
+segment 只改变自然聚类结构，不直接进入新旧结构增量的比较样本。
 
 结构 Pareto 只过滤由 lineage 代码证明合法的 Split/Merge；不得从 Pareto 排名反向发明
 成员关系。

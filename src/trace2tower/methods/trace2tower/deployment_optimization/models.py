@@ -80,3 +80,26 @@ class LineageComponent:
     old_mid_ids: tuple[str, ...]
     new_mid_ids: tuple[str, ...]
     overlaps: tuple[LineageOverlap, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class StructuralObjectives:
+    outcome_consistency_gain: float
+    transition_role_coherence_gain: float
+    spectral_compactness_gain: float
+
+    @property
+    def values(self) -> tuple[float, float, float]:
+        return (
+            self.outcome_consistency_gain,
+            self.transition_role_coherence_gain,
+            self.spectral_compactness_gain,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class StructuralProposal:
+    action: RefinementAction
+    component: LineageComponent
+    objectives: StructuralObjectives
+    pareto_front_rank: int
