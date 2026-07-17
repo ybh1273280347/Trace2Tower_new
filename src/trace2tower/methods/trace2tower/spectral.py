@@ -110,6 +110,7 @@ def semantic_only_clustering(
     *,
     cluster_count: int,
     random_state: int,
+    node_member_segment_ids: tuple[tuple[str, ...], ...] | None = None,
 ) -> ClusteringResult:
     if not 1 <= cluster_count <= len(segment_ids):
         raise ValueError("cluster count must fit the segment set")
@@ -120,7 +121,7 @@ def semantic_only_clustering(
         cluster_count,
         random_state,
         (),
-        node_member_segment_ids=tuple((segment_id,) for segment_id in segment_ids),
+        node_member_segment_ids=node_member_segment_ids,
     )
 
 

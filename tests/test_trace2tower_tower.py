@@ -6,18 +6,15 @@ from dataclasses import replace
 import pytest
 
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.llm_runtime import EmbeddingResult, LLMUsage
+from trace2tower.llm_runtime import EmbeddingResult, LLMUsage, ModelRole
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.graph_retrieval import TowerGraphProfile
+from trace2tower.methods.trace2tower.high_to_mid_provider import HighToMidSkillProvider
 from trace2tower.methods.trace2tower.models import (
-    AlfworldEventType,
     HighPath,
     MidCluster,
     PrimitiveAction,
 )
-from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
-from trace2tower.methods.trace2tower.retrieval import SkillEmbeddingIndex
 from trace2tower.methods.trace2tower.skills import HighSkillCard, LowSkill, MidSkillCard
 from trace2tower.methods.trace2tower.tower import (
     TowerSnapshot,
@@ -26,6 +23,7 @@ from trace2tower.methods.trace2tower.tower import (
     build_tower_snapshot,
 )
 from trace2tower.results import MethodName
+from trace2tower.semantic_index import SkillEmbeddingIndex
 
 
 def config() -> Trace2TowerConfig:
@@ -140,117 +138,36 @@ def test_snapshot_rejects_support_outside_training_provenance() -> None:
         replace(snapshot, snapshot_id="", high_paths=(invalid_path,))
 
 
-def test_provider_selects_from_complete_snapshot_and_reports_embedding_cost() -> None:
+def test_high_to_mid_provider_can_skip_rewrite_without_dropping_high() -> None:
     class FakeRuntime:
-        async def embed(self, texts) -> EmbeddingResult:
-            assert texts in (["goal"], ["goal\ninitial observation"])
-            return EmbeddingResult(
-                ((1.0, 0.0),),
-                LLMUsage(23, None, None),
-                1,
-            )
+        def __init__(self):
+            self.calls = []
 
-    provider = Trace2TowerSkillProvider(FakeRuntime(), complete_snapshot())
+        async def embed(self, texts) -> EmbeddingResult:
+            self.calls.append(texts)
+            vectors = ((1.0, 1.0),) if texts == ["goal"] else ((1.0, 0.0),)
+            return EmbeddingResult(vectors, LLMUsage(7, None, None), 1)
+
+    runtime = FakeRuntime()
+    provider = HighToMidSkillProvider(
+        runtime,
+        complete_snapshot(),
+        reference_high_top_k=1,
+        skills_per_step=2,
+        max_mid_skills=2,
+        mid_similarity_threshold=-1.0,
+        rewrite_model_role=ModelRole.RENDERER,
+        rewrite_max_output_tokens=1200,
+        rewrite_plan=False,
+    )
     selection = asyncio.run(
-        provider.select(
+        provider.select_task(
             "goal",
             EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
         )
     )
     assert selection.skill_ids == ("high_ab", "mid_a", "mid_b")
-    assert selection.model_input_tokens == 46
-    assert "Combined" in selection.context
-
-
-def test_provider_does_not_fill_low_context_without_an_accepted_mid() -> None:
-    class FakeRuntime:
-        async def embed(self, texts) -> EmbeddingResult:
-            assert texts == ["goal\ninitial observation"]
-            return EmbeddingResult(
-                ((-1.0, 0.0),),
-                LLMUsage(23, None, None),
-                1,
-            )
-
-    snapshot = complete_snapshot()
-    provider = Trace2TowerSkillProvider(
-        FakeRuntime(),
-        snapshot,
-        include_high=False,
-        direct_mid_similarity_threshold=0.99,
-        low_top_k=3,
-        graph_profile=TowerGraphProfile(
-            snapshot.snapshot_id,
-            Benchmark.ALFWORLD,
-            {
-                "mid_a": {AlfworldEventType.GOTO_LOCATION: 1},
-                "mid_b": {AlfworldEventType.GOTO_LOCATION: 1},
-            },
-        ),
-        mid_context_budget=2,
-    )
-    selection = asyncio.run(
-        provider.select_state(
-            "goal",
-            EnvironmentState(
-                "initial observation",
-                ("go to table",),
-                {},
-                False,
-                0.0,
-                False,
-                True,
-            ),
-        )
-    )
-
-    assert selection.skill_ids == ()
-    assert selection.context == ""
-
-
-def test_provider_applies_configured_high_similarity_threshold() -> None:
-    class FakeRuntime:
-        async def embed(self, texts) -> EmbeddingResult:
-            return EmbeddingResult(
-                ((1.0, 0.0), (1.0, 0.0)),
-                LLMUsage(23, None, None),
-                1,
-            )
-
-    provider = Trace2TowerSkillProvider(
-        FakeRuntime(),
-        complete_snapshot(),
-        high_similarity_threshold=0.8,
-    )
-    selection = asyncio.run(
-        provider.select(
-            "goal",
-            EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
-        )
-    )
-    assert selection.skill_ids == ("mid_a", "mid_b")
-    assert "Combined" not in selection.context
-
-
-def test_provider_can_disable_high_explicitly() -> None:
-    class FakeRuntime:
-        async def embed(self, texts) -> EmbeddingResult:
-            return EmbeddingResult(
-                ((1.0, 0.0), (1.0, 0.0)),
-                LLMUsage(23, None, None),
-                1,
-            )
-
-    provider = Trace2TowerSkillProvider(
-        FakeRuntime(),
-        complete_snapshot(),
-        include_high=False,
-    )
-    selection = asyncio.run(
-        provider.select(
-            "goal",
-            EnvironmentState("initial observation", (), {}, False, 0.0, False, True),
-        )
-    )
-    assert selection.skill_ids == ("mid_a", "mid_b")
-    assert "Combined" not in selection.context
+    assert selection.context_skill_ids == selection.skill_ids
+    assert selection.model_output_tokens == 0
+    assert "# Reference Plan" in selection.context
+    assert runtime.calls == [["goal"], ("# step 1: Execute both skills.",)]

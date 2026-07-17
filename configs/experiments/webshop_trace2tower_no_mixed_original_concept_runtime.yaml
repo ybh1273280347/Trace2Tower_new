@@ -1,5 +1,0 @@
-method: trace2tower_no_mixed
-retrieval_strategy: legacy
-include_high: true
-high_similarity_threshold: -1.0
-include_high_child_context: true

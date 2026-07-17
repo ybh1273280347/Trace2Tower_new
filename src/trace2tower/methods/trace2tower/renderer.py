@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
-from enum import StrEnum
 from statistics import fmean
 from typing import Any
 
@@ -19,11 +18,6 @@ from trace2tower.methods.trace2tower.skills import (
     legal_grounding_actions,
 )
 
-
-class RendererStyle(StrEnum):
-    TRACE2TOWER = "trace2tower"
-    TRACE2TOWER_DECISION_STATE = "trace2tower_decision_state"
-    SKILLX = "skillx"
 
 MID_RENDERER_INSTRUCTIONS = """You render one fixed Trace2Tower MidCluster into a concise reusable execution skill. A Mid skill is one stable behavior phase discovered by contrastive spectral decomposition. It is not an atomic action and not an end-to-end task strategy.
 
@@ -87,49 +81,6 @@ WebShop execution semantics:
 }
 
 
-DECISION_STATE_RENDERER_INSTRUCTIONS = """
-WebShop decision-state rendering profile:
-- Render a decision card, not a generic search/click tutorial. The card must
-  bind the task's product category, identity, attributes, options, and price
-  constraints to observable page evidence.
-- Name the candidate discriminator: what visible title, category, price,
-  option, or detail evidence makes a candidate acceptable or unacceptable.
-- Treat evidence as supported, contradicted, or uncertain. Contradiction means
-  reject and recover; uncertainty means perform one targeted verification when
-  the evidence supports it; supported means advance or stop when the purchase
-  gate is complete.
-- Convert repeated failure behavior into a concrete recovery guard: change the
-  query, return to results, reject the current candidate, correct an option, or
-  stop. Do not emit a warning without the corrective action.
-- Preserve exact product attributes and option values when they are stable in
-  the evidence. Do not replace a concrete product behavior with generic words
-  such as "target item" or "check details".
-- A reusable card may cover one decision role (query, candidate, option,
-  verification, recovery, or stop), but it must state its applicability and
-  completion condition so it can be routed by the current state.
-"""
-
-
-WEBSHOP_HIGH_DECISION_TREE_INSTRUCTIONS = """
-WebShop High strategy form:
-- WebShop execution is a conditional policy, not a single linear event list.
-  The procedure may contain explicit `IF condition -> action` and
-  `ELSE/OTHERWISE -> recovery` items. Use this form whenever successful and
-  unsuccessful trajectories diverge.
-- Start with one objective-binding and query step, then branch on the observed
-  candidate set. If no plausible candidate is present, reformulate or return
-  to search; do not pretend that the original query succeeded.
-- For each candidate, branch on category/identity, price, attributes, and
-  required options: contradicted means reject and recover; uncertain means one
-  targeted verification; supported means continue toward purchase.
-- Include the positive stopping branch explicitly: when all required slots are
-  supported and exact options are selected, purchase immediately. Do not force
-  every task through detail tabs or a fixed number of candidates.
-- Keep the strategy end to end, but express alternatives as guarded branches
-  rather than flattening them into a generic `search -> inspect -> buy` list.
-"""
-
-
 MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS = """
 This target was created by one fixed structural Split or coordinated Split/Merge transaction. Sibling profiles are supplied only to express the target's observable boundary; they are not members of the target and must not be merged into it.
 
@@ -137,17 +88,6 @@ This target was created by one fixed structural Split or coordinated Split/Merge
 - Do not manufacture a distinction from product names or incidental categories when the operational behavior is the same.
 - Do not mention siblings, clusters, comparisons, scores, or evidence in the card.
 - If the stable behavior is shared, keep shared steps concise and use the applicability condition or constraints for the defensible boundary.
-"""
-
-
-SKILLX_MID_ADAPTER_INSTRUCTIONS = """
-
-Diagnostic adapter contract:
-- The input is one fixed Trace2Tower Mid cluster. Its membership and mixed outcome evidence are immutable; do not discover, split, merge, filter, or relabel the cluster.
-- Treat the cluster evidence as the trajectory and extract exactly one reusable skill for the recurring subtask shared by its segments.
-- Preserve SkillX's generalization rules: use a generic action-oriented name, parameterize incidental values, keep the skill self-contained, exclude exploration and incorrect actions from the recommended procedure, and retain observed failure modes only as guards.
-- Return the result through the supplied function instead of `<skill>` tags. Map SkillX `document` to description and constraints, `content` to an imperative procedure, and `tools` to grounding_actions.
-- Return no IDs, scores, evidence metadata, or prose outside the function call.
 """
 
 
@@ -211,57 +151,12 @@ WebShop task-strategy semantics:
 }
 
 
-SKILLX_HIGH_ADAPTER_INSTRUCTIONS = """
-
-Diagnostic adapter contract:
-- The input is one fixed Trace2Tower High path with immutable ordered Mid children and supporting examples. Do not discover, reorder, merge, split, filter, or score the path.
-- Apply SkillX plan-writing rules to the fixed path: describe natural reusable sub-goals, remove incidental exploration or failed actions, preserve necessary order, list only demonstrated environment operations, and keep the plan concise.
-- Return the plan through the supplied function instead of `<plan>` tags. Use name for a short plan label, description for applicability, and procedure for the ordered plan steps.
-- Return no IDs, scores, evidence metadata, or prose outside the function call.
-"""
+def _mid_renderer_instructions(benchmark: Benchmark) -> str:
+    return MID_RENDERER_INSTRUCTIONS + MID_BENCHMARK_INSTRUCTIONS[benchmark]
 
 
-def _mid_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
-    if style is RendererStyle.TRACE2TOWER:
-        return MID_RENDERER_INSTRUCTIONS + MID_BENCHMARK_INSTRUCTIONS[benchmark]
-    if style is RendererStyle.TRACE2TOWER_DECISION_STATE:
-        return (
-            MID_RENDERER_INSTRUCTIONS
-            + MID_BENCHMARK_INSTRUCTIONS[benchmark]
-            + (DECISION_STATE_RENDERER_INSTRUCTIONS if benchmark is Benchmark.WEBSHOP else "")
-        )
-
-    from third_party.SkillX.prompts.skill_prompts import FUNCTIONAL_SKILL_PROMPT
-
-    return (
-        FUNCTIONAL_SKILL_PROMPT
-        + SKILLX_MID_ADAPTER_INSTRUCTIONS
-        + MID_BENCHMARK_INSTRUCTIONS[benchmark]
-    )
-
-
-def _high_renderer_instructions(style: RendererStyle, benchmark: Benchmark) -> str:
-    if style is RendererStyle.TRACE2TOWER:
-        return HIGH_RENDERER_INSTRUCTIONS + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
-    if style is RendererStyle.TRACE2TOWER_DECISION_STATE:
-        return (
-            HIGH_RENDERER_INSTRUCTIONS
-            + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
-            + (
-                DECISION_STATE_RENDERER_INSTRUCTIONS
-                + WEBSHOP_HIGH_DECISION_TREE_INSTRUCTIONS
-                if benchmark is Benchmark.WEBSHOP
-                else ""
-            )
-        )
-
-    from third_party.SkillX.prompts.plan_prompts import PLAN_EXTRACTION_PROMPTS
-
-    return (
-        PLAN_EXTRACTION_PROMPTS["default"]
-        + SKILLX_HIGH_ADAPTER_INSTRUCTIONS
-        + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
-    )
+def _high_renderer_instructions(benchmark: Benchmark) -> str:
+    return HIGH_RENDERER_INSTRUCTIONS + HIGH_BENCHMARK_INSTRUCTIONS[benchmark]
 
 
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
@@ -300,7 +195,6 @@ async def render_mid_card(
     sibling_inputs: Sequence[MidRenderInput] = (),
     *,
     trajectory_contexts: Mapping[str, Mapping[str, object]] = {},
-    renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[MidSkillCard, ChatResult]:
     legal_actions = legal_grounding_actions(benchmark, render_input)
     legal_action_values = sorted(action.value for action in legal_actions)
@@ -326,7 +220,7 @@ async def render_mid_card(
             {
                 "role": "system",
                 "content": (
-                    _mid_renderer_instructions(renderer_style, benchmark)
+                    _mid_renderer_instructions(benchmark)
                     + (MID_CONTRASTIVE_BOUNDARY_INSTRUCTIONS if sibling_inputs else "")
                 ),
             },
@@ -358,9 +252,9 @@ async def render_mid_card(
         temperature=0,
         max_output_tokens=1200,
         prompt_cache_key=(
-            f"trace2tower:mid:{benchmark.value}:{renderer_style}:contrastive-v4"
+            f"trace2tower:mid:{benchmark.value}:contrastive-v4"
             if sibling_inputs
-            else f"trace2tower:mid:{benchmark.value}:{renderer_style}:v3"
+            else f"trace2tower:mid:{benchmark.value}:v3"
         ),
     )
     payload = _tool_payload(
@@ -497,7 +391,6 @@ async def render_high_card(
     supporting_examples: Sequence[Mapping[str, object]] = (),
     *,
     unsuccessful_examples: Sequence[Mapping[str, object]] = (),
-    renderer_style: RendererStyle = RendererStyle.TRACE2TOWER,
 ) -> tuple[HighSkillCard, ChatResult]:
     missing = set(path.ordered_mid_ids) - set(child_mid_cards)
     if missing:
@@ -540,7 +433,7 @@ async def render_high_card(
         [
             {
                 "role": "system",
-                "content": _high_renderer_instructions(renderer_style, benchmark),
+                "content": _high_renderer_instructions(benchmark),
             },
             {
                 "role": "user",
@@ -556,7 +449,7 @@ async def render_high_card(
         tool_choice="required",
         temperature=0,
         max_output_tokens=1000,
-        prompt_cache_key=f"trace2tower:high:{benchmark.value}:{renderer_style}:task-v7",
+        prompt_cache_key=f"trace2tower:high:{benchmark.value}:task-v7",
     )
     payload = _tool_payload(
         result,
@@ -572,113 +465,6 @@ async def render_high_card(
             procedure=_required_text_tuple(payload, "procedure"),
             constraints=_required_text_tuple(payload, "constraints"),
             retrieval_condition=path.task_condition,
-        ),
-        result,
-    )
-
-
-async def render_task_conditioned_high_card(
-    runtime: CommonLLMRuntime,
-    benchmark: Benchmark,
-    community_id: str,
-    task_condition: Mapping[str, object],
-    path: HighPath,
-    parent_high_card: HighSkillCard,
-    child_mid_cards: Mapping[str, MidSkillCard],
-    member_mid_ids: Sequence[str],
-    successful_examples: Sequence[Mapping[str, object]],
-    unsuccessful_examples: Sequence[Mapping[str, object]],
-) -> tuple[HighSkillCard, ChatResult]:
-    missing = set(path.ordered_mid_ids) - set(child_mid_cards)
-    if missing:
-        raise ValueError(f"task-conditioned High is missing Mid cards: {sorted(missing)}")
-    render_input = {
-        "task_condition": task_condition,
-        "parent_community_strategy": {
-            "name": parent_high_card.name,
-            "description": parent_high_card.description,
-            "procedure": parent_high_card.procedure,
-            "constraints": parent_high_card.constraints,
-        },
-        "ordered_mid_ids": path.ordered_mid_ids,
-        "child_mid_cards": [
-            {
-                "skill_id": child_mid_cards[mid_id].skill_id,
-                "name": child_mid_cards[mid_id].name,
-                "description": child_mid_cards[mid_id].description,
-                "procedure": child_mid_cards[mid_id].procedure,
-                "constraints": child_mid_cards[mid_id].constraints,
-                "grounding_actions": child_mid_cards[mid_id].grounding_actions,
-            }
-            for mid_id in path.ordered_mid_ids
-        ],
-        "positive_support": path.positive_support,
-        "negative_support": path.negative_support,
-        "contrastive_path_score": path.contrastive_score,
-        "successful_complete_trajectories": list(successful_examples),
-        "unsuccessful_complete_trajectories": list(unsuccessful_examples),
-    }
-    tool = _tool(
-        "render_high_skill",
-        "Render one task-conditioned end-to-end strategy from a fixed graph path.",
-        {
-            "name": _text_property("Short strategy name."),
-            "description": _text_property("Complete concrete objective for this strategy."),
-            "procedure": _string_array("End-to-end execution checklist."),
-            "constraints": _string_array("Contrast-derived failure guards and recovery rules."),
-        },
-        ["name", "description", "procedure", "constraints"],
-    )
-    result = await runtime.chat(
-        ModelRole.RENDERER,
-        [
-            {
-                "role": "system",
-                "content": (
-                    _high_renderer_instructions(RendererStyle.TRACE2TOWER, benchmark)
-                    + """
-
-Task-conditioned graph contract:
-- The task condition is authoritative for target type, quantity, required transformation, device class, and final destination.
-- The ordered Mid path is fixed graph evidence. Preserve its causal relations, but restore initial search, acquisition, repeated-object progress, and final completion when the mined path is only a structural backbone.
-- Compare all supplied successful and unsuccessful complete trajectories for this task condition. Prefer relations repeated across successful variants over any one shortest trajectory.
-- Preserve source receptacle categories that repeat across successful variants as an ordered search prior. Phrase them as likely candidates with fallback to other unvisited locations, never as a guaranteed fixed location.
-- Instance numbers and one-off source locations are scene-specific and must not be copied.
-- Name exact environment action forms only as conditional examples. Never prescribe a source receptacle merely because one successful trajectory used it.
-- Produce one compact execution card suitable for one-time task-start injection.
-"""
-                ),
-            },
-            {
-                "role": "user",
-                "content": json.dumps(
-                    render_input,
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                ),
-            },
-        ],
-        tools=[tool],
-        tool_choice="required",
-        temperature=0,
-        max_output_tokens=1200,
-        prompt_cache_key=f"trace2tower:high:{benchmark.value}:task-community-v3",
-    )
-    payload = _tool_payload(
-        result,
-        "render_high_skill",
-        {"name", "description", "procedure", "constraints"},
-    )
-    return (
-        HighSkillCard(
-            community_id,
-            path.ordered_mid_ids,
-            _required_text(payload, "name"),
-            _required_text(payload, "description"),
-            _required_text_tuple(payload, "procedure"),
-            _required_text_tuple(payload, "constraints"),
-            tuple(member_mid_ids),
         ),
         result,
     )
@@ -711,7 +497,7 @@ async def render_high_community_card(
     }
     tool = _tool(
         "render_high_skill",
-        "Render one end-to-end strategy shared by the supplied Mid transition community.",
+        "Render one task-level strategy from a discovered Mid composition community.",
         {
             "name": _text_property("Short strategy name."),
             "description": _text_property("Complete objective patterns covered."),
@@ -720,23 +506,22 @@ async def render_high_community_card(
         },
         ["name", "description", "procedure", "constraints"],
     )
+    community_contract = """
+
+High community contract:
+- The input is one discovered community of complete successful Mid compositions, not a global bucket and not one local path.
+- Render only relations stable across the supplied successful trajectories. Use failures to add recovery guards or remove brittle detours.
+- Produce an end-to-end strategy beginning at the initial task state and ending at the demonstrated completion action.
+- Express mutually exclusive variants as observable conditions; never serialize them as mandatory consecutive steps.
+- Concrete task entities and attributes are runtime variables. Do not claim an unobserved entity property or invent a category-specific fact.
+- Keep the strategy compact. Mid skills provide local detail at retrieval time and must not be copied wholesale into High.
+"""
     result = await runtime.chat(
         ModelRole.RENDERER,
         [
             {
                 "role": "system",
-                "content": (
-                    _high_renderer_instructions(RendererStyle.TRACE2TOWER, benchmark)
-                    + """
-
-Community induction contract:
-- The input is the complete Mid transition community, not one local path.
-- Induce one strategy containing only relations stable across successful task variants.
-- Use failed trajectories to remove brittle path-specific operations and add guards for target substitution, premature phase entry, repeated transformations, wasted search, and missing completion.
-- Express conditional objective variants inside one shared strategy; do not serialize mutually exclusive transformations as one mandatory sequence.
-- Prefer the shortest action allowed by current environment state. Repair a prerequisite only when the intended action is unavailable; do not add container or appliance operations merely because some trajectory used them.
-"""
-                ),
+                "content": _high_renderer_instructions(benchmark) + community_contract,
             },
             {
                 "role": "user",
@@ -751,8 +536,8 @@ Community induction contract:
         tools=[tool],
         tool_choice="required",
         temperature=0,
-        max_output_tokens=1400,
-        prompt_cache_key=f"trace2tower:high:{benchmark.value}:community-v1",
+        max_output_tokens=1200,
+        prompt_cache_key=f"trace2tower:high:{benchmark.value}:community-v2",
     )
     payload = _tool_payload(
         result,
@@ -761,13 +546,13 @@ Community induction contract:
     )
     return (
         HighSkillCard(
-            community_id,
-            (),
-            _required_text(payload, "name"),
-            _required_text(payload, "description"),
-            _required_text_tuple(payload, "procedure"),
-            _required_text_tuple(payload, "constraints"),
-            member_mid_ids,
+            skill_id=community_id,
+            ordered_mid_ids=(),
+            name=_required_text(payload, "name"),
+            description=_required_text(payload, "description"),
+            procedure=_required_text_tuple(payload, "procedure"),
+            constraints=_required_text_tuple(payload, "constraints"),
+            member_mid_ids=member_mid_ids,
         ),
         result,
     )

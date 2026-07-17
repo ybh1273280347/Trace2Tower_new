@@ -13,12 +13,11 @@ from trace2tower.methods.trace2tower.graph import (
     GraphComponents,
     _nearest_neighbors,
     build_graph,
+    embedding_node_groups,
 )
 from trace2tower.methods.trace2tower.models import (
     AlfworldEventType,
-    GraphOutcomeMode,
     SegmentInstance,
-    SemanticNeighborScope,
     WebShopEventType,
 )
 from trace2tower.methods.trace2tower.spectral import (
@@ -102,46 +101,36 @@ def test_collapsed_duplicate_embeddings_use_full_group_outcome() -> None:
     assert sorted(len(cluster.member_segment_ids) for cluster in clustering.clusters) == [1, 3]
 
 
-def test_continuous_graph_outcome_preserves_partial_reward() -> None:
-    groups = (
-        (segment("s0", "t0", 0, (1.0, 0.0), 0.75),),
-        (segment("s1", "t1", 0, (0.0, 1.0), 0.25),),
+def test_semantic_only_clustering_expands_collapsed_embedding_nodes() -> None:
+    segments = (
+        segment("s0", "t0", 0, (1.0, 0.0), 1.0),
+        segment("s1", "t1", 0, (1.0, 0.0), 1.0),
+        segment("s2", "t2", 0, (1.0, 0.0), 0.0),
+        segment("s3", "t3", 0, (0.0, 1.0), 0.0),
     )
+    node_groups = embedding_node_groups(
+        segments,
+        collapse_duplicate_embeddings=True,
+    )
+    node_segments = tuple(group[0] for group in node_groups)
 
-    binary = build_graph(groups, config(collapse_duplicate_embeddings=True))
-    continuous = build_graph(
-        groups,
-        config(
-            collapse_duplicate_embeddings=True,
-            graph_outcome_mode=GraphOutcomeMode.CONTINUOUS_SIGNED,
+    clustering = semantic_only_clustering(
+        tuple(segment.segment_id for segment in node_segments),
+        np.asarray([segment.embedding for segment in node_segments]),
+        cluster_count=2,
+        random_state=42,
+        node_member_segment_ids=tuple(
+            tuple(segment.segment_id for segment in group) for group in node_groups
         ),
     )
 
-    assert binary.rho == pytest.approx((0.0, 0.0))
-    assert continuous.rho == pytest.approx((0.75, 0.25))
-
-
-def test_continuous_residual_only_calibrates_existing_edge_weights() -> None:
-    groups = (
-        (segment("s0", "t0", 0, (1.0, 0.0), 1.0),),
-        (segment("s1", "t1", 0, (0.9, 0.1), 0.5),),
-        (segment("s2", "t2", 0, (0.8, 0.2), 0.0),),
-    )
-    graph = build_graph(
-        groups,
-        config(
-            collapse_duplicate_embeddings=True,
-            graph_outcome_mode=GraphOutcomeMode.CONTINUOUS_RESIDUAL,
-            continuous_residual_weight=0.2,
-        ),
-    )
-
-    assert graph.adjacency.nnz == graph.base.nnz
-    assert np.all(graph.adjacency.data >= 0)
-    assert np.all(graph.adjacency.data <= 1.2 * graph.base.data + 1e-12)
-    assert np.all(graph.adjacency.data >= 0.8 * graph.base.data - 1e-12)
-    assert graph.positive.nnz > 0
-    assert graph.negative.nnz > 0
+    assert len(clustering.labels) == 2
+    assert sorted(len(cluster.member_segment_ids) for cluster in clustering.clusters) == [1, 3]
+    assert {
+        segment_id
+        for cluster in clustering.clusters
+        for segment_id in cluster.member_segment_ids
+    } == {"s0", "s1", "s2", "s3"}
 
 
 def test_config_rejects_string_boolean() -> None:
@@ -204,40 +193,6 @@ def test_observed_transitions_connect_different_event_types() -> None:
     assert graph.negative[2, 3] > graph.positive[2, 3]
     assert graph.adjacency[0, 1] > 0
     assert graph.adjacency[2, 3] < 0
-
-
-def test_same_event_semantic_scope_does_not_create_cross_event_neighbors() -> None:
-    groups = (
-        (
-            segment(
-                "left",
-                "left-trajectory",
-                0,
-                (1.0, 0.0),
-                1.0,
-                WebShopEventType.QUERY_FORMULATION,
-            ),
-        ),
-        (
-            segment(
-                "right",
-                "right-trajectory",
-                0,
-                (1.0, 0.0),
-                1.0,
-                WebShopEventType.CANDIDATE_SELECTION,
-            ),
-        ),
-    )
-
-    global_graph = build_graph(groups, config())
-    same_event_graph = build_graph(
-        groups,
-        config(semantic_neighbor_scope=SemanticNeighborScope.SAME_EVENT),
-    )
-
-    assert global_graph.cross_event_edge_count == 1
-    assert same_event_graph.cross_event_edge_count == 0
 
 
 def test_transition_graph_rejects_unlabeled_segments() -> None:

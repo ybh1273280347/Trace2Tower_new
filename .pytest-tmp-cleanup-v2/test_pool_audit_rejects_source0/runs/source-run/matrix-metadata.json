@@ -1,0 +1,1 @@
+{"run_id": "source-run", "benchmarks": ["webshop"], "split": "train", "method": "no_skill", "agent_model": "deepseek-v4-flash", "repeat_ids": [0, 1, 2, 3], "shards": [{"official_result_count": 8, "trajectory_count": 8, "error_attempt_count": 1, "invocation_summary": {"failed": 0}}]}

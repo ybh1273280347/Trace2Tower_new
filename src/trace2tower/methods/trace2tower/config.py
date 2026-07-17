@@ -3,11 +3,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from trace2tower.results import MethodName
-from trace2tower.methods.trace2tower.models import (
-    GraphOutcomeMode,
-    HighPathDiscovery,
-    SemanticNeighborScope,
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,10 +22,6 @@ class Trace2TowerConfig:
     success_threshold: float = 0.999
     collapse_duplicate_embeddings: bool = False
     high_min_success_count: int = 0
-    high_path_discovery: HighPathDiscovery = HighPathDiscovery.CONTRASTIVE_SUBSEQUENCE
-    semantic_neighbor_scope: SemanticNeighborScope = SemanticNeighborScope.GLOBAL
-    graph_outcome_mode: GraphOutcomeMode = GraphOutcomeMode.BINARY_CONTRASTIVE
-    continuous_residual_weight: float = 0.2
 
     def __post_init__(self) -> None:
         if self.failure_penalty < 0:
@@ -56,8 +47,6 @@ class Trace2TowerConfig:
             raise ValueError("High path epsilon must be positive")
         if not 0 < self.success_threshold <= 1:
             raise ValueError("success threshold must be in (0, 1]")
-        if not 0 <= self.continuous_residual_weight <= 1:
-            raise ValueError("continuous residual weight must be in [0, 1]")
 
     def to_record(self) -> dict:
         record = asdict(self)
@@ -65,14 +54,6 @@ class Trace2TowerConfig:
             record.pop("collapse_duplicate_embeddings")
         if not self.high_min_success_count:
             record.pop("high_min_success_count")
-        if self.high_path_discovery is HighPathDiscovery.CONTRASTIVE_SUBSEQUENCE:
-            record.pop("high_path_discovery")
-        if self.semantic_neighbor_scope is SemanticNeighborScope.GLOBAL:
-            record.pop("semantic_neighbor_scope")
-        if self.graph_outcome_mode is GraphOutcomeMode.BINARY_CONTRASTIVE:
-            record.pop("graph_outcome_mode")
-        if self.graph_outcome_mode is not GraphOutcomeMode.CONTINUOUS_RESIDUAL:
-            record.pop("continuous_residual_weight")
         if self.max_mid_clusters is None:
             record.pop("max_mid_clusters")
         return record
@@ -115,17 +96,4 @@ class Trace2TowerConfig:
                 record.get("collapse_duplicate_embeddings", False)
             ),
             high_min_success_count=int(record.get("high_min_success_count", 0)),
-            high_path_discovery=HighPathDiscovery(
-                record.get(
-                    "high_path_discovery",
-                    HighPathDiscovery.CONTRASTIVE_SUBSEQUENCE,
-                )
-            ),
-            semantic_neighbor_scope=SemanticNeighborScope(
-                record.get("semantic_neighbor_scope", SemanticNeighborScope.GLOBAL)
-            ),
-            graph_outcome_mode=GraphOutcomeMode(
-                record.get("graph_outcome_mode", GraphOutcomeMode.BINARY_CONTRASTIVE)
-            ),
-            continuous_residual_weight=float(record.get("continuous_residual_weight", 0.2)),
         )

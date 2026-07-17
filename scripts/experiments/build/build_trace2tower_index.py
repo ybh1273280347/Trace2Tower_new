@@ -13,13 +13,9 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 
 from trace2tower.llm_runtime import CommonLLMRuntime, EmbeddingResult, LLMUsage
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.retrieval import (
-    SkillEmbeddingIndex,
-    high_card_text,
-    mid_card_text,
-    retrieve_tower,
-)
+from trace2tower.methods.trace2tower.skill_text import high_card_text, mid_card_text
 from trace2tower.methods.trace2tower.skills import HighSkillCard, MidSkillCard
+from trace2tower.semantic_index import SkillEmbeddingIndex
 
 
 async def main(options: argparse.Namespace) -> int:
@@ -147,43 +143,6 @@ async def main(options: argparse.Namespace) -> int:
             tuple(all_high_vectors[skill_id] for skill_id in high_texts),
             tuple(high_hashes.values()),
         )
-        retrieval = None
-        query_usage = None
-        if options.query_goal is not None:
-            if options.query_observation is None:
-                raise ValueError("query goal requires --query-observation")
-            query_result = await runtime.embed(
-                [
-                    options.query_goal,
-                    f"{options.query_goal}\n{options.query_observation}",
-                ]
-            )
-            selected = retrieve_tower(
-                query_result.vectors[0],
-                query_result.vectors[1],
-                high_index,
-                mid_index,
-                {card.skill_id: card for card in high_cards},
-                {card.skill_id: card for card in mid_cards},
-                high_top_k=1,
-                direct_mid_top_k=options.direct_mid_top_k,
-                high_similarity_threshold=options.high_similarity_threshold,
-            )
-            retrieval = {
-                "skill_ids": selected.skill_ids,
-                "high_candidate": asdict(selected.high_candidate)
-                if selected.high_candidate
-                else None,
-                "high_match": asdict(selected.high_match)
-                if selected.high_match
-                else None,
-                "direct_mid_matches": [
-                    asdict(match) for match in selected.direct_mid_matches
-                ],
-                "context": selected.context,
-                "context_chars": len(selected.context),
-            }
-            query_usage = asdict(query_result.usage)
     finally:
         await runtime.close()
 
@@ -198,8 +157,6 @@ async def main(options: argparse.Namespace) -> int:
         "new_high_embeddings": len(missing_high_ids),
         "mid_embedding_usage": asdict(mid_result.usage) if mid_result else None,
         "high_embedding_usage": asdict(high_result.usage) if high_result else None,
-        "query_embedding_usage": query_usage,
-        "retrieval": retrieval,
     }
     options.output.parent.mkdir(parents=True, exist_ok=True)
     write_json(
@@ -266,10 +223,6 @@ if __name__ == "__main__":
     parser.add_argument("--cards", type=Path, required=True)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--query-goal")
-    parser.add_argument("--query-observation")
-    parser.add_argument("--direct-mid-top-k", type=int, choices=(3, 5, 8), default=3)
-    parser.add_argument("--high-similarity-threshold", type=float, default=-1.0)
     parser.add_argument("--embedding-batch-size", type=int, default=16)
     parser.add_argument("--embedding-batch-delay-seconds", type=float, default=0.0)
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))

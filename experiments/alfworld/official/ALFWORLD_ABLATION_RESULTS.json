@@ -1,0 +1,60 @@
+{
+  "protocol_id": "alfworld-trace2tower-ablation-v1",
+  "benchmark": "alfworld",
+  "split": "valid_unseen",
+  "repeat_id": 0,
+  "agent_model": "deepseek-v4-flash",
+  "full_snapshot": "artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json",
+  "structure": {
+    "full": {"mid_count": 39, "high_count": 118},
+    "semantic_only": {"mid_count": 39, "high_count": 0},
+    "no_transition": {"mid_count": 19, "high_count": 76},
+    "no_outcome": {"mid_count": 39, "high_count": 106},
+    "no_contrastive": {"mid_count": 10, "high_count": 44}
+  },
+  "build_ablation_results": "experiments/alfworld/official/ALFWORLD_BUILD_ABLATION_RESULTS.json",
+  "deployment": {
+    "D0": {
+      "run": "artifacts/runs/alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "success": 118,
+      "total": 134,
+      "mean_steps": 10.06,
+      "mean_invalid_actions": 0.22,
+      "mean_input_tokens": 43758,
+      "mean_context_chars": 5422
+    },
+    "D1": {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-only-rewrite-flash-r0",
+      "success": 78,
+      "total": 134,
+      "mean_steps": 14.17,
+      "mean_invalid_actions": 0.37,
+      "mean_input_tokens": 49667,
+      "mean_context_chars": 968
+    },
+    "D2": {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-mid-no-rewrite-flash-r0",
+      "success": 81,
+      "total": 134,
+      "mean_steps": 14.01,
+      "mean_invalid_actions": 0.41,
+      "mean_input_tokens": 63618,
+      "mean_context_chars": 5461
+    },
+    "D3": {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-only-no-rewrite-flash-r0",
+      "success": 78,
+      "total": 134,
+      "mean_steps": 14.24,
+      "mean_invalid_actions": 0.40,
+      "mean_input_tokens": 46020,
+      "mean_context_chars": 1254
+    }
+  },
+  "paired_success": {
+    "D0_minus_D1": {"delta": 0.2985074627, "ci95": [0.2089552239, 0.3880597015], "wins": 44, "losses": 4, "ties": 86, "mcnemar_exact_p": 1.5138326148e-9},
+    "D0_minus_D2": {"delta": 0.2761194030, "ci95": [0.1865671642, 0.3656716418], "wins": 44, "losses": 7, "ties": 83, "mcnemar_exact_p": 1.2115257420e-7},
+    "D1_minus_D3": {"delta": 0.0, "ci95": [-0.0671641791, 0.0671641791], "wins": 11, "losses": 11, "ties": 112, "mcnemar_exact_p": 1.0},
+    "D2_minus_D3": {"delta": 0.0223880597, "ci95": [-0.0447761194, 0.0895522388], "wins": 12, "losses": 9, "ties": 113, "mcnemar_exact_p": 0.6636238098}
+  }
+}

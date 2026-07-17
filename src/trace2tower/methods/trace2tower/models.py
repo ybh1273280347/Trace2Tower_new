@@ -60,28 +60,6 @@ class WebShopEventType(StrEnum):
     OTHER_CLICK = "OTHER_CLICK"
 
 
-class WebShopSignatureMode(StrEnum):
-    EVENT_CONTEXT = "event_context"
-    PRODUCT_ENTITY = "product_entity"
-    DECISION_STATE = "decision_state"
-
-
-class HighPathDiscovery(StrEnum):
-    CONTRASTIVE_SUBSEQUENCE = "contrastive_subsequence"
-    GOAL_CONDITIONED_TRAJECTORY = "goal_conditioned_trajectory"
-
-
-class SemanticNeighborScope(StrEnum):
-    GLOBAL = "global"
-    SAME_EVENT = "same_event"
-
-
-class GraphOutcomeMode(StrEnum):
-    BINARY_CONTRASTIVE = "binary_contrastive"
-    CONTINUOUS_SIGNED = "continuous_signed"
-    CONTINUOUS_RESIDUAL = "continuous_residual"
-
-
 EventType = AlfworldEventType | WebShopEventType
 
 

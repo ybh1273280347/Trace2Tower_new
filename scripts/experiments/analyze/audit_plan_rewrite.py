@@ -9,11 +9,9 @@ from dotenv import load_dotenv
 
 from trace2tower.benchmarks.models import EnvironmentState
 from trace2tower.llm_runtime import CommonLLMRuntime, ModelRole
-from trace2tower.manifests import Benchmark
-from trace2tower.methods.trace2tower.plan_rewrite_provider import (
-    PlanRewriteTrace2TowerProvider,
+from trace2tower.methods.trace2tower.high_to_mid_provider import (
+    HighToMidSkillProvider,
 )
-from trace2tower.methods.trace2tower.task_adapter_factory import task_adapter_for
 from trace2tower.trajectory import TrajectoryReader
 
 
@@ -30,18 +28,16 @@ async def main(options: argparse.Namespace) -> None:
         timeout_seconds=120,
         retry_base_seconds=1,
     )
-    provider = PlanRewriteTrace2TowerProvider.from_path(
+    provider = HighToMidSkillProvider.from_path(
         runtime,
         options.tower,
-        adapter=task_adapter_for(Benchmark.ALFWORLD),
         reference_high_top_k=options.high_top_k,
-        high_similarity_threshold=-1.0,
         skills_per_step=options.skills_per_step,
         max_mid_skills=options.max_mid_skills,
         mid_similarity_threshold=options.mid_threshold,
-        expose_reference_mid_evidence=False,
         rewrite_model_role=ModelRole(options.rewrite_model_role),
         rewrite_max_output_tokens=1200,
+        rewrite_plan=options.rewrite_plan,
     )
 
     async def audit(trajectory):
@@ -90,6 +86,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skills-per-step", type=int, default=4)
     parser.add_argument("--max-mid-skills", type=int, default=8)
     parser.add_argument("--mid-threshold", type=float, default=0.45)
+    parser.add_argument(
+        "--rewrite-plan",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
     parser.add_argument(
         "--rewrite-model-role",
         choices=(ModelRole.AGENT.value, ModelRole.RENDERER.value),

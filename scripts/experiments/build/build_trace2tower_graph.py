@@ -16,7 +16,11 @@ from trace2tower.methods.trace2tower.alfworld_events import (
     ALFWORLD_EXCLUSIVE_PATH_EVENTS,
 )
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.graph import build_graph, ordered_segment_groups
+from trace2tower.methods.trace2tower.graph import (
+    build_graph,
+    embedding_node_groups,
+    ordered_segment_groups,
+)
 from trace2tower.methods.trace2tower.models import SegmentInstance, event_type_from_value
 from trace2tower.methods.trace2tower.spectral import (
     semantic_only_clustering,
@@ -90,17 +94,30 @@ def main(options: argparse.Namespace) -> int:
             raise ValueError("semantic-only clustering requires --full-report")
         full_report = json.loads(options.full_report.read_text(encoding="utf-8"))
         cluster_count = int(full_report["cluster_count"])
-        segment_ids = tuple(segment.segment_id for segment in segments)
-        embeddings = np.asarray([segment.embedding for segment in segments], dtype=np.float64)
+        node_groups = embedding_node_groups(
+            segments,
+            config.collapse_duplicate_embeddings,
+        )
+        node_segments = tuple(group[0] for group in node_groups)
+        segment_ids = tuple(segment.segment_id for segment in node_segments)
+        embeddings = np.asarray(
+            [segment.embedding for segment in node_segments],
+            dtype=np.float64,
+        )
         clustering = semantic_only_clustering(
             segment_ids,
             embeddings,
             cluster_count=cluster_count,
             random_state=config.random_state,
+            node_member_segment_ids=tuple(
+                tuple(segment.segment_id for segment in group) for group in node_groups
+            ),
         )
         graph = None
+        graph_node_count = len(node_groups)
     else:
         graph = build_graph(ordered_groups, config)
+        graph_node_count = len(graph.segment_ids)
         clustering = spectral_clustering(graph, config)
         spectral_cluster_count = clustering.cluster_count
         if benchmark is Benchmark.ALFWORLD and not config.collapse_duplicate_embeddings:
@@ -144,13 +161,12 @@ def main(options: argparse.Namespace) -> int:
         **invocation,
         "method": config.method.value,
         "exclusive_event_post_merge": (
-            benchmark is Benchmark.ALFWORLD
+            not config.semantic_only
+            and benchmark is Benchmark.ALFWORLD
             and not config.collapse_duplicate_embeddings
         ),
-        "graph_node_count": len(graph.segment_ids) if graph else len(segments),
-        "collapsed_segment_count": (
-            len(segments) - len(graph.segment_ids) if graph else 0
-        ),
+        "graph_node_count": graph_node_count,
+        "collapsed_segment_count": len(segments) - graph_node_count,
         "cluster_count": clustering.cluster_count,
         "spectral_cluster_count": (
             spectral_cluster_count if not config.semantic_only else clustering.cluster_count

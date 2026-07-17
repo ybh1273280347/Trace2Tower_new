@@ -10,12 +10,7 @@ from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
 
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.models import (
-    EventType,
-    GraphOutcomeMode,
-    SegmentInstance,
-    SemanticNeighborScope,
-)
+from trace2tower.methods.trace2tower.models import EventType, SegmentInstance
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,7 +50,10 @@ def build_graph(
     if dimension == 0 or any(len(segment.embedding) != dimension for segment in segments):
         raise ValueError("all segment embeddings must have one fixed nonzero dimension")
 
-    node_groups = _node_groups(segments, config.collapse_duplicate_embeddings)
+    node_groups = embedding_node_groups(
+        segments,
+        config.collapse_duplicate_embeddings,
+    )
     node_segments = tuple(group[0] for group in node_groups)
     segment_to_node = {
         segment.segment_id: node_index
@@ -69,15 +67,7 @@ def build_graph(
     normalized_embeddings = _normalize_rows(embeddings)
     requested_neighbors = min(30, max(10, math.ceil(math.log2(max(len(node_groups), 2)))))
     neighbor_count = min(requested_neighbors, len(node_groups) - 1)
-    semantic_neighbors = (
-        _nearest_neighbors_by_event(
-            normalized_embeddings,
-            tuple(segment.event_type for segment in node_segments),
-            neighbor_count,
-        )
-        if config.semantic_neighbor_scope is SemanticNeighborScope.SAME_EVENT
-        else _nearest_neighbors(normalized_embeddings, neighbor_count)
-    )
+    semantic_neighbors = _nearest_neighbors(normalized_embeddings, neighbor_count)
     candidate_edges = {
         tuple(sorted((source, target)))
         for source, targets in enumerate(semantic_neighbors)
@@ -109,29 +99,18 @@ def build_graph(
             observed_transitions.add((source_index, target_index))
             candidate_edges.add(tuple(sorted((source_index, target_index))))
 
-    if config.graph_outcome_mode is not GraphOutcomeMode.BINARY_CONTRASTIVE:
-        node_outcomes = np.asarray(
-            [
-                np.mean(
-                    [min(1.0, max(0.0, segment.trajectory_score)) for segment in group]
-                )
-                for group in node_groups
-            ],
-            dtype=np.float64,
-        )
-    else:
-        node_outcomes = np.asarray(
-            [
-                np.mean(
-                    [
-                        float(segment.trajectory_score >= config.success_threshold)
-                        for segment in group
-                    ]
-                )
-                for group in node_groups
-            ],
-            dtype=np.float64,
-        )
+    node_outcomes = np.asarray(
+        [
+            np.mean(
+                [
+                    float(segment.trajectory_score >= config.success_threshold)
+                    for segment in group
+                ]
+            )
+            for group in node_groups
+        ],
+        dtype=np.float64,
+    )
     if config.collapse_duplicate_embeddings:
         rho = node_outcomes
     else:
@@ -155,11 +134,6 @@ def build_graph(
     positive_values = []
     negative_values = []
     adjacency_values = []
-    local_outcome_calibration = (
-        _local_edge_outcome_calibration(candidate_edges, rho)
-        if config.graph_outcome_mode is GraphOutcomeMode.CONTINUOUS_RESIDUAL
-        else {}
-    )
     enabled_count = 1 + config.use_transition_edge + config.use_outcome_edge
     for left, right in sorted(candidate_edges):
         semantic_value = max(
@@ -191,21 +165,11 @@ def build_graph(
             + (outcome_value if config.use_outcome_edge else 0)
         ) / enabled_count
         if config.use_contrastive_decomposition:
-            if config.graph_outcome_mode is GraphOutcomeMode.CONTINUOUS_RESIDUAL:
-                correction = (
-                    base_value
-                    * config.continuous_residual_weight
-                    * local_outcome_calibration[(left, right)]
-                )
-                positive_value = max(0.0, correction)
-                negative_value = max(0.0, -correction)
-                adjacency_value = base_value + correction
-            else:
-                positive_value = base_value * math.sqrt(rho[left] * rho[right])
-                negative_value = base_value * math.sqrt(
-                    (1 - rho[left]) * (1 - rho[right])
-                )
-                adjacency_value = positive_value - config.failure_penalty * negative_value
+            positive_value = base_value * math.sqrt(rho[left] * rho[right])
+            negative_value = base_value * math.sqrt(
+                (1 - rho[left]) * (1 - rho[right])
+            )
+            adjacency_value = positive_value - config.failure_penalty * negative_value
         else:
             positive_value = base_value
             negative_value = 0.0
@@ -316,70 +280,17 @@ def _nearest_neighbors(values: np.ndarray, neighbor_count: int) -> tuple[np.ndar
     return tuple(neighbors)
 
 
-def _nearest_neighbors_by_event(
-    values: np.ndarray,
-    event_types: tuple[EventType | None, ...],
-    neighbor_count: int,
-) -> tuple[np.ndarray, ...]:
-    neighbors = [np.empty(0, dtype=np.int64) for _ in range(len(values))]
-    event_indices: dict[EventType | None, list[int]] = {}
-    for index, event_type in enumerate(event_types):
-        event_indices.setdefault(event_type, []).append(index)
-
-    for indices in event_indices.values():
-        if len(indices) < 2:
-            continue
-        local_neighbors = _nearest_neighbors(
-            values[indices],
-            min(neighbor_count, len(indices) - 1),
-        )
-        for local_source, local_targets in enumerate(local_neighbors):
-            neighbors[indices[local_source]] = np.asarray(
-                [indices[int(target)] for target in local_targets],
-                dtype=np.int64,
-            )
-    return tuple(neighbors)
-
-
 def _transition_key(segment: SegmentInstance) -> str:
     if segment.event_type is None:
         raise ValueError("transition-aware graph requires domain event labels")
     return segment.event_type.value
 
 
-def _local_edge_outcome_calibration(
-    candidate_edges: set[tuple[int, int]],
-    outcomes: np.ndarray,
-) -> dict[tuple[int, int], float]:
-    affinities = {
-        edge: math.sqrt(outcomes[edge[0]] * outcomes[edge[1]])
-        for edge in candidate_edges
-    }
-    incident: dict[int, list[float]] = {}
-    for (left, right), affinity in affinities.items():
-        incident.setdefault(left, []).append(affinity)
-        incident.setdefault(right, []).append(affinity)
-    local_moments = {
-        node: (float(np.mean(values)), float(np.std(values)))
-        for node, values in incident.items()
-    }
-
-    calibrated = {}
-    for edge, affinity in affinities.items():
-        endpoint_scores = []
-        for node in edge:
-            mean, deviation = local_moments[node]
-            endpoint_scores.append(
-                0.0 if deviation <= 1e-12 else (affinity - mean) / deviation
-            )
-        calibrated[edge] = math.tanh(sum(endpoint_scores) / 2)
-    return calibrated
-
-
-def _node_groups(
-    segments: tuple[SegmentInstance, ...], collapse: bool
+def embedding_node_groups(
+    segments: tuple[SegmentInstance, ...],
+    collapse_duplicate_embeddings: bool,
 ) -> tuple[tuple[SegmentInstance, ...], ...]:
-    if not collapse:
+    if not collapse_duplicate_embeddings:
         return tuple((segment,) for segment in segments)
     grouped: dict[tuple[EventType | None, bytes], list[SegmentInstance]] = {}
     for segment in segments:

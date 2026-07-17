@@ -10,7 +10,7 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.manifests import Benchmark, ExperimentSplit
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
 from trace2tower.methods.trace2tower.models import HighCommunity, HighPath, MidCluster
-from trace2tower.methods.trace2tower.retrieval import SkillEmbeddingIndex
+from trace2tower.semantic_index import SkillEmbeddingIndex
 from trace2tower.methods.trace2tower.skills import LOW_SKILLS, HighSkillCard, MidSkillCard
 from trace2tower.methods.trace2tower.tower import (
     TowerSourceHashes,

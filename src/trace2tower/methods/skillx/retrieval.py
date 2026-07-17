@@ -9,26 +9,27 @@ from trace2tower.semantic_index import SkillEmbeddingIndex, SkillMatch
 
 @dataclass(frozen=True, slots=True)
 class SkillXRetrieval:
-    plan: SkillXPlan | None
-    plan_match: SkillMatch | None
+    source_plan: SkillXPlan | None
+    source_plan_match: SkillMatch | None
+    injected_plan: str | None
     skills: tuple[SkillXCard, ...]
     skill_matches: tuple[SkillMatch, ...]
     context: str
 
     @property
     def skill_ids(self) -> tuple[str, ...]:
-        plan_ids = (self.plan.plan_id,) if self.plan else ()
+        plan_ids = (self.source_plan.plan_id,) if self.source_plan else ()
         return plan_ids + tuple(skill.skill_id for skill in self.skills)
 
 
-def retrieve_plan(
+def retrieve_plans(
     query_vector: Sequence[float],
     index: SkillEmbeddingIndex,
     plans: Mapping[str, SkillXPlan],
     *,
     top_k: int,
     threshold: float,
-) -> tuple[SkillXPlan | None, SkillMatch | None]:
+) -> tuple[tuple[SkillXPlan, ...], tuple[SkillMatch, ...]]:
     if set(index.skill_ids) != set(plans):
         raise ValueError("SkillX plan index and plan library differ")
     matches = tuple(
@@ -36,9 +37,7 @@ def retrieve_plan(
         for match in index.search(query_vector, top_k)
         if match.cosine_similarity >= threshold
     )
-    if not matches:
-        return None, None
-    return plans[matches[0].skill_id], matches[0]
+    return tuple(plans[match.skill_id] for match in matches), matches
 
 
 def retrieve_skills(
@@ -47,23 +46,21 @@ def retrieve_skills(
     skills: Mapping[str, SkillXCard],
     *,
     top_k: int,
-    max_skills: int,
     threshold: float,
 ) -> tuple[tuple[SkillXCard, ...], tuple[SkillMatch, ...]]:
     if set(index.skill_ids) != set(skills):
         raise ValueError("SkillX skill index and skill library differ")
     selected = []
     matches = []
-    seen = set()
+    seen_names = set()
     for query_vector in query_vectors:
         for match in index.search(query_vector, top_k):
-            if match.cosine_similarity < threshold or match.skill_id in seen:
+            skill = skills[match.skill_id]
+            if match.cosine_similarity < threshold or skill.name in seen_names:
                 continue
-            seen.add(match.skill_id)
-            selected.append(skills[match.skill_id])
+            seen_names.add(skill.name)
+            selected.append(skill)
             matches.append(match)
-            if len(selected) == max_skills:
-                return tuple(selected), tuple(matches)
     return tuple(selected), tuple(matches)
 
 
@@ -73,26 +70,6 @@ def plan_steps(plan: str) -> tuple[str, ...]:
         for raw_line in plan.splitlines()
         if (line := raw_line.strip())
         and (line.startswith("#") or line.startswith("step") or len(line) > 10)
+        and len(line) >= 5
     )
     return steps or (plan,)
-
-
-def format_retrieval(
-    plan: SkillXPlan | None,
-    skills: Sequence[SkillXCard],
-) -> str:
-    sections = []
-    if plan:
-        sections.append(
-            "## Reference Plan\n"
-            f"{plan.plan}\n"
-            "Adapt this plan to the current task and observation."
-        )
-    for skill in skills:
-        sections.append(
-            f"## Skill: {skill.name}\n"
-            f"Description:\n{skill.document}\n\n"
-            f"Reference implementation:\n{skill.content}\n\n"
-            "Treat this as guidance and call only the provided benchmark tools."
-        )
-    return "\n\n".join(sections)

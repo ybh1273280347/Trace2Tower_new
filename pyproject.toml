@@ -32,9 +32,6 @@ dev = [
     "ruff>=0.9",
 ]
 
-[project.scripts]
-trace2tower-lock-sources = "trace2tower.reproducibility:main"
-
 [tool.setuptools.packages.find]
 where = ["src"]
 

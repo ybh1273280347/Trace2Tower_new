@@ -1,0 +1,9 @@
+method: trace2tower
+retrieval_contract: high_to_mid
+reference_high_top_k: 3
+skills_per_step: 4
+max_mid_skills: 8
+mid_similarity_threshold: 0.45
+rewrite_model_role: renderer
+rewrite_max_output_tokens: 1200
+rewrite_plan: true

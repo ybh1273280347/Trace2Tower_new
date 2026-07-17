@@ -30,21 +30,8 @@ from trace2tower.methods.global_e2e.provider import GlobalE2ESkillProvider
 from trace2tower.methods.manual_skill.provider import ManualSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
-from trace2tower.methods.trace2tower.labeled_mid_provider import (
-    LabeledMidDiagnosticProvider,
-)
-from trace2tower.methods.trace2tower.plan_rewrite_provider import (
-    PlanRewriteTrace2TowerProvider,
-    PlanRewriteWithDynamicMidProvider,
-)
-from trace2tower.methods.trace2tower.task_adapter_factory import task_adapter_for
-from trace2tower.methods.trace2tower.task_conditioned_provider import (
-    TaskConditionedHighProvider,
-)
-from trace2tower.methods.trace2tower.task_conditioning import TaskCompatibility
-from trace2tower.methods.trace2tower.provider import Trace2TowerSkillProvider
-from trace2tower.methods.trace2tower.three_signal_provider import (
-    ThreeSignalTrace2TowerSkillProvider,
+from trace2tower.methods.trace2tower.high_to_mid_provider import (
+    HighToMidSkillProvider,
 )
 from trace2tower.methods.trace2tower.tower import TowerSnapshot
 from trace2tower.results import EpisodeResultWriter, MethodName
@@ -56,31 +43,17 @@ EXECUTABLE_METHODS = (
     MethodName.MANUAL_SKILL,
     MethodName.GLOBAL_E2E_GPT,
     MethodName.SKILLX,
-    MethodName.SEMANTIC_CLUSTERING,
     MethodName.TRACE2TOWER,
-    MethodName.TRACE2TOWER_NO_EVENT,
-    MethodName.TRACE2TOWER_MID_ONLY,
-    MethodName.TRACE2TOWER_NO_MIXED,
 )
 METHOD_CONFIG_FILES = {
     MethodName.NO_SKILL: "webshop_no_skill.yaml",
     MethodName.MANUAL_SKILL: "webshop_manual_skill.yaml",
     MethodName.GLOBAL_E2E_GPT: "webshop_global_e2e.yaml",
     MethodName.SKILLX: "webshop_skillx.yaml",
-    MethodName.SEMANTIC_CLUSTERING: "webshop_semantic_clustering_runtime.yaml",
-    MethodName.TRACE2TOWER: "webshop_trace2tower_runtime.yaml",
-    MethodName.TRACE2TOWER_NO_EVENT: "webshop_trace2tower_no_event_runtime.yaml",
-    MethodName.TRACE2TOWER_MID_ONLY: "webshop_trace2tower_mid_only.yaml",
-    MethodName.TRACE2TOWER_NO_MIXED: "webshop_trace2tower_no_mixed_runtime.yaml",
+    MethodName.TRACE2TOWER: "webshop_trace2tower_alfworld_isomorphic_runtime.yaml",
 }
 
-TOWER_ARTIFACT_METHODS = {
-    MethodName.SEMANTIC_CLUSTERING,
-    MethodName.TRACE2TOWER,
-    MethodName.TRACE2TOWER_NO_EVENT,
-    MethodName.TRACE2TOWER_MID_ONLY,
-    MethodName.TRACE2TOWER_NO_MIXED,
-}
+TOWER_ARTIFACT_METHODS = {MethodName.TRACE2TOWER}
 
 
 @dataclass(frozen=True, slots=True)
@@ -190,219 +163,22 @@ def create_provider(
             plan_top_k=int(method_config["plan_top_k"]),
             skills_per_step=int(method_config["skills_per_step"]),
             max_skills=int(method_config["max_skills"]),
+            llm_max_output_tokens=int(method_config["llm_max_output_tokens"]),
+            rewrite_plan=bool(method_config.get("rewrite_plan", True)),
         )
     if artifact.method in TOWER_ARTIFACT_METHODS:
-        retrieval_strategy = method_config.get("retrieval_strategy", "legacy")
-        if retrieval_strategy not in {
-            "legacy",
-            "diverse",
-            "graph",
-            "labeled_mid_diagnostic",
-            "three_signal_graph",
-            "task_conditioned_high",
-            "task_conditioned_three_signal",
-            "plan_rewrite",
-            "plan_rewrite_graph_mid",
-        }:
-            raise ValueError("unknown Tower retrieval strategy")
-        diverse = retrieval_strategy == "diverse"
-        graph = retrieval_strategy == "graph"
-        labeled_mid_diagnostic = retrieval_strategy == "labeled_mid_diagnostic"
-        three_signal_graph = retrieval_strategy == "three_signal_graph"
-        task_conditioned_high = retrieval_strategy == "task_conditioned_high"
-        task_conditioned_three_signal = (
-            retrieval_strategy == "task_conditioned_three_signal"
-        )
-        plan_rewrite = retrieval_strategy in {
-            "plan_rewrite",
-            "plan_rewrite_graph_mid",
-        }
-        hierarchical = method_config.get("retrieval_contract") == "hierarchical"
-        if plan_rewrite:
-            task_provider = PlanRewriteTrace2TowerProvider.from_path(
-                runtime,
-                artifact.path,
-                adapter=task_adapter_for(artifact.benchmark),
-                reference_high_top_k=int(method_config["reference_high_top_k"]),
-                high_similarity_threshold=float(
-                    method_config["high_similarity_threshold"]
-                ),
-                skills_per_step=int(method_config["skills_per_step"]),
-                max_mid_skills=int(method_config["max_mid_skills"]),
-                mid_similarity_threshold=float(
-                    method_config["mid_similarity_threshold"]
-                ),
-                expose_reference_mid_evidence=bool(
-                    method_config.get("expose_reference_mid_evidence", False)
-                ),
-                rewrite_model_role=ModelRole(method_config["rewrite_model_role"]),
-                rewrite_max_output_tokens=int(
-                    method_config["rewrite_max_output_tokens"]
-                ),
-            )
-            if retrieval_strategy == "plan_rewrite_graph_mid":
-                state_provider = Trace2TowerSkillProvider.from_path(
-                    runtime,
-                    artifact.path,
-                    graph_profile_path=Path(method_config["graph_profile"]),
-                    lifecycle_report_path=(
-                        Path(method_config["lifecycle_report"])
-                        if method_config.get("lifecycle_report")
-                        else None
-                    ),
-                    include_high=False,
-                    high_similarity_threshold=float(
-                        method_config["high_similarity_threshold"]
-                    ),
-                    mid_context_budget=int(method_config["mid_context_budget"]),
-                    min_event_compatibility=float(
-                        method_config["min_event_compatibility"]
-                    ),
-                    direct_mid_similarity_threshold=float(
-                        method_config.get("direct_mid_similarity_threshold", 0.45)
-                    ),
-                    direct_mid_dedup_similarity_threshold=float(
-                        method_config["direct_mid_dedup_similarity_threshold"]
-                    ),
-                    direct_mid_mmr_lambda=float(
-                        method_config["direct_mid_mmr_lambda"]
-                    ),
-                    status_tie_epsilon=float(
-                        method_config.get("status_tie_epsilon", 0.0)
-                    ),
-                    low_top_k=0,
-                )
-                return PlanRewriteWithDynamicMidProvider(
-                    task_provider,
-                    state_provider,
-                )
-            return task_provider
-        if task_conditioned_high or task_conditioned_three_signal:
-            task_provider = TaskConditionedHighProvider.from_path(
-                runtime,
-                artifact.path,
-                profile_path=Path(method_config["task_condition_profile"]),
-                adapter=task_adapter_for(artifact.benchmark),
-                similarity_threshold=float(method_config["high_similarity_threshold"]),
-                minimum_compatibility=TaskCompatibility(
-                    method_config["minimum_task_compatibility"]
-                ),
-                initial_mid_top_k=int(method_config.get("initial_mid_top_k", 0)),
-                initial_mid_from_high=bool(
-                    method_config.get("initial_mid_from_high", False)
-                ),
-            )
-            if task_conditioned_three_signal:
-                return ThreeSignalTrace2TowerSkillProvider.from_task_provider(
-                    task_provider,
-                    graph_profile_path=Path(method_config["graph_profile"]),
-                    signal_profile_path=Path(method_config["signal_profile"]),
-                    mid_top_k=int(method_config["mid_top_k"]),
-                    score_threshold=float(method_config["three_signal_threshold"]),
-                    min_event_compatibility=float(
-                        method_config["min_event_compatibility"]
-                    ),
-                )
-            return task_provider
-        common_kwargs = {
-            "include_high": (
-                int(method_config["high_top_k"]) == 1
-                if hierarchical
-                else bool(method_config["include_high"])
-            ),
-            "high_similarity_threshold": float(
-                method_config["high_similarity_threshold"]
-            ),
-            "low_top_k": int(method_config.get("low_top_k", 0)),
-            "lifecycle_report_path": (
-                Path(method_config["lifecycle_report"])
-                if method_config.get("lifecycle_report")
-                else None
-            ),
-            "status_tie_epsilon": float(
-                method_config.get("status_tie_epsilon", 0.0)
-            ),
-        }
-        if three_signal_graph:
-            return ThreeSignalTrace2TowerSkillProvider.from_path(
-                runtime,
-                artifact.path,
-                graph_profile_path=Path(method_config["graph_profile"]),
-                signal_profile_path=Path(method_config["signal_profile"]),
-                mid_top_k=int(method_config["mid_top_k"]),
-                score_threshold=float(method_config["three_signal_threshold"]),
-                high_similarity_threshold=float(
-                    method_config["high_similarity_threshold"]
-                ),
-                min_event_compatibility=float(
-                    method_config["min_event_compatibility"]
-                ),
-            )
-        if labeled_mid_diagnostic:
-            return LabeledMidDiagnosticProvider.from_path(
-                runtime,
-                artifact.path,
-                graph_profile_path=Path(method_config["graph_profile"]),
-                labels_path=Path(method_config["labels"]),
-                manipulation_mid_id=str(method_config["manipulation_mid_id"]),
-                high_similarity_threshold=float(
-                    method_config["high_similarity_threshold"]
-                ),
-                min_event_compatibility=float(
-                    method_config["min_event_compatibility"]
-                ),
-            )
-        if graph:
-            return Trace2TowerSkillProvider.from_path(
-                runtime,
-                artifact.path,
-                graph_profile_path=Path(method_config["graph_profile"]),
-                mid_context_budget=int(
-                    method_config["mid_top_k"]
-                    if hierarchical
-                    else method_config["mid_context_budget"]
-                ),
-                min_event_compatibility=float(
-                    method_config["min_event_compatibility"]
-                ),
-                direct_mid_similarity_threshold=float(
-                    method_config.get("direct_mid_similarity_threshold", 0.45)
-                ),
-                direct_mid_dedup_similarity_threshold=float(
-                    method_config["direct_mid_dedup_similarity_threshold"]
-                ),
-                direct_mid_mmr_lambda=float(method_config["direct_mid_mmr_lambda"]),
-                **common_kwargs,
-            )
-        return Trace2TowerSkillProvider.from_path(
+        if method_config.get("retrieval_contract") != "high_to_mid":
+            raise ValueError("Tower only supports the High-to-Mid retrieval contract")
+        return HighToMidSkillProvider.from_path(
             runtime,
             artifact.path,
-            direct_mid_top_k=int(
-                method_config["mid_top_k"]
-                if hierarchical
-                else method_config["direct_mid_top_k"]
-            ),
-            include_high_child_context=bool(
-                method_config["include_high_child_context"]
-            ),
-            direct_mid_candidate_top_k=(
-                int(method_config["direct_mid_candidate_top_k"])
-                if diverse
-                else None
-            ),
-            direct_mid_similarity_threshold=float(
-                method_config.get("direct_mid_similarity_threshold", 0.45)
-            ),
-            direct_mid_relative_margin=float(
-                method_config.get("direct_mid_relative_margin", 0.08)
-            ),
-            direct_mid_dedup_similarity_threshold=float(
-                method_config.get("direct_mid_dedup_similarity_threshold", 0.95)
-            ),
-            direct_mid_mmr_lambda=float(
-                method_config.get("direct_mid_mmr_lambda", 0.75)
-            ),
-            **common_kwargs,
+            reference_high_top_k=int(method_config["reference_high_top_k"]),
+            skills_per_step=int(method_config["skills_per_step"]),
+            max_mid_skills=int(method_config["max_mid_skills"]),
+            mid_similarity_threshold=float(method_config["mid_similarity_threshold"]),
+            rewrite_model_role=ModelRole(method_config["rewrite_model_role"]),
+            rewrite_max_output_tokens=int(method_config["rewrite_max_output_tokens"]),
+            rewrite_plan=bool(method_config["rewrite_plan"]),
         )
     raise ValueError(f"unsupported provider method: {artifact.method}")
 
@@ -582,36 +358,8 @@ async def main(options: argparse.Namespace) -> int:
         or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_strategy") in {
-            "task_conditioned_high",
-            "task_conditioned_three_signal",
-            "plan_rewrite",
-            "plan_rewrite_graph_mid",
-        }:
-            if options.direct_mid_top_k is not None:
-                raise ValueError("one-shot task retrieval does not accept legacy Mid caps")
-        elif method_config.get("retrieval_contract") == "hierarchical":
-            limits = tuple(
-                int(method_config[field])
-                for field in ("high_top_k", "mid_top_k", "low_top_k")
-            )
-            if not (
-                limits[0] in (0, 1)
-                and 0 <= limits[1] <= 12
-                and 0 <= limits[2] <= 3
-            ):
-                raise ValueError("hierarchical retrieval requires valid High/Mid/Low Top-K")
-            if options.direct_mid_top_k is not None:
-                raise ValueError("hierarchical retrieval does not accept legacy Mid caps")
-        else:
-            if options.direct_mid_top_k not in (3, 5, 8):
-                raise ValueError("legacy Tower runs require an explicit direct Mid cap")
-            cap_field = (
-                "mid_context_budget"
-                if method_config.get("retrieval_strategy") == "graph"
-                else "direct_mid_top_k"
-            )
-            method_config = {**method_config, cap_field: options.direct_mid_top_k}
+        if method_config.get("retrieval_contract") != "high_to_mid":
+            raise ValueError("Tower config must use the High-to-Mid retrieval contract")
     no_skill_config = load_yaml(options.config_root / "webshop_no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")
@@ -859,7 +607,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--method-config", type=Path)
-    parser.add_argument("--direct-mid-top-k", type=int, choices=(3, 5, 8))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     parser.add_argument("--dry-run", action="store_true")
     raise SystemExit(asyncio.run(main(parser.parse_args())))

@@ -1,0 +1,212 @@
+{
+  "protocol_id": "alfworld-trace2tower-component-ablation-v1",
+  "benchmark": "alfworld",
+  "split": "valid_unseen",
+  "repeat_id": 0,
+  "agent_model": "deepseek-v4-flash",
+  "success_threshold": 0.999,
+  "bootstrap": {
+    "samples": 10000,
+    "seed": 20260715,
+    "confidence_level": 0.95,
+    "unit": "task"
+  },
+  "manifest": {
+    "path": "artifacts/manifests/alfworld_test.jsonl",
+    "sha256": "631e359f23fe0ba5e5454c3e8df024b0f3621c21996e4ddbc1a84239daaf1010",
+    "expected_count": 134
+  },
+  "audits": {
+    "full": {
+      "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "run_path": "artifacts/runs/alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "expected_count": 134,
+      "result_count": 134,
+      "unique_key_count": 134,
+      "duplicate_key_count": 0,
+      "missing_key_count": 0,
+      "unexpected_key_count": 0,
+      "scope_error_count": 0,
+      "success_disagreement_count": 0,
+      "result_files": {
+        "artifacts/runs/alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0/alfworld/test/trace2tower/shard-00/results.jsonl": "733e8266f9508d3f6f6e1d76e0a4774ff27e3f95874f359465b17dab455ca626"
+      }
+    },
+    "no_transition": {
+      "run_id": "alfworld-ablation-v1-no-transition-flash-r0",
+      "run_path": "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0",
+      "expected_count": 134,
+      "result_count": 134,
+      "unique_key_count": 134,
+      "duplicate_key_count": 0,
+      "missing_key_count": 0,
+      "unexpected_key_count": 0,
+      "scope_error_count": 0,
+      "success_disagreement_count": 0,
+      "result_files": {
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-00/results.jsonl": "3bc677d7e96d60a4bc2257d1cbe6fd21ad1fa24a36dba9dbaecd93e78a03ab7d",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-01/results.jsonl": "b7be15f3bd2b968fc5e429abad99d5dc2ef5b09098b94ebd997089812c296c34",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-02/results.jsonl": "a863a9669aa9a93d1c5a2dfa34530eb1da415d7da8930e950930fa444fd67b14",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-03/results.jsonl": "95470f0468220210e6b68a609ba4f1087e83722361ffd3d348d99b40beaa230f",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-04/results.jsonl": "6218e654c4033a7e273ad6cb9f026d0396ce6c5b53745195416c13e76931b0ab",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-05/results.jsonl": "3c4b5b111fd64a2ef1896278a163c14bb4d97a3343994c4d63a555772653b349",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-06/results.jsonl": "3f6535261ca4222acf25d9ef43b565ad454c8e370feb4356b4dd91c82788b01d",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-07/results.jsonl": "b13b08ca246aaf1d6d461ce72c78b15563e38fe516e48b8362de304abb8075df",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-08/results.jsonl": "7ea56f10bf906b28663c14b5d68e7a888f221344c4c26e0f2acbc5cdb0199940",
+        "artifacts/runs/alfworld-ablation-v1-no-transition-flash-r0/alfworld/test/trace2tower/shard-09/results.jsonl": "4d61a546e2c38484b7f5984465cc7ab638b845aba8f375d5a4d599096aff0cbb"
+      }
+    },
+    "no_outcome": {
+      "run_id": "alfworld-ablation-v1-no-outcome-flash-r0",
+      "run_path": "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0",
+      "expected_count": 134,
+      "result_count": 134,
+      "unique_key_count": 134,
+      "duplicate_key_count": 0,
+      "missing_key_count": 0,
+      "unexpected_key_count": 0,
+      "scope_error_count": 0,
+      "success_disagreement_count": 0,
+      "result_files": {
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-00/results.jsonl": "d72d1c2629be0865f4bb623e8a9e1c40d515e53e0356547c39263856d36f7edb",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-01/results.jsonl": "3ef997118bb021a6dba54079d0c0b86bdb5f24953304fb60b7df0e7a14df0aea",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-02/results.jsonl": "e46d35bbe17439e3a611b9855609cd21b75402761c2de3401bd1685f46e8e5cf",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-03/results.jsonl": "aac031d6f3305d7eaffa0f00f4db92b7f2750854b4988b11c6e8d05ef853fa50",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-04/results.jsonl": "76f61b26d2b0e5cabe858695b7ca87f158e670318fbb0c1718b873bc6b093cfc",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-05/results.jsonl": "2d1c267f208dd6989e6ec6824e2182fe3b69a41b62f67622125dfef9e1fa89fe",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-06/results.jsonl": "bf9734293bcd9a0a6da65988b71dcf2fb73749c16b5b31ddfb976007d4468cca",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-07/results.jsonl": "15c2e09d24c7c48ce4c0afbda2cd296df48f5fa09c4b49eb926841536e4aae38",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-08/results.jsonl": "860053e815e8f0a78204ced73f6a74a82cea83918b6a924502edfc62bcb93653",
+        "artifacts/runs/alfworld-ablation-v1-no-outcome-flash-r0/alfworld/test/trace2tower/shard-09/results.jsonl": "780518f6cb0fe1af175d4e620c2efc2758e0f876bc1c489987f18e0838c81ead"
+      }
+    },
+    "no_contrastive": {
+      "run_id": "alfworld-ablation-v1-no-contrastive-flash-r0",
+      "run_path": "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0",
+      "expected_count": 134,
+      "result_count": 134,
+      "unique_key_count": 134,
+      "duplicate_key_count": 0,
+      "missing_key_count": 0,
+      "unexpected_key_count": 0,
+      "scope_error_count": 0,
+      "success_disagreement_count": 0,
+      "result_files": {
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-00/results.jsonl": "ee6de5427da79ff4370810d1887304040c2bda11e38720567c7ca304c214e475",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-01/results.jsonl": "f4c2b75b8dfb8b680c44df461cd061a3b43a098ea86239f9703372fac5efa653",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-02/results.jsonl": "6d31e675da68ea1a452079eb98c37aa3233dc76999782d7be6dbcf1b0472c09a",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-03/results.jsonl": "deb3b9fda8beaaa27d228680c1fc6c4dac44afb5f70821c3905b622eb7d3893c",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-04/results.jsonl": "39383e7c72838098bfcab66cea2c512ff51a581923181577206caa19c44e334a",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-05/results.jsonl": "c379ea0d83aadadaca47a656d4b1316673dfcca84f26f3c11c4b81327076f9d4",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-06/results.jsonl": "3055983d517bbc550d0573985dcfbc6f95974e7227952628d9b01438adc4f731",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-07/results.jsonl": "cf5a6272c886aaa5b886a6b71a9ec325136134c1b4b2067dbe35dadc65ecb60e",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-08/results.jsonl": "82dc7565d30d21d8e4f7c92fd7921ed3f67cd4d069fe7ec13e54055688c5e39f",
+        "artifacts/runs/alfworld-ablation-v1-no-contrastive-flash-r0/alfworld/test/trace2tower/shard-09/results.jsonl": "283909e1b2c19197fc4d8b91d0faecf5d3d2310172cb81dbe5b0cfab8ac451cf"
+      }
+    }
+  },
+  "summary": {
+    "full": {
+      "episode_count": 134,
+      "success_count": 118,
+      "success_rate": 0.8805970149253731,
+      "mean_steps": 10.059701492537313,
+      "mean_invalid_actions": 0.21641791044776118,
+      "mean_input_tokens": 43757.92537313433,
+      "mean_skill_context_chars": 5422.059701492537,
+      "finish_reason_counts": {
+        "completed": 118,
+        "task_limit_reached": 16
+      }
+    },
+    "no_transition": {
+      "episode_count": 134,
+      "success_count": 69,
+      "success_rate": 0.5149253731343284,
+      "mean_steps": 14.746268656716419,
+      "mean_invalid_actions": 0.35074626865671643,
+      "mean_input_tokens": 71878.80597014926,
+      "mean_skill_context_chars": 5865.873134328358,
+      "finish_reason_counts": {
+        "completed": 69,
+        "task_limit_reached": 65
+      }
+    },
+    "no_outcome": {
+      "episode_count": 134,
+      "success_count": 76,
+      "success_rate": 0.5671641791044776,
+      "mean_steps": 14.261194029850746,
+      "mean_invalid_actions": 0.39552238805970147,
+      "mean_input_tokens": 68058.77611940299,
+      "mean_skill_context_chars": 5357.440298507463,
+      "finish_reason_counts": {
+        "completed": 76,
+        "task_limit_reached": 58
+      }
+    },
+    "no_contrastive": {
+      "episode_count": 134,
+      "success_count": 81,
+      "success_rate": 0.6044776119402985,
+      "mean_steps": 14.052238805970148,
+      "mean_invalid_actions": 0.40298507462686567,
+      "mean_input_tokens": 70158.70895522388,
+      "mean_skill_context_chars": 7723.917910447762,
+      "finish_reason_counts": {
+        "completed": 81,
+        "task_limit_reached": 53
+      }
+    }
+  },
+  "full_minus_ablation": {
+    "no_transition": {
+      "direction": "full_minus_ablation",
+      "success_rate_difference": 0.3656716417910448,
+      "bootstrap_ci95": [
+        0.2759328358208957,
+        0.4626865671641791
+      ],
+      "full_wins": 54,
+      "full_losses": 5,
+      "ties": 75,
+      "mcnemar_exact_p": 1.9067358802971057e-11,
+      "mean_step_difference": -4.686567164179104,
+      "mean_invalid_action_difference": -0.13432835820895522,
+      "mean_input_token_difference": -28120.880597014926,
+      "mean_skill_context_char_difference": -443.8134328358209
+    },
+    "no_outcome": {
+      "direction": "full_minus_ablation",
+      "success_rate_difference": 0.31343283582089554,
+      "bootstrap_ci95": [
+        0.22388059701492538,
+        0.40298507462686567
+      ],
+      "full_wins": 46,
+      "full_losses": 4,
+      "ties": 84,
+      "mcnemar_exact_p": 4.461782054931973e-10,
+      "mean_step_difference": -4.201492537313433,
+      "mean_invalid_action_difference": -0.1791044776119403,
+      "mean_input_token_difference": -24300.850746268658,
+      "mean_skill_context_char_difference": 64.61940298507463
+    },
+    "no_contrastive": {
+      "direction": "full_minus_ablation",
+      "success_rate_difference": 0.27611940298507465,
+      "bootstrap_ci95": [
+        0.1791044776119403,
+        0.3656716417910448
+      ],
+      "full_wins": 43,
+      "full_losses": 6,
+      "ties": 85,
+      "mcnemar_exact_p": 5.7277652842913085e-08,
+      "mean_step_difference": -3.9925373134328357,
+      "mean_invalid_action_difference": -0.1865671641791045,
+      "mean_input_token_difference": -26400.783582089553,
+      "mean_skill_context_char_difference": -2301.8582089552237
+    }
+  }
+}

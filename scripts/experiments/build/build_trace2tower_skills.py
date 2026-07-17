@@ -14,16 +14,9 @@ from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
 from trace2tower.llm_runtime import CommonLLMRuntime
 from trace2tower.manifests import Benchmark
 from trace2tower.methods.trace2tower.config import Trace2TowerConfig
-from trace2tower.methods.trace2tower.goal_conditioned_high_paths import (
-    mine_goal_conditioned_high_paths,
-)
 from trace2tower.methods.trace2tower.high_paths import mine_high_paths
-from trace2tower.methods.trace2tower.models import HighPathDiscovery, MidCluster
-from trace2tower.methods.trace2tower.renderer import (
-    RendererStyle,
-    render_high_card,
-    render_mid_card,
-)
+from trace2tower.methods.trace2tower.models import MidCluster
+from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
 from trace2tower.methods.trace2tower.skills import (
     LOW_SKILLS,
     HighSkillCard,
@@ -199,8 +192,6 @@ async def main(options: argparse.Namespace) -> int:
         raise ValueError("render High limit must be non-negative")
     if options.render_concurrency is not None and options.render_concurrency <= 0:
         raise ValueError("render concurrency must be positive")
-    if options.structure_only and options.render_all_mid:
-        raise ValueError("structure-only build cannot render Mid cards")
     load_dotenv(options.env)
     config_record = load_yaml(options.config)
     config = Trace2TowerConfig.from_record(config_record)
@@ -218,12 +209,6 @@ async def main(options: argparse.Namespace) -> int:
     trajectory_contexts = build_trajectory_render_contexts(records, clusters)
     if config.semantic_only:
         high_paths = ()
-    elif config.high_path_discovery is HighPathDiscovery.GOAL_CONDITIONED_TRAJECTORY:
-        high_paths = mine_goal_conditioned_high_paths(
-            records,
-            clusters,
-            success_threshold=config.success_threshold,
-        )
     else:
         high_paths = mine_high_paths(
             records,
@@ -257,7 +242,6 @@ async def main(options: argparse.Namespace) -> int:
         "structure_only": options.structure_only,
         "success_threshold": config.success_threshold,
         "ensure_high_path": options.ensure_high_path,
-        "renderer_style": options.renderer_style.value,
         "render_concurrency": options.render_concurrency,
     }
     print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
@@ -346,7 +330,6 @@ async def main(options: argparse.Namespace) -> int:
                         options.benchmark,
                         inputs_by_id[mid_id],
                         trajectory_contexts=trajectory_contexts,
-                        renderer_style=options.renderer_style,
                     )
                     for mid_id in missing_mid_ids
                 )
@@ -384,7 +367,6 @@ async def main(options: argparse.Namespace) -> int:
                             successful=False,
                             success_threshold=config.success_threshold,
                         ),
-                        renderer_style=options.renderer_style,
                     )
                     for path in missing_paths
                 )
@@ -421,7 +403,6 @@ async def main(options: argparse.Namespace) -> int:
         "high_min_support_ratio": config.high_min_support_ratio,
         "high_min_success_count": config.high_min_success_count,
         "high_path_epsilon": config.high_path_epsilon,
-        "high_path_discovery": config.high_path_discovery.value,
     }
     write_json(options.output_dir / "report.json", report)
     print(yaml.safe_dump(report, sort_keys=False))
@@ -441,12 +422,6 @@ if __name__ == "__main__":
     parser.add_argument("--structure-only", action="store_true")
     parser.add_argument("--ensure-high-path", action="store_true")
     parser.add_argument("--reuse-mid-cards-from", type=Path)
-    parser.add_argument(
-        "--renderer-style",
-        type=RendererStyle,
-        choices=tuple(RendererStyle),
-        default=RendererStyle.TRACE2TOWER,
-    )
     parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))

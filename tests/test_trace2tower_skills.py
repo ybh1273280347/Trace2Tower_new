@@ -12,9 +12,6 @@ from trace2tower.methods.trace2tower.high_paths import (
     compress_repeated_mid_ids,
     mine_high_paths,
 )
-from trace2tower.methods.trace2tower.goal_conditioned_high_paths import (
-    mine_goal_conditioned_high_paths,
-)
 from trace2tower.methods.trace2tower.models import HighPath, MidCluster, PrimitiveAction
 from trace2tower.methods.trace2tower.renderer import render_high_card, render_mid_card
 from trace2tower.methods.trace2tower.skills import (
@@ -114,22 +111,6 @@ def test_high_paths_require_positive_contrastive_evidence() -> None:
     assert mine_high_paths(path_records, path_clusters, max_path_length=2) == ()
 
 
-def test_goal_conditioned_high_paths_keep_one_complete_composition_per_goal() -> None:
-    path_records = list(records())
-    for item in path_records[:2]:
-        for transition in item["transitions"]:
-            transition["goal"] = "buy a red washable rug under 100 dollars"
-    for transition in path_records[2]["transitions"]:
-        transition["goal"] = "buy a blue lamp"
-
-    paths = mine_goal_conditioned_high_paths(path_records, clusters())
-
-    assert len(paths) == 1
-    assert paths[0].task_condition == "buy a red washable rug under 100 dollars"
-    assert paths[0].ordered_mid_ids == ("mid_a", "mid_b")
-    assert paths[0].supporting_trajectory_ids == ("positive-2",)
-
-
 def test_mid_evidence_requires_a_cluster_partition() -> None:
     inputs = build_mid_render_inputs(records(), clusters())
     assert sum(item.support_count for item in inputs) == 8
@@ -196,7 +177,7 @@ def test_mid_renderer_preserves_builder_fields_and_rejects_illegal_grounding() -
     assert "WebShop execution semantics" not in runtime.calls[0][1][0]["content"]
     assert (
         runtime.calls[0][2]["prompt_cache_key"]
-        == "trace2tower:mid:alfworld:trace2tower:v3"
+        == "trace2tower:mid:alfworld:v3"
     )
 
     payload["grounding_actions"] = ["CLICK"]
@@ -247,7 +228,7 @@ def test_high_renderer_preserves_path_id_and_mid_order() -> None:
     assert runtime.calls[0][2]["tool_choice"] == "required"
     assert (
         runtime.calls[0][2]["prompt_cache_key"]
-        == "trace2tower:high:alfworld:trace2tower:task-v7"
+        == "trace2tower:high:alfworld:task-v7"
     )
     assert "ALFWorld task-strategy semantics" in runtime.calls[0][1][0]["content"]
     assert "WebShop task-strategy semantics" not in runtime.calls[0][1][0]["content"]
