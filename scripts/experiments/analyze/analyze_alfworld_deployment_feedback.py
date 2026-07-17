@@ -159,11 +159,11 @@ def _audit_inputs(
             raise ValueError("Tower feedback uses the wrong base snapshot")
         method = tower["method"]
         if (
-            method.get("retrieval_contract") != "high_to_mid"
-            or method.get("rewrite_plan") is not True
+            method.get("retrieval_strategy") != "plan_rewrite"
+            or method.get("rewrite_contract_version") != "budgeted_v2"
             or method.get("rewrite_model_role") != "renderer"
         ):
-            raise ValueError("Tower feedback does not use the required rewrite contract")
+            raise ValueError("Tower feedback does not use the original plan-rewrite contract")
         if tower.get("selection", {}).get("repeat_ids") != experiment_config["repeat_ids"]:
             raise ValueError("Tower run repeat selection differs from the deployment protocol")
 

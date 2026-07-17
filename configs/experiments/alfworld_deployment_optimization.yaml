@@ -2,6 +2,10 @@ benchmark: alfworld
 agent_model: deepseek-v4-flash
 base_snapshot: artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json
 base_snapshot_id: tower_d2c2d0090ed9b6b4
+runtime_contract:
+  retrieval_strategy: plan_rewrite
+  rewrite_contract_version: budgeted_v2
+  rewrite_model_role: renderer
 source_manifest: artifacts/manifests/alfworld_train_p1000.jsonl
 construction_pool: artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl
 no_skill_trajectory_pool: artifacts/trajectories/alfworld/alfworld-pool-p1000-global.jsonl

@@ -1,14 +1,24 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import replace
 
 import pytest
 
 from trace2tower.algorithms.semantic_index import SkillEmbeddingIndex
 from trace2tower.benchmarks.models import EnvironmentState
-from trace2tower.components.llm_runtime import EmbeddingResult, LLMUsage, ModelRole
+from trace2tower.components.llm_runtime import (
+    ChatResult,
+    EmbeddingResult,
+    LLMUsage,
+    ModelRole,
+    ToolCall,
+)
 from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.adapters.alfworld.plan_rewrite import (
+    AlfworldPlanRewriteAdapter,
+)
 from trace2tower.methods.trace2tower.artifacts.tower import (
     TowerSnapshot,
     TowerSourceHashes,
@@ -22,6 +32,7 @@ from trace2tower.methods.trace2tower.core.models import (
     PrimitiveAction,
 )
 from trace2tower.methods.trace2tower.induction.skills import HighSkillCard, LowSkill, MidSkillCard
+from trace2tower.methods.trace2tower.inference.plan_rewrite import PlanRewriteTrace2TowerProvider
 from trace2tower.methods.trace2tower.inference.provider import HighToMidSkillProvider
 
 
@@ -166,3 +177,76 @@ def test_high_to_mid_provider_can_skip_rewrite_without_dropping_high() -> None:
     assert selection.model_output_tokens == 0
     assert "# Reference Plan" in selection.context
     assert runtime.calls == [["goal"], ("# step 1: Execute both skills.",)]
+
+
+def test_plan_rewrite_provider_preserves_original_two_stage_contract() -> None:
+    class FakeRuntime:
+        def __init__(self):
+            self.embed_calls = []
+            self.chat_calls = []
+
+        async def embed(self, texts) -> EmbeddingResult:
+            self.embed_calls.append(texts)
+            vectors = ((1.0, 1.0),) if len(texts) == 1 else tuple((1.0, 0.0) for _ in texts)
+            return EmbeddingResult(vectors, LLMUsage(7, 3, None), 1)
+
+        async def chat(self, role, messages, **kwargs) -> ChatResult:
+            self.chat_calls.append((role, messages, kwargs))
+            if len(self.chat_calls) == 1:
+                payload = {
+                    "name": "Rewritten goal",
+                    "description": "Use the concrete task plan.",
+                    "procedure": ["Find the object.", "Place the object."],
+                    "constraints": ["Use the exact object."],
+                }
+                call = ToolCall("rewrite", "submit_task_plan", json.dumps(payload))
+            else:
+                call = ToolCall("select", "select_supporting_skills", '{"skill_ids":["mid_a"]}')
+            return ChatResult(None, (call,), LLMUsage(11, 5, None), 1)
+
+    runtime = FakeRuntime()
+    provider = PlanRewriteTrace2TowerProvider(
+        runtime,
+        complete_snapshot(),
+        reference_high_top_k=1,
+        high_similarity_threshold=-1.0,
+        skills_per_step=2,
+        max_mid_skills=2,
+        mid_similarity_threshold=-1.0,
+        expose_reference_mid_evidence=False,
+        rewrite_model_role=ModelRole.RENDERER,
+        rewrite_max_output_tokens=1200,
+    )
+
+    selection = asyncio.run(
+        provider.select_task(
+            "goal",
+            EnvironmentState("Your task is to: goal", (), {}, False, 0.0, False, True),
+        )
+    )
+
+    assert selection.skill_ids == ("high_ab", "mid_a")
+    assert selection.context_skill_ids == selection.skill_ids
+    assert "## Strategy: Rewritten goal" in selection.context
+    assert "## Skill: Name mid_a" in selection.context
+    assert [call[2]["tools"][0]["function"]["name"] for call in runtime.chat_calls] == [
+        "submit_task_plan",
+        "select_supporting_skills",
+    ]
+
+
+def test_alfworld_plan_rewrite_preserves_observation_goal_case() -> None:
+    state = EnvironmentState(
+        "Your task is to: Put a CLEAN apple in cabinet.\nYou are in a room.",
+        (),
+        {},
+        False,
+        0.0,
+        False,
+        True,
+    )
+
+    assert (
+        AlfworldPlanRewriteAdapter().task_text("fallback", state)
+        == "Put a CLEAN apple in cabinet."
+    )

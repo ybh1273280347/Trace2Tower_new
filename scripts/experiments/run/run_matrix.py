@@ -33,6 +33,9 @@ from trace2tower.methods.expert_crafted import ExpertCraftedSkillProvider
 from trace2tower.methods.skillx.models import SkillXExecutionLibrary
 from trace2tower.methods.skillx.provider import SkillXProvider
 from trace2tower.methods.trace2tower.artifacts.tower import TowerSnapshot
+from trace2tower.methods.trace2tower.inference.plan_rewrite import (
+    PlanRewriteTrace2TowerProvider,
+)
 from trace2tower.methods.trace2tower.inference.provider import (
     HighToMidSkillProvider,
 )
@@ -154,8 +157,28 @@ def create_provider(
             rewrite_plan=bool(method_config.get("rewrite_plan", True)),
         )
     if artifact.method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_contract") != "high_to_mid":
-            raise ValueError("Tower only supports the High-to-Mid retrieval contract")
+        contract = method_config.get("retrieval_contract") or method_config.get(
+            "retrieval_strategy"
+        )
+        if contract == "plan_rewrite":
+            if artifact.benchmark is not Benchmark.ALFWORLD:
+                raise ValueError("plan_rewrite is the frozen ALFWorld runtime contract")
+            return PlanRewriteTrace2TowerProvider.from_path(
+                runtime,
+                artifact.path,
+                reference_high_top_k=int(method_config["reference_high_top_k"]),
+                high_similarity_threshold=float(method_config["high_similarity_threshold"]),
+                skills_per_step=int(method_config["skills_per_step"]),
+                max_mid_skills=int(method_config["max_mid_skills"]),
+                mid_similarity_threshold=float(method_config["mid_similarity_threshold"]),
+                expose_reference_mid_evidence=bool(
+                    method_config.get("expose_reference_mid_evidence", False)
+                ),
+                rewrite_model_role=ModelRole(method_config["rewrite_model_role"]),
+                rewrite_max_output_tokens=int(method_config["rewrite_max_output_tokens"]),
+            )
+        if contract != "high_to_mid":
+            raise ValueError("unsupported Tower retrieval contract")
         return HighToMidSkillProvider.from_path(
             runtime,
             artifact.path,
@@ -327,8 +350,11 @@ async def main(options: argparse.Namespace) -> int:
         getattr(options, "method_config", None) or options.config_root / METHOD_CONFIG_FILES[method]
     )
     if method in TOWER_ARTIFACT_METHODS:
-        if method_config.get("retrieval_contract") != "high_to_mid":
-            raise ValueError("Tower config must use the High-to-Mid retrieval contract")
+        contract = method_config.get("retrieval_contract") or method_config.get(
+            "retrieval_strategy"
+        )
+        if contract not in {"high_to_mid", "plan_rewrite"}:
+            raise ValueError("Tower config uses an unsupported retrieval contract")
     no_skill_config = load_yaml(options.config_root / "webshop_no_skill.yaml")
     if method_config["method"] != method.value:
         raise ValueError("method config does not match the requested method")
