@@ -11,6 +11,8 @@
 - `rendering/`: 将确定性归纳结果渲染为模型可读技能文本。
 - `artifacts/`: Tower snapshot、内容哈希和完整性合同。
 - `inference/`: 部署期 High-to-Mid 检索、rewrite 和上下文格式化。
+- `deployment_optimization/`: 部署反馈驱动的结构 refinement 与 Pareto 管理；当前仅包含
+  实施协议，不参与构建或推理入口。
 
 依赖方向应从数据集适配和预处理流向核心算法，再流向归纳、artifact 与 inference。
 `eigen_trace/` 不得依赖 benchmark adapter；benchmark 特例只能留在 `adapters/` 或构建脚本。
