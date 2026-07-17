@@ -30,8 +30,11 @@ def build_structural_proposals(
     new_clusters: Sequence[MidCluster],
     evidence: Mapping[str, SegmentStructuralEvidence],
     *,
+    min_historical_coverage: float = 0.8,
     tolerance: float = 1e-9,
 ) -> tuple[StructuralProposal, ...]:
+    if not 0 < min_historical_coverage <= 1:
+        raise ValueError("minimum structural historical coverage must be in (0, 1]")
     old_by_id = {cluster.cluster_id: cluster for cluster in old_clusters}
     new_by_id = {cluster.cluster_id: cluster for cluster in new_clusters}
     candidates = []
@@ -52,6 +55,8 @@ def build_structural_proposals(
             for segment_id in cluster.member_segment_ids
         }
         evaluation_ids = historical_ids & new_member_ids
+        if len(evaluation_ids) / len(historical_ids) < min_historical_coverage:
+            continue
         old_scores = _partition_scores(old_partition, evaluation_ids, evidence)
         new_scores = _partition_scores(new_partition, evaluation_ids, evidence)
         objectives = StructuralObjectives(

@@ -42,6 +42,7 @@ def main(options: argparse.Namespace) -> int:
         snapshot.mid_clusters,
         new_clusters,
         evidence,
+        min_historical_coverage=options.min_historical_coverage,
         tolerance=options.tolerance,
     )
     selected = []
@@ -72,6 +73,7 @@ def main(options: argparse.Namespace) -> int:
             "outcome_consistency": "segment_weighted_binary_outcome_purity",
             "transition_role_coherence": "segment_weighted_event_type_purity",
             "spectral_compactness": "mean_cosine_to_partition_recomputed_centroid",
+            "min_historical_coverage": options.min_historical_coverage,
             "tolerance": options.tolerance,
         },
         "lineage_kind_counts": dict(sorted(Counter(item.kind.value for item in lineage).items())),
@@ -152,5 +154,6 @@ if __name__ == "__main__":
     parser.add_argument("--clusters", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--min-overlap-fraction", type=float, default=0.2)
+    parser.add_argument("--min-historical-coverage", type=float, default=0.8)
     parser.add_argument("--tolerance", type=float, default=1e-9)
     raise SystemExit(main(parser.parse_args()))
