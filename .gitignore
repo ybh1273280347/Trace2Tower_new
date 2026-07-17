@@ -11,6 +11,8 @@
 
 # Experiment outputs and local runtime state
 /artifacts/
+/clean_artifacts/alfworld/
+/clean_artifacts/webshop/
 /checkpoints/
 /logs/
 
