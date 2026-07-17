@@ -41,3 +41,12 @@ The original provider contract has been restored under the organized inference a
 adapter directories. Future formal analyzers reject runs that do not bind to the original
 `plan_rewrite`/`budgeted_v2` contract. Correct repeats use new run IDs and never overwrite or
 delete the invalid diagnostic artifacts.
+
+## Correct Repeat Results
+
+The repaired formal contract was rerun on all 134 `valid_unseen` tasks. Repeat 1 scored
+`106/134` (79.10%) and repeat 2 scored `108/134` (80.60%), with zero failed episodes. Including
+the original repeat 0 (`118/134`, 88.06%), the three-repeat mean is 82.59% with a sample
+standard deviation of 4.80 percentage points. The pooled result is `332/402` (82.59%), above
+the strongest recorded ablation, D2 (`81/134`, 60.45%), by 22.14 percentage points. The full
+per-repeat record is `ALFWORLD_FULL_REPEAT_RESULTS.json`.
