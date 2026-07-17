@@ -1,0 +1,43 @@
+benchmark: alfworld
+agent_model: deepseek-v4-flash
+base_snapshot: artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json
+base_snapshot_id: tower_d2c2d0090ed9b6b4
+source_manifest: artifacts/manifests/alfworld_train_p1000.jsonl
+construction_pool: artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl
+no_skill_trajectory_pool: artifacts/trajectories/alfworld/alfworld-pool-p1000-global.jsonl
+no_skill_trajectory_pool_sha256: 5741fd8af9c5f43497b54c85b6f9323858b4dea4051e8e7576f7fdba702594cd
+selection_seed: 20260717
+partitions:
+  feedback_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback.jsonl
+  feedback_pilot_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback_pilot.jsonl
+  gate_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_gate.jsonl
+  holdout_manifest: experiments/alfworld/deployment-optimization-v1/manifests/deployment_holdout.jsonl
+repeat_ids: [0]
+rollout_budget:
+  pilot_task_count: 60
+  max_tower_rewrites: 450
+  auto_expand_after_pilot: false
+bootstrap:
+  samples: 10000
+  seed: 20260717
+deployment_pareto:
+  objectives:
+    - performance_level
+    - paired_success_gain
+    - guarded_step_saving
+  ranking_min_exposure: 10
+  action_min_exposure: 20
+  max_front_1_probability: 0.10
+  min_dominated_probability: 0.90
+structure_pareto:
+  objectives:
+    - outcome_consistency_gain
+    - transition_role_coherence_gain
+    - spectral_compactness_gain
+  require_noop_dominance: true
+round_budget:
+  split: 1
+  merge: 1
+  promote: 1
+  downweight: 1
+physical_prune: false
