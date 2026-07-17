@@ -1,7 +1,7 @@
 # ALFWorld 部署反馈结构优化实施文档
 
-状态：实验阶段 1 已启动；manifest、反馈指标、Pareto 和 lineage 核心已开始实现，尚未
-接入活动推理策略。
+状态：第一轮实验已完成。450-task feedback、候选物化、120-task gate 和 120-task holdout
+均已冻结；所有修改候选未通过 gate，最终 v1 为 v0/no-op，未接入活动推理策略。
 
 本轮反馈已冻结为 450 个 task、`repeat_id=0`。正式 Tower 反馈使用恢复后的
 `plan_rewrite/budgeted_v2` 合同；清理期 `high_to_mid` 结果已隔离为无效诊断。
