@@ -1,0 +1,141 @@
+{
+  "schema_version": "trace2tower.skill_snapshot.v1",
+  "benchmark": "webshop",
+  "tower_snapshot_id": "tower_d9ec0f9a77f6bb0a",
+  "low_skills": [
+    {
+      "primitive_action": "CLICK",
+      "action_template": "click_action(value)"
+    },
+    {
+      "primitive_action": "SEARCH",
+      "action_template": "search_action(keywords)"
+    }
+  ],
+  "mid_skills": [
+    {
+      "skill_id": "mid_0000",
+      "name": "Refine search, open a promising result, and select the required option before buying",
+      "description": "Use this when search results or a product page suggest a likely match, but the item still needs query refinement, product selection, or variant selection to satisfy the request. Apply it when the required attribute is visible as a selectable option or can be checked on the product page.",
+      "procedure": [
+        "Refine the search with keywords that combine the product type and the requested distinguishing attribute when the current results are not specific enough.",
+        "Open a promising search result that appears to match the product type and basic constraints such as price.",
+        "On the product page, select the requested variant or attribute value if it is listed as an option.",
+        "Inspect the product details needed to confirm the request when they are not already visible on the main product view.",
+        "Buy the item only after the required option is selected and the visible details still match the request."
+      ],
+      "constraints": [
+        "Do not keep issuing new searches after you have already found a product page with the required selectable option; continue by selecting and verifying it.",
+        "If search is unavailable on the current page, use page navigation controls such as returning to search results instead of trying to search from that page.",
+        "Do not purchase based only on the result title when the required attribute must be confirmed or selected on the product page.",
+        "If the requested variant is not available as an option on the product page, backtrack and continue searching rather than buying a different variant."
+      ],
+      "grounding_actions": [
+        "SEARCH",
+        "CLICK"
+      ]
+    },
+    {
+      "skill_id": "mid_0001",
+      "name": "Refine search terms and inspect product details",
+      "description": "Use this when the initial search results do not clearly confirm the required product attributes or when a promising item needs verification before purchase. It applies to shopping tasks that require narrowing by specific keywords and checking detail sections or options on a product page.",
+      "procedure": [
+        "Search with the core product type and the most distinctive required attribute terms.",
+        "If results are broad or missing a clear match, submit a refined search that adds or removes specific attributes to better target the required item.",
+        "Open a promising result and select any required variant or option that is explicitly available on the page.",
+        "Inspect the product detail sections such as Description, Features, or Attributes to verify the requested properties.",
+        "Use the page back control to return from each detail section after checking it, then continue inspection or proceed.",
+        "If the item still does not satisfy the visible requirements, go back to search and try a more specific query based on the product title or missing attribute.",
+        "Proceed only after the visible page confirms the requested attributes and any required selectable options."
+      ],
+      "constraints": [
+        "Keep search queries centered on the product type plus distinctive required attributes; repeated backtracking without a more targeted query is not useful.",
+        "Do not buy based only on a search result snippet when the required attributes need confirmation on the product page.",
+        "Select a variant only if that option is explicitly shown on the product page.",
+        "When detail sections are available, verify the needed attributes there before proceeding."
+      ],
+      "grounding_actions": [
+        "SEARCH",
+        "CLICK"
+      ]
+    },
+    {
+      "skill_id": "mid_0002",
+      "name": "Refine search and backtrack",
+      "description": "Use this when search results are weak, missing the target attribute, or a product page shows the wrong variant and you need to return to search. It covers iterating on keywords, paging through results, and backing out to search before trying a tighter query.",
+      "procedure": [
+        "Formulate a focused keyword search around the target attributes.",
+        "Run the search and inspect the returned results list.",
+        "If the results are not specific enough, move through additional result pages or open a promising candidate to check its attributes.",
+        "When a result or product page is not a fit, back out to search instead of continuing to force the current path.",
+        "Refine the query with the missing attribute, brand, size, color, or format, then search again.",
+        "Repeat the search-and-backtrack cycle until a candidate matches the required details."
+      ],
+      "constraints": [
+        "Use this only when the current results set is incomplete, noisy, or mismatched.",
+        "Back out before refining the query if the current page is no longer useful for search.",
+        "Do not treat a product as suitable until the key target attributes are visible and match."
+      ],
+      "grounding_actions": [
+        "CLICK",
+        "SEARCH"
+      ]
+    }
+  ],
+  "high_skills": [
+    {
+      "skill_id": "high_community_b5c70ebca921",
+      "ordered_mid_ids": [],
+      "member_mid_ids": [
+        "mid_0000",
+        "mid_0001",
+        "mid_0002"
+      ],
+      "name": "Search, verify, and select the exact product before purchase",
+      "description": "Apply this to WebShop purchase tasks that require finding a product under a stated price limit while preserving all requested product attributes, quantities, flavors, sizes, colors, materials, care properties, usage properties, and any required selectable variants through search, inspection, selection, and checkout.",
+      "procedure": [
+        "Form an initial search query from the product type plus the most distinctive requested attributes, quantity or size, and other required constraints that can help narrow results.",
+        "If the results are broad, noisy, or miss a key requested attribute, revise the query by adding, removing, or rephrasing specific requested terms, and navigate result pages only while they remain relevant.",
+        "Open a promising result that matches the product type and any visible required constraints.",
+        "On the product page, inspect the visible product information and any relevant detail sections such as Description, Features, or Attributes to verify the requested properties and price-related fit.",
+        "If the task requires a selectable variant such as color, size, flavor, pack, or style, choose the option values that match the request and then re-check the visible page state.",
+        "If the page shows a wrong or unavailable variant, missing required attribute, wrong quantity, or another mismatch, return to search or results and continue with a more targeted query instead of forcing the current item.",
+        "Purchase only after the product page visibly confirms the requested attributes and any required selections are set to the requested values, then use Buy Now as the completion action."
+      ],
+      "constraints": [
+        "If search results or a title look close but the product page does not visibly confirm a required attribute or quantity, do not buy; inspect details or continue searching.",
+        "If a required variant value is not explicitly available as a selectable option on the product page, backtrack and find another product rather than substituting a different option.",
+        "If you enter a detail section such as Description, Features, or Attributes, return to the main product page before making further selections or purchasing.",
+        "If search is not available from the current page, use Back to Search, result navigation, or page back controls to return to a useful search state before refining the query.",
+        "If repeated paging or backtracking is not producing better candidates, change the query using the missing distinguishing attribute instead of repeating the same navigation cycle."
+      ]
+    },
+    {
+      "skill_id": "high_community_e2d4258d36a0",
+      "ordered_mid_ids": [],
+      "member_mid_ids": [
+        "mid_0000",
+        "mid_0001"
+      ],
+      "name": "Search, verify product details, select required options, then buy",
+      "description": "Apply this when a shopping request specifies a product plus required attributes such as size, color, pack count, scent, material properties, or price limit, and the item may need a more precise query, product-page verification, or explicit option selection before purchase.",
+      "procedure": [
+        "Form the search query from the product type and the most distinctive required attributes, quantities, or variant values in the request.",
+        "If the results are too broad or do not show a clear candidate, revise the query by reordering, adding, or simplifying the requested attributes while keeping the required product and constraints bound.",
+        "Open a promising result that matches the product type and visible constraints closely enough to inspect further.",
+        "On the product page, verify the requested attributes using the visible title, options, and detail sections when needed rather than relying only on the search-result title.",
+        "If the request includes selectable variants such as size, color, scent, flavor, or capacity, select the exact required options shown on the page and keep checking that the page still matches the request.",
+        "If the current product cannot visibly satisfy the required attributes or required option values, return to search or results and continue with a better-matched candidate or a more targeted query.",
+        "Click `Buy Now` only after the required product attributes, quantity/pack information, price limit, and any required selected variants are all visibly satisfied."
+      ],
+      "constraints": [
+        "If search results stay broad after a query attempt, change the query to emphasize the product type plus the most distinctive missing attribute instead of repeating backtracking with near-duplicate searches.",
+        "If a product page does not show the exact required option value, do not substitute a different variant; go back and keep searching.",
+        "If the page lacks enough visible information to confirm a requested attribute, inspect the available detail sections before deciding.",
+        "If you have already reached a product page with the required selectable option visible, stop issuing new searches and complete selection and verification there.",
+        "If search is unavailable from the current page, use the page navigation controls to return to results or search before refining the query.",
+        "Do not purchase from a promising title alone when the request depends on an attribute or variant that must be confirmed on the product page."
+      ]
+    }
+  ]
+}
