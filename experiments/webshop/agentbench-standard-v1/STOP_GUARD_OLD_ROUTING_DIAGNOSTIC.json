@@ -1,0 +1,78 @@
+{
+  "evidence_role": "diagnostic",
+  "code_commit": "9a1b3c0",
+  "question": "Does adding only the state-derived completion guard improve WebShop while preserving the original High retrieval routing?",
+  "manifest": {
+    "path": "artifacts/manifests/webshop_agentbench_std_0_199.jsonl",
+    "sha256": "533742b82caf54ca59690032d071258805cb0ce3406d5a2326ddaaf72e698e6d",
+    "count": 200
+  },
+  "artifact": {
+    "path": "artifacts/trace2tower/webshop/alfworld-v17-replication/stop-guard-old-routing-v1/p100/tower.json",
+    "snapshot_id": "tower_d8706432cdcc0067",
+    "sha256": "60131dbf4a7f7eac86720927275678b82d0aed333d39f2eda9ad887f3875e6c7",
+    "provenance": "artifacts/trace2tower/webshop/alfworld-v17-replication/stop-guard-old-routing-v1/p100/provenance.json"
+  },
+  "runtime": {
+    "agent_model": "deepseek-v4-flash",
+    "max_steps": 20,
+    "temperature": 0,
+    "agent_max_output_tokens": 512,
+    "retrieval_strategy": "plan_rewrite",
+    "rewrite_contract_version": "budgeted_v2",
+    "reference_high_top_k": 3,
+    "skills_per_step": 4,
+    "max_mid_skills": 8
+  },
+  "run": {
+    "run_id": "webshop-agentbench-std-p100-tower-stop-guard-old-routing-v1-full200-r0",
+    "matrix_metadata": "artifacts/runs/webshop-agentbench-std-p100-tower-stop-guard-old-routing-v1-full200-r0/matrix-metadata.json",
+    "result_count": 200,
+    "unique_result_count": 200,
+    "failed_attempt_count": 0,
+    "same_ordered_high_routing_as_base": 200
+  },
+  "metrics": {
+    "no_skill": {
+      "mean_reward": 0.6982321428571429,
+      "full_success_rate": 0.47
+    },
+    "base_tower": {
+      "mean_reward": 0.6601071428571429,
+      "full_success_rate": 0.445,
+      "task_limit_count": 28
+    },
+    "stop_guard_old_routing": {
+      "mean_reward": 0.6768571428571428,
+      "full_success_rate": 0.46,
+      "task_limit_count": 28,
+      "mean_reward_given_purchase": 0.7870431893687707
+    }
+  },
+  "paired_comparisons": {
+    "stop_guard_minus_base_tower": {
+      "mean_reward_delta": 0.01675,
+      "improved": 22,
+      "worse": 21,
+      "tied": 157,
+      "bootstrap_95_percent_interval": [-0.020166666666666666, 0.05508333333333334]
+    },
+    "stop_guard_minus_no_skill": {
+      "mean_reward_delta": -0.021375,
+      "improved": 25,
+      "worse": 28,
+      "tied": 147,
+      "bootstrap_95_percent_interval": [-0.0575, 0.0135]
+    }
+  },
+  "diagnostic_subsets": {
+    "previous_negative_flips_33": {
+      "base_tower_mean_reward": 0.1611111111111111,
+      "stop_guard_mean_reward": 0.41767676767676765
+    },
+    "remaining_167": {
+      "base_tower_mean_reward": 0.7587111491303108,
+      "stop_guard_mean_reward": 0.7280724265754206
+    }
+  }
+}
