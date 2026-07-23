@@ -104,6 +104,7 @@ Contrastive evidence contract:
 - Compare complete successful and unsuccessful sequences. Do not require a failure to contain the successful Mid path.
 - Extract the earliest stable divergence that separates successful execution from failure. Convert it into an explicit prerequisite, ordering rule, progress check, completion check, or recovery guard.
 - Absence is evidence: when failures consistently skip a behavior that successful trajectories perform, include the missing behavior in the strategy.
+- Excess is also evidence: when state_transitions show that a failure keeps inspecting, backtracking, or repeating an action after the visible state already satisfies the task requirements, add the observable completion condition and direct the agent to complete the terminal action immediately. Do not continue checking unless a visible requirement is missing or contradicted.
 - Never copy a failed action sequence into the recommended procedure.
 
 Card requirements:
@@ -119,7 +120,7 @@ Composition rules:
 - Generalize incidental values but keep distinctions that change prerequisites, order, verification, or completion.
 - Remove exploration and repeated detours from the main procedure. Put necessary search and recovery discipline in constraints.
 - Include progress tracking for repeated subgoals when successful trajectories require it.
-- Do not stop at an intermediate state. End with the task's demonstrated completion action and require confirmation when evidence provides one.
+- Do not stop at an intermediate state. End with the task's demonstrated completion action and require confirmation when evidence provides one. When the visible completion conditions are satisfied, state that the completion action should be taken without additional exploratory detours.
 - Do not invent operations, entities, attributes, tools, destinations, or hidden state absent from the supplied evidence.
 - Do not mention training data, trajectories, failures, rewards, support, scores, paths, clusters, or rendering in the card.
 

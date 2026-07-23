@@ -20,6 +20,7 @@ from trace2tower.methods.trace2tower.induction.skills import (
     build_mid_render_inputs,
 )
 from trace2tower.methods.trace2tower.rendering.renderer import render_high_card, render_mid_card
+from scripts.experiments.build.build_trace2tower_skills import build_trajectory_render_contexts
 
 
 def segment(segment_id: str, trajectory_id: str, step: int) -> dict:
@@ -108,6 +109,29 @@ def test_high_paths_require_positive_contrastive_evidence() -> None:
         MidCluster("mid_b", ("p1b", "p2b", "n1c"), ()),
     )
     assert mine_high_paths(path_records, path_clusters, max_path_length=2) == ()
+
+
+def test_high_render_context_preserves_compact_visible_state_transitions() -> None:
+    source = record("positive-1", 1.0, ("p1a1", "p1b"))
+    source["transitions"][0]["observation_before"] = "initial visible page"
+    source["transitions"][0]["observation_after"] = "product page with Buy Now"
+
+    context = build_trajectory_render_contexts([source], clusters())["positive-1"]
+
+    assert context["state_transitions"] == [
+        {
+            "step_index": 0,
+            "raw_action": "go to counter",
+            "observation_before": "initial visible page",
+            "observation_after": "product page with Buy Now",
+        },
+        {
+            "step_index": 1,
+            "raw_action": "go to counter",
+            "observation_before": "before",
+            "observation_after": "after",
+        },
+    ]
 
 
 def test_mid_evidence_requires_a_cluster_partition() -> None:

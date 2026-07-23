@@ -172,6 +172,38 @@ def build_high_render_examples(
     return tuple(examples)
 
 
+def _compact_state_observation(observation: str, *, limit: int = 600) -> str:
+    if len(observation) <= limit:
+        return observation
+    prefix_length = limit * 2 // 3
+    suffix_length = limit - prefix_length
+    return (
+        f"{observation[:prefix_length]}\n"
+        "...[state observation truncated]...\n"
+        f"{observation[-suffix_length:]}"
+    )
+
+
+def _state_transition_evidence(transitions: list[dict], *, limit: int = 8) -> list[dict]:
+    """保留轨迹的可见状态，使渲染器能区分遗漏与已满足后的冗余动作。"""
+    evidence = [
+        {
+            "step_index": transition["step_index"],
+            "raw_action": transition["raw_action"],
+            "observation_before": _compact_state_observation(
+                transition["observation_before"]
+            ),
+            "observation_after": _compact_state_observation(transition["observation_after"]),
+        }
+        for transition in transitions
+    ]
+    if len(evidence) <= limit:
+        return evidence
+    leading_count = limit // 2
+    trailing_count = limit - leading_count
+    return [*evidence[:leading_count], *evidence[-trailing_count:]]
+
+
 def build_trajectory_render_contexts(
     records: list[dict],
     clusters: tuple[MidCluster, ...],
@@ -199,6 +231,7 @@ def build_trajectory_render_contexts(
                 }
                 for transition in transitions
             ],
+            "state_transitions": _state_transition_evidence(transitions),
         }
     return contexts
 
