@@ -1,0 +1,114 @@
+[
+  {
+    "method": "No-Skill",
+    "run_id": "alfworld-test-v1-flash-noskill-r0",
+    "n": 134,
+    "mean_primary_score": 0.5298507462686567,
+    "full_success_count": 71,
+    "full_success_rate": 0.5298507462686567,
+    "mean_steps": 14.835820895522389,
+    "mean_invalid_actions": 0.5373134328358209,
+    "mean_input_tokens": 45677.28358208955,
+    "mean_skill_context_chars": 0.0,
+    "finish_reason_counts": {
+      "completed": 71,
+      "task_limit_reached": 63
+    }
+  },
+  {
+    "method": "Expert-Crafted Skills",
+    "run_id": "alfworld-test-v1-flash-manual-event-policy-r0",
+    "n": 134,
+    "mean_primary_score": 0.7611940298507462,
+    "full_success_count": 102,
+    "full_success_rate": 0.7611940298507462,
+    "mean_steps": 11.492537313432836,
+    "mean_invalid_actions": 0.3656716417910448,
+    "mean_input_tokens": 38889.49253731343,
+    "mean_skill_context_chars": 3286.0,
+    "finish_reason_counts": {
+      "completed": 102,
+      "task_limit_reached": 32
+    }
+  },
+  {
+    "method": "Trace2Skill +Combined",
+    "run_id": "trace2skill-gpt54-p310-alfworld-test-r0",
+    "n": 134,
+    "mean_primary_score": 0.5895522388059702,
+    "full_success_count": 79,
+    "full_success_rate": 0.5895522388059702,
+    "mean_steps": 14.111940298507463,
+    "mean_invalid_actions": 0.26865671641791045,
+    "mean_input_tokens": 68448.97014925373,
+    "mean_skill_context_chars": 9508.0,
+    "finish_reason_counts": {
+      "completed": 79,
+      "task_limit_reached": 55
+    }
+  },
+  {
+    "method": "Trace2Skill +Error",
+    "run_id": "trace2skill-gpt54-p310-error-alfworld-test-r0",
+    "n": 134,
+    "mean_primary_score": 0.6194029850746269,
+    "full_success_count": 83,
+    "full_success_rate": 0.6194029850746269,
+    "mean_steps": 14.14179104477612,
+    "mean_invalid_actions": 0.3880597014925373,
+    "mean_input_tokens": 73130.69402985074,
+    "mean_skill_context_chars": 11447.0,
+    "finish_reason_counts": {
+      "completed": 83,
+      "task_limit_reached": 51
+    }
+  },
+  {
+    "method": "SkillX no-rewrite",
+    "run_id": "alfworld-test-v1-flash-skillx-global-p310-r0",
+    "n": 134,
+    "mean_primary_score": 0.8134328358208955,
+    "full_success_count": 109,
+    "full_success_rate": 0.8134328358208955,
+    "mean_steps": 11.686567164179104,
+    "mean_invalid_actions": 0.4925373134328358,
+    "mean_input_tokens": 64651.28358208955,
+    "mean_skill_context_chars": 13091.589552238805,
+    "finish_reason_counts": {
+      "completed": 109,
+      "task_limit_reached": 25
+    }
+  },
+  {
+    "method": "ExpeL",
+    "run_id": "alfworld-test-expel-p310-flash-r0",
+    "n": 134,
+    "mean_primary_score": 0.8059701492537313,
+    "full_success_count": 108,
+    "full_success_rate": 0.8059701492537313,
+    "mean_steps": 11.574626865671641,
+    "mean_invalid_actions": 0.31343283582089554,
+    "mean_input_tokens": 52830.72388059701,
+    "mean_skill_context_chars": 7469.268656716418,
+    "finish_reason_counts": {
+      "completed": 108,
+      "task_limit_reached": 26
+    }
+  },
+  {
+    "method": "Trace2Tower",
+    "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+    "n": 134,
+    "mean_primary_score": 0.8805970149253731,
+    "full_success_count": 118,
+    "full_success_rate": 0.8805970149253731,
+    "mean_steps": 10.059701492537313,
+    "mean_invalid_actions": 0.21641791044776118,
+    "mean_input_tokens": 43757.92537313433,
+    "mean_skill_context_chars": 5422.059701492537,
+    "finish_reason_counts": {
+      "completed": 118,
+      "task_limit_reached": 16
+    }
+  }
+]

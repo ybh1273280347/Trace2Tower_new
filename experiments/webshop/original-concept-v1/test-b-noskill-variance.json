@@ -1,0 +1,66 @@
+{
+  "protocol_id": "webshop-test-b-noskill-variance-v1",
+  "agent_model": "deepseek-v4-flash",
+  "runs": {
+    "noskill_repeat0": "artifacts/runs/webshop-original-concept-v1-test-b-flash-noskill-r1",
+    "noskill_repeat1": "artifacts/runs/webshop-original-concept-v1-test-b-flash-noskill-repeat1",
+    "final_tower_repeat0": "artifacts/runs/webshop-original-concept-v1-test-b-flash-final-graph-cap3-r1"
+  },
+  "summary": {
+    "noskill_repeat0": {
+      "task_count": 100,
+      "mean_reward": 0.7332309523809524,
+      "full_success_rate": 0.48,
+      "mean_steps": 7.32,
+      "mean_invalid_actions": 0.32,
+      "mean_input_tokens": 16570.53
+    },
+    "noskill_repeat1": {
+      "task_count": 100,
+      "mean_reward": 0.7279809523809524,
+      "full_success_rate": 0.49,
+      "mean_steps": 7.79,
+      "mean_invalid_actions": 0.33,
+      "mean_input_tokens": 18867.61
+    },
+    "noskill_two_repeat_task_mean_reward": 0.7306059523809525,
+    "final_tower_repeat0": {
+      "task_count": 100,
+      "mean_reward": 0.7512309523809525,
+      "full_success_rate": 0.53,
+      "mean_steps": 6.87,
+      "mean_invalid_actions": 0.08,
+      "mean_input_tokens": 19636.66
+    }
+  },
+  "paired_deltas": {
+    "noskill_repeat1_minus_repeat0": {
+      "mean_reward": -0.0052499999999999995,
+      "bootstrap_ci95": [
+        -0.0323375,
+        0.018250000000000002
+      ]
+    },
+    "tower_minus_noskill_repeat0": {
+      "mean_reward": 0.018000000000000002,
+      "bootstrap_ci95": [
+        -0.02175,
+        0.05825208333333331
+      ]
+    },
+    "tower_minus_noskill_repeat1": {
+      "mean_reward": 0.023249999999999996,
+      "bootstrap_ci95": [
+        -0.01775,
+        0.06625208333333331
+      ]
+    },
+    "tower_minus_noskill_two_repeat_mean": {
+      "mean_reward": 0.020624999999999994,
+      "bootstrap_ci95": [
+        -0.01829270833333333,
+        0.05991770833333331
+      ]
+    }
+  }
+}

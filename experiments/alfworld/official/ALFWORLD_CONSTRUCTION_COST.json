@@ -1,0 +1,46 @@
+{
+  "protocol_id": "alfworld-p310-construction-chat-usage-v1",
+  "scope": "skill-construction LLM chat usage only",
+  "excluded": [
+    "trajectory collection agent usage",
+    "embedding usage",
+    "runtime plan rewrite",
+    "evaluation agent usage",
+    "currency cost estimates"
+  ],
+  "methods": {
+    "trace2tower": {
+      "model": "gpt-5.4",
+      "calls": 157,
+      "input_tokens": 983841,
+      "output_tokens": 41891,
+      "total_tokens": 1025732,
+      "cached_input_tokens": 617216,
+      "source": "artifacts/trace2tower/alfworld/original-concept-v17/p310/skills/rendered-cards.json"
+    },
+    "skillx": {
+      "model": "gpt-5.4",
+      "calls": 150,
+      "input_tokens": 1133696,
+      "output_tokens": 99945,
+      "total_tokens": 1233641,
+      "cached_input_tokens": 980352,
+      "source": "artifacts/skillx/alfworld-global-p310-recovered/report.json"
+    },
+    "expel": {
+      "model": "gpt-5.4",
+      "calls": 74,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "missing_reason": "The completed rule checkpoint retained 46 comparison and 28 success updates, but the resumed full build did not retain provider token usage.",
+      "source": "artifacts/expel/alfworld-p310/report.json"
+    }
+  },
+  "trace2tower_relative_to_skillx": {
+    "calls_change": 0.046666666666666634,
+    "input_tokens_change": -0.1321827015355086,
+    "output_tokens_change": -0.5808594727099905,
+    "total_tokens_change": -0.16853282275799852
+  }
+}

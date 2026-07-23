@@ -1,0 +1,42 @@
+{
+  "protocol_id": "alfworld-deployment-optimization-v1-gate",
+  "manifest": {
+    "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_holdout.jsonl",
+    "sha256": "64d0628aab37bdeabdedc3bfa239d20776079029c89298e3fb18275a4013eaf5",
+    "task_count": 120
+  },
+  "baseline": {
+    "path": "artifacts/runs/alfworld-deployment-v1-holdout-v0-noop-r0",
+    "result_tree_sha256": "497135ee6ee45f8379555d6129761cfad3e1ce9b46db4ba70aac6b6f04c5c7ab",
+    "success_rate": 0.8083333333333333,
+    "mean_steps": 10.583333333333334
+  },
+  "gate_contract": {
+    "paired_success_point_minimum": 0.0,
+    "one_sided_95_lower_minimum": -0.03,
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 20260717,
+    "selection_tie_break": [
+      "guarded_step_one_sided_95_lower",
+      "fewer_actions",
+      "candidate_name"
+    ]
+  },
+  "candidates": {
+    "graph_v2": {
+      "path": "artifacts/runs/alfworld-deployment-v2-holdout-graph-full-r0",
+      "result_tree_sha256": "182b949d86a4edb0f3cf34e56d0c6f01a3e8e9447f9698a2c817cc1835f28026",
+      "success_rate": 0.825,
+      "mean_steps": 10.141666666666667,
+      "paired_success_delta": 0.016666666666666666,
+      "paired_success_one_sided_95_lower": -0.041666666666666664,
+      "guarded_step_saving": -0.029923207561558963,
+      "guarded_step_one_sided_95_lower": -0.10409357304166708,
+      "paired_wins": 9,
+      "paired_losses": 7,
+      "paired_ties": 104,
+      "gate_pass": false
+    }
+  },
+  "selected": null
+}

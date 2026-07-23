@@ -1,0 +1,34 @@
+{
+  "experiment": "webshop_manual_dual_layer_v1",
+  "purpose": "Test whether a hand-written global execution card plus object-conditioned decision units has value before implementing dual-layer rendering.",
+  "benchmark": "webshop",
+  "split": "test",
+  "repeat_id": 0,
+  "agent_model": "deepseek-v4-flash",
+  "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+  "run_id": "webshop-test-a-flash-manual-dual-layer-v1-r0",
+  "skill_file": "experiments/webshop/original-concept-v1/manual-skill-dual-layer-v1.md",
+  "episodes": 100,
+  "metrics": {
+    "mean_reward": 0.65425,
+    "full_success_rate": 0.52,
+    "mean_steps": 9.08,
+    "mean_invalid_actions": 0.12,
+    "invalid_action_rate_per_step": 0.0132158590,
+    "completed_rate": 0.84
+  },
+  "comparison_reference": {
+    "no_skill_test_a_recorded": {
+      "mean_reward": 0.68075,
+      "full_success_rate": 0.51,
+      "mean_steps": 7.98,
+      "mean_invalid_actions": 0.36
+    },
+    "delta_vs_no_skill_recorded": {
+      "mean_reward": -0.02650,
+      "full_success_rate": 0.01,
+      "mean_steps": 1.10
+    }
+  },
+  "conclusion": "The decision units reduce invalid actions and slightly increase complete success, but the card is too conservative or causes extra exploration: reward and step efficiency are worse than the recorded NoSkill Test-A reference. This validates the behavioral target, not a positive end-to-end result. Use it as a renderer design probe and do not adopt it as a main method result."
+}

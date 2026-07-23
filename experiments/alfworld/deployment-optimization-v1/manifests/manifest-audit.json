@@ -1,0 +1,91 @@
+{
+  "protocol_id": "alfworld-deployment-optimization-v1",
+  "benchmark": "alfworld",
+  "source_split": "train",
+  "selection_seed": 20260717,
+  "construction_task_count": 310,
+  "candidate_task_count": 690,
+  "repeat_ids": [
+    0
+  ],
+  "pilot_is_feedback_subset": true,
+  "pilot_remaining_intersection": 0,
+  "pilot_remaining_cover_feedback": true,
+  "partitions": {
+    "deployment_feedback": {
+      "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback.jsonl",
+      "sha256": "a468c1298b98313ebe6f4cc8147871922c0a2bfd7b6d6f49e3873b12dfa91a27",
+      "task_count": 450,
+      "task_family_counts": {
+        "look_at_obj_in_light": 31,
+        "pick_and_place": 102,
+        "pick_clean_then_place": 88,
+        "pick_cool_then_place": 71,
+        "pick_heat_then_place": 59,
+        "pick_two_obj_and_place": 99
+      }
+    },
+    "deployment_gate": {
+      "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_gate.jsonl",
+      "sha256": "3c846708031246ad143a309dc27eb50bf13505616f93acb01ccb803594ef10d2",
+      "task_count": 120,
+      "task_family_counts": {
+        "look_at_obj_in_light": 9,
+        "pick_and_place": 27,
+        "pick_clean_then_place": 26,
+        "pick_cool_then_place": 19,
+        "pick_heat_then_place": 11,
+        "pick_two_obj_and_place": 28
+      }
+    },
+    "deployment_holdout": {
+      "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_holdout.jsonl",
+      "sha256": "64d0628aab37bdeabdedc3bfa239d20776079029c89298e3fb18275a4013eaf5",
+      "task_count": 120,
+      "task_family_counts": {
+        "look_at_obj_in_light": 9,
+        "pick_and_place": 30,
+        "pick_clean_then_place": 25,
+        "pick_cool_then_place": 16,
+        "pick_heat_then_place": 16,
+        "pick_two_obj_and_place": 24
+      }
+    },
+    "deployment_feedback_pilot": {
+      "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback_pilot.jsonl",
+      "sha256": "de8cc75a546c78b7aa45ece20c537408e54b42628c41b81751ef96c48c725cb5",
+      "task_count": 60,
+      "task_family_counts": {
+        "look_at_obj_in_light": 3,
+        "pick_and_place": 19,
+        "pick_clean_then_place": 7,
+        "pick_cool_then_place": 6,
+        "pick_heat_then_place": 11,
+        "pick_two_obj_and_place": 14
+      }
+    },
+    "deployment_feedback_remaining": {
+      "path": "experiments/alfworld/deployment-optimization-v1/manifests/deployment_feedback_remaining.jsonl",
+      "sha256": "ab607371c56f86c73ad66823d8e696e31dc08cc88368bc0cf3c32051a4fe191b",
+      "task_count": 390,
+      "task_family_counts": {
+        "look_at_obj_in_light": 28,
+        "pick_and_place": 83,
+        "pick_clean_then_place": 81,
+        "pick_cool_then_place": 65,
+        "pick_heat_then_place": 48,
+        "pick_two_obj_and_place": 85
+      }
+    }
+  },
+  "intersections": {
+    "feedback_gate": 0,
+    "feedback_holdout": 0,
+    "gate_holdout": 0,
+    "construction_candidates": 0
+  },
+  "source_manifest": "artifacts/manifests/alfworld_train_p1000.jsonl",
+  "source_manifest_sha256": "eff6af3bd9c8e2c95e54bedee3d9b203ebcc051fe1f31d34ff354934b0770fea",
+  "construction_pool": "artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl",
+  "construction_pool_sha256": "374858560ef4e2b6d7e085449cb13dcf94003623809c3aebe689c754d2a10fda"
+}

@@ -1,0 +1,268 @@
+{
+  "bundle": "trace2tower-paper-raw-data-20260721",
+  "created_on": "2026-07-21",
+  "file_count": 52,
+  "total_bytes_excluding_manifest": 30395631,
+  "files": [
+    {
+      "path": "alfworld-ablation-results.json",
+      "bytes": 3031,
+      "sha256": "42d21a4bb2d07cb7bb0f86251b02dcc2641845496e50dabb67b72a7b1892ae26"
+    },
+    {
+      "path": "alfworld-ablation-v1-plan-rewrite-high-only-flash-r0.jsonl",
+      "bytes": 93802,
+      "sha256": "2cb92ad88e80a0c7c38775a80342495ebad7d6271dd05cebeaaabd059811c216"
+    },
+    {
+      "path": "alfworld-ablation-v3-formal-no-contrastive-flash-r0.jsonl",
+      "bytes": 95111,
+      "sha256": "ef5d1faebf87de726d34e98e9d4c40ed4dd28ee6bcd996d52808a55bf6af19b2"
+    },
+    {
+      "path": "alfworld-ablation-v3-formal-no-outcome-flash-r0.jsonl",
+      "bytes": 96434,
+      "sha256": "b7302dec1e48f9c284ab6e488d6496ed098e8e252c3e60d388a4360be4abbe5d"
+    },
+    {
+      "path": "alfworld-ablation-v3-formal-no-transition-flash-r0.jsonl",
+      "bytes": 95823,
+      "sha256": "18f4d72cd4f2d09af61eae59a8b2292475dcd10982323e1aef5f0d79c16bfeec"
+    },
+    {
+      "path": "alfworld-build-ablation-formal-rewrite-results.json",
+      "bytes": 1455,
+      "sha256": "b277e9b4c420f270040dd57f5720454dd9b49878eae5191cc8a3d53141c9148a"
+    },
+    {
+      "path": "alfworld-deployment-v1-gate-v0-r0.jsonl",
+      "bytes": 83614,
+      "sha256": "6851ec130977c323e345c686784befa69181db9daba007ea06903b5bbaa2bb8b"
+    },
+    {
+      "path": "alfworld-deployment-v1-holdout-v0-noop-r0.jsonl",
+      "bytes": 84412,
+      "sha256": "881b2489c3fc4cd19e741761c06718cae3b090075b7bb4858e7e9b1c71710f91"
+    },
+    {
+      "path": "alfworld-deployment-v2-dev-embedding-graph-r0.jsonl",
+      "bytes": 97829,
+      "sha256": "37114bf6b9b8746ed2d5e50b7214d4dc3ecd7b1fbd4756643b2db9e122230564"
+    },
+    {
+      "path": "alfworld-deployment-v2-dev-graph-full-r0.jsonl",
+      "bytes": 97953,
+      "sha256": "61e86e39e3312feaa8fdd59a0d23c9098d74dbafa2124d126860fa352318ba35"
+    },
+    {
+      "path": "alfworld-deployment-v2-holdout-embedding-graph-r0.jsonl",
+      "bytes": 98291,
+      "sha256": "243e3ccef2c17afadd94b44ea59d51df462bd7dcbdf6805a47ba77479298e1cf"
+    },
+    {
+      "path": "alfworld-deployment-v2-holdout-graph-full-r0.jsonl",
+      "bytes": 98275,
+      "sha256": "f6456e900a81c5fd9388f0314d88934b32d4e380f2f110d352c3e9da4bf6a3a6"
+    },
+    {
+      "path": "alfworld-main-table.json",
+      "bytes": 3636,
+      "sha256": "06da68e815c68e49f1406e95952099d58cc48ed7911193ddcd3c3191ca603417"
+    },
+    {
+      "path": "alfworld-p310-tower.json",
+      "bytes": 27534576,
+      "sha256": "34a37e967a6f0cd6df3e72bba358c8a414f7abf4004e73d38a756e315c3d6a40"
+    },
+    {
+      "path": "alfworld-task-family-map.json",
+      "bytes": 16944,
+      "sha256": "13f54cdb82c317c54ebc1476b9ab932438fd56e3a3396d2961f5a7c944d10996"
+    },
+    {
+      "path": "alfworld-test-expel-p310-flash-r0.jsonl",
+      "bytes": 180729,
+      "sha256": "78485b60698d54e9189fb6ec0365e976e0c9a02fc27c90a1a1a266c795771b6c"
+    },
+    {
+      "path": "alfworld-test-v1-flash-manual-event-policy-r0.jsonl",
+      "bytes": 86917,
+      "sha256": "a76b7f05d4fb714d4ffd2cbe601c5758d9bf4fa43071b029b4c5076d8ded1700"
+    },
+    {
+      "path": "alfworld-test-v1-flash-noskill-r0.jsonl",
+      "bytes": 75053,
+      "sha256": "f8b0289d7f835397c6e810d1b6c59b92265346228faeb39bcc69dddd8ec71333"
+    },
+    {
+      "path": "alfworld-test-v1-flash-skillx-global-p310-r0.jsonl",
+      "bytes": 128246,
+      "sha256": "db3cda5e2ebb8e34994d971434eed11bec22b774ca5638ded8a34386c7a736a7"
+    },
+    {
+      "path": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0.jsonl",
+      "bytes": 103955,
+      "sha256": "3ad20a20c369ecc53dce19cf7f80b7a51de0230a6eaf3ca3cd29162c132bfc92"
+    },
+    {
+      "path": "cross-dsflash-render-gpt54-agent-alfworld-tower-r0.jsonl",
+      "bytes": 96109,
+      "sha256": "7ad857564de14987f3322810adbaecaa7531ccb9205fd11822f240a6de80252a"
+    },
+    {
+      "path": "cross-dsflash-render-gpt54-agent-webshop-tower-r0.jsonl",
+      "bytes": 66863,
+      "sha256": "5e0846b393c3cf10557e2840e5a4b2fb6c1f2989e14d74f0adbcfc85a9551a8a"
+    },
+    {
+      "path": "cross-gpt54-agent-alfworld-noskill-r0.jsonl",
+      "bytes": 75800,
+      "sha256": "0e6c47c9f51b70341b5c61e6f5085ba21d9599fb87b15c5c8dbfc48066925c32"
+    },
+    {
+      "path": "cross-gpt54-agent-webshop-noskill-r0.jsonl",
+      "bytes": 52085,
+      "sha256": "0d45b74afa4d7aa74bebe20cf3399c72726ab6e66753075f94170774631a7180"
+    },
+    {
+      "path": "cross-model-analysis-data.json",
+      "bytes": 6727,
+      "sha256": "e32d8c9cad54292a03fca9075efe0b905e8d62b25bbff334770e7b61e14ea89e"
+    },
+    {
+      "path": "deployment-test-1-embedding.json",
+      "bytes": 1469,
+      "sha256": "dc6904e924d399ca17329d3341afb3b25f54ac3e93f29cd287f7fc8cd9332378"
+    },
+    {
+      "path": "deployment-test-1-tfidf.json",
+      "bytes": 1492,
+      "sha256": "734893fc776f0c4d735526f8ba34f21d4a7b302f2d3ad60d2eda8f01ff70314b"
+    },
+    {
+      "path": "deployment-test-2-embedding.json",
+      "bytes": 1520,
+      "sha256": "34f030848492c36b7f52b88e51d38096fc089210b8b49910137a3d09e59fc262"
+    },
+    {
+      "path": "deployment-test-2-tfidf.json",
+      "bytes": 1488,
+      "sha256": "7432129cdc0439c24960e6fc20c9e0eadfe87cbdeac5bbae6756d7dc87ccc5a6"
+    },
+    {
+      "path": "expel-results.json",
+      "bytes": 938,
+      "sha256": "87cabdca42c555ab18228006de86492260970de7af9119ab414f23dfdfb9962f"
+    },
+    {
+      "path": "generalize-dspro-agent-alfworld-noskill-r0.jsonl",
+      "bytes": 76073,
+      "sha256": "2e6aedc61ce776ff34a4092c9e2c87d4fa6bcb2ddde96c358aa9fbf8c93a2ad2"
+    },
+    {
+      "path": "generalize-dspro-agent-webshop-noskill-r0.jsonl",
+      "bytes": 52322,
+      "sha256": "9da3f63086950baeeb220c846ccb6108ace4319bf76c4b2b2103c4bdc1072bfa"
+    },
+    {
+      "path": "generalize-gpt54-render-dspro-agent-alfworld-tower-r0.jsonl",
+      "bytes": 95542,
+      "sha256": "13c5b832462730656d674525aad054e2ed092b244689f2af5bfb006b7a75c22f"
+    },
+    {
+      "path": "generalize-gpt54-render-dspro-agent-webshop-tower-r0.jsonl",
+      "bytes": 68281,
+      "sha256": "eb8d834a2ffd37e66c3b0acc9eb81a65f45b9c82edc3b4cc573090fc937c1be9"
+    },
+    {
+      "path": "main-tables.json",
+      "bytes": 7372,
+      "sha256": "bb3e0644c2f3a7578447285d318782c195817d7f8f05cdc32aa88e447dbfa827"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3614,
+      "sha256": "9cfb4223c3b05fa68b975e38ffa9e7985710284e690cf98767e96622764784aa"
+    },
+    {
+      "path": "report-data.json",
+      "bytes": 5890,
+      "sha256": "3dc494ce645873fd1369b17269aa7f0311a56fa5e131715e9d9b9f8ff296ef70"
+    },
+    {
+      "path": "run-catalog.json",
+      "bytes": 20680,
+      "sha256": "cba86724ac06b1f8e20eebd617c4c71b092ebaa583888a74fb214ee283845f92"
+    },
+    {
+      "path": "trace2skill-gpt54-p100-error-webshop-validation-r0.jsonl",
+      "bytes": 60038,
+      "sha256": "5f785df9d434945442d56a32cce927d383b27a2acd838ed242e280ed7051b8a5"
+    },
+    {
+      "path": "trace2skill-gpt54-p100-webshop-validation-r0.jsonl",
+      "bytes": 59446,
+      "sha256": "08249a0fccf7474eff5752f064bfcf7c7cbef1112ab60a17e8c5a102416a8e0b"
+    },
+    {
+      "path": "trace2skill-gpt54-p310-alfworld-test-r0.jsonl",
+      "bytes": 84747,
+      "sha256": "e7d9e4f8dc6aa7c42e0bf612adf5f8974cc1c97005ba1abfc59a057f47876e9d"
+    },
+    {
+      "path": "trace2skill-gpt54-p310-error-alfworld-test-r0.jsonl",
+      "bytes": 85654,
+      "sha256": "fa026cde45ff67c06c4034756cd930dbdad2ef23f543c1aec3e22454dcc56fe8"
+    },
+    {
+      "path": "trace2skill-implementation-audit.json",
+      "bytes": 11711,
+      "sha256": "fc9a2f3432a46ea9fde0aadb23e412255ad99f30d96d908c3bd6d5d6b032c1eb"
+    },
+    {
+      "path": "trace2skill-results.json",
+      "bytes": 3065,
+      "sha256": "75df89b91691d121b5bf21b3fe9e8bd1ca91f73ed4a175ec950c8a90f7605e5e"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 3739,
+      "sha256": "ca7ba0dbab1897bd1064e5591a47f76640c197890ae5091100af656356391871"
+    },
+    {
+      "path": "webshop-alfworld-v17-replication-p100-validation-r0.jsonl",
+      "bytes": 66673,
+      "sha256": "9fc361bf8a63882a79bec6ac86c4f3bee8e2ef1e16e713a6f3c71e26e7f93538"
+    },
+    {
+      "path": "webshop-expert-crafted-results.json",
+      "bytes": 2037,
+      "sha256": "28e1e67ed8656293df9a34c22b66f809cdae04b9d4bff811e9544d341736ea5e"
+    },
+    {
+      "path": "webshop-expert-crafted-skills-validation-flash-r0.jsonl",
+      "bytes": 62212,
+      "sha256": "02925178b7b6ec8f7b01a8ec9e75040d75b5faa81a8bf81d8b57dd25ffffeb1a"
+    },
+    {
+      "path": "webshop-main-table.json",
+      "bytes": 3250,
+      "sha256": "255b3054b41f8f0aeaf55d223d731a28965fff9ee0c6c085ad59a749d8c08805"
+    },
+    {
+      "path": "webshop-original-concept-v1-validation-flash-noskill-r1.jsonl",
+      "bytes": 53690,
+      "sha256": "926832b615af7e726d5929f9107a2d1daa9c7a56ed1f49d0848c7d95cb6d900c"
+    },
+    {
+      "path": "webshop-skillx-native-inference-p100-validation-flash-r1.jsonl",
+      "bytes": 68058,
+      "sha256": "ce9ee4cd9575d4d0bdf1d3ee49aa8f962e432cb3994d6736bdbb48b585d476ea"
+    },
+    {
+      "path": "webshop-validation-expel-p100-flash-r0.jsonl",
+      "bytes": 120960,
+      "sha256": "e861ac7ccdad4379418b0b50f19909fbeef38e79b4efba403ba73f60248da507"
+    }
+  ]
+}

@@ -1,0 +1,443 @@
+{
+  "protocol_id": "webshop-common-zero-recovery-skill-repeat3-v1",
+  "selection": "post_hoc_repeat0_common_zero_final_t1_and_skillx",
+  "statistical_unit": "task_mean_across_real_repeats_0_1_2",
+  "sample_ids": [
+    "webshop:232",
+    "webshop:492",
+    "webshop:499",
+    "webshop:664",
+    "webshop:951",
+    "webshop:969"
+  ],
+  "runs": {
+    "final_t1": [
+      "artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2",
+      "artifacts/runs/webshop-original-concept-v1-test-a-flash-final-graph-cap3-repeat12"
+    ],
+    "generic_manual": [
+      "artifacts/runs/webshop-original-concept-v1-test-flash-manual-r1",
+      "artifacts/runs/webshop-original-concept-v1-test-a-flash-manual-repeat12"
+    ],
+    "recovery_skill": [
+      "artifacts/runs/webshop-original-concept-v1-failure6-manual-recovery-repeat3"
+    ],
+    "skillx": [
+      "artifacts/runs/webshop-original-concept-v1-test-flash-p100-skillx-r1",
+      "artifacts/runs/webshop-original-concept-v1-test-a-flash-p100-skillx-repeat12"
+    ]
+  },
+  "summary": {
+    "final_t1": {
+      "aggregate": {
+        "reward": 0.0,
+        "full_success": 0.0,
+        "zero_rate": 1.0,
+        "steps": 14.666666666666666,
+        "invalid_actions": 0.888888888888889
+      },
+      "task_metrics": {
+        "webshop:232": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 0.0
+        },
+        "webshop:492": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 2.0
+        },
+        "webshop:499": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 4.0,
+          "invalid_actions": 0.0
+        },
+        "webshop:664": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 2.3333333333333335
+        },
+        "webshop:951": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:969": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 4.0,
+          "invalid_actions": 0.0
+        }
+      }
+    },
+    "generic_manual": {
+      "aggregate": {
+        "reward": 0.0,
+        "full_success": 0.0,
+        "zero_rate": 1.0,
+        "steps": 14.833333333333334,
+        "invalid_actions": 0.611111111111111
+      },
+      "task_metrics": {
+        "webshop:232": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 0.0
+        },
+        "webshop:492": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:499": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 5.0,
+          "invalid_actions": 0.3333333333333333
+        },
+        "webshop:664": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:951": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.3333333333333333
+        },
+        "webshop:969": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 4.0,
+          "invalid_actions": 0.0
+        }
+      }
+    },
+    "recovery_skill": {
+      "aggregate": {
+        "reward": 0.1111111111111111,
+        "full_success": 0.1111111111111111,
+        "zero_rate": 0.8888888888888888,
+        "steps": 16.000000000000004,
+        "invalid_actions": 0.5
+      },
+      "task_metrics": {
+        "webshop:232": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 0.0
+        },
+        "webshop:492": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:499": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 7.333333333333333,
+          "invalid_actions": 0.0
+        },
+        "webshop:664": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:951": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:969": {
+          "reward": 0.6666666666666666,
+          "full_success": 0.6666666666666666,
+          "zero_rate": 0.3333333333333333,
+          "steps": 8.666666666666666,
+          "invalid_actions": 0.0
+        }
+      }
+    },
+    "skillx": {
+      "aggregate": {
+        "reward": 0.0,
+        "full_success": 0.0,
+        "zero_rate": 1.0,
+        "steps": 15.5,
+        "invalid_actions": 1.1666666666666667
+      },
+      "task_metrics": {
+        "webshop:232": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 0.0
+        },
+        "webshop:492": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 2.0
+        },
+        "webshop:499": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 7.0,
+          "invalid_actions": 1.0
+        },
+        "webshop:664": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 2.0
+        },
+        "webshop:951": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 20.0,
+          "invalid_actions": 2.0
+        },
+        "webshop:969": {
+          "reward": 0.0,
+          "full_success": 0.0,
+          "zero_rate": 1.0,
+          "steps": 6.0,
+          "invalid_actions": 0.0
+        }
+      }
+    }
+  },
+  "paired_comparisons": {
+    "final_t1": {
+      "mean_reward_difference": 0.1111111111111111,
+      "wins": 1,
+      "ties": 5,
+      "losses": 0,
+      "per_task_difference": {
+        "webshop:232": 0.0,
+        "webshop:492": 0.0,
+        "webshop:499": 0.0,
+        "webshop:664": 0.0,
+        "webshop:951": 0.0,
+        "webshop:969": 0.6666666666666666
+      }
+    },
+    "skillx": {
+      "mean_reward_difference": 0.1111111111111111,
+      "wins": 1,
+      "ties": 5,
+      "losses": 0,
+      "per_task_difference": {
+        "webshop:232": 0.0,
+        "webshop:492": 0.0,
+        "webshop:499": 0.0,
+        "webshop:664": 0.0,
+        "webshop:951": 0.0,
+        "webshop:969": 0.6666666666666666
+      }
+    },
+    "generic_manual": {
+      "mean_reward_difference": 0.1111111111111111,
+      "wins": 1,
+      "ties": 5,
+      "losses": 0,
+      "per_task_difference": {
+        "webshop:232": 0.0,
+        "webshop:492": 0.0,
+        "webshop:499": 0.0,
+        "webshop:664": 0.0,
+        "webshop:951": 0.0,
+        "webshop:969": 0.6666666666666666
+      }
+    }
+  },
+  "baseline_diagnostics": {
+    "by_sample": {
+      "webshop:951": {
+        "search_actions": 21,
+        "repeated_exact_searches": 6,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:492": {
+        "search_actions": 28,
+        "repeated_exact_searches": 1,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:969": {
+        "search_actions": 3,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 3,
+        "twenty_step_runs": 0
+      },
+      "webshop:499": {
+        "search_actions": 3,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 3,
+        "twenty_step_runs": 0
+      },
+      "webshop:664": {
+        "search_actions": 33,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:232": {
+        "search_actions": 12,
+        "repeated_exact_searches": 2,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      }
+    },
+    "retrieved_skills": [
+      {
+        "skill_id": "mid_0002",
+        "retrieval_count": 150,
+        "sample_coverage": 6,
+        "name": "Select required options before purchase"
+      },
+      {
+        "skill_id": "high_efbf322a092b",
+        "retrieval_count": 127,
+        "sample_coverage": 6,
+        "name": "Search, open, and configure the chosen product"
+      },
+      {
+        "skill_id": "mid_0006",
+        "retrieval_count": 121,
+        "sample_coverage": 6,
+        "name": "Select matching product options"
+      },
+      {
+        "skill_id": "mid_0000",
+        "retrieval_count": 114,
+        "sample_coverage": 6,
+        "name": "Search with core attributes and open a matching result"
+      },
+      {
+        "skill_id": "high_f4ff56f0acaa",
+        "retrieval_count": 113,
+        "sample_coverage": 5,
+        "name": "Search and buy a direct match"
+      },
+      {
+        "skill_id": "mid_0004",
+        "retrieval_count": 113,
+        "sample_coverage": 5,
+        "name": "Search and open a likely matching product"
+      },
+      {
+        "skill_id": "mid_0001",
+        "retrieval_count": 90,
+        "sample_coverage": 6,
+        "name": "Refine search terms and inspect matching results"
+      },
+      {
+        "skill_id": "mid_0007",
+        "retrieval_count": 62,
+        "sample_coverage": 3,
+        "name": "Search and open the closest matching product"
+      },
+      {
+        "skill_id": "mid_0005",
+        "retrieval_count": 17,
+        "sample_coverage": 3,
+        "name": "Search or return to search"
+      },
+      {
+        "skill_id": "high_69655a587d87",
+        "retrieval_count": 8,
+        "sample_coverage": 1,
+        "name": "Check description, then features, for requirement evidence"
+      },
+      {
+        "skill_id": "mid_6fd1c9c5ff45",
+        "retrieval_count": 8,
+        "sample_coverage": 1,
+        "name": "Inspect features and return to the product page"
+      }
+    ]
+  },
+  "intervention_diagnostics": {
+    "by_sample": {
+      "webshop:232": {
+        "search_actions": 15,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:664": {
+        "search_actions": 25,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:951": {
+        "search_actions": 31,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:492": {
+        "search_actions": 28,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 0,
+        "twenty_step_runs": 3
+      },
+      "webshop:969": {
+        "search_actions": 7,
+        "repeated_exact_searches": 2,
+        "zero_reward_purchases": 1,
+        "twenty_step_runs": 0
+      },
+      "webshop:499": {
+        "search_actions": 3,
+        "repeated_exact_searches": 0,
+        "zero_reward_purchases": 3,
+        "twenty_step_runs": 0
+      }
+    },
+    "retrieved_skills": [
+      {
+        "skill_id": "manual_webshop_hard_task_recovery_v1",
+        "retrieval_count": 288,
+        "sample_coverage": 6
+      }
+    ]
+  }
+}

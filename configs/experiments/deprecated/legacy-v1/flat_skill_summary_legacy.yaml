@@ -1,0 +1,4 @@
+method: flat_skill_summary
+retrieval_strategy: legacy
+flat_top_k: 3
+success_threshold: 0.999

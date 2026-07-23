@@ -1,0 +1,27 @@
+{
+  "protocol_id": "expel-full-baseline-v1",
+  "agent_model": "deepseek-v4-flash",
+  "alfworld": {
+    "training_pool": "P310",
+    "split": "valid_unseen",
+    "run": "artifacts/runs/alfworld-test-expel-p310-flash-r0",
+    "episode_count": 134,
+    "success_count": 108,
+    "success_rate": 0.8059701492537313,
+    "mean_steps": 11.574626865671641,
+    "mean_invalid_action_rate": 0.027079303675048357,
+    "mean_input_tokens": 52830.72388059701
+  },
+  "webshop": {
+    "training_pool": "P100",
+    "split": "validation",
+    "run": "artifacts/runs/webshop-validation-expel-p100-flash-r0",
+    "episode_count": 100,
+    "mean_reward": 0.63348333,
+    "full_success_rate": 0.42,
+    "mean_steps": 9.86,
+    "mean_invalid_actions": 0.31,
+    "mean_input_tokens": 54092.24
+  },
+  "note": "Full ExpeL baseline using the public repository's rule induction and episodic-memory path; no Trace2Tower graph or deployment optimization is used."
+}

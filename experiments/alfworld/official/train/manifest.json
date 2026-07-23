@@ -1,0 +1,41 @@
+{
+  "status": "official_event_tower_ready",
+  "protocol": "configs/experiments/alfworld_protocol.json",
+  "manifest": "artifacts/manifests/alfworld_train.jsonl",
+  "trajectory_pool": {
+    "raw": "artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl",
+    "preprocessed": "artifacts/trace2tower/alfworld/original-concept-v3/p310/preprocessed.jsonl",
+    "trajectory_count": 1240,
+    "task_count": 310
+  },
+  "tower": {
+    "snapshot": "artifacts/trace2tower/alfworld/original-concept-v3/p310/tower.json",
+    "snapshot_id": "tower_4ff0dbf6b2420d21",
+    "build_config": "configs/experiments/alfworld_trace2tower_official_events.yaml",
+    "retrieval_config": "configs/experiments/alfworld_trace2tower_official_events_runtime.yaml",
+    "graph": "artifacts/trace2tower/alfworld/original-concept-v3/p310/graph",
+    "structure": "artifacts/trace2tower/alfworld/original-concept-v3/p310/skills-structure",
+    "cards": "artifacts/trace2tower/alfworld/original-concept-v3/p310/skills/rendered-cards.json",
+    "index": "artifacts/trace2tower/alfworld/original-concept-v3/p310/skills/retrieval-index.json",
+    "graph_profile": "artifacts/trace2tower/alfworld/original-concept-v3/p310/graph-retrieval-profile.json",
+    "event_source": "official ALFWorld/ALFRED high-level action vocabulary",
+    "task_family_partition": false,
+    "high_min_support_ratio": 0.02,
+    "high_fallback": false,
+    "mid_count": 4,
+    "high_count": 12
+  },
+  "reusable_additional_pool": {
+    "manifest": "experiments/alfworld/official/train-p1000/manifest.json",
+    "raw": "artifacts/trajectories/alfworld/alfworld-pool-p1000-global.jsonl",
+    "active": false
+  },
+  "no_event_ablation": {
+    "artifacts": "artifacts/trace2tower/alfworld/deprecated/original-concept-v1",
+    "report": "experiments/alfworld/deprecated/no-event-ablation/P1000_NO_EVENT_HIGH_DIAGNOSTIC.md"
+  },
+  "skillx": {
+    "library": "artifacts/skillx/alfworld-global-p1000/library.json",
+    "config": "configs/experiments/alfworld_skillx.yaml"
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "protocol_id": "webshop-test-a-graph-retrieval-v1",
+  "agent_model": "deepseek-v4-flash",
+  "repeat_id": 0,
+  "runs": {
+    "noskill": "artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1",
+    "v0": "artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1",
+    "legacy_cap8": "artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap8-r1",
+    "legacy_cap3": "artifacts/runs/webshop-original-concept-v1-test-a-flash-pareto-v1-cap3-r1",
+    "graph_cap3": "artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2",
+    "graph_cap8": "artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap8-r2"
+  },
+  "summary": {
+    "noskill": {
+      "task_count": 100,
+      "mean_reward": 0.6807499999999999,
+      "full_success_rate": 0.51,
+      "mean_steps": 7.98,
+      "mean_invalid_actions": 0.36,
+      "mean_input_tokens": 21388.46
+    },
+    "v0": {
+      "task_count": 100,
+      "mean_reward": 0.7209166666666665,
+      "full_success_rate": 0.56,
+      "mean_steps": 7.17,
+      "mean_invalid_actions": 0.19,
+      "mean_input_tokens": 32359.55
+    },
+    "legacy_cap8": {
+      "task_count": 100,
+      "mean_reward": 0.6798333333333333,
+      "full_success_rate": 0.52,
+      "mean_steps": 7.66,
+      "mean_invalid_actions": 0.25,
+      "mean_input_tokens": 35273.32
+    },
+    "legacy_cap3": {
+      "task_count": 100,
+      "mean_reward": 0.6928333333333333,
+      "full_success_rate": 0.53,
+      "mean_steps": 7.16,
+      "mean_invalid_actions": 0.21,
+      "mean_input_tokens": 30242.22
+    },
+    "graph_cap3": {
+      "task_count": 100,
+      "mean_reward": 0.71925,
+      "full_success_rate": 0.54,
+      "mean_steps": 6.81,
+      "mean_invalid_actions": 0.16,
+      "mean_input_tokens": 20059.41
+    },
+    "graph_cap8": {
+      "task_count": 100,
+      "mean_reward": 0.7144166666666668,
+      "full_success_rate": 0.54,
+      "mean_steps": 7.56,
+      "mean_invalid_actions": 0.21,
+      "mean_input_tokens": 27808.05
+    }
+  },
+  "paired_deltas": {
+    "graph_cap3_minus_noskill": {
+      "mean_reward": 0.0385,
+      "bootstrap_ci95": [
+        -0.021085416666666666,
+        0.10033541666666665
+      ]
+    },
+    "graph_cap3_minus_v0": {
+      "mean_reward": -0.0016666666666666674,
+      "bootstrap_ci95": [
+        -0.04083333333333334,
+        0.04033333333333333
+      ]
+    },
+    "graph_cap3_minus_legacy_cap3": {
+      "mean_reward": 0.026416666666666665,
+      "bootstrap_ci95": [
+        -0.0010000000000000002,
+        0.059416666666666666
+      ]
+    },
+    "graph_cap3_minus_legacy_cap8": {
+      "mean_reward": 0.03941666666666667,
+      "bootstrap_ci95": [
+        -0.005,
+        0.09025
+      ]
+    },
+    "graph_cap8_minus_legacy_cap8": {
+      "mean_reward": 0.034583333333333334,
+      "bootstrap_ci95": [
+        -0.007833333333333333,
+        0.08200000000000002
+      ]
+    },
+    "graph_cap3_minus_graph_cap8": {
+      "mean_reward": 0.004833333333333333,
+      "bootstrap_ci95": [
+        -0.015166666666666667,
+        0.03133333333333333
+      ]
+    }
+  },
+  "result_audits": {
+    "noskill": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "v0": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "legacy_cap8": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "legacy_cap3": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "graph_cap3": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    },
+    "graph_cap8": {
+      "duplicate_key_count": 0,
+      "discarded_row_count": 0,
+      "primary_score_disagreement_count": 0,
+      "step_disagreement_count": 0,
+      "keys": []
+    }
+  },
+  "rate_limit_error_attempts": {
+    "graph_cap3": 2,
+    "graph_cap8": 4
+  },
+  "retrieval_audits": {
+    "graph_cap3": {
+      "trajectory_count": 100,
+      "step_count": 681,
+      "mean_context_skill_count": 3.4787077826725405,
+      "max_context_skill_count": 4,
+      "high_selection_counts": {
+        "high_69655a587d87": 69,
+        "high_b979447aef67": 20,
+        "high_efbf322a092b": 434,
+        "high_f4ff56f0acaa": 142,
+        "none": 16
+      },
+      "high_selection_by_page": {
+        "ITEM": {
+          "high_69655a587d87": 4,
+          "high_b979447aef67": 10,
+          "high_efbf322a092b": 276
+        },
+        "ITEM_DETAIL": {
+          "high_69655a587d87": 65,
+          "high_b979447aef67": 10
+        },
+        "RESULTS": {
+          "high_efbf322a092b": 17,
+          "high_f4ff56f0acaa": 142
+        },
+        "SEARCH": {
+          "high_efbf322a092b": 141
+        },
+        "UNKNOWN": {
+          "none": 16
+        }
+      }
+    },
+    "graph_cap8": {
+      "trajectory_count": 100,
+      "step_count": 756,
+      "mean_context_skill_count": 6.232804232804233,
+      "max_context_skill_count": 8,
+      "high_selection_counts": {
+        "high_69655a587d87": 95,
+        "high_b979447aef67": 27,
+        "high_efbf322a092b": 471,
+        "high_f4ff56f0acaa": 143,
+        "none": 20
+      },
+      "high_selection_by_page": {
+        "ITEM": {
+          "high_69655a587d87": 4,
+          "high_b979447aef67": 10,
+          "high_efbf322a092b": 311
+        },
+        "ITEM_DETAIL": {
+          "high_69655a587d87": 91,
+          "high_b979447aef67": 17
+        },
+        "RESULTS": {
+          "high_efbf322a092b": 20,
+          "high_f4ff56f0acaa": 143
+        },
+        "SEARCH": {
+          "high_efbf322a092b": 140
+        },
+        "UNKNOWN": {
+          "none": 20
+        }
+      }
+    }
+  }
+}

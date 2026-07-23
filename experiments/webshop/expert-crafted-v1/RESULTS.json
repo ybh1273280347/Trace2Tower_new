@@ -1,0 +1,62 @@
+{
+  "protocol_id": "webshop-expert-crafted-validation-v1",
+  "benchmark": "webshop",
+  "split": "validation",
+  "repeat_id": 0,
+  "agent_model": "deepseek-v4-flash",
+  "run": "artifacts/runs/webshop-expert-crafted-skills-validation-flash-r0",
+  "manifest": {
+    "path": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+    "sha256": "9e173425f03b41c798be577454d0bcda593c72b017cfa7872756a017746d92c4",
+    "task_count": 100
+  },
+  "expert_crafted_skill": {
+    "path": "experiments/webshop/event-tower-v2/manual-skill.md",
+    "sha256": "5d901247b383634ae557aa08298a3244f32204c74a0a340c22b4d37a843d2dc4",
+    "skill_id": "expert_crafted_webshop_constraint_v1",
+    "provenance": "Frozen human-prior shopping policy previously evaluated on the disjoint Test-A split; not rewritten from validation feedback."
+  },
+  "completeness": {
+    "result_rows": 100,
+    "unique_task_repeat_keys": 100,
+    "trajectory_files": 100,
+    "error_attempts": 0
+  },
+  "summary": {
+    "mean_reward": 0.70085,
+    "full_success_rate": 0.50,
+    "mean_steps": 6.22,
+    "mean_invalid_actions": 0.06,
+    "mean_input_tokens": 15526.06,
+    "mean_context_chars": 2552.0
+  },
+  "paired": {
+    "expert_crafted_minus_no_skill": {
+      "mean_reward": 0.04850,
+      "reward_bootstrap_ci95": [-0.0061666667, 0.1066666667],
+      "full_success_delta": 0.03,
+      "full_success_bootstrap_ci95": [-0.03, 0.09],
+      "wins": 13,
+      "losses": 7,
+      "ties": 80
+    },
+    "expert_crafted_minus_skillx_rewrite": {
+      "mean_reward": 0.0165833333,
+      "reward_bootstrap_ci95": [-0.0187520833, 0.051],
+      "full_success_delta": 0.02,
+      "full_success_bootstrap_ci95": [-0.02, 0.06],
+      "wins": 10,
+      "losses": 5,
+      "ties": 85
+    },
+    "expert_crafted_minus_trace2tower": {
+      "mean_reward": -0.0139166667,
+      "reward_bootstrap_ci95": [-0.0575833333, 0.0280854167],
+      "full_success_delta": -0.02,
+      "full_success_bootstrap_ci95": [-0.07, 0.03],
+      "wins": 8,
+      "losses": 9,
+      "ties": 83
+    }
+  }
+}

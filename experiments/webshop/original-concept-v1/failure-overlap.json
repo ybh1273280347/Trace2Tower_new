@@ -1,0 +1,428 @@
+{
+  "protocol_id": "webshop-test-a-failure-overlap-v1",
+  "agent_model": "deepseek-v4-flash",
+  "repeat_id": 0,
+  "runs": {
+    "final": "artifacts/runs/webshop-original-concept-v1-test-a-flash-graph-cap3-r2",
+    "skillx": "artifacts/runs/webshop-original-concept-v1-test-flash-p100-skillx-r1",
+    "legacy": "artifacts/runs/webshop-original-concept-v1-test-flash-p100-full-cap8-r1",
+    "noskill": "artifacts/runs/webshop-original-concept-v1-test-flash-noskill-r1"
+  },
+  "overlaps": {
+    "zero": {
+      "final_vs_skillx": {
+        "left_count": 7,
+        "right_count": 7,
+        "intersection_count": 6,
+        "union_count": 8,
+        "jaccard": 0.75,
+        "left_coverage": 0.8571428571428571,
+        "right_coverage": 0.8571428571428571
+      },
+      "final_vs_legacy": {
+        "left_count": 7,
+        "right_count": 9,
+        "intersection_count": 5,
+        "union_count": 11,
+        "jaccard": 0.45454545454545453,
+        "left_coverage": 0.7142857142857143,
+        "right_coverage": 0.5555555555555556
+      },
+      "final_vs_noskill": {
+        "left_count": 7,
+        "right_count": 15,
+        "intersection_count": 4,
+        "union_count": 18,
+        "jaccard": 0.2222222222222222,
+        "left_coverage": 0.5714285714285714,
+        "right_coverage": 0.26666666666666666
+      }
+    },
+    "nonfull": {
+      "final_vs_skillx": {
+        "left_count": 46,
+        "right_count": 51,
+        "intersection_count": 44,
+        "union_count": 53,
+        "jaccard": 0.8301886792452831,
+        "left_coverage": 0.9565217391304348,
+        "right_coverage": 0.8627450980392157
+      },
+      "final_vs_legacy": {
+        "left_count": 46,
+        "right_count": 44,
+        "intersection_count": 42,
+        "union_count": 48,
+        "jaccard": 0.875,
+        "left_coverage": 0.9130434782608695,
+        "right_coverage": 0.9545454545454546
+      },
+      "final_vs_noskill": {
+        "left_count": 46,
+        "right_count": 49,
+        "intersection_count": 42,
+        "union_count": 53,
+        "jaccard": 0.7924528301886793,
+        "left_coverage": 0.9130434782608695,
+        "right_coverage": 0.8571428571428571
+      }
+    }
+  },
+  "score_correlations": {
+    "skillx": 0.878420225996804,
+    "legacy": 0.836205346884811,
+    "noskill": 0.6627718635553325
+  },
+  "final_skillx_categories": {
+    "common_zero": [
+      {
+        "sample_id": "webshop:232",
+        "task_goal": "i am interested in red heavy duty bed frames for a queen sized bed, and price lower than 330.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 20,
+        "skillx_steps": 20,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "red pu"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "< prev"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:492",
+        "task_goal": "i'm looking for an original lightweight lace-up boot for my little toddler; she's a size 7, and price lower than 50.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 20,
+        "skillx_steps": 20,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Back to Search"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Back to Search"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:499",
+        "task_goal": "i'm looking for furniture it was in living room  the color was pastel blue, and price lower than 80.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 4,
+        "skillx_steps": 7,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:664",
+        "task_goal": "buy me a travel sized bottle of impression chanel 1932, and price lower than 40.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 20,
+        "skillx_steps": 20,
+        "final_last_action": {
+          "name": "search_action",
+          "arguments": {
+            "keywords": "Chanel 1932 impression travel size perfume"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "< prev"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:951",
+        "task_goal": "i need to order a game boy color. make sure that it's green and has stereo sound, and price lower than 60.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 20,
+        "skillx_steps": 20,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Back to Search"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "next >"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:969",
+        "task_goal": "i'm looking for a cheese platter that i can include in a gift basket, and price lower than 80.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.0,
+        "final_steps": 4,
+        "skillx_steps": 6,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      }
+    ],
+    "final_only_zero": [
+      {
+        "sample_id": "webshop:87",
+        "task_goal": "i need to order a fully assembled tan chair, and price lower than 120.00 dollars",
+        "final_score": 0.0,
+        "skillx_score": 0.3333333333333333,
+        "final_steps": 20,
+        "skillx_steps": 10,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Attributes"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      }
+    ],
+    "skillx_only_zero": [
+      {
+        "sample_id": "webshop:407",
+        "task_goal": "i would like a 120 wide by 90 long color 8 window panel that is machine washable, and price lower than 80.00 dollars",
+        "final_score": 0.5,
+        "skillx_score": 0.0,
+        "final_steps": 14,
+        "skillx_steps": 20,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "search_action",
+          "arguments": {
+            "keywords": "window panel 120 width 90 length"
+          }
+        }
+      }
+    ],
+    "final_only_nonfull": [
+      {
+        "sample_id": "webshop:482",
+        "task_goal": "i want a black kodak pixpro az401 with optical zoom, and price lower than 240.00 dollars",
+        "final_score": 0.3333333333333333,
+        "skillx_score": 1.0,
+        "final_steps": 5,
+        "skillx_steps": 4,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:89",
+        "task_goal": "i would like a 7 pack of 1.23 ounce gluten free barbecue chips, and price lower than 50.00 dollars",
+        "final_score": 0.75,
+        "skillx_score": 1.0,
+        "final_steps": 10,
+        "skillx_steps": 8,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      }
+    ],
+    "skillx_only_nonfull": [
+      {
+        "sample_id": "webshop:17",
+        "task_goal": "i'm looking for a high speed cable hdmi male to male 2 pack of 30 feet, and price lower than 50.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.4,
+        "final_steps": 15,
+        "skillx_steps": 15,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:282",
+        "task_goal": "i want a rich protein bar, and price lower than 140.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.5,
+        "final_steps": 3,
+        "skillx_steps": 5,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:46",
+        "task_goal": "i want to find a black and white case cover for my iphone, and it needs to feature cats, and price lower than 40.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.6666666666666666,
+        "final_steps": 11,
+        "skillx_steps": 15,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:484",
+        "task_goal": "i'm looking for a classic fit women t-shirt with needle sleeve and star wars design. also, choose medium size white colored one, and price lower than 50.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.8571428571428571,
+        "final_steps": 11,
+        "skillx_steps": 17,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:899",
+        "task_goal": "i want to find a printed backdrop that is 5 by 7 feet for a digital photography session, and price lower than 130.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.75,
+        "final_steps": 5,
+        "skillx_steps": 6,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:977",
+        "task_goal": "i am looking for a set of 2 easy to install sea teal colored curtains that are machine washable, and price lower than 60.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.5,
+        "final_steps": 8,
+        "skillx_steps": 16,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      },
+      {
+        "sample_id": "webshop:986",
+        "task_goal": "i'm looking for a slim fit women's jumpsuits with long sleeve. also, choose large, 001-hot pink one, and price lower than 40.00 dollars",
+        "final_score": 1.0,
+        "skillx_score": 0.6,
+        "final_steps": 12,
+        "skillx_steps": 9,
+        "final_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        },
+        "skillx_last_action": {
+          "name": "click_action",
+          "arguments": {
+            "value": "Buy Now"
+          }
+        }
+      }
+    ]
+  }
+}

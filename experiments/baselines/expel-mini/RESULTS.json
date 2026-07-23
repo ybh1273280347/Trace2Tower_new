@@ -1,0 +1,93 @@
+{
+  "protocol_id": "expel-mini-same-model-v1",
+  "status": "exploratory",
+  "expel_commit": "e41ec9a24823e7b560c561ab191441b56d9bcefc",
+  "agent_model": "deepseek-v4-flash",
+  "induction_model_role": "renderer",
+  "induction_contract": {
+    "training_tasks": 20,
+    "comparison_rule_updates": 4,
+    "all_success_rule_updates": 1,
+    "maximum_rules": 20,
+    "retrieved_successful_episodes": 2
+  },
+  "alfworld": {
+    "library": "artifacts/expel/alfworld-mini-p20/library.json",
+    "library_id": "expellib_a435ea2186d82cf0",
+    "run": "artifacts/runs/alfworld-test-expel-mini-p20-first20-flash-r0",
+    "evaluation_tasks": 20,
+    "rule_count": 4,
+    "build_usage": {
+      "input_tokens": 34784,
+      "output_tokens": 6198,
+      "embedding_input_tokens": 205
+    },
+    "results": {
+      "no_skill": {
+        "success_rate": 0.55,
+        "successes": 11,
+        "mean_steps": 16.45,
+        "mean_invalid_actions": 0.45,
+        "mean_input_tokens": 48364
+      },
+      "skillx": {
+        "success_rate": 0.9,
+        "successes": 18,
+        "mean_steps": 12.0,
+        "mean_invalid_actions": 0.3,
+        "mean_input_tokens": 65850
+      },
+      "expel": {
+        "success_rate": 0.9,
+        "successes": 18,
+        "mean_steps": 12.1,
+        "mean_invalid_actions": 0.2,
+        "mean_input_tokens": 49060,
+        "mean_context_chars": 5897
+      }
+    }
+  },
+  "webshop": {
+    "library": "artifacts/expel/webshop-mini-p20/library.json",
+    "library_id": "expellib_da0c3dd5e63151d8",
+    "run": "artifacts/runs/webshop-validation-expel-mini-p20-first20-flash-r0",
+    "evaluation_tasks": 20,
+    "rule_count": 6,
+    "build_usage": {
+      "input_tokens": 47357,
+      "output_tokens": 5403,
+      "embedding_input_tokens": 638
+    },
+    "results": {
+      "no_skill": {
+        "mean_reward": 0.59083,
+        "full_success_rate": 0.3,
+        "mean_steps": 8.65,
+        "mean_invalid_actions": 0.5,
+        "mean_input_tokens": 23078
+      },
+      "skillx": {
+        "mean_reward": 0.64583,
+        "full_success_rate": 0.35,
+        "mean_steps": 8.45,
+        "mean_invalid_actions": 0.3,
+        "mean_input_tokens": 37632
+      },
+      "expert_crafted": {
+        "mean_reward": 0.67083,
+        "full_success_rate": 0.35,
+        "mean_steps": 6.5,
+        "mean_invalid_actions": 0.0,
+        "mean_input_tokens": 16854
+      },
+      "expel": {
+        "mean_reward": 0.63958,
+        "full_success_rate": 0.35,
+        "mean_steps": 8.15,
+        "mean_invalid_actions": 0.35,
+        "mean_input_tokens": 38963,
+        "mean_context_chars": 10082
+      }
+    }
+  }
+}

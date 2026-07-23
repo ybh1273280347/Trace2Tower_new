@@ -1,0 +1,76 @@
+{
+  "protocol_id": "webshop-p100-construction-llm-usage-v1",
+  "scope": "skill-construction LLM chat usage only",
+  "excluded": [
+    "trajectory collection agent usage",
+    "embedding usage",
+    "runtime evaluation usage",
+    "currency cost estimates"
+  ],
+  "comparability_notes": [
+    "Both methods use gpt-5.4 for skill construction.",
+    "Trace2Tower renders Mid and High cards after deterministic graph construction.",
+    "SkillX usage covers upstream extraction, validation, planning, and merging.",
+    "The evidence sets differ: Trace2Tower uses mixed trajectories while SkillX uses full-success trajectories.",
+    "Cached-token prices are provider-specific, so token usage does not prove a billing-cost ratio."
+  ],
+  "sources": {
+    "trace2tower_cards": "artifacts/trace2tower/original-concept-v1/p100/full/skills/rendered-cards.json",
+    "trace2tower_report": "artifacts/trace2tower/original-concept-v1/p100/full/skills/report.json",
+    "skillx_report": "artifacts/skillx/webshop-scale-v1/p100/upstream-parallel4-recoverable/report.json"
+  },
+  "trace2tower": {
+    "source_trajectory_count": 351,
+    "mid_skill_count": 9,
+    "high_skill_count": 5,
+    "llm_usage": {
+      "calls": 14,
+      "input_tokens": 1269049,
+      "output_tokens": 7147,
+      "total_tokens": 1276196,
+      "cached_input_tokens": 129536,
+      "uncached_input_tokens": 1139513
+    }
+  },
+  "skillx": {
+    "source_trajectory_count": 186,
+    "planning_skill_count": 51,
+    "atomic_skill_count": 2,
+    "llm_usage": {
+      "calls": 429,
+      "input_tokens": 1686214,
+      "output_tokens": 197111,
+      "total_tokens": 1883325,
+      "cached_input_tokens": 1065592,
+      "uncached_input_tokens": 620622,
+      "validation_failures": 50,
+      "transport_failures": 0
+    }
+  },
+  "trace2tower_relative_to_skillx": {
+    "calls": {
+      "ratio": 0.03263403263403263,
+      "relative_change": -0.9673659673659674
+    },
+    "input_tokens": {
+      "ratio": 0.7526025759482485,
+      "relative_change": -0.24739742405175147
+    },
+    "output_tokens": {
+      "ratio": 0.03625875775578227,
+      "relative_change": -0.9637412422442178
+    },
+    "total_tokens": {
+      "ratio": 0.6776291930495267,
+      "relative_change": -0.32237080695047327
+    },
+    "cached_input_tokens": {
+      "ratio": 0.1215624741927492,
+      "relative_change": -0.8784375258072508
+    },
+    "uncached_input_tokens": {
+      "ratio": 1.8360821885141037,
+      "relative_change": 0.8360821885141037
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "protocol_id": "alfworld-trace2tower-ablation-v1",
+  "benchmark": "alfworld",
+  "split": "valid_unseen",
+  "repeat_id": 0,
+  "agent_model": "deepseek-v4-flash",
+  "full_snapshot": "artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json",
+  "structure": {
+    "full": {"mid_count": 39, "high_count": 118},
+    "semantic_only": {"mid_count": 39, "high_count": 0},
+    "no_transition": {"mid_count": 19, "high_count": 76},
+    "no_outcome": {"mid_count": 39, "high_count": 106},
+    "no_contrastive": {"mid_count": 10, "high_count": 44}
+  },
+  "build_ablation_results": "experiments/alfworld/official/ALFWORLD_BUILD_ABLATION_RESULTS.json",
+  "deployment": {
+    "D0": {
+      "run": "artifacts/runs/alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "runtime_contract": "plan_rewrite/budgeted_v2",
+      "success": 118,
+      "total": 134,
+      "mean_steps": 10.06,
+      "mean_invalid_actions": 0.22,
+      "mean_input_tokens": 43758,
+      "mean_context_chars": 5422
+    },
+    "D1": {
+      "run": "artifacts/runs/alfworld-ablation-v1-plan-rewrite-high-only-flash-r0",
+      "runtime_contract": "plan_rewrite/budgeted_v2",
+      "success": 115,
+      "total": 134,
+      "mean_steps": 10.50,
+      "mean_invalid_actions": 0.2238806,
+      "mean_input_tokens": 37409.97,
+      "mean_context_chars": 1960.46
+    },
+    "D2": {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-mid-no-rewrite-flash-r0",
+      "runtime_contract": "legacy_high_to_mid/no_rewrite",
+      "success": 81,
+      "total": 134,
+      "mean_steps": 14.01,
+      "mean_invalid_actions": 0.41,
+      "mean_input_tokens": 63618,
+      "mean_context_chars": 5461
+    },
+    "D3": {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-only-no-rewrite-flash-r0",
+      "runtime_contract": "legacy_high_to_mid/no_rewrite",
+      "success": 78,
+      "total": 134,
+      "mean_steps": 14.24,
+      "mean_invalid_actions": 0.40,
+      "mean_input_tokens": 46020,
+      "mean_context_chars": 1254
+    }
+  },
+  "paired_success": {
+    "D0_minus_D1": {"delta": 0.0223880597, "ci95": [-0.0223880597, 0.0746268657], "wins": 7, "losses": 4, "ties": 123, "mcnemar_exact_p": 0.548828125}
+  },
+  "legacy_diagnostics": {
+    "note": "D2 and D3 use the legacy high_to_mid provider and are not contract-comparable with D0/D1. They cannot complete a formal rewrite x Mid factorial ablation.",
+    "D0_minus_D2": {"delta": 0.2761194030, "ci95": [0.1865671642, 0.3656716418], "wins": 44, "losses": 7, "ties": 83, "mcnemar_exact_p": 1.2115257420e-7},
+    "D2_minus_D3": {"delta": 0.0223880597, "ci95": [-0.0447761194, 0.0895522388], "wins": 12, "losses": 9, "ties": 113, "mcnemar_exact_p": 0.6636238098}
+  },
+  "invalidated_runs": [
+    {
+      "run": "artifacts/runs/alfworld-ablation-v1-high-only-rewrite-flash-r0",
+      "reason": "Configured as a rewrite ablation but executed through the SkillX-native high_to_mid rewrite provider instead of the formal plan_rewrite/budgeted_v2 contract. Its 78/134 result is invalid for D1."
+    }
+  ]
+}

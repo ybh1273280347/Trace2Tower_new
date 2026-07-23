@@ -1,0 +1,471 @@
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import os
+from collections.abc import Awaitable, Callable
+from dataclasses import asdict
+from pathlib import Path
+
+import yaml
+from dotenv import load_dotenv
+
+from scripts.experiments.run.rollout_no_skill_train import load_yaml, write_json
+from trace2tower.components.llm_runtime import CommonLLMRuntime
+from trace2tower.core.manifests import Benchmark
+from trace2tower.methods.trace2tower.core.config import Trace2TowerConfig
+from trace2tower.methods.trace2tower.core.models import MidCluster
+from trace2tower.methods.trace2tower.induction.high_paths import mine_high_paths
+from trace2tower.methods.trace2tower.induction.skills import (
+    LOW_SKILLS,
+    HighSkillCard,
+    MidSkillCard,
+    build_mid_render_inputs,
+)
+from trace2tower.methods.trace2tower.rendering.renderer import render_high_card, render_mid_card
+
+
+def load_skill_records(path: Path) -> list[dict]:
+    records = []
+    with path.open(encoding="utf-8") as input_file:
+        for line in input_file:
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            # Skill 渲染与 High 挖掘不消费向量，读取时释放它以避免大池内存峰值。
+            for segment in record["segments"]:
+                segment["embedding"] = ()
+            records.append(record)
+    return records
+
+
+def write_rendered_cards(
+    output: Path,
+    mid_cards: dict[str, MidSkillCard],
+    high_cards: dict[str, HighSkillCard],
+    usages: list[dict],
+) -> None:
+    write_json(
+        output,
+        {
+            "mid_cards": [mid_cards[skill_id].to_record() for skill_id in sorted(mid_cards)],
+            "high_cards": [high_cards[skill_id].to_record() for skill_id in sorted(high_cards)],
+            "usage": usages,
+        },
+    )
+
+
+async def render_with_validation_retries(
+    render: Callable[[int], Awaitable[tuple]],
+    *,
+    max_attempts: int = 5,
+) -> tuple:
+    for attempt in range(max_attempts):
+        try:
+            return await render(attempt)
+        except ValueError:
+            if attempt + 1 == max_attempts:
+                raise
+    raise RuntimeError("unreachable renderer retry state")
+
+
+def build_high_render_examples(
+    records: list[dict],
+    clusters: tuple[MidCluster, ...],
+    path,
+    trajectory_contexts: dict[str, dict],
+    *,
+    successful: bool,
+    success_threshold: float,
+    limit: int = 8,
+) -> tuple[dict, ...]:
+    segment_to_mid = {
+        segment_id: cluster.cluster_id
+        for cluster in clusters
+        for segment_id in cluster.member_segment_ids
+    }
+    records_by_id = {record["trajectory_id"]: record for record in records}
+    supporting_records = [
+        records_by_id[trajectory_id] for trajectory_id in path.supporting_trajectory_ids
+    ]
+    supporting_sample_ids = {record["sample_id"] for record in supporting_records}
+    supporting_goals = {
+        next(transition["goal"] for transition in record["transitions"] if transition.get("goal"))
+        for record in supporting_records
+    }
+    candidates = (
+        supporting_records
+        if successful
+        else sorted(
+            (
+                record
+                for record in records
+                if float(record["primary_score"]) < success_threshold
+                and (
+                    record["sample_id"] in supporting_sample_ids
+                    or any(
+                        transition.get("goal") in supporting_goals
+                        for transition in record["transitions"]
+                    )
+                )
+            ),
+            key=lambda item: (
+                item["sample_id"] not in supporting_sample_ids,
+                item["trajectory_id"],
+            ),
+        )
+    )
+    examples = []
+    seen_samples = set()
+    for record in candidates:
+        trajectory_id = record["trajectory_id"]
+        sample_id = record["sample_id"]
+        if sample_id in seen_samples:
+            continue
+        groups = []
+        for segment in sorted(record["segments"], key=lambda item: item["start_step"]):
+            mid_id = segment_to_mid[segment["segment_id"]]
+            if groups and groups[-1][0] == mid_id:
+                groups[-1][1].extend(segment["raw_actions"])
+            else:
+                groups.append([mid_id, list(segment["raw_actions"])])
+        ordered_mid_ids = tuple(group[0] for group in groups)
+        goal = next(
+            transition["goal"] for transition in record["transitions"] if transition.get("goal")
+        )
+        if successful:
+            start = next(
+                (
+                    index
+                    for index in range(len(ordered_mid_ids) - len(path.ordered_mid_ids) + 1)
+                    if ordered_mid_ids[index : index + len(path.ordered_mid_ids)]
+                    == path.ordered_mid_ids
+                ),
+                None,
+            )
+            if start is None:
+                continue
+            path_groups = groups[start : start + len(path.ordered_mid_ids)]
+            examples.append(
+                {
+                    "goal": goal,
+                    "structural_anchor_steps": [
+                        {"mid_id": mid_id, "raw_actions": group_actions}
+                        for mid_id, group_actions in path_groups
+                    ],
+                    "complete_trajectory": trajectory_contexts[trajectory_id],
+                }
+            )
+        else:
+            # 失败轨迹不需要复现成功路径；缺失和提前跳转正是对比证据。
+            examples.append(
+                {
+                    "goal": goal,
+                    "observed_mid_sequence": ordered_mid_ids,
+                    "complete_trajectory": trajectory_contexts[trajectory_id],
+                }
+            )
+        seen_samples.add(sample_id)
+        if len(examples) >= limit:
+            break
+    return tuple(examples)
+
+
+def build_trajectory_render_contexts(
+    records: list[dict],
+    clusters: tuple[MidCluster, ...],
+) -> dict[str, dict]:
+    segment_to_mid = {
+        segment_id: cluster.cluster_id
+        for cluster in clusters
+        for segment_id in cluster.member_segment_ids
+    }
+    contexts = {}
+    for record in records:
+        transitions = sorted(record["transitions"], key=lambda item: item["step_index"])
+        segments = sorted(record["segments"], key=lambda item: item["start_step"])
+        contexts[record["trajectory_id"]] = {
+            "goal": next(
+                transition["goal"] for transition in transitions if transition.get("goal")
+            ),
+            "trajectory_score": record["primary_score"],
+            "ordered_mid_ids": [segment_to_mid[segment["segment_id"]] for segment in segments],
+            "ordered_events": [segment["event_type"] for segment in segments],
+            "ordered_actions": [
+                {
+                    "primitive_action": transition["primitive_action"],
+                    "raw_action": transition["raw_action"],
+                }
+                for transition in transitions
+            ],
+        }
+    return contexts
+
+
+async def main(options: argparse.Namespace) -> int:
+    if options.render_high_limit < 0:
+        raise ValueError("render High limit must be non-negative")
+    if options.render_concurrency is not None and options.render_concurrency <= 0:
+        raise ValueError("render concurrency must be positive")
+    load_dotenv(options.env)
+    config_record = load_yaml(options.config)
+    config = Trace2TowerConfig.from_record(config_record)
+    records = load_skill_records(options.input)
+    cluster_records = json.loads(options.clusters.read_text(encoding="utf-8"))["clusters"]
+    clusters = tuple(
+        MidCluster(
+            cluster_id=item["cluster_id"],
+            member_segment_ids=tuple(item["member_segment_ids"]),
+            centroid=tuple(item["centroid"]),
+        )
+        for item in cluster_records
+    )
+    mid_inputs = build_mid_render_inputs(records, clusters)
+    trajectory_contexts = build_trajectory_render_contexts(records, clusters)
+    if config.semantic_only:
+        high_paths = ()
+    else:
+        high_paths = mine_high_paths(
+            records,
+            clusters,
+            max_path_length=config.max_high_path_length,
+            min_support_ratio=config.high_min_support_ratio,
+            min_success_count=config.high_min_success_count,
+            epsilon=config.high_path_epsilon,
+            success_threshold=config.success_threshold,
+        )
+    used_high_fallback = False
+    if not high_paths and options.ensure_high_path and not config.semantic_only:
+        high_paths = mine_high_paths(
+            records,
+            clusters,
+            max_path_length=config.max_high_path_length,
+            min_support_ratio=0.0,
+            min_success_count=0,
+            epsilon=config.high_path_epsilon,
+            success_threshold=config.success_threshold,
+        )[:1]
+        used_high_fallback = bool(high_paths)
+    invocation = {
+        "benchmark": options.benchmark.value,
+        "input": options.input.as_posix(),
+        "clusters": options.clusters.as_posix(),
+        "config": options.config.as_posix(),
+        "output_dir": options.output_dir.as_posix(),
+        "render_high_limit": options.render_high_limit,
+        "render_all_mid": options.render_all_mid,
+        "structure_only": options.structure_only,
+        "success_threshold": config.success_threshold,
+        "ensure_high_path": options.ensure_high_path,
+        "render_concurrency": options.render_concurrency,
+    }
+    print(yaml.safe_dump({"method_config": config_record, "invocation": invocation}))
+    options.output_dir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        options.output_dir / "low-skills.json",
+        {"skills": [asdict(skill) for skill in LOW_SKILLS[options.benchmark]]},
+    )
+    write_json(
+        options.output_dir / "mid-render-inputs.json",
+        {"inputs": [item.to_record() for item in mid_inputs]},
+    )
+    write_json(
+        options.output_dir / "high-paths.json",
+        {"paths": [path.to_record() for path in high_paths]},
+    )
+
+    rendered_cards_path = options.output_dir / "rendered-cards.json"
+    mid_cards: dict[str, MidSkillCard] = {}
+    high_cards: dict[str, HighSkillCard] = {}
+    usages = []
+    if rendered_cards_path.exists():
+        existing = json.loads(rendered_cards_path.read_text(encoding="utf-8"))
+        mid_cards = {
+            card.skill_id: card
+            for card in (MidSkillCard.from_record(item) for item in existing["mid_cards"])
+        }
+        high_cards = {
+            card.skill_id: card
+            for card in (HighSkillCard.from_record(item) for item in existing["high_cards"])
+        }
+        usages = list(existing.get("usage", ()))
+    elif options.reuse_mid_cards_from:
+        existing = json.loads(options.reuse_mid_cards_from.read_text(encoding="utf-8"))
+        mid_cards = {
+            card.skill_id: card
+            for card in (MidSkillCard.from_record(item) for item in existing["mid_cards"])
+        }
+        source_mid_ids = set(mid_cards)
+        usages = [item for item in existing.get("usage", ()) if item["skill_id"] in source_mid_ids]
+
+    inputs_by_id = {item.cluster_id: item for item in mid_inputs}
+    paths_by_id = {path.path_id: path for path in high_paths}
+    if set(mid_cards) - set(inputs_by_id) or set(high_cards) - set(paths_by_id):
+        raise ValueError("rendered cards do not belong to the current tower structure")
+    for skill_id, card in mid_cards.items():
+        if card.member_segment_ids != inputs_by_id[skill_id].member_segment_ids:
+            raise ValueError(f"rendered Mid card membership changed: {skill_id}")
+    for skill_id, card in high_cards.items():
+        if card.ordered_mid_ids != paths_by_id[skill_id].ordered_mid_ids:
+            raise ValueError(f"rendered High card path changed: {skill_id}")
+
+    reused_mid_count = len(mid_cards)
+    reused_high_count = len(high_cards)
+    selected_paths = (
+        ()
+        if options.structure_only
+        else high_paths
+        if options.render_high_limit == 0
+        else high_paths[: options.render_high_limit]
+    )
+    required_mid_ids = tuple(
+        inputs_by_id
+        if options.render_all_mid
+        else dict.fromkeys(mid_id for path in selected_paths for mid_id in path.ordered_mid_ids)
+    )
+    missing_mid_ids = tuple(skill_id for skill_id in required_mid_ids if skill_id not in mid_cards)
+    missing_paths = tuple(path for path in selected_paths if path.path_id not in high_cards)
+    if missing_mid_ids or missing_paths:
+        common = load_yaml(options.config_root / "common.yaml")
+        runtime = CommonLLMRuntime(
+            max_concurrency=(
+                options.render_concurrency
+                if options.render_concurrency is not None
+                else common["global_api_concurrency"]
+            ),
+            max_attempts=common["provider_max_attempts"],
+            timeout_seconds=common["provider_timeout_seconds"],
+            retry_base_seconds=common["retry_base_seconds"],
+        )
+        try:
+            rendered_mids = await asyncio.gather(
+                *(
+                    render_with_validation_retries(
+                        lambda attempt, mid_id=mid_id: render_mid_card(
+                            runtime,
+                            options.benchmark,
+                            inputs_by_id[mid_id],
+                            trajectory_contexts=trajectory_contexts,
+                            validation_retry=attempt,
+                        )
+                    )
+                    for mid_id in missing_mid_ids
+                ),
+                return_exceptions=True,
+            )
+            mid_errors = []
+            for mid_id, rendered in zip(missing_mid_ids, rendered_mids, strict=True):
+                if isinstance(rendered, BaseException):
+                    mid_errors.append((mid_id, rendered))
+                    continue
+                card, result = rendered
+                mid_cards[mid_id] = card
+                usages.append(
+                    {
+                        "skill_id": mid_id,
+                        **asdict(result.usage),
+                        "latency_ms": result.latency_ms,
+                    }
+                )
+                write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
+            if mid_errors:
+                skill_id, error = mid_errors[0]
+                raise RuntimeError(
+                    f"failed to render {len(mid_errors)} Mid cards; first failure: {skill_id}"
+                ) from error
+            rendered_highs = await asyncio.gather(
+                *(
+                    render_with_validation_retries(
+                        lambda attempt, path=path: render_high_card(
+                            runtime,
+                            options.benchmark,
+                            path,
+                            mid_cards,
+                            build_high_render_examples(
+                                records,
+                                clusters,
+                                path,
+                                trajectory_contexts,
+                                successful=True,
+                                success_threshold=config.success_threshold,
+                            ),
+                            unsuccessful_examples=build_high_render_examples(
+                                records,
+                                clusters,
+                                path,
+                                trajectory_contexts,
+                                successful=False,
+                                success_threshold=config.success_threshold,
+                            ),
+                            validation_retry=attempt,
+                        )
+                    )
+                    for path in missing_paths
+                ),
+                return_exceptions=True,
+            )
+            high_errors = []
+            for path, rendered in zip(missing_paths, rendered_highs, strict=True):
+                if isinstance(rendered, BaseException):
+                    high_errors.append((path.path_id, rendered))
+                    continue
+                card, result = rendered
+                high_cards[path.path_id] = card
+                usages.append(
+                    {
+                        "skill_id": path.path_id,
+                        **asdict(result.usage),
+                        "latency_ms": result.latency_ms,
+                    }
+                )
+                write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
+            if high_errors:
+                skill_id, error = high_errors[0]
+                raise RuntimeError(
+                    f"failed to render {len(high_errors)} High cards; first failure: {skill_id}"
+                ) from error
+        finally:
+            await runtime.close()
+    if mid_cards or high_cards:
+        write_rendered_cards(rendered_cards_path, mid_cards, high_cards, usages)
+
+    report = {
+        "renderer_model": os.environ.get("RENDERER_MODEL"),
+        **invocation,
+        "trajectory_count": len(records),
+        "mid_cluster_count": len(mid_inputs),
+        "high_path_count": len(high_paths),
+        "used_high_fallback": used_high_fallback,
+        "rendered_mid_count": len(mid_cards),
+        "rendered_high_count": len(high_cards),
+        "reused_mid_count": reused_mid_count,
+        "reused_high_count": reused_high_count,
+        "new_mid_count": len(mid_cards) - reused_mid_count,
+        "new_high_count": len(high_cards) - reused_high_count,
+        "max_high_path_length": config.max_high_path_length,
+        "high_min_support_ratio": config.high_min_support_ratio,
+        "high_min_success_count": config.high_min_success_count,
+        "high_path_epsilon": config.high_path_epsilon,
+    }
+    write_json(options.output_dir / "report.json", report)
+    print(yaml.safe_dump(report, sort_keys=False))
+    return 0
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--benchmark", type=Benchmark, choices=tuple(Benchmark), required=True)
+    parser.add_argument("--input", type=Path, required=True)
+    parser.add_argument("--clusters", type=Path, required=True)
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--render-high-limit", type=int, default=0)
+    parser.add_argument("--render-concurrency", type=int)
+    parser.add_argument("--render-all-mid", action="store_true")
+    parser.add_argument("--structure-only", action="store_true")
+    parser.add_argument("--ensure-high-path", action="store_true")
+    parser.add_argument("--reuse-mid-cards-from", type=Path)
+    parser.add_argument("--config-root", type=Path, default=Path("configs/experiments"))
+    parser.add_argument("--env", type=Path, default=Path(".env"))
+    raise SystemExit(asyncio.run(main(parser.parse_args())))

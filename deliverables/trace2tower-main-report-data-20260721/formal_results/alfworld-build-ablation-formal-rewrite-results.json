@@ -1,0 +1,50 @@
+{
+  "source_split": "valid_unseen",
+  "runs": {
+    "no_transition": {
+      "aggregate": {
+        "episode_count": 134,
+        "success_count": 94,
+        "success_rate": 0.7014925373134329,
+        "mean_steps": 11.64179104477612,
+        "mean_success_steps": 8.085106382978724,
+        "invalid_action_rate": 0.022435897435897436,
+        "mean_input_tokens": 47351.80597014925
+      },
+      "finish_reason_counts": {
+        "completed": 94,
+        "task_limit_reached": 40
+      }
+    },
+    "no_outcome": {
+      "aggregate": {
+        "episode_count": 134,
+        "success_count": 99,
+        "success_rate": 0.7388059701492538,
+        "mean_steps": 11.567164179104477,
+        "mean_success_steps": 8.585858585858587,
+        "invalid_action_rate": 0.03870967741935484,
+        "mean_input_tokens": 48535.58208955224
+      },
+      "finish_reason_counts": {
+        "completed": 99,
+        "task_limit_reached": 35
+      }
+    },
+    "no_contrastive": {
+      "aggregate": {
+        "episode_count": 134,
+        "success_count": 99,
+        "success_rate": 0.7388059701492538,
+        "mean_steps": 11.813432835820896,
+        "mean_success_steps": 8.919191919191919,
+        "invalid_action_rate": 0.041692987997473153,
+        "mean_input_tokens": 47321.32089552239
+      },
+      "finish_reason_counts": {
+        "completed": 99,
+        "task_limit_reached": 35
+      }
+    }
+  }
+}

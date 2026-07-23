@@ -1,0 +1,18 @@
+agent_max_output_tokens: 512
+agent_temperature: 0
+embedding_batch_size: 4
+embedding_dimension: 4096
+episode_concurrency: 50
+global_api_concurrency: 50
+manifests_dir: artifacts/manifests
+num_shards: 10
+provider_max_attempts: 5
+provider_timeout_seconds: 120
+repeat_ids:
+  - 0
+  - 1
+  - 2
+retry_base_seconds: 4
+runs_dir: artifacts/runs
+trajectories_dir: artifacts/trajectories
+transition_embedding_cache: artifacts/cache/transition-embeddings.sqlite

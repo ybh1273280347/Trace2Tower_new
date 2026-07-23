@@ -1,0 +1,17 @@
+{
+  "status": "running",
+  "protocol": "configs/experiments/alfworld_protocol.json",
+  "manifest": "artifacts/manifests/alfworld_test.jsonl",
+  "source_split": "valid_unseen",
+  "sample_count": 133,
+  "repeat_ids": [0, 1, 2],
+  "models": {
+    "flash": "deepseek-v4-flash",
+    "pro": "deepseek-v4-pro"
+  },
+  "conditions": ["noskill", "skillx", "trace2tower"],
+  "run_id_template": "alfworld-global-v1-{model}-{condition}",
+  "num_shards": 10,
+  "max_agent_steps": 20,
+  "sampling": "mixed valid_unseen cohort; no task-family partition"
+}

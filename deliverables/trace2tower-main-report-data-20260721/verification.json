@@ -1,0 +1,105 @@
+{
+  "all_passed": true,
+  "checks": [
+    {
+      "run_id": "alfworld-test-v1-flash-noskill-r0",
+      "expected_mean_primary_score": 0.5298507463,
+      "observed_mean_primary_score": 0.5298507462686567,
+      "absolute_difference": 3.134326131970511e-11,
+      "passed": true
+    },
+    {
+      "run_id": "alfworld-test-v1-flash-manual-event-policy-r0",
+      "expected_mean_primary_score": 0.7611940299,
+      "observed_mean_primary_score": 0.7611940298507462,
+      "absolute_difference": 4.925371221986552e-11,
+      "passed": true
+    },
+    {
+      "run_id": "trace2skill-gpt54-p310-alfworld-test-r0",
+      "expected_mean_primary_score": 0.5895522388,
+      "observed_mean_primary_score": 0.5895522388059702,
+      "absolute_difference": 5.970224314921779e-12,
+      "passed": true
+    },
+    {
+      "run_id": "trace2skill-gpt54-p310-error-alfworld-test-r0",
+      "expected_mean_primary_score": 0.6194029851,
+      "observed_mean_primary_score": 0.6194029850746269,
+      "absolute_difference": 2.537314802708579e-11,
+      "passed": true
+    },
+    {
+      "run_id": "alfworld-test-v1-flash-skillx-global-p310-r0",
+      "expected_mean_primary_score": 0.8134328358,
+      "observed_mean_primary_score": 0.8134328358208955,
+      "absolute_difference": 2.089550754647007e-11,
+      "passed": true
+    },
+    {
+      "run_id": "alfworld-test-expel-p310-flash-r0",
+      "expected_mean_primary_score": 0.8059701493,
+      "observed_mean_primary_score": 0.8059701492537313,
+      "absolute_difference": 4.626865557355586e-11,
+      "passed": true
+    },
+    {
+      "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "expected_mean_primary_score": 0.8805970149,
+      "observed_mean_primary_score": 0.8805970149253731,
+      "absolute_difference": 2.537314802708579e-11,
+      "passed": true
+    },
+    {
+      "run_id": "webshop-original-concept-v1-validation-flash-noskill-r1",
+      "expected_mean_primary_score": 0.65235,
+      "observed_mean_primary_score": 0.65235,
+      "absolute_difference": 0.0,
+      "passed": true
+    },
+    {
+      "run_id": "webshop-skillx-native-inference-p100-validation-flash-r1",
+      "expected_mean_primary_score": 0.6842666667,
+      "observed_mean_primary_score": 0.6842666666666666,
+      "absolute_difference": 3.333344711364816e-11,
+      "passed": true
+    },
+    {
+      "run_id": "webshop-validation-expel-p100-flash-r0",
+      "expected_mean_primary_score": 0.63348333,
+      "observed_mean_primary_score": 0.6334833333333334,
+      "absolute_difference": 3.333333387089965e-09,
+      "passed": true
+    },
+    {
+      "run_id": "trace2skill-gpt54-p100-webshop-validation-r0",
+      "expected_mean_primary_score": 0.59685,
+      "observed_mean_primary_score": 0.59685,
+      "absolute_difference": 0.0,
+      "passed": true
+    },
+    {
+      "run_id": "trace2skill-gpt54-p100-error-webshop-validation-r0",
+      "expected_mean_primary_score": 0.6283333333,
+      "observed_mean_primary_score": 0.6283333333333334,
+      "absolute_difference": 3.333344711364816e-11,
+      "passed": true
+    },
+    {
+      "run_id": "webshop-expert-crafted-skills-validation-flash-r0",
+      "expected_mean_primary_score": 0.70085,
+      "observed_mean_primary_score": 0.70085,
+      "absolute_difference": 0.0,
+      "passed": true
+    },
+    {
+      "run_id": "webshop-alfworld-v17-replication-p100-validation-r0",
+      "expected_mean_primary_score": 0.7147666667,
+      "observed_mean_primary_score": 0.7147666666666668,
+      "absolute_difference": 3.333322506904324e-11,
+      "passed": true
+    }
+  ],
+  "family_map_count": 134,
+  "all_run_counts_passed": true
+}

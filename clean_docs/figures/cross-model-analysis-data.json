@@ -1,0 +1,322 @@
+{
+  "DeepSeek V4 Flash": {
+    "alfworld": {
+      "tower": {
+        "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+        "n": 134,
+        "mean_score": 0.8805970149253731,
+        "full_success_rate": 0.8805970149253731
+      },
+      "noskill": {
+        "run_id": "alfworld-test-v1-flash-noskill-r0",
+        "n": 134,
+        "mean_score": 0.5298507462686567,
+        "full_success_rate": 0.5298507462686567
+      }
+    },
+    "webshop": {
+      "tower": {
+        "run_id": "webshop-alfworld-v17-replication-p100-validation-r0",
+        "n": 100,
+        "mean_score": 0.7147666666666668,
+        "full_success_rate": 0.52
+      },
+      "noskill": {
+        "run_id": "webshop-original-concept-v1-validation-flash-noskill-r1",
+        "n": 100,
+        "mean_score": 0.65235,
+        "full_success_rate": 0.47
+      }
+    }
+  },
+  "GPT-5.4": {
+    "alfworld": {
+      "tower": {
+        "run_id": "cross-dsflash-render-gpt54-agent-alfworld-tower-r0",
+        "n": 134,
+        "mean_score": 0.8507462686567164,
+        "full_success_rate": 0.8507462686567164
+      },
+      "noskill": {
+        "run_id": "cross-gpt54-agent-alfworld-noskill-r0",
+        "n": 134,
+        "mean_score": 0.5149253731343284,
+        "full_success_rate": 0.5149253731343284
+      }
+    },
+    "webshop": {
+      "tower": {
+        "run_id": "cross-dsflash-render-gpt54-agent-webshop-tower-r0",
+        "n": 100,
+        "mean_score": 0.64755,
+        "full_success_rate": 0.41
+      },
+      "noskill": {
+        "run_id": "cross-gpt54-agent-webshop-noskill-r0",
+        "n": 100,
+        "mean_score": 0.6009666666666666,
+        "full_success_rate": 0.37
+      }
+    }
+  },
+  "DeepSeek V4 Pro": {
+    "alfworld": {
+      "tower": {
+        "run_id": "generalize-gpt54-render-dspro-agent-alfworld-tower-r0",
+        "n": 134,
+        "mean_score": 0.8582089552238806,
+        "full_success_rate": 0.8582089552238806
+      },
+      "noskill": {
+        "run_id": "generalize-dspro-agent-alfworld-noskill-r0",
+        "n": 134,
+        "mean_score": 0.664179104477612,
+        "full_success_rate": 0.664179104477612
+      }
+    },
+    "webshop": {
+      "tower": {
+        "run_id": "generalize-gpt54-render-dspro-agent-webshop-tower-r0",
+        "n": 100,
+        "mean_score": 0.6276666666666667,
+        "full_success_rate": 0.46
+      },
+      "noskill": {
+        "run_id": "generalize-dspro-agent-webshop-noskill-r0",
+        "n": 100,
+        "mean_score": 0.61125,
+        "full_success_rate": 0.49
+      }
+    }
+  },
+  "alfworld_family_spectrum": {
+    "DeepSeek V4 Flash": {
+      "look_at_obj_in_light": {
+        "tower_success_rate": 0.9444444444444444,
+        "gain_pp": 27.777777777777786
+      },
+      "pick_and_place": {
+        "tower_success_rate": 0.9166666666666665,
+        "gain_pp": 20.833333333333314
+      },
+      "pick_clean_then_place": {
+        "tower_success_rate": 0.967741935483871,
+        "gain_pp": 25.80645161290323
+      },
+      "pick_cool_then_place": {
+        "tower_success_rate": 0.8571428571428571,
+        "gain_pp": 52.38095238095238
+      },
+      "pick_heat_then_place": {
+        "tower_success_rate": 0.782608695652174,
+        "gain_pp": 52.173913043478265
+      },
+      "pick_two_obj_and_place": {
+        "tower_success_rate": 0.7647058823529411,
+        "gain_pp": 35.294117647058826
+      }
+    },
+    "GPT-5.4": {
+      "look_at_obj_in_light": {
+        "tower_success_rate": 1.0,
+        "gain_pp": 33.33333333333334
+      },
+      "pick_and_place": {
+        "tower_success_rate": 0.875,
+        "gain_pp": 16.666666666666657
+      },
+      "pick_clean_then_place": {
+        "tower_success_rate": 0.8387096774193549,
+        "gain_pp": 35.483870967741936
+      },
+      "pick_cool_then_place": {
+        "tower_success_rate": 0.9047619047619048,
+        "gain_pp": 57.14285714285715
+      },
+      "pick_heat_then_place": {
+        "tower_success_rate": 0.8695652173913043,
+        "gain_pp": 30.434782608695656
+      },
+      "pick_two_obj_and_place": {
+        "tower_success_rate": 0.5882352941176471,
+        "gain_pp": 29.411764705882355
+      }
+    },
+    "DeepSeek V4 Pro": {
+      "look_at_obj_in_light": {
+        "tower_success_rate": 0.9444444444444444,
+        "gain_pp": -5.555555555555557
+      },
+      "pick_and_place": {
+        "tower_success_rate": 0.875,
+        "gain_pp": 4.166666666666657
+      },
+      "pick_clean_then_place": {
+        "tower_success_rate": 0.8709677419354839,
+        "gain_pp": 9.677419354838705
+      },
+      "pick_cool_then_place": {
+        "tower_success_rate": 0.9047619047619048,
+        "gain_pp": 28.571428571428577
+      },
+      "pick_heat_then_place": {
+        "tower_success_rate": 0.6956521739130435,
+        "gain_pp": 26.086956521739125
+      },
+      "pick_two_obj_and_place": {
+        "tower_success_rate": 0.8823529411764706,
+        "gain_pp": 64.70588235294117
+      }
+    }
+  },
+  "webshop_reward_deltas": {
+    "DeepSeek V4 Flash": {
+      "improved": 16,
+      "worse": 9,
+      "tied": 75,
+      "mean_delta": 0.06241666666666667
+    },
+    "GPT-5.4": {
+      "improved": 26,
+      "worse": 17,
+      "tied": 57,
+      "mean_delta": 0.04658333333333333
+    },
+    "DeepSeek V4 Pro": {
+      "improved": 19,
+      "worse": 16,
+      "tied": 65,
+      "mean_delta": 0.016416666666666677
+    }
+  },
+  "success_set_agreement": {
+    "alfworld:noskill": [
+      [
+        1.0,
+        0.48936170212765956,
+        0.5384615384615384
+      ],
+      [
+        0.48936170212765956,
+        1.0,
+        0.5643564356435643
+      ],
+      [
+        0.5384615384615384,
+        0.5643564356435643,
+        1.0
+      ]
+    ],
+    "alfworld:tower": [
+      [
+        1.0,
+        0.856,
+        0.9256198347107438
+      ],
+      [
+        0.856,
+        1.0,
+        0.8174603174603174
+      ],
+      [
+        0.9256198347107438,
+        0.8174603174603174,
+        1.0
+      ]
+    ],
+    "webshop:noskill": [
+      [
+        1.0,
+        0.5,
+        0.6842105263157895
+      ],
+      [
+        0.5,
+        1.0,
+        0.5925925925925926
+      ],
+      [
+        0.6842105263157895,
+        0.5925925925925926,
+        1.0
+      ]
+    ],
+    "webshop:tower": [
+      [
+        1.0,
+        0.576271186440678,
+        0.7818181818181819
+      ],
+      [
+        0.576271186440678,
+        1.0,
+        0.5818181818181818
+      ],
+      [
+        0.7818181818181819,
+        0.5818181818181818,
+        1.0
+      ]
+    ]
+  },
+  "alfworld_author_executor_matrix": {
+    "authors": [
+      "GPT-5.4",
+      "DeepSeek V4 Flash"
+    ],
+    "executors": [
+      "DeepSeek V4 Flash",
+      "DeepSeek V4 Pro"
+    ],
+    "cells": {
+      "GPT-5.4": {
+        "DeepSeek V4 Flash": {
+          "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+          "n": 134,
+          "success_count": 118,
+          "success_rate": 0.8805970149253731,
+          "gain_over_no_skill_pp": 35.07462686567165
+        },
+        "DeepSeek V4 Pro": {
+          "run_id": "generalize-gpt54-render-dspro-agent-alfworld-tower-r0",
+          "n": 134,
+          "success_count": 115,
+          "success_rate": 0.8582089552238806,
+          "gain_over_no_skill_pp": 19.402985074626866
+        }
+      },
+      "DeepSeek V4 Flash": {
+        "DeepSeek V4 Flash": {
+          "run_id": "alfworld-author-matrix-dsflash-author-dsflash-user-r0",
+          "n": 134,
+          "success_count": 88,
+          "success_rate": 0.6567164179104478,
+          "gain_over_no_skill_pp": 12.686567164179108
+        },
+        "DeepSeek V4 Pro": {
+          "run_id": "alfworld-author-matrix-dsflash-author-dspro-user-r0",
+          "n": 134,
+          "success_count": 106,
+          "success_rate": 0.7910447761194029,
+          "gain_over_no_skill_pp": 12.686567164179097
+        }
+      }
+    },
+    "paired_author_comparisons": {
+      "DeepSeek V4 Flash": {
+        "gpt54_author_only": 34,
+        "deepseek_flash_author_only": 4,
+        "tied": 96,
+        "gpt54_minus_flash_author_pp": 22.388059701492537,
+        "mcnemar_exact_p": 6.038535502739251e-07
+      },
+      "DeepSeek V4 Pro": {
+        "gpt54_author_only": 20,
+        "deepseek_flash_author_only": 11,
+        "tied": 103,
+        "gpt54_minus_flash_author_pp": 6.7164179104477695,
+        "mcnemar_exact_p": 0.14961278438568115
+      }
+    }
+  }
+}

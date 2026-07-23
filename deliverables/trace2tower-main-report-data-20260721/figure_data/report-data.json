@@ -1,0 +1,106 @@
+{
+  "main_results": {
+    "alfworld": [
+      {"method": "No-Skill", "score": 52.99, "input_tokens": 45677, "steps": 14.84},
+      {"method": "Expert-Crafted", "score": 76.12, "input_tokens": 38889, "steps": 11.49},
+      {"method": "Trace2Skill", "score": 61.94, "input_tokens": 73131, "steps": 14.14},
+      {"method": "SkillX", "score": 81.34, "input_tokens": 64651, "steps": 11.69},
+      {"method": "ExpeL", "score": 80.60, "input_tokens": 52831, "steps": 11.57},
+      {"method": "Trace2Tower", "score": 88.06, "input_tokens": 43758, "steps": 10.06}
+    ],
+    "webshop": [
+      {"method": "No-Skill", "score": 0.65235, "input_tokens": 19572, "steps": 7.69},
+      {"method": "Expert-Crafted", "score": 0.70085, "input_tokens": 15526, "steps": 6.22},
+      {"method": "Trace2Skill", "score": 0.62833, "input_tokens": 42828, "steps": 11.54},
+      {"method": "SkillX", "score": 0.68427, "input_tokens": 34044, "steps": 7.95},
+      {"method": "ExpeL", "score": 0.63348, "input_tokens": 54092, "steps": 9.86},
+      {"method": "Trace2Tower", "score": 0.71477, "input_tokens": 41977, "steps": 9.9}
+    ]
+  },
+  "alfworld_build_ablation": [
+    {"method": "Full", "score": 88.06},
+    {"method": "Semantic-only", "score": null},
+    {"method": "No transition", "score": 70.15},
+    {"method": "No outcome", "score": 73.88},
+    {"method": "No contrastive", "score": 73.88}
+  ],
+  "alfworld_deployment_ablation": [
+    {"method": "Full", "score": 88.06, "input_tokens": 43758},
+    {"method": "High-only", "score": 85.82, "input_tokens": 37410}
+  ],
+  "deployment_optimization": {
+    "groups": ["Test-1", "Test-2", "Overall"],
+    "series": [
+      {"method": "Frozen v0", "scores": [80.0, 80.83, 80.42]},
+      {"method": "TF-IDF Pareto", "scores": [86.67, 82.5, 84.58]},
+      {"method": "Embedding Pareto", "scores": [81.67, 85.83, 83.75]}
+    ]
+  },
+  "alfworld_family_results": {
+    "families": [
+      "Look in light",
+      "Pick & place",
+      "Clean & place",
+      "Cool & place",
+      "Heat & place",
+      "Pick two & place"
+    ],
+    "task_counts": [18, 24, 31, 21, 23, 17],
+    "series": [
+      {"method": "No-Skill", "successes": [12, 17, 22, 7, 6, 7], "macro": 51.51, "worst": 26.09},
+      {"method": "Expert-Crafted", "successes": [13, 19, 28, 17, 16, 9], "macro": 74.20, "worst": 52.94},
+      {"method": "Trace2Skill", "successes": [15, 17, 23, 9, 12, 7], "macro": 60.76, "worst": 41.18},
+      {"method": "SkillX", "successes": [18, 21, 29, 17, 16, 8], "macro": 79.77, "worst": 47.06},
+      {"method": "ExpeL", "successes": [17, 20, 26, 20, 13, 12], "macro": 80.67, "worst": 56.52},
+      {"method": "Trace2Tower", "successes": [17, 22, 30, 18, 18, 13], "macro": 87.22, "worst": 76.47}
+    ]
+  },
+  "tower_structure_metrics": {
+    "segment_instances": 13724,
+    "quotient_nodes": 3764,
+    "collapsed_instances": 9960,
+    "collapse_rate": 0.7257,
+    "segments_per_node": 3.646,
+    "mid_count": 39,
+    "high_count": 118,
+    "cluster_size_min": 81,
+    "cluster_size_max": 695,
+    "cluster_size_cv": 0.435,
+    "normalized_cluster_entropy": 0.9741,
+    "edge_count": 30797,
+    "edge_density": 0.004349,
+    "positive_adjacency_share": 0.5085,
+    "high_path_length_counts": {"2": 40, "3": 47, "4": 31},
+    "mean_high_path_length": 2.924,
+    "mean_supporting_trajectories": 5.10,
+    "mid_covered_by_high": 28,
+    "mid_covered_by_high_rate": 0.7179
+  },
+  "tower_test_utilization": {
+    "episodes": 134,
+    "selected_high": 402,
+    "selected_mid": 431,
+    "unique_high": 53,
+    "unique_mid": 30,
+    "mean_high_per_episode": 3.0,
+    "mean_mid_per_episode": 3.22,
+    "high_catalog_coverage": 0.4492,
+    "mid_catalog_coverage": 0.7692
+  },
+  "alfworld_repeat_stability": {
+    "success_rates": [88.06, 79.10, 80.60],
+    "mean": 82.59,
+    "sample_sd": 4.80,
+    "always_success": 95,
+    "stochastic": 28,
+    "never_success": 11
+  },
+  "sources": [
+    "clean_docs/REPORT.md",
+    "experiments/alfworld/official/ALFWORLD_ABLATION_RESULTS.json",
+    "experiments/alfworld/deployment-optimization-v1/RESULTS.md",
+    "experiments/baselines/expel/RESULTS.json",
+    "experiments/baselines/trace2skill/RESULTS.json",
+    "artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json"
+  ]
+}

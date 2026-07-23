@@ -1,0 +1,1844 @@
+{
+  "version": "webshop-freeze-v1",
+  "frozen_on": "2026-07-14",
+  "status": "frozen",
+  "scope": {
+    "benchmark": "webshop",
+    "condition_count": 29,
+    "episode_count": 19500,
+    "unresolved_error_count": 0
+  },
+  "policy": {
+    "validation_only_selects_configuration": true,
+    "random300_never_selects_configuration": true,
+    "post_selection_ablations_never_select_configuration": true,
+    "allowed_after_freeze": [
+      "recompute statistics from frozen results",
+      "verify hashes and completeness",
+      "correct documentation errors without changing experiments",
+      "maintain reproducibility without changing behavior"
+    ]
+  },
+  "protocol_provenance": {
+    "high_top_k": 1,
+    "selection_mode": "fixed algorithm contract, not validation-selected",
+    "introduced_in_commit": "9b0c7069cd9597c23c88da8a9a9540afb18c48c7",
+    "random300_preregistered_in_commit": "17e2b054fbd2aef0a51ce706815ec94a99e6399b",
+    "contract_source": "src/trace2tower/methods/trace2tower/config.py"
+  },
+  "run_groups": {
+    "validation": [
+      {
+        "run_id": "webshop-test100b-repeat3-no-skill-v3",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/resolved-config.yaml",
+        "resolved_config_sha256": "6925116ac0768a154239298345920830d373dc888e58a7b9df7b2c9034324bc7",
+        "result_set_sha256": "2479dfefdc67280f59f1ed4195d60096ae21d36b719e50301309a5fca2a934ab",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-00/results.jsonl",
+            "sha256": "78dcbce58d5bbeff395b6cbbe871fdc60fdca9bfd427278081ddb4d951819e27"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-01/results.jsonl",
+            "sha256": "0a41411444d013ca2fde96e4f41abfcd8d3900dbbe1742b4e59b46673f1de8c5"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-02/results.jsonl",
+            "sha256": "80ddae1aa4655c1f73a8ba2114798377f23c3c827a95e0411f29eafc58ded230"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-03/results.jsonl",
+            "sha256": "ef4c041041bed7e5d5bc0a7fe01c1f806a655e88e95700434ff8d50d69a83951"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-04/results.jsonl",
+            "sha256": "5d23bff4cdc9095792740e15370e027c83e18e06341e248409fbe3815d248064"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-05/results.jsonl",
+            "sha256": "233aad8cddf636920c10d1e88a950d4e19c4b250fee0bf058d4e9b812e948bf0"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-06/results.jsonl",
+            "sha256": "99903725972122c033b7e89151e62ba9b719df95274df178796d67031e071d14"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-07/results.jsonl",
+            "sha256": "ea435b40167731d0329d9025940070ed0e4d245a32c59cd6652dad9e1f017a59"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-08/results.jsonl",
+            "sha256": "1a02e959305efaabd8c7f0337eeadb0d5a1b4e8d381cb0135b7b8ba3a64607ce"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-no-skill-v3/webshop/test/no_skill/shard-09/results.jsonl",
+            "sha256": "2dbe7d8fbebda1bfe3e0a09c6b43ef43c3e5135e8e71baf0852b3cac31476365"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-flat94-diverse3-v1",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "333cddd23f240dbbae983ef9f04eb9b925dfbc3d3cc8f0253efe61ca37ed7114",
+        "result_set_sha256": "376f8966aabfdf5e23e11b30d86b6df9f5fd3b8d575e8981854d5ef2ef617535",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-00/results.jsonl",
+            "sha256": "21691ff2b9e5b91bde184d18c54b550920e91bc65e418e73bfd5b12e93415d02"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-01/results.jsonl",
+            "sha256": "473058e372642a1813b7f2ad7a262de7e302363abf2aeee403fd4abcb2d48959"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-02/results.jsonl",
+            "sha256": "5b5bf408a3cc695ec3cf17d18de28da4065df7b8a3cc9e25982041a0fdd134a2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-03/results.jsonl",
+            "sha256": "3d3bc1583addd33e0dc2330eac3a732c7a77123fe5288c4fa43eea2b9eb7ffb8"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-04/results.jsonl",
+            "sha256": "f34cc6f9cb74c580d0d21481643e355543ba7319ceb38609c867385f36d529b3"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-05/results.jsonl",
+            "sha256": "54d8621ea6b33778289d83321f22edfae76bf3e12467e13314dc883ad0003e21"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-06/results.jsonl",
+            "sha256": "d431049247dde96ae52feadffd2d6dce839b61a28be0eff9c50a48d3db041d23"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-07/results.jsonl",
+            "sha256": "5752052c6aaf155d03ae52be373de7ab1d851f5a1d704bdb7d849f6bf14932c4"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-08/results.jsonl",
+            "sha256": "4276505bc874f95bf308428482f088db6e65468472dac0cea321719fcb73f1fc"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse3-v1/webshop/test/flat_skill_summary/shard-09/results.jsonl",
+            "sha256": "26a6d8297b8194e7656aa8c100055dab4de8d1f28e6d432f9cdfcc8e524282b5"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-flat94-diverse-v1",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/resolved-config.yaml",
+        "resolved_config_sha256": "aa47c5891dc07e81e67eb056bc93a2ae484b730de6a127e60abfe6051ab185b7",
+        "result_set_sha256": "b2248c6ac874b677141850bccb19afcf4719e06dba8d949b0d94ccc034976210",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-00/results.jsonl",
+            "sha256": "e358b15a97bd83be972122b67f1a6777d95b5dda90002668d808e18ede565798"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-01/results.jsonl",
+            "sha256": "c9e6995d01440aa957270d96283c136b3cf57fdbd9d71f5eaeb903e04e63ad57"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-02/results.jsonl",
+            "sha256": "53cf319cded8107d6087bc9f1b762c1f91bf7147894dc3f1071574e65d0f51ec"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-03/results.jsonl",
+            "sha256": "24cec0c1ce8a3a9f997b0d119d0ddb546b930a8215f492e61b6d8557b2687094"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-04/results.jsonl",
+            "sha256": "88619bc6c40b402b848d1b38d0a3c2367370a75fe401105d246620b5964a2268"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-05/results.jsonl",
+            "sha256": "df0a1ff15491671e9b27427edb92653f59df1b76b0730fee5cbda6766c68c934"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-06/results.jsonl",
+            "sha256": "495475d604f97d3fa08aa82eb39ac3020509bf5d04f64927fe4c68b1ffbd3eed"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-07/results.jsonl",
+            "sha256": "9b24e0d7b281175d3715192e536033a9798864755bc06e91f1cc0e8cdc398434"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-08/results.jsonl",
+            "sha256": "c2c2b8d843aaed3a389cb4cf6b320a9a09839f71815c167d57a6f037fdaedceb"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-flat94-diverse-v1/webshop/test/flat_skill_summary/shard-09/results.jsonl",
+            "sha256": "40a5d7216fffa6560e5a3c8771dfea7711259bb113e0ad87b19290036246146a"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-success-only-cap3-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/resolved-config.yaml",
+        "resolved_config_sha256": "5f233c5a05dd692ef5a1bf3855a86b7bf87e2241cfefacb158b3de15e9c79e7c",
+        "result_set_sha256": "6ff9b2c4caaa02235a76c57c8976b6b666cdcd9b88303978437db99494a608e6",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "fd32e9fcca1f8382c7293ae8b09ec747589a57d57ae5708849a04d0302c84a1c"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "fa519fbe8fd7962ec4ec72df94fa0a056ef6cc65444e978ca7cd8635ec01c7e2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "8dc09cc5aaa896aac9a29c8e297bf93bd2e75fa353072d6b7de8cba9feed70e2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "87d07380baaaf29b33884f67ae67171d388e1eed6d394cd5e1a64a03b8210409"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "6bb0c826ba1ec59908e3a63b17945d3d1687775b3f7c00fdaa03f9474317f2a6"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "7347743fbedfb9dcf242badf3cec4543c8aa93fb9ee69398626a40e6264435d2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "ab74b26c7499138765bd1648b0948c7318a84d0cc8e51fd4c852c230026be176"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "6d530d360dd52338b8847b7d576a89e78696a79079da5f63acd2b91d04e462d2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "90de4f8cb5d35417220b37245ea853788295bc8fd6f26ceea48b9ca4217a9925"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap3-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "7cda1e89fcb3a8fc42c6062a450c671281c3e86a61c3aff1053d65e94f89340c"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-success-only-cap5-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/resolved-config.yaml",
+        "resolved_config_sha256": "241d3dcaf182d3e8d2f2384be86cf9cf1ac254cd64890881dc4d249ace899a76",
+        "result_set_sha256": "19b78744a304e1f82995540cc970aa7ba6adc75c21a16457ee1a4589dab89f71",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "57b266b4a1778c709ef4777be8d419e99e007c4aaa2ae315619be966001135c5"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "70cea3a4159c3b2080862faa252504cf87d40849f3817f2b281be70e3a049b87"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "6eb81b7ce2e36c142175ce11a84c029492bfaccfdf9089504d348779bf750af6"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "ffe7a11bf1ec817de1c04b27507324c8a80dc0e343feb94c79a04a938e3cab8d"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "a31012eef3eb831963f82d799718a8b95579c893c1986e938fbba3e938cbec71"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "87a7863145413f8a4091a9d80e951af548577f8647304b7f74da39256cdf9acf"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "8f61d5ed0bc26da0d19fab400142df0a321600dc637ccbd086ee7b4426d314cc"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "4fd86bb7b764f7f767b92eaace8542abe8ce53641d14671c069d92e8090758c4"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "4015e19c3c06301fc3c1515e725eb35f882804dd5e0cddf1e8c000a8869889f0"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap5-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "118d276e410abc3573d119743f8d27e521499a8e408055ecc7b4f46d0542f69f"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-success-only-cap8-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/resolved-config.yaml",
+        "resolved_config_sha256": "0bd009e2440ecca70e0543bbeae6cdb8f2aa238e80a13a43167184a714d9faaf",
+        "result_set_sha256": "cef799508eeaf67a77f07895b75585ebfe201f22abab83ec37b6e2f471ff6d61",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "48fa91d934e16f3dee4c7d08e80c75a2725e2541865c76876d194f31d7062bac"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "5be8499fce12c6805782f716c1e8b85d70932aaa30bb692db5c9008d499c0e53"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "633fa79105ab84891da5ba15708000ce288ed8ee62d07aa9d4e835ce89cdca64"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "e46a40fe44d82fde054af63932c6224ab33261cd235ecb047791d269f9803e4a"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "af4de0f316676cdd6f4373695e1db07e5f36a6e43708aae0e7e73e1dd835a436"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "b555a4f38cdb2cc560cd5c903bd6cc7220334c0ea90c9467fb6260cdd966e9fb"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "d6c21c008556712c0c2d92715ad08066c5d865b2c71224ded647a94edc18a718"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "59c2fa99acd01420c06b88c88c489c85a9b7a5d4a8ff5579c0f6901cd9a877d7"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "6e333205e30a8b847f1ea0be3d7c9595c02f8ebc8e948d10eb7eaad861ca9796"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap8-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "e57f3354cf307a6bdc24f458905c2d386bf8b149701202439b2e4a234724a6e6"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-success-only-cap12-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/resolved-config.yaml",
+        "resolved_config_sha256": "34ef5525952988b23c0560a62ae947a0657a60b791bb9322598da8851efa99fe",
+        "result_set_sha256": "0bfab15800ca3b43c665073f3586ef26689dcc3db7d34ab806424bb8625c2bab",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "5c3b7bb75c13f9aed1567b354b656e2cd16ed43d0d52774608a766c6d10de293"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "087e2262006c352b508cf140e87788a287334fe1d5b622909a7783f5316fc540"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "4a54bdbc03a429aad6cf8c6d1e90452e17550ea71e9170a712ac0f9777ba5324"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "62ab09cb7a3d861291bf4a0a3423eca346ceeac1e6347a9a9cf1dc2fc1a50df9"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "a8575ad24562823fdb01798d7ee92adfdb929a69d278c43d3fd572753829ca7b"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "64f08788b39daf6f3d6e30701712b93d685e381f612158757ae2370fc8e3eca6"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "c222fb1d581fcc7b7e875dd2c6166f5bc4261c181ada73229196830c2634b673"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "ee200c9c5671735b99c041b446a4d614c20d55c525e5a7f918722343ccb10bf5"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "5e584be54d1cb04c279c6f42b17700683b37d3a49eb7dec8a02c5dba54586f58"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-success-only-cap12-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "97a49286a9cbf36ed20a7efb2a7946e85ad9d70b6df929ea73fe38040ea30a1a"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-mixed-cap3-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/resolved-config.yaml",
+        "resolved_config_sha256": "0421b285e87ec261ac0af706e5cc243ac4b023333c01ccc70efdb1433ca5b0af",
+        "result_set_sha256": "2496835a109398ddad0a6c66f15d37e0508c5a1988775704a7fde94061eedceb",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "6cc33129e1f30007407008b45ad86e5f19b4e2877b2288577ba0e187b2838900"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "418a345ed1d153adc503fe4c006b6c1b462b8f0f0dd237a405ca8eb0459948c0"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "b85354c9d7ffab8f1b544e2172e9770e627da577d3b8928bdc74f87daf3c056c"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "28c59e27dd16ceeb81dfdc054ea39fe2dab86f3eec85ca8c929a57b8fe1693ca"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "bde0c4314e1bd21479f43a2946090064b535a25b8e467f0657b2a138a45c0240"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "b5e16736dbc053e82654ebff0eea6c2a52184eb1fe5d8b346017beecb0cd0a9b"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "14c61d7ccab0efd45de35eb6abc194a35dc2619421b6695966b8f2edde680e3d"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "1c4783fb621a0706c4116f8d383c20703fd757a2212b5a71d5c7cf1b3613a5f2"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "59e4d976a3a6827a499fb84847787d2dc77c6f78ee1fa1a02174c422dfad0ab5"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap3-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "d98974698283d18d9d5d94ded1c4672cd0184ea568fd8b10a95d86322d1b1b3b"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-mixed-cap5-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/resolved-config.yaml",
+        "resolved_config_sha256": "522aa7b4e2844e3dbc73ee0e5dfffe92dd20f185abc6ac7aef1737a9ec5cc0ae",
+        "result_set_sha256": "dbd58928041198df0d4fa476e48382c91bc483812ad93ca3853c500f9439597b",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "ff809c70a5fdfdaf86d743f4bb016df6502df7df66c09faaede5e238eb5df2a1"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "52572349131cf85a0d2425bc16e6d81dce74fe386ee0288e825dda9277c4a699"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "6a02b01944e0cf247840c829752ca420817a81614ddc86409415f11310fa3e5a"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "073e5e8395d74a32ea0bc68062585e5c9be0571b199969056ec586091b011796"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "b71245a2933e3b70b840a7309458bcd05ff94d7d38b8ced4e96dd38c5cd9fa25"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "9fc4cb9f748fc94b3c55d69939c7bf6dd136d9c58f4a1901269250e45bb0e765"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "3be6a63b7fb3df8f762116c2e391372ceacc9beccec197280ca5070ccc5f3756"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "5d4ab7d5075ec8d2ceb82e5f2e7c0b03c7abdfbb81c1045553cb39a8eb1f7e1f"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "7b838ad6be5b478b4b763ba5831111d5f9caf52a8f9c29d2909e4c93ac00abd8"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap5-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "f17523f5644b33eb650fae5af2f284360d49759f136a57005dd2b37a824eede6"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-mixed-cap8-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/resolved-config.yaml",
+        "resolved_config_sha256": "8331aa752dd94196f00825112ed8d0c1cc39a7aaef4c8222e9246e7c27da6319",
+        "result_set_sha256": "dd12fd98a77e4ffcfafd4354a89836043b3533839f7cf23e25a8ecde1df98cb1",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "d3e3fc9d88e5cfac179f59019adb9ceac2472b504063ef23003336417f4ca9ed"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "7ed42c3c22adee6acf5389e8c4f35c84c91b9a80656e50b43d272542a025353c"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "3cb8a931826d1e5357e423dc409e0d83c44126c319dc9a3008fb1e7a94d2f9aa"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "f222f9fb589466e1767f24865f476afd1946626ca605517eacdfee4987c4360c"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "0b62d5925f01ff9fdbd84582c880c1e16a4b001ee45d8ed208b22ce4defef74e"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "163ba8471743541f6ecb9e9129784d4c469ba264835706d25a1b9957ca24801a"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "a607e57060ef931a9ae50ff18ad50f0c7d21b97c3ff1cdf93b57b60a65d341eb"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "3ea04cf27ce465e9e0d54011862a850962fbbfc8e7ba4f1a475c2582af88314d"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "cf3eae416abb647b5f0a985839ba54f9b2be77a332ef96be32f488974767c6c4"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap8-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "417620084d507c60cfc06ad86c5d501ea214be8a4b019e1cda717ba9e641f5d3"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-test100b-repeat3-tower-mixed-cap12-v4",
+        "episode_count": 300,
+        "task_count": 100,
+        "unique_episode_key_count": 300,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "b503017f0f0e1eea0b4b348c526917b786b53d20ec04780b8f1e8515bfa25f2e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/resolved-config.yaml",
+        "resolved_config_sha256": "f91db7e69d75ae524c9621333c7ab752a8e11c562c84c0f64767ce4338d40ef8",
+        "result_set_sha256": "9f0a6909ff33a35d481054130181f8154d96491842908cd4ebe22782084fb6bd",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "da2a5741c1c54ae851453668b977455ca4d5e959fc21446dd454b02fd013230d"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "77813de0346e0911ac8ed7a71e5a6e300668da871fe4a3d15b8c70e999f0165f"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "f7f2593f5d32877eae62a7c77e3d09e746083827502b946641c762695f64b981"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "00b948ee3d921e051aae7d850a6b154c72770cde7a019b474dd95d4a13f91819"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "33a3f2b38d3e33132e648fc2d242a81d49553c8c1064969addcaa04edcb9f452"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "e1021e6f7c8cb16e3dde05cc97f668c801249d16fdea162b25f1f589684ab73a"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "7d622b1900c2467fde2652f49e8deb24c5bcb0e476d2e5c92990aed6c9f160a6"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "b344707efe12e68b850f5a5133364ef15b196c8ac2568a9bbcdecda27ce126d8"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "10974c358f7f10d809c9e31844a0547bdd99623b4915b67bd2fa5b852d3ace19"
+          },
+          {
+            "path": "artifacts/runs/webshop-test100b-repeat3-tower-mixed-cap12-v4/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "0fbf8ffcc50228fa4555d92c6c3296e5256e676ad298a4943b4e4107671b690b"
+          }
+        ]
+      }
+    ],
+    "final_baselines": [
+      {
+        "run_id": "webshop-final-random300-flash-noskill-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/resolved-config.yaml",
+        "resolved_config_sha256": "f0cbc354aa53d9e3a92c0effb38856552c00a1008fddd81e77d49fead374637f",
+        "result_set_sha256": "e595a0375baa7e3ec42b1a2f0d5688153f507aa8de825c1dca81a6159a7169ed",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-00/results.jsonl",
+            "sha256": "e2b687229369a049fb8a8fe538213db2fab714e9211305c44a91efd95198e9d5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-01/results.jsonl",
+            "sha256": "fbaccbfe65b795d1f6ea6be9343c5918085454f171928f1f145906443ad232e7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-02/results.jsonl",
+            "sha256": "0d73c885e5eebd74a44cf5c485ecf5892211e1b1bc0806ed1a1925dab00c3515"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-03/results.jsonl",
+            "sha256": "66369ea2a23d4c1ec97c802ac6f20d8b2cf64745e95d5a2a8aa9908afe2c195f"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-04/results.jsonl",
+            "sha256": "91c16912a06ca5a32a072b065bdbda62282c4e8d3807e607197ff427023c30ce"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-05/results.jsonl",
+            "sha256": "796c12d32a33632caf2d1ab7be86e9329154aa31b398f5d16ceaa846ccda8286"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-06/results.jsonl",
+            "sha256": "dd9873d741409c633ecb82bc03ed6980984b137ccd586cbc2e3860d978561348"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-07/results.jsonl",
+            "sha256": "9da47fcc7382867a390e9fb639f4e0bb5cc7fe8aa361833d876049115eb9d138"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-08/results.jsonl",
+            "sha256": "c8b17e88bc1756e94cbf8ddca57c6e1de64fcc6cdc6b38eebf91d297d627fd75"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-noskill-v1/webshop/test/no_skill/shard-09/results.jsonl",
+            "sha256": "1dab9cbdd9451a1c069b1f88d9c184d857c74d2cf4299b36e9a894404726c590"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-flat-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "f624d95c865e2ded4da42945d5cc1fca6f955bf012cc3b0852f1e27ec7c9011e",
+        "result_set_sha256": "2fc0d3a17ab3f073c39ac247545829fd988a97cd95da045f4934a93d72456e3f",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-00/results.jsonl",
+            "sha256": "46bbda0e5040c583f5fff57b3a7def161cad92a7e5b6c09617a4cdb737465aef"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-01/results.jsonl",
+            "sha256": "7e87cdd2d62e95918b645b500d7b1186036bcbf8186e964eefd6d6adcf9e0459"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-02/results.jsonl",
+            "sha256": "1a63e68f4dca09a58704de969a6b6d4b568fc0e2efebb7660924a13e7489bd23"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-03/results.jsonl",
+            "sha256": "9e23314619e84e7138b31ab45a6e17536e2ee517224f86270523f1cc4b9d0ea2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-04/results.jsonl",
+            "sha256": "a1bb648b8b8111b013cf822042f830e6cc7fc3ae14615871b1e7b21fdd18dbfa"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-05/results.jsonl",
+            "sha256": "1be4f3c796c2e96257034c9a226b3007d855da06e7c6dc48d2e674963f848bab"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-06/results.jsonl",
+            "sha256": "a849c438c97d9761e04e5add63004c71e145d0bc1d56b5c6a552551a49e48f89"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-07/results.jsonl",
+            "sha256": "11ed309ffd95b6d6209ae8484d035b08296ade6c20b560bc65f0a45c1539284f"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-08/results.jsonl",
+            "sha256": "8c985c33e1adbb48490a6a6d016808d5840b1ae7969debbf74a421d6d03b944e"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-flat-cap3-v1/webshop/test/flat_skill_summary/shard-09/results.jsonl",
+            "sha256": "ebc563601932cb39cf1c1b97a7810b8c30e05f40943211ec3f2464ae0326da6f"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-skillx-official-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/resolved-config.yaml",
+        "resolved_config_sha256": "e0125c11eb7ac186e6701e5e7901725ef068192f6110e66cf033d106baa87fda",
+        "result_set_sha256": "8832974b2639a5382a64362322f9c4625092b9c21b9ca68072a84b386a075cb3",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-00/results.jsonl",
+            "sha256": "fcb1be0f0d254b5dfff918947a4a753c2626a5f0e766a029994c0348ac584131"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-01/results.jsonl",
+            "sha256": "6166e81bebb4e6714a213bff5e5e22b7c380a609a2cd4c16526f9726adb623b7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-02/results.jsonl",
+            "sha256": "88e0e6b557f0f4a4bebba86faa54f07902c40e7c1296d1dc99503a52e388249d"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-03/results.jsonl",
+            "sha256": "fa2a7d10e6447c7998ca6e338dd1ffc410788d37f4948f7f06f109ed70e976cf"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-04/results.jsonl",
+            "sha256": "ad998939fbc166572d6a57d022710f2415a2f74c10f46646c48667033b56fc95"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-05/results.jsonl",
+            "sha256": "f7beb452e6d4ef2575937f1a1f53a11bacf5c18f95c7cbca8c3c692dfa220ff8"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-06/results.jsonl",
+            "sha256": "0c465a990d301a242e139c988fa265c240a0d237d215951514843cf591c1b093"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-07/results.jsonl",
+            "sha256": "6210dfc7a0be596f6e9ffd44f7761d7c921a0dab0ced808616ba2a97f241a25c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-08/results.jsonl",
+            "sha256": "afac8e47d5f939bbbe634a4d31af39db4b1d641e83765cfba72fb8ff6c4d1f16"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-skillx-official-v1/webshop/test/skillx/shard-09/results.jsonl",
+            "sha256": "050b0d3985ba2452ed30847be073faea32aadc60269257f26d0e4c37c4eaf6d2"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-success-tower-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "222ee5817b2b7f3a7f95e4e5642e0fb43e106c8798e96da6f181de053e07dded",
+        "result_set_sha256": "d59e48229929e40ce4132d1c1135a62b421dff8f4b176bf5c8eef2a01974637d",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "5562108576c94700821245a9a359726ceb3f3d19815b83b782d3e89e9c07ad34"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "7c6d9fc5299e386d1a0a7410e6137d6dea2c1d6867a9477bf2afca0c6c7541e3"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "aea1543b8c1cbc8c16d35f172caa37b17b9f0025017b784d23bb2c184c7a9a50"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "b878414bbb8416f07985bd44424633f56606331e05e8dfe742b08bdff93b4d74"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "85699b569e22aa2c4d53da6ca1c75a2561c5acda6ec0e55cf1e1db4b48ee4e5d"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "90b0f604bf198dfd974b827937a634f711478dfb145817c0c7a29a9b0f460740"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "7ee28f068d63dcb157417655240182db3a8272c22c04660686e7ba041d84b0ea"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "db1de92992fc5ecb75534e72a584de7664f84b1b39f2f5746b983cf00dcbc2a2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "ca8e8deffcf4a4bb15167828b9389e9901816368ad270226152eb976a4c4aad4"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "dd395a76ac7e68b06c1a159b64812134e9e4ecb9c772fe1d4b956dff5ee8cfcc"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-mixed-tower-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "e15747d13d533b11d8ac4ce695f65bcb4b37cc89deefed1d8b0b800febef9898",
+        "result_set_sha256": "1a696523e1c362bc85d2c36e234a0c8c09c04a905dbc45b2effa041f5d251512",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "49613a1531cb8f66053582486e176a99f1f5b2262e104eb41df657c7e56abc96"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "319218cfa2c1187d1cfcdc4afcb8a47962172ca11015c1f374df26c4e4340141"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "32cf4b5b348929919e39873df292373a899e6b8b00304fcc3ea66b673c2471a0"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "1ed5dd8ea57a120d4a0dd8a91a09f60598251508ba299127d20fecf66498511a"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "d43f763ab0c24711f1df2dd5f341ce93809c462b75dc3cdbdee4c90959ba9f45"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "bf9cc317556aee2acc543566b46eb474a95fe1d5ae204947d29e22030c96a2f7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "065eb67ccfd4ce27cffd9ee745b4f45f346b538d5e32583e4ee60600b28b443e"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "e5100e50e11b0bf3aa08057923c13a202dca46c7ef3d446de8d9c4ed5204db94"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "a216169942c0e0bb7274a8ddde74424a052aa3d549046854f8bfa8a05d040c28"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "1c6bb1e124fb114073cd58d1444773e94a4ee77e525ee8cfdf8243ae5b9de149"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-noskill-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/resolved-config.yaml",
+        "resolved_config_sha256": "0626ed3d5638f8cb753ec64217efac4a8cc9e4bc6c21c32f2ce05c97499f590c",
+        "result_set_sha256": "be26671c64bc8e2f24973a8ba0bcb784acdb293bcf7e7da54a50df481142a667",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-00/results.jsonl",
+            "sha256": "18d781814b03126688d48ec18bd5482f93bb6999517fc3eea89cfd9eaf861a2b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-01/results.jsonl",
+            "sha256": "e6a39294d672338510cdba698729bbedc3c4dd843177c0554e1d711ce40d3205"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-02/results.jsonl",
+            "sha256": "c75967c9248b5fa5897f64426e13de5a2c9b79dfceb5a29ba7d083a125692538"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-03/results.jsonl",
+            "sha256": "c7ca7e298eac2740132fd0627e6534418eb65a6a3b143a43e976ef648eae8512"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-04/results.jsonl",
+            "sha256": "44fad6a5267b3e38faa1d5c6d8e830ca0d752f49a95d159c27321a8b55bb0cba"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-05/results.jsonl",
+            "sha256": "541089f642e3bd21c5ec86286e716002de913823b2a18fd5f87cd23b056ba635"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-06/results.jsonl",
+            "sha256": "e459775bfa1818e8c4bd8faf935fcd8bfd804ea9e52f50e654bdb68465232602"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-07/results.jsonl",
+            "sha256": "5a4e7ba888d586eb9b0368a0ca0dd9225841dd5ed391b52134484dfec506d64b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-08/results.jsonl",
+            "sha256": "6b9b9d6907eddd606a3882143633cef12e60fc7a954f0f15abd5cdd9f43aa1b5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-noskill-v1/webshop/test/no_skill/shard-09/results.jsonl",
+            "sha256": "2a5da8140a9d4e14036bbf11bf2c88cc11df92ae7311c9fe692e5a97701ff39f"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-flat-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "83305fc12621b9aaa3a235ea17d7ac787913247aa3b0021080813aee329dc8c0",
+        "result_set_sha256": "8a56d4877907495d7c0bb4358d31a1cf2cc2101b4161de3a5800da0b04a3a1b1",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-00/results.jsonl",
+            "sha256": "2e4424b0fbb611f83926e41b0cab9568b3577b8453f8652d0f22ec1562235af6"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-01/results.jsonl",
+            "sha256": "8ccb0925511fa623289aa53085f61031d3c07c7979bd0ff921f45b60903ddb7b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-02/results.jsonl",
+            "sha256": "078f3d31bb3f06f9d53839ee9dbbae63e28b6d35cef0ca487d7df7d1f8b27f54"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-03/results.jsonl",
+            "sha256": "8e1778b6dd9ebcf27e26d07f44d05389519cd91916e0fcc368c8a2777e12b548"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-04/results.jsonl",
+            "sha256": "9312199085773ce59f7557b4b530aa72cf510bf739481da6f7082aa81afa2b14"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-05/results.jsonl",
+            "sha256": "0e13557a68dad5b367ed93a092bc70cde68cd6ee8d9bac53aa2ba7cc34ab5a41"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-06/results.jsonl",
+            "sha256": "e7c862acb16d37979caf38ad6e330f8b359394d9e19e35da0449dc3adc339323"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-07/results.jsonl",
+            "sha256": "a976f8c4bdf610d360474ac5dccd33b7f551e80fbfb62af624877514233a1aac"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-08/results.jsonl",
+            "sha256": "3370e09e0b3225769e161ce4dfcf32817105b65fdb166923c9c02ea4baeb62d6"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-flat-cap3-v1/webshop/test/flat_skill_summary/shard-09/results.jsonl",
+            "sha256": "287426309d728b2aa36289e095bc1ad5dc655b482efa786cb5b490017c10df35"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-skillx-official-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/resolved-config.yaml",
+        "resolved_config_sha256": "66efd5798e9a0ad1da1796671990e83b16d665cfbff43b4330556e0e6913a5b2",
+        "result_set_sha256": "b80948c365001256c13035f853e9fd7c89cb10804b9372e9992cdeadc7baed13",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-00/results.jsonl",
+            "sha256": "8bcc90c3662ada5c359216dbbdbc4efdb8fad64a958fd9636dbaaa94bd7a3a49"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-01/results.jsonl",
+            "sha256": "8e436056f13f28716f4df864f19e0b8972623de184a976043cc1f91560099c58"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-02/results.jsonl",
+            "sha256": "b1584e1e92f8d0c46973ee38af8fcc56e5d8dac58b7b7a888e20d3427e0a47c2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-03/results.jsonl",
+            "sha256": "bf4e9fefd7b7852faf3a42185c49f405268b35efbc73475bf77f918c17a220cc"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-04/results.jsonl",
+            "sha256": "4b95e4a9c5e0880606bdd8413c77bbe9c3bddcb1f11e5755f5e18a6e941c54cf"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-05/results.jsonl",
+            "sha256": "14052c025e21939083f855104c85284e45b5bcabbec0b0558bade1d0556b9681"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-06/results.jsonl",
+            "sha256": "8a9580c6b6b9b0964a776d9ddf0beb6fb6078fbfb89fe74cf0dc2126afbd3121"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-07/results.jsonl",
+            "sha256": "19d418db91bf423401e3c15287b26a39623283444fd4d572d49e803657bcb771"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-08/results.jsonl",
+            "sha256": "adb8f594f5f2225962b59190ff90d84b91be09de3bf932b725c87df4000ead88"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-skillx-official-v1/webshop/test/skillx/shard-09/results.jsonl",
+            "sha256": "b5207b332717bddd6db3519c6fcf7c8c03ab79f2936ee6cadd1c14f3f72733a8"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-success-tower-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "58a5b35ddc27f1163162cc4fd3ddf2beb90cbce71b1501f0a21cecd33a96f417",
+        "result_set_sha256": "ba991b74c376f171ebfa40909b0c2491a9e184394a8a1f86c4b4970ed1eb7555",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "47b3a5ca65eed3ea119379ccaacd99ffcc690f5f488a3b3a849a144a88e447be"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "133ebc35768d33bffb224b9fd2b04f79261f719d0a04879944f120167384871d"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "c953999764c068e6eccd1019ece4c236075bee9d3c5aa0aaaebd197e44b10b93"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "df9cbfa338f60901aaf60b0f824439439cca484c228ae84d7498405a027fda35"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "ecc3cc1786abe421315b401dce3b8689a5d5cb9a8dad491fbd16303e6d8fbda7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "4af46023395b4833c315a9fa421dea356cf0c7153b08ecdafb47435ab6510648"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "1e069a7a14812f93a7cce9b1d0eb63bd5190475c18a742f8a4a033d1ef9a6a64"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "23f2531bab0e09099deaf9bec2c298fc7ec2f7c47c808e3fcb5874d78124c634"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "180c2f521b1074b71f052fca30f8ebd4ba3d7677d724cf75582ace4e602cd583"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "ce1bd4dda6de1be18cc9624498fb2dd1586c1057960a6c5a9011260bcfab2ed2"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-mixed-tower-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "ad78764b9994652d9e1599ae34db055eeb251d8ef53671aa8c3e10bccd4cb15b",
+        "result_set_sha256": "086775524615f0aaa47bee122d9bb5350157ba4eca1f35dd5a85c68781cb2264",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "89c1a0403cefa5be58f6407f6d3d921564da3d79faf4fa8b60f978bfd12050c5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "9a099085626de29120d3a470dd6a8bad5ec4ce9c7ddd00c27e70f623ab59451b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "b65e7546c22c91141d3d4433c46a75a0ea2ee546dcd0e15c9b0f0abf576df962"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "a87e09178ebf7419b7dd860e0ce93085816eebcc733b20f01370674869bf691c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "a75ab6b4232e8c1d08bd8f4404bcf9aec86f28abe4767bae9d20b06cf310d293"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "b9ee7cea5a454f4a2e2f2fbd8cebf693d9a605c7a6b66fd8fbc1ab2b99840059"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "03e283fee902ab91f33a19caf5824fc7956411dd478addeb0498a2fca24c0210"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "5e94fbaed65fac0bf5d90a90fbec375ad2fab06a7d8fda2d50408b01019bfa00"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "26a5ed8874fa2acf02d306eed77e9c8c803e9f5c733c1a0ab5805391fea5f0b7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "ea43d501b798dc1be0982a82ae374270b5d673059e8444d5802d382ba6f8793b"
+          }
+        ]
+      }
+    ],
+    "mid_only": [
+      {
+        "run_id": "webshop-final-random300-flash-success-tower-cap3-mid-only-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/resolved-config.yaml",
+        "resolved_config_sha256": "be9901ee509786b90af0a092601b98b27b17b3897c2c9d066524f7563d78b380",
+        "result_set_sha256": "24d36e4fffa371529a8fa55d5c4dcad21b751623f8493b45904aed7ea7dc09c0",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "a7cfb79fc8080ad081120be5f374b070efffe5e342e3335f230e6a8da9b4b0e2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "ff203694dfd8edd2c9324ebc77a78dc1087fdb4107fa60dced3b40f12b9b10e5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "78c984f879d4d96a438f3c225c248d1cee985515328cb2329464f607eaa23772"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "64281d8f4a45bfbf9524cba528fcdf79a1248bc87f2747cc0c43e463c1c458b2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "7e7445a9727af36be5348eaafc6c7fda62e74b90c0b164e1db9010a49585f370"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "77b7af72bf4ff2b4d2b7df493d0811ec131e3bcefb91e386957b4d2e5dbe902c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "2aad5aa4792fc1e533f334819046b0d327331e66582c65a1c0fbe17ead9a8d1b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "4d638511ac386c5b0c517b4c7d6c3256a22bc03c4c3b22fca72fd563735616c6"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "4742a59924c450355d6a7dae0ef230502688b45a81650c5cde1b4844ec0ae84c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "ea5ecabef1eaa8d797e27e72d784347bcfd6345ea3db3174529eb1051553d731"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/resolved-config.yaml",
+        "resolved_config_sha256": "954d5ce41f22a635f101582516e32493b9c3a420b0baddaa10bfe5e2cb3c73a3",
+        "result_set_sha256": "97936557974a13deaffeb5ebb08b6dc0e02d67d32048b65fd537944521cddc08",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "216cee20f95aa61fae7d7be41324520c14ac178043b0d5c9bdb4fe3a0d31e11b"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "250134dc59b7a5dfdcee1f00a51e07dc92b8524cf6f07bb40b684e25d39fc7c5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "96a3603d719b7b298a614338b34957d4a4cc028cfd5b5da1265f9ea8a75154de"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "8073e2396f08097cf6efa7cbf53147bf9cbe78a0abced9865972b82ed65d00e7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "0ddfece601365a1442cab0f461f39c4b9413a5d8927775251852a8459c4cb6d6"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "a928d2eb42dfb8522efd00597d853c8b7072061730fdcaf1acf87c64a99a5c04"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "006ec8f43a1be447cd792b97ee4d052ac013ad1580fda201717d2d85644e53cb"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "d9c3d9ac8dbfb3662fe6896b1a8b3aae0362e7488ccf88eba378a89f3f2c945f"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "87a9233e5c15cecd3a3cc585ccbbeb0598a1ab41ea349fe65518acecd6caa69e"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "1fb1b0cdbeca20b9a054efcaf2586d25dcfa4d289f2346e08b43edfc98dc612b"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-success-tower-cap3-mid-only-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/resolved-config.yaml",
+        "resolved_config_sha256": "8d19a85fe85334a6d51175abef0abff4e374d850d0e0fb86c0cfd98037f55d9f",
+        "result_set_sha256": "ce01c142431da5fab4b5225ce4a84a46639029bc86b537b13a1e90f6c50195f1",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "f0ff08abcf53b92dd0cbe0e8742920446bf8e9aa143dcf3fc72d3faed3f1e0c8"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "f43055fecec0529a20fe95cf2c56e297be90658f5119133b4bcff574ce5130c8"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "3fbfbef2ba1b20088a8d05fa0ef840c2c5388123ae168d25b68a6ac85d0f50f4"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "5a83020ed1b43012396bbfd8757f7fa9b91ef15ca16e31b86aa1a17f082b9d2a"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "ac601301acb55bf5bce71945b45cf83ca00b7c9b3f0518cdd42d2f464cd618d4"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "c8288750c2b4f3a0d391fe69271536ad9a32f09f28e73ba63f3a73ed0947c894"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "f928ae62591654ebb16b24f1788bcbab7084ed84fe832c54e6a86ced772d2320"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "f481fc6247f69535ec4f16f3e545c3983fae29e98217b333c9dcaa36eea9caac"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "8a9d8c65e7327f78d896100e002378fde741f1b00c1ce7a379704340155dfc31"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "2451009afc2ac0e32bac9eb37a4242dd033ca17c3b02900b48c1290c2cc233a4"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/resolved-config.yaml",
+        "resolved_config_sha256": "a20cad09ad6d2228bafd930275e9c399c8828cd3d3abb1237d894d47b0ecad9b",
+        "result_set_sha256": "6d90c1dc525f2d5511c46dec7e60f15c802ae4a226d2cd37030325b40e96743e",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "0df003f086ca4201a0d1aa85796713a3a2873dbe0293c48268e722b04d496f3f"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "9a627c32a1c7505f91f974ee8ec19cb9385b5848badd240bfc178aece8f34f91"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "ddc17d2b2cf2f847ea6e95fd02b61ddbdc2a38d25a9449d2d03837eeda3612b6"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "1511ffa057777aede0af6d1a82c27fe2d312282f73fd9442baf042a8fad60d12"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "d7ff2601b43caca3348d6ad283d14357b91716b11647e0c94c6bf8bcdcb61da0"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "609ae91f26ac3b40b6423c3b419751bdc8e0749084a8e58862ea3e71f8cf2053"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "1f9613ec96443c449876ff5f81dff1ea11fbe04f2e0486c52619c183f6a69398"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "c00d1590a4c17a85be9721d9c160d22b9fc1ef3ec0b9712185f207e8a866049c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "36872382c414943877150c45a7b2787cd9ab7b7dc3773e7148c7b99d4d42df93"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-tower-cap3-mid-only-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "f6b938260d8348b92cf97bd01d4fc0fc4426d0a15d06319bf967e180bbafdf9d"
+          }
+        ]
+      }
+    ],
+    "cross_high": [
+      {
+        "run_id": "webshop-final-random300-flash-success-mid-mixed-high-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "8bb8f5b7faecf4c349c107d65ebecd4942571664bbe5ec70e611cd1198dde857",
+        "result_set_sha256": "032b8bd0a53b7f1967e7f23f314a6eb7d5a6777ee9036d6a3691f3719bce164b",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "7b1b440a471a97d7da29bf2996c6e5c9e0bdc97af91c102fc6aa092b178d6b9c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "5b7f5cceef430790e878bd3e2a853d3cbe3af8c6c7936cee6aacb9221c7515e2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "8ead8d4c4d8a64b5aaa05dc2f4cfec5cc9f5348ec0b3fdf27e7da19d2f4611fe"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "8e46d16782330f2b6605504a0a72631deb0a78b1f308a27919f34f283c48820e"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "598961d91ca310a0680d3af9e0a1e30e89521c2a3bf941aa3bfc17d77771fdaa"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "b6843117b02a4cef29bc0ed3912a15d964fff576edbbfb713e2a2ed869720741"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "12d3a1f282c4c5aed34f70aa8219dfbff0a7fee4f65c251bd408ea41a9c053a1"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "36157949a11725477dea076fdace5651323cd4e5b6248e7ed1ac5618b77d1f2e"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "90d31a06f736a533e82b2153dc0a2f8beacc2662cfda3336dbc9cf0d821161f2"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "ce97318f45e0a6ef7a132ab62bf48faf5fd6e30ef6def52db5f140fa4f089a18"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-flash-mixed-mid-success-high-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "6a4a0543323437d511d88051a23e8b63880da0997fb34c34d87584ad62d4d3bb",
+        "result_set_sha256": "02436e529c58f70ce863182d45c06c3628789c1a7ddf26d59dec52dac3009b62",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "a2b5ef1a11ab90705c0c86154b476c0e2914a2445bd459652926058ab4dc43cf"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "e54771140dffbcbef7e5847768b6ec85f1c5477bf1cf482504834da8942091ac"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "05fcf78d73f7c32b389c654102cae88e6938dc580649b56c1156f0155fa67052"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "6d6316cec27d213ca32156c77d137b119bb771d4b13ad36d6344980607fca087"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "82df9c013601b20757fe896b162571339563d1de2e1ba85296bbeda91baf9032"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "ad73ca36211e59d1c337cc8c4393ec97fccd70eff807f1cf67b036ffd83c5390"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "c510f2726c80f4bf91b34d56266f473b7169242124f1e15a4230e7ac90dcfa55"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "25d40df6dafe987c7a56242d31efc88d6d0ba441475fbc43e3dd08b1b8fc9ad5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "9afd3308e9040487390b1f027dd46cecfeb05a844a038d75ce3a78a64767addf"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-flash-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "723e251d2090a0d74ea31de938cac1e12f0ffdcbcff05e3d16518b4d2af350f3"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-success-mid-mixed-high-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "b2e966116916924b458c22c2a37f6da72f91a94cc997ae2a96391171d1bbe903",
+        "result_set_sha256": "369746bf797031af71ebacc3eb89e556d46cf524e76157c385da51338e43e3e8",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "3bb9fffd9e96dd4cc8c969a951bfed6586a9c93ac977136579761ba643cc4dbf"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "27e49d095c2c9984617066067d2da943c469d3b616a62301eb16cac051fda20c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "f52ea6c3dc2412ab49da709fd1ccc49f404a36da5d1796c49ab508f4fa3bcf8d"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "751d388b2d67be4e3710406457bdc78b85ad5d4c528a006693706cc6f4f63439"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "61240cd459abf63019e179bff5363d241f3396ea80c6c1937ea3baf0cebbe79a"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "d7821f13b77610e104a97f5c0cd4c2de90da356ab7d02a9cc713481d7eac73ad"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "cacf2089a6ec1cd9597a34a9ece3c669a0c3b5cec514f54777b840b55ad006ea"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "072dd0f9aac71dcd929416ca4cfce494245e12a3606e914de842b5a37fcb53a5"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "77e20246abcac44a33ea7e9d8ad5448bb5b8f5c4f2b1b5e39e16a2e87c585b64"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-success-mid-mixed-high-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "564bd744dd95548ca0cd7233b88aeeadc0dc84f88d48543604965cd8715f8be0"
+          }
+        ]
+      },
+      {
+        "run_id": "webshop-final-random300-pro-mixed-mid-success-high-cap3-v1",
+        "episode_count": 900,
+        "task_count": 300,
+        "unique_episode_key_count": 900,
+        "repeat_ids": [
+          0,
+          1,
+          2
+        ],
+        "episode_key_sha256": "500fd8d0b246e3e1b3341cd0d6c9201e91cb22739f6c752f213ea8387b6f7f8e",
+        "error_count": 0,
+        "result_shard_count": 10,
+        "resolved_config_path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/resolved-config.yaml",
+        "resolved_config_sha256": "ba7df6a8dedf4601bd2fcee3d3c2061c498bfc9bc3d0c259d74fa6e70363b253",
+        "result_set_sha256": "37af83439754c20f2ab974d66760888b3796bf94bf189f94d45c870b8da79948",
+        "result_shards": [
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-00/results.jsonl",
+            "sha256": "fa7477c7ff6582e1a19b42ccffc91d3d8020ef6fe64400414a1acf55bb97c8ba"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-01/results.jsonl",
+            "sha256": "cd38a0c06cadec0fbc2be63a7030d322a60efef5d27a254155eb4271c5268d6f"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-02/results.jsonl",
+            "sha256": "63ec84de666908219eec9868ae40d7979d2d0018e34f77fb2b36431ed4a4165c"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-03/results.jsonl",
+            "sha256": "be393d450910d52bb0508852c04e3a15e59aa5f995bf10de22f9f6821dbac329"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-04/results.jsonl",
+            "sha256": "1c28352d322a33525ae9184fecd232a858727d58cd7843af1ad0435349c197e3"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-05/results.jsonl",
+            "sha256": "1cc0532dd2f4b6c5c593e9e3bc408d676fe95e0ecbb1492eff271bf992d87a15"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-06/results.jsonl",
+            "sha256": "3628c99f2c606348bfa7074da3e281896023b429b0df9beeb0a33f1b88ed00bc"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-07/results.jsonl",
+            "sha256": "ebe3af6783ba11132361a32b3501bb0bf245bc05aa5a8b20487c1d628f0303a9"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-08/results.jsonl",
+            "sha256": "b1933f41efc37321cd54f3cd5f7343006c875a4d812a89481349c74ff26e5fb7"
+          },
+          {
+            "path": "artifacts/runs/webshop-final-random300-pro-mixed-mid-success-high-cap3-v1/webshop/test/trace2tower_static/shard-09/results.jsonl",
+            "sha256": "ea34ca0a7794897ff9b35fb236a2d07670cf60f4c19a2c11b97dbd7901aadf26"
+          }
+        ]
+      }
+    ]
+  },
+  "frozen_files": [
+    {
+      "path": "configs/experiments/webshop_final_random300_v1.json",
+      "sha256": "600f7c4f7a6585d602a0e8421ac9e3c8cc25816a71a59144a9badfdec51b0e9b"
+    },
+    {
+      "path": "configs/experiments/skillx.yaml",
+      "sha256": "5491a65b39c46ab6c07d064e26338412dbfaa30e06e80ca5c539557e26749e04"
+    },
+    {
+      "path": "configs/experiments/trace2tower_static_diverse3.yaml",
+      "sha256": "002dc258236a13e569588fdbbff6bfac48a7de97bd7ac924c66f91d0e16863e5"
+    },
+    {
+      "path": "configs/experiments/trace2tower_static_diverse3_mid_only.yaml",
+      "sha256": "07619a86d967768fb489d4950ba7f0170a662e59797ebcd96991f04a33bec9f5"
+    },
+    {
+      "path": "src/trace2tower/methods/trace2tower/config.py",
+      "sha256": "e6ea29fed1352fffbb3d446599c582bc5162eedac4cf30e19e548e0aeaf80930"
+    },
+    {
+      "path": "docs/methods/retrieval.md",
+      "sha256": "59cdbdac60c217460116a7396515e50c48d76bd676ebe60cbe7f4f42d8034bfb"
+    },
+    {
+      "path": "artifacts/manifests/webshop-final-random300-v1/webshop_test.jsonl",
+      "sha256": "b055ef5458374c0b8e34935dd59d83f1a90d023bf93fb6a7d2c27c61bcd8fc3e"
+    },
+    {
+      "path": "artifacts/flat_skill_summary/webshop-flash50-repeat4-mmr-v1/library.json",
+      "sha256": "c9d3d37d78e0ef797ea96b07781301de28a070f10721340d7df2b1845b11be1c"
+    },
+    {
+      "path": "artifacts/trace2tower/towers/webshop-flash50-repeat4-success-only-task-support10-cap3-v4.json",
+      "sha256": "ec1932fa776b79b340f9f068bd15f65923c9cb6e17f43d1c9d5aef0168112c06"
+    },
+    {
+      "path": "artifacts/trace2tower/towers/webshop-flash50-repeat4-mixed-task-support10-cap3-v4.json",
+      "sha256": "b40de448d3e42c268abdb9ba26f930955496fcd769e41c89f07252b48ce23f7b"
+    },
+    {
+      "path": "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/library.json",
+      "sha256": "ec856af8b58b2c64007be9bf00bf774701361e006879b177d583e94745a85760"
+    },
+    {
+      "path": "artifacts/skillx/webshop-success94-official-parallel2-recoverable-v6/report.json",
+      "sha256": "0c0f92845cd271e6060ff60fb8b1847aa155f171f652624dfc1e2047a483756f"
+    },
+    {
+      "path": "artifacts/skillx/webshop-success94-official-execution-v1/library.json",
+      "sha256": "b33cace93000d9bd500e006de02c8213119395981e163a91c72d9edc760bf4cc"
+    },
+    {
+      "path": "artifacts/evaluations/webshop-final-random300-v1/report.json",
+      "sha256": "23eb40a493b2c5e449990fff300e7da50de1065c0114843894d9374cfdfb5e47"
+    },
+    {
+      "path": "artifacts/evaluations/webshop-cross-high-random300-v1/report.json",
+      "sha256": "cd3a79d4ee8a0a112f2d0959f32589ccd9917a076f08718193b763759b1d0064"
+    },
+    {
+      "path": "scripts/experiments/analyze/summarize_webshop_final_random300.py",
+      "sha256": "0cc86955fb710a1bccae18ce37e6bb7faace414276aca7e46d25c1a96ceebe2a"
+    },
+    {
+      "path": "scripts/experiments/analyze/summarize_webshop_cross_high_random300.py",
+      "sha256": "163535fa5b4d608dec82adcb1f6d6be15894804935e238fddc866bfa249f1509"
+    },
+    {
+      "path": "scripts/experiments/freeze/freeze_webshop.py",
+      "sha256": "4f07a5b3ce9802e95cf5702f8f2b1ddf4d5fb43b1e75361f909fd886bd95c806"
+    },
+    {
+      "path": "docs/protocols/webshop-validation-and-final-test.md",
+      "sha256": "ba3cb2c1d48f612db5f4e5a4263fef1f2fb5dcb448e6d6a23c5823a34bfdca2e"
+    },
+    {
+      "path": "docs/reports/webshop/final-random300-report.md",
+      "sha256": "e6b90c37b4a592c7beb6a358645c62b114c87fba18058e7058615e95c3198755"
+    },
+    {
+      "path": "docs/reports/webshop/mid-only-ablation.md",
+      "sha256": "29ad528a823c447dd21dd7c18b4e4da53e03e980db57aadbc9537543e986f8d8"
+    },
+    {
+      "path": "docs/baselines/skillx.md",
+      "sha256": "d4afd3bcdbcf5fcefeb997ca43336fe683d8521d56c7a2742b9aa1d36a65af7c"
+    },
+    {
+      "path": "docs/reports/webshop/complete-experiment-report.md",
+      "sha256": "5d787e866881d9985a84231183701c2e99c2663ddc5da59d192c8744cbb7def4"
+    }
+  ]
+}

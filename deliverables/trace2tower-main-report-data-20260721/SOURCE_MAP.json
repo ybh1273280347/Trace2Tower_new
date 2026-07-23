@@ -1,0 +1,137 @@
+{
+  "publication_boundary": {
+    "included": [
+      "official aggregate results",
+      "whitelisted per-task metrics",
+      "ALFWorld task-family labels without task text",
+      "the ALFWorld Tower snapshot used by structural figures",
+      "plotting scripts and rendered figures"
+    ],
+    "excluded": [
+      "training trajectories",
+      "evaluation trajectories and observations",
+      "task/goal text",
+      "private manifests",
+      "credentials and environment files",
+      "deprecated, diagnostic, exploratory, or invalid runs except expel-mini figure data"
+    ]
+  },
+  "tables": {
+    "ALFWorld main": {
+      "aggregate": "tables/alfworld-main-table.json",
+      "rows": [
+        "alfworld-test-v1-flash-noskill-r0",
+        "alfworld-test-v1-flash-manual-event-policy-r0",
+        "trace2skill-gpt54-p310-alfworld-test-r0",
+        "trace2skill-gpt54-p310-error-alfworld-test-r0",
+        "alfworld-test-v1-flash-skillx-global-p310-r0",
+        "alfworld-test-expel-p310-flash-r0",
+        "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0"
+      ]
+    },
+    "WebShop main": {
+      "aggregate": "tables/webshop-main-table.json",
+      "rows": [
+        "webshop-original-concept-v1-validation-flash-noskill-r1",
+        "webshop-skillx-native-inference-p100-validation-flash-r1",
+        "webshop-validation-expel-p100-flash-r0",
+        "trace2skill-gpt54-p100-webshop-validation-r0",
+        "trace2skill-gpt54-p100-error-webshop-validation-r0",
+        "webshop-expert-crafted-skills-validation-flash-r0",
+        "webshop-alfworld-v17-replication-p100-validation-r0"
+      ]
+    },
+    "ALFWorld task families": {
+      "aggregate": "figure_data/report-data.json#alfworld_family_results",
+      "family_map": "figure_data/alfworld-task-family-map.json",
+      "rows": [
+        "alfworld-test-v1-flash-noskill-r0",
+        "alfworld-test-v1-flash-manual-event-policy-r0",
+        "trace2skill-gpt54-p310-alfworld-test-r0",
+        "trace2skill-gpt54-p310-error-alfworld-test-r0",
+        "alfworld-test-v1-flash-skillx-global-p310-r0",
+        "alfworld-test-expel-p310-flash-r0",
+        "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0"
+      ]
+    },
+    "ALFWorld build ablation": {
+      "aggregate": "formal_results/alfworld-build-ablation-formal-rewrite-results.json",
+      "rows": [
+        "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+        "alfworld-ablation-v3-formal-no-transition-flash-r0",
+        "alfworld-ablation-v3-formal-no-outcome-flash-r0",
+        "alfworld-ablation-v3-formal-no-contrastive-flash-r0"
+      ],
+      "semantic_only": "No compliant High was produced, so no rollout exists."
+    },
+    "ALFWorld runtime ablation": {
+      "aggregate": "formal_results/alfworld-ablation-results.json",
+      "rows": [
+        "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+        "alfworld-ablation-v1-plan-rewrite-high-only-flash-r0"
+      ]
+    },
+    "Deployment optimization": {
+      "aggregate": "figure_data/report-data.json#deployment_optimization",
+      "rows": [
+        "alfworld-deployment-v1-gate-v0-r0",
+        "alfworld-deployment-v1-holdout-v0-noop-r0",
+        "alfworld-deployment-v2-dev-graph-full-r0",
+        "alfworld-deployment-v2-holdout-graph-full-r0",
+        "alfworld-deployment-v2-dev-embedding-graph-r0",
+        "alfworld-deployment-v2-holdout-embedding-graph-r0"
+      ]
+    }
+  },
+  "figures": {
+    "main-performance": [
+      "figure_data/report-data.json",
+      "tables/main-tables.json"
+    ],
+    "quality-cost-tradeoff": [
+      "figure_data/report-data.json",
+      "tables/main-tables.json"
+    ],
+    "alfworld-mechanisms": [
+      "figure_data/report-data.json",
+      "formal_results/alfworld-ablation-results.json",
+      "formal_results/alfworld-build-ablation-formal-rewrite-results.json"
+    ],
+    "deployment-optimization": [
+      "figure_data/report-data.json",
+      "formal_results/deployment/"
+    ],
+    "tower-structure": [
+      "tower/alfworld-p310-tower.json"
+    ],
+    "tower-embedding-map": [
+      "tower/alfworld-p310-tower.json"
+    ],
+    "tower-compression-utilization": [
+      "tower/alfworld-p310-tower.json",
+      "figure_data/report-data.json"
+    ],
+    "alfworld-family-heatmap": [
+      "figure_data/report-data.json",
+      "figure_data/alfworld-task-family-map.json"
+    ],
+    "expel-mini": [
+      "figure_data/expel-mini-results.json"
+    ],
+    "cross-model-tower-gains": [
+      "figure_data/cross-model-analysis-data.json"
+    ],
+    "alfworld-cross-model-family-spectrum": [
+      "figure_data/cross-model-analysis-data.json",
+      "figure_data/alfworld-task-family-map.json"
+    ],
+    "webshop-paired-reward-waterfalls": [
+      "figure_data/cross-model-analysis-data.json",
+      "task_level/run-catalog.json"
+    ],
+    "cross-model-success-set-agreement": [
+      "figure_data/cross-model-analysis-data.json",
+      "task_level/run-catalog.json"
+    ]
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "audit_version": 1,
+  "builder_sha256": "824dcd8ef3f3698122b08b2b2045c736b6f26f0819d2465a8f6268b06ad657d0",
+  "provider_sha256": "3d43a19b2f9381d7d78b1555644ccd2346f90f96f911ee521446fd2db8e76556",
+  "benchmarks": {
+    "alfworld": {
+      "benchmark": "alfworld",
+      "analysis": {
+        "source_pool": "artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl",
+        "source_pool_sha256": "374858560ef4e2b6d7e085449cb13dcf94003623809c3aebe689c754d2a10fda",
+        "source_pool_rows": 1240,
+        "selected_contract": "repeat_id=0, one trajectory per training task",
+        "selected_trajectory_count": 310,
+        "selected_unique_sample_ids": 310,
+        "analysis_batch_size": 4,
+        "expected_analysis_batches": 78,
+        "completed_analysis_checkpoints": 78,
+        "checkpoint_json_parse_failures": 0,
+        "covered_trajectory_count": 310,
+        "duplicate_trajectory_records": 0,
+        "outcome_counts": {
+          "success": 212,
+          "error": 98
+        },
+        "total_trajectory_local_patches": 844,
+        "trajectories_with_zero_patches": 0,
+        "trajectories_with_one_to_three_patches": 310,
+        "min_patches_per_trajectory": 1,
+        "max_patches_per_trajectory": 3,
+        "invalid_patch_items": 0,
+        "passed": true,
+        "failures": []
+      },
+      "variants": {
+        "combined": {
+          "definition": "all success and error trajectory-local patches",
+          "input_patch_count": 844,
+          "merge": {
+            "initial_patch_count": 844,
+            "merge_batch_size": 32,
+            "levels": [
+              {
+                "level": 0,
+                "input_patch_count": 844,
+                "expected_merge_calls": 27,
+                "completed_merge_calls": 27,
+                "output_patch_count": 230
+              },
+              {
+                "level": 1,
+                "input_patch_count": 230,
+                "expected_merge_calls": 8,
+                "completed_merge_calls": 8,
+                "output_patch_count": 81
+              },
+              {
+                "level": 2,
+                "input_patch_count": 81,
+                "expected_merge_calls": 3,
+                "completed_merge_calls": 3,
+                "output_patch_count": 27
+              },
+              {
+                "level": 3,
+                "input_patch_count": 27,
+                "expected_merge_calls": 1,
+                "completed_merge_calls": 1,
+                "output_patch_count": 11,
+                "final": true
+              }
+            ],
+            "merge_checkpoint_count": 39,
+            "final_patch_count": 11,
+            "final_skill_materialized": true,
+            "passed": true,
+            "failures": []
+          },
+          "deployment": {
+            "artifact_id": "trace2skill_f3061fe54ec973d8",
+            "artifact_sha256": "fcc0069b9e675594c0d9df5e9a707042608de47f1eb089b2a24d991174bfd238",
+            "author_model": "gpt-5.4",
+            "evolution_signal": "combined",
+            "formal_result_count": 134,
+            "unique_result_keys": 134,
+            "error_attempt_count": 0,
+            "skill_context_chars": 9508,
+            "skill_context_sha256": "ad941ef809d3865b7fae301329962d2a4b16b47f601c2a2effb7d03cfe4ad18e",
+            "rows_with_exact_full_skill": 134,
+            "test_time_retrieval_calls": 0,
+            "provider_contract": "Trace2SkillProvider returns one artifact ID and the complete skill_markdown",
+            "passed": true,
+            "failures": []
+          }
+        },
+        "error": {
+          "definition": "only patches whose frozen trajectory outcome is error",
+          "input_patch_count": 281,
+          "merge": {
+            "initial_patch_count": 281,
+            "merge_batch_size": 32,
+            "levels": [
+              {
+                "level": 0,
+                "input_patch_count": 281,
+                "expected_merge_calls": 9,
+                "completed_merge_calls": 9,
+                "output_patch_count": 74
+              },
+              {
+                "level": 1,
+                "input_patch_count": 74,
+                "expected_merge_calls": 3,
+                "completed_merge_calls": 3,
+                "output_patch_count": 22
+              },
+              {
+                "level": 2,
+                "input_patch_count": 22,
+                "expected_merge_calls": 1,
+                "completed_merge_calls": 1,
+                "output_patch_count": 8,
+                "final": true
+              }
+            ],
+            "merge_checkpoint_count": 13,
+            "final_patch_count": 8,
+            "final_skill_materialized": true,
+            "passed": true,
+            "failures": []
+          },
+          "deployment": {
+            "artifact_id": "trace2skill_6aaea76f0302d888",
+            "artifact_sha256": "32cb9cba26ba8efd60e54bbb0e77249af9538981d75cbe82b02b24403ce18fb0",
+            "author_model": "gpt-5.4",
+            "evolution_signal": "error",
+            "formal_result_count": 134,
+            "unique_result_keys": 134,
+            "error_attempt_count": 0,
+            "skill_context_chars": 11447,
+            "skill_context_sha256": "4f38335110c4296a1f22dad4d2882ac592939d93866ebb3634f1e769694a6b04",
+            "rows_with_exact_full_skill": 134,
+            "test_time_retrieval_calls": 0,
+            "provider_contract": "Trace2SkillProvider returns one artifact ID and the complete skill_markdown",
+            "passed": true,
+            "failures": []
+          }
+        }
+      },
+      "variant_definition_passed": true,
+      "variant_definition_failures": []
+    },
+    "webshop": {
+      "benchmark": "webshop",
+      "analysis": {
+        "source_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p100.jsonl",
+        "source_pool_sha256": "7a4377cac314e62e4382e2cb55603b28b670f7959013e20df663af0525bbb92f",
+        "source_pool_rows": 400,
+        "selected_contract": "repeat_id=0, one trajectory per training task",
+        "selected_trajectory_count": 100,
+        "selected_unique_sample_ids": 100,
+        "analysis_batch_size": 4,
+        "expected_analysis_batches": 25,
+        "completed_analysis_checkpoints": 25,
+        "checkpoint_json_parse_failures": 0,
+        "covered_trajectory_count": 100,
+        "duplicate_trajectory_records": 0,
+        "outcome_counts": {
+          "success": 46,
+          "error": 54
+        },
+        "total_trajectory_local_patches": 235,
+        "trajectories_with_zero_patches": 9,
+        "trajectories_with_one_to_three_patches": 91,
+        "min_patches_per_trajectory": 0,
+        "max_patches_per_trajectory": 3,
+        "invalid_patch_items": 0,
+        "passed": true,
+        "failures": []
+      },
+      "variants": {
+        "combined": {
+          "definition": "all success and error trajectory-local patches",
+          "input_patch_count": 235,
+          "merge": {
+            "initial_patch_count": 235,
+            "merge_batch_size": 32,
+            "levels": [
+              {
+                "level": 0,
+                "input_patch_count": 235,
+                "expected_merge_calls": 8,
+                "completed_merge_calls": 8,
+                "output_patch_count": 66
+              },
+              {
+                "level": 1,
+                "input_patch_count": 66,
+                "expected_merge_calls": 3,
+                "completed_merge_calls": 3,
+                "output_patch_count": 24
+              },
+              {
+                "level": 2,
+                "input_patch_count": 24,
+                "expected_merge_calls": 1,
+                "completed_merge_calls": 1,
+                "output_patch_count": 10,
+                "final": true
+              }
+            ],
+            "merge_checkpoint_count": 12,
+            "final_patch_count": 10,
+            "final_skill_materialized": true,
+            "passed": true,
+            "failures": []
+          },
+          "deployment": {
+            "artifact_id": "trace2skill_1cb2ab10de58438c",
+            "artifact_sha256": "1799dfb8574dc06df778811d51891dfb23d224f00564da15441b524c211fcf00",
+            "author_model": "gpt-5.4",
+            "evolution_signal": "combined",
+            "formal_result_count": 100,
+            "unique_result_keys": 100,
+            "error_attempt_count": 0,
+            "skill_context_chars": 7129,
+            "skill_context_sha256": "f2b96f8e4db31f35f95e248f3b8ce018cbbbe00f23cd17e70b8ba43ed6219446",
+            "rows_with_exact_full_skill": 100,
+            "test_time_retrieval_calls": 0,
+            "provider_contract": "Trace2SkillProvider returns one artifact ID and the complete skill_markdown",
+            "passed": true,
+            "failures": []
+          }
+        },
+        "error": {
+          "definition": "only patches whose frozen trajectory outcome is error",
+          "input_patch_count": 135,
+          "merge": {
+            "initial_patch_count": 135,
+            "merge_batch_size": 32,
+            "levels": [
+              {
+                "level": 0,
+                "input_patch_count": 135,
+                "expected_merge_calls": 5,
+                "completed_merge_calls": 5,
+                "output_patch_count": 36
+              },
+              {
+                "level": 1,
+                "input_patch_count": 36,
+                "expected_merge_calls": 2,
+                "completed_merge_calls": 2,
+                "output_patch_count": 12
+              },
+              {
+                "level": 2,
+                "input_patch_count": 12,
+                "expected_merge_calls": 1,
+                "completed_merge_calls": 1,
+                "output_patch_count": 12,
+                "final": true
+              }
+            ],
+            "merge_checkpoint_count": 8,
+            "final_patch_count": 12,
+            "final_skill_materialized": true,
+            "passed": true,
+            "failures": []
+          },
+          "deployment": {
+            "artifact_id": "trace2skill_c0a30e26c1d37b21",
+            "artifact_sha256": "2ce21df9465872016f5e24b8408e5b56ec826068ec76431afa09155584fa7a55",
+            "author_model": "gpt-5.4",
+            "evolution_signal": "error",
+            "formal_result_count": 100,
+            "unique_result_keys": 100,
+            "error_attempt_count": 0,
+            "skill_context_chars": 5309,
+            "skill_context_sha256": "2149c33117592853c1424470b130170faa2e9dbf2494746641970f67fe06b93c",
+            "rows_with_exact_full_skill": 100,
+            "test_time_retrieval_calls": 0,
+            "provider_contract": "Trace2SkillProvider returns one artifact ID and the complete skill_markdown",
+            "passed": true,
+            "failures": []
+          }
+        }
+      },
+      "variant_definition_passed": true,
+      "variant_definition_failures": []
+    }
+  },
+  "single_build_and_no_test_selection": {
+    "construction_seed_parameter": false,
+    "training_validation_stage": false,
+    "test_manifest_consumed_by_builder": false,
+    "expert_skill_initialization": false,
+    "artifact_count": 4,
+    "expected_artifact_count": 4,
+    "formal_run_count": 4,
+    "expected_formal_run_count": 4,
+    "policy": "Combined and Error are reported as separate predefined variants; no candidate artifact is selected within either variant.",
+    "passed": true
+  },
+  "overall_passed": true
+}

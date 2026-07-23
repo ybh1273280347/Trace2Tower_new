@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "copy_policy": "copied; original artifacts remain unchanged",
+  "alfworld": {
+    "training_pool": {
+      "source": "artifacts/trajectories/alfworld/alfworld-pool-v1-pro-expanded.jsonl",
+      "preprocessed_source": "artifacts/trace2tower/alfworld/original-concept-v16/p310/preprocessed.jsonl",
+      "scope": "P310, 1240 No-Skill trajectories"
+    },
+    "manifests": {
+      "train": "artifacts/manifests/alfworld_train.jsonl",
+      "validation": "artifacts/manifests/alfworld_dev.jsonl",
+      "test": "artifacts/manifests/alfworld_test.jsonl"
+    },
+    "skills": {
+      "trace2tower_full": "artifacts/trace2tower/alfworld/original-concept-v17/p310",
+      "trace2tower_build_ablations": [
+        "artifacts/trace2tower/alfworld/ablations-v1/no-transition",
+        "artifacts/trace2tower/alfworld/ablations-v1/no-outcome",
+        "artifacts/trace2tower/alfworld/ablations-v1/no-contrastive"
+      ],
+      "skillx": "artifacts/skillx/alfworld-global-p310-recovered"
+    },
+    "excluded": {
+      "semantic_only": "Historical G1 ignored collapse_duplicate_embeddings and must be rebuilt.",
+      "historical_towers": "Older original-concept-v* Tower snapshots are not copied."
+    }
+  },
+  "webshop": {
+    "training_pools": {
+      "p100": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p100.jsonl",
+      "p200": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p200.jsonl"
+    },
+    "manifests": {
+      "train": "artifacts/manifests/webshop_train.jsonl",
+      "validation": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+      "test_a": "experiments/webshop/event-tower-v2/manifests/test.jsonl"
+    },
+    "skills": {
+      "trace2tower": "artifacts/trace2tower/webshop/constraint-branch-v1/p200",
+      "skillx": "artifacts/skillx/webshop-scale-v1/p100"
+    },
+    "excluded": {
+      "historical_towers": "Early V* and isomorphic Tower versions are not copied.",
+      "diagnostics": "Deployment optimization and refinement artifacts are not copied."
+    }
+  }
+}

@@ -1,0 +1,20 @@
+manifests_dir: artifacts/manifests/webshop-final-random300-v1
+runs_dir: artifacts/runs
+trajectories_dir: artifacts/trajectories
+repeat_ids:
+  - 0
+num_shards: 10
+global_api_concurrency: 10
+episode_concurrency: 10
+provider_max_attempts: 5
+provider_timeout_seconds: 120
+retry_base_seconds: 1
+agent_temperature: 0
+agent_max_output_tokens: 512
+embedding_dimension: 4096
+embedding_batch_size: 16
+transition_embedding_cache: artifacts/cache/transition-embeddings.sqlite
+baseline_method: no_skill
+bootstrap_samples: 10000
+bootstrap_seed: 42
+confidence_level: 0.95

@@ -1,0 +1,82 @@
+{
+  "baseline": "Trace2Skill",
+  "upstream_repository": "https://github.com/Qwen-Applications/Trace2Skill",
+  "upstream_commit": "3d0b52a140f002a512930252b613c49048f7d5ac",
+  "paper_source": "MinerU_markdown_202607191706586_180c9e4c.md",
+  "construction_model": "gpt-5.4",
+  "execution_model": "deepseek-v4-flash",
+  "deployment_contract": "one consolidated static SKILL.md preloaded without test-time retrieval",
+  "reported_variants": ["+Combined", "+Error"],
+  "selection_policy": "Each predefined variant is built once and reported separately; no seed, checkpoint, patch subset, or artifact is selected using test results.",
+  "results": {
+    "alfworld": {
+      "dataset": "frozen valid_unseen test",
+      "task_count": 134,
+      "no_skill": {
+        "success_count": 71,
+        "success_rate": 0.5298507463
+      },
+      "combined": {
+        "run_id": "trace2skill-gpt54-p310-alfworld-test-r0",
+        "artifact_id": "trace2skill_f3061fe54ec973d8",
+        "success_count": 79,
+        "success_rate": 0.5895522388,
+        "mean_steps": 14.1119402985,
+        "mean_invalid_actions": 0.2686567164,
+        "mean_input_tokens": 68448.9701492537,
+        "skill_context_chars": 9508
+      },
+      "error": {
+        "run_id": "trace2skill-gpt54-p310-error-alfworld-test-r0",
+        "artifact_id": "trace2skill_6aaea76f0302d888",
+        "success_count": 83,
+        "success_rate": 0.6194029851,
+        "mean_steps": 14.1417910448,
+        "mean_invalid_actions": 0.3880597015,
+        "mean_input_tokens": 73130.6940298507,
+        "skill_context_chars": 11447,
+        "paired_vs_no_skill": {
+          "trace2skill_only_success": 22,
+          "no_skill_only_success": 10,
+          "both_success": 61,
+          "both_fail": 41
+        }
+      }
+    },
+    "webshop": {
+      "dataset": "frozen validation",
+      "task_count": 100,
+      "no_skill": {
+        "mean_reward": 0.65235,
+        "full_success_count": 47
+      },
+      "combined": {
+        "run_id": "trace2skill-gpt54-p100-webshop-validation-r0",
+        "artifact_id": "trace2skill_1cb2ab10de58438c",
+        "mean_reward": 0.59685,
+        "full_success_count": 42,
+        "mean_steps": 11.5,
+        "mean_invalid_actions": 0.54,
+        "mean_input_tokens": 47042.82,
+        "skill_context_chars": 7129
+      },
+      "error": {
+        "run_id": "trace2skill-gpt54-p100-error-webshop-validation-r0",
+        "artifact_id": "trace2skill_c0a30e26c1d37b21",
+        "mean_reward": 0.6283333333,
+        "full_success_count": 44,
+        "mean_steps": 11.54,
+        "mean_invalid_actions": 0.74,
+        "mean_input_tokens": 42828.47,
+        "skill_context_chars": 5309,
+        "paired_vs_no_skill": {
+          "trace2skill_higher_reward": 12,
+          "no_skill_higher_reward": 18,
+          "equal_reward": 70,
+          "mean_reward_difference": -0.0240166667
+        }
+      }
+    }
+  },
+  "interpretation_boundary": "Point estimates on one formal run per condition. The evidence does not establish general statistical superiority of Trace2Tower over Trace2Skill."
+}

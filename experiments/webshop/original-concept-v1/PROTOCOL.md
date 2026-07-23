@@ -1,0 +1,88 @@
+# Trace2Tower WebShop Original-Concept Protocol
+
+## Authority
+
+`Trace2Tower原始资料.md` is the sole algorithm authority. Later implementation notes and the deprecated event-stratified variant do not define Trace2Tower.
+
+## Final deployment freeze
+
+`FINAL_EXPERIMENTS.md` defines the final post-hoc deployment configuration and
+the remaining execution matrix. It supersedes the legacy cap8 retrieval policy
+below wherever the two conflict. The final method is P100 Pareto T1 with native
+rendering, per-step graph-aware retrieval, and a total Mid context budget of 3.
+Earlier cap8 Full runs remain historical evidence under their recorded legacy
+runtime; they are not relabeled as final-algorithm results.
+
+## Full mechanism
+
+1. Convert each trajectory into event segments.
+2. Encode each WebShop segment as a compact behavioral signature. Product names, goals, prices, and full page text are excluded.
+3. Build a sparse graph whose mask is the union of global semantic kNN edges and observed consecutive trajectory transitions. Event labels never restrict graph edges or clusters.
+4. Compute `S_uv = max(0, cosine(h_u, h_v))`.
+5. Compute `T_uv = #(type(u) -> type(v)) / #(type(u))` on observed directed transitions.
+6. Estimate `rho_u = P(success | u)` with cosine-weighted semantic neighbors and compute `O_uv = 1 - |rho_u - rho_v|`.
+7. Use equal weights for the otherwise unspecified `alpha`, `beta`, and `gamma`: `B_uv = M_uv * mean(S_uv, T_uv, O_uv)`.
+8. Lift the shared graph into success and failure mass: `W+_uv = B_uv * sqrt(rho_u rho_v)` and `W-_uv = B_uv * sqrt((1-rho_u)(1-rho_v))`.
+9. Compute `W_CE = W+ - W-`, its signed normalized Laplacian, the EigenTrace representation, and K-means Mid clusters.
+10. Map trajectories to Mid sequences and mine contrastive contiguous paths as High skills.
+11. At final deployment, retrieve from `(goal, current observation)` at every
+    agent step. Graph-aware ranking selects a High path, its active Mid, and at
+    most one directed successor. Event compatibility filters mixed-event tails,
+    and a total Mid budget of 3 includes both path children and direct Mids.
+
+`semantic_clustering` is the graph-structure ablation: it uses the same segments and compact embeddings but skips `S/T/O`, contrastive graph construction, spectral decomposition, and High induction, then directly applies K-means.
+
+`trace2tower_no_mixed` is the training-evidence ablation. It keeps event extraction, relational graph construction, spectral clustering, High induction, native rendering, graph-aware retrieval, and total cap3 fixed, but replaces the P100 mixed evidence with all 186 full-success trajectories from the same P100 rollout pool. It is compared with P100 V0 Mixed rather than refined T1 so the feedback pool and Pareto lifecycle do not change. The earlier No-event design is retired because event labels do not constrain the original-concept graph.
+
+## Fast mechanism gate
+
+- Training evidence: P50 mixed pool, 173 trajectories from 50 tasks.
+- Evaluation: the frozen 100-task validation manifest.
+- Agent: `deepseek-v4-flash`.
+- Repeats: one execution per task, represented by `repeat_id=0` only.
+- Tower direct Mid cap: 8.
+- Comparator: identical-key NoSkill.
+- Gate: Full Trace2Tower mean reward must not be below NoSkill.
+
+## Validation execution policy
+
+All subsequent validation conditions use only `deepseek-v4-flash`, the same 100-task manifest, and one execution per task. Reports and tables must label this as `single-repeat` or `1 run/task`. The statistical unit is the task, and paired task bootstrap may quantify variation across tasks. A result must never be copied into synthetic repeat IDs or reported as three independent executions.
+
+The historical generic-retrieval study records direct Mid caps 3, 5, and 8 as retrieval-sensitivity evidence. Its cap8 runs remain valid matched comparisons with SkillX and Semantic-only, but they do not define the final deployment retriever. The final Tower uses graph-aware retrieval and a total Mid budget of 3.
+
+## Formal test policy
+
+The frozen 100-task test manifest is evaluated once per task. The P50 historical table contains NoSkill, Manual, Global E2E, SkillX, Semantic-only, and Full on both Flash and Pro. Semantic-only is a graph-structure baseline rather than a final deployment condition.
+
+After the P50 test exposed a validation/test gap, two post-hoc diagnostics were registered:
+
+1. A seen-task diagnostic reruns the 50 P50 training task IDs with fresh Flash executions and compares NoSkill, SkillX, and P50 Full. It measures task-specific memorization and is not held-out evidence.
+2. A scale diagnostic rebuilds Full from the nested P100 pool, keeps cap 8 and the same test manifest, and runs Flash followed by an authorized Pro follow-up. It measures whether broader training coverage improves held-out performance and whether the effect transfers to the stronger agent.
+
+The P100 Full scale follow-up is evaluated on both Flash and Pro with the same snapshot, cap 8, 100-task test manifest, and `repeat_id=0`. P200 remains Flash-only. Any SkillX-style renderer experiment must keep graph, clusters, paths, retrieval, and cap fixed and be reported only as a renderer diagnostic; it does not redefine Full Trace2Tower.
+
+## Test-A repeat3 extensions
+
+The primary Flash comparison is extended post hoc to real repeat IDs `0`, `1`, and `2` for NoSkill, Manual, native P100 SkillX, and P100 Full. Existing repeat-0 results are reused without modification; two new executions per task are added. Final method means first average the three executions within each of the 100 tasks and then average across tasks. Task-cluster bootstrap resamples the 100 task-level means, so 300 episodes are never treated as 300 independent statistical units.
+
+Global E2E is not repeated. Its existing single-repeat result remains a diagnostic showing that direct corpus-level trajectory induction is not a competitive default, but it is excluded from the repeat3 primary matrix. Semantic-only and No-Mixed retain their separate mechanism-analysis roles.
+
+The same four-method repeat3 matrix is subsequently extended to `deepseek-v4-pro`. Existing repeat-0 NoSkill, Manual, and P100 Full results are reused without modification, and repeat IDs `1` and `2` are added. The existing Pro SkillX result uses the P50 library and is not reusable: native P100 SkillX is therefore executed at repeat IDs `0`, `1`, and `2`. Per-repeat metrics and the final three-repeat aggregate must both be reported. Aggregation and task-cluster bootstrap follow the Flash procedure above.
+
+The renderer control was run on the P100 structure. The native Trace2Tower renderer outperformed the SkillX-style adapter and is frozen for P200. P200 is a strict superset of P100, uses four Flash collection rollouts per training task, and is evaluated on the same 100-task Flash test with cap 8. Because the renderer was selected after observing this test set, the P200 result is a post-hoc scale diagnostic rather than new confirmatory test evidence. It must not be described as prompt tuning or as an independent held-out confirmation.
+
+Scale is not assumed to be monotonic. P50, P100, and P200 differ in the evidence pool and in graph-induced Mid/High structure; a larger pool can improve behavioral coverage while worsening structural compression. The scale diagnostic therefore reports the realized artifact and execution result rather than treating pool size alone as the causal variable.
+
+## Test-B robustness protocol
+
+Test-B is frozen before any Test-B rollout with seed `20260720`. It samples 100 tasks without replacement from WebShop indices `[0, 1000)` after excluding the frozen validation, Test-A, and ablation manifests. The selection algorithm, excluded-manifest hashes, selected IDs, and output hash are persisted in `manifests/test-b-selection.json`.
+
+Test-B uses `deepseek-v4-flash`, cap 8, and one real execution per task. The required methods are NoSkill, the P100 native SkillX artifact, and P100 Full Trace2Tower. Manual remains an optional baseline and is not required for this robustness matrix. Test-B measures cross-split heterogeneity; it does not replace Test-A. Every required Test-B result must be reported regardless of direction, and no candidate split may be retained or discarded based on reward.
+
+Existing results may be reused by selecting their real `repeat_id=0` rows only when manifest, model, method artifact, retrieval behavior, and execution configuration match exactly. The current reuse audit is recorded in `REUSE.md`.
+
+The unusually high Test-B NoSkill repeat0 result is followed by one registered
+NoSkill repeat1 variance diagnostic. Repeat1 does not replace repeat0. Both
+per-repeat results and the two-repeat task mean must be reported regardless of
+direction. Final Tower and SkillX remain single-repeat Test-B conditions unless
+an explicitly registered extension evaluates all compared methods again.

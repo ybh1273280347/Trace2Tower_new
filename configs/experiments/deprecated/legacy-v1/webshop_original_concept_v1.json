@@ -1,0 +1,226 @@
+{
+  "protocol_id": "webshop-original-concept-v1",
+  "status": "active",
+  "authority": "Trace2Tower原始资料.md",
+  "validation": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/validation.jsonl",
+    "agent_models": ["deepseek-v4-flash"],
+    "task_count": 100,
+    "repeat_ids": [0],
+    "episodes_per_condition": 100,
+    "reporting_label": "single-repeat",
+    "statistical_unit": "task",
+    "comparison": "paired task bootstrap",
+    "bootstrap_samples": 10000
+  },
+  "tower": {
+    "direct_mid_cap": 8,
+    "high_top_k": 1,
+    "dynamic_state_retrieval": true
+  },
+  "semantic_clustering": {
+    "direct_mid_cap": 8,
+    "cap_selection": "fixed_to_common_retrieval_budget",
+    "include_high": false
+  },
+  "test": {
+    "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+    "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
+    "methods": [
+      "no_skill",
+      "manual_skill",
+      "global_e2e_gpt",
+      "skillx",
+      "semantic_clustering",
+      "trace2tower"
+    ],
+    "task_count": 100,
+    "repeat_ids": [0],
+    "episodes_per_condition": 100
+  },
+  "diagnostics": {
+    "seen_p50": {
+      "agent_model": "deepseek-v4-flash",
+      "task_source": "experiments/webshop/event-tower-v2/stage-1-pools/audit.json:pools.p50.sample_ids",
+      "task_count": 50,
+      "repeat_ids": [0],
+      "methods": ["no_skill", "skillx", "trace2tower"]
+    },
+    "p100_scale": {
+      "agent_models": ["deepseek-v4-flash", "deepseek-v4-pro"],
+      "snapshot_id": "tower_9094918372ee0a39",
+      "direct_mid_cap": 8,
+      "task_count": 100,
+      "repeat_ids": [0],
+      "flash_mean_reward": 0.7209166666666667,
+      "pro_mean_reward": 0.6573333333333333
+    },
+    "renderer_control": {
+      "status": "completed",
+      "role": "diagnostic_only",
+      "fixed_components": ["graph", "clusters", "high_paths", "retrieval", "direct_mid_cap"],
+      "selected_renderer": "trace2tower",
+      "native_mean_reward": 0.7209166666666667,
+      "skillx_style_mean_reward": 0.6898333333333333
+    },
+    "p200_scale": {
+      "status": "completed",
+      "role": "post_hoc_diagnostic_only",
+      "agent_model": "deepseek-v4-flash",
+      "snapshot_id": "tower_abe0cf9c83bf1a1d",
+      "direct_mid_cap": 8,
+      "task_count": 100,
+      "repeat_ids": [0],
+      "mean_reward": 0.69325,
+      "full_success_rate": 0.52
+    },
+    "test_b_robustness": {
+      "status": "completed",
+      "role": "cross_split_robustness",
+      "manifest": "experiments/webshop/original-concept-v1/manifests/test-b.jsonl",
+      "selection_audit": "experiments/webshop/original-concept-v1/manifests/test-b-selection.json",
+      "selection_seed": 20260720,
+      "agent_model": "deepseek-v4-flash",
+      "task_count": 100,
+      "repeat_ids": [0],
+      "methods": ["no_skill", "manual_skill", "skillx_p100", "trace2tower_p100"],
+      "skillx_artifact_id": "skillxlib_5346d9c7cc996337",
+      "trace2tower_snapshot_id": "tower_9094918372ee0a39",
+      "manual_skill": "optional_not_run",
+      "outcome_based_split_selection": false,
+      "mean_reward": {
+        "no_skill": 0.7332309523809524,
+        "skillx_p100": 0.6957309523809524,
+        "trace2tower_p100": 0.7146476190476191
+      }
+    },
+    "p100_no_mixed_test_a": {
+      "status": "completed",
+      "role": "training_evidence_ablation",
+      "agent_model": "deepseek-v4-flash",
+      "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+      "task_count": 100,
+      "repeat_ids": [0],
+      "direct_mid_cap": 8,
+      "snapshot_id": "tower_e121333546770f8f",
+      "training_trajectory_count": 186,
+      "runtime_config": "configs/experiments/webshop_trace2tower_no_mixed_original_concept_runtime.yaml",
+      "fixed_against_full": ["source_rollout_pool", "event_extraction", "graph_algorithm", "renderer", "retrieval", "direct_mid_cap"],
+      "changed_component": "exclude partial and failure trajectories",
+      "mean_reward": 0.6919166666666667,
+      "full_success_rate": 0.52,
+      "minus_full_reward": -0.029,
+      "minus_full_reward_ci95": [-0.08333750000000001, 0.022166666666666668]
+    },
+    "test_a_repeat3": {
+      "status": "completed",
+      "role": "primary_flash_variance_extension",
+      "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+      "agent_model": "deepseek-v4-flash",
+      "task_count": 100,
+      "repeat_ids": [0, 1, 2],
+      "methods": ["no_skill", "skillx_p100", "trace2tower_p100"],
+      "existing_repeat_id": 0,
+      "additional_repeat_ids": [1, 2],
+      "global_e2e_gpt": "single_repeat_diagnostic_only",
+      "statistical_unit": "task_mean_across_three_repeats",
+      "bootstrap_samples": 10000,
+      "mean_reward": {
+        "no_skill": 0.6849166666666666,
+        "manual_skill": 0.6915833333333333,
+        "skillx_p100": 0.706265873015873,
+        "trace2tower_p100": 0.7095833333333333
+      },
+      "trace2tower_minus_no_skill": 0.024666666666666667,
+      "trace2tower_minus_no_skill_ci95": [-0.02441666666666666, 0.0755],
+      "trace2tower_minus_skillx": 0.0033174603174603184,
+      "trace2tower_minus_skillx_ci95": [-0.036449107142857144, 0.042274107142857134]
+    },
+    "test_a_pro_repeat3": {
+      "status": "completed",
+      "role": "primary_pro_variance_extension",
+      "manifest": "experiments/webshop/event-tower-v2/manifests/test.jsonl",
+      "agent_model": "deepseek-v4-pro",
+      "task_count": 100,
+      "repeat_ids": [0, 1, 2],
+      "methods": ["no_skill", "manual_skill", "skillx_p100", "trace2tower_p100"],
+      "reused_repeat_id_0": ["no_skill", "manual_skill", "trace2tower_p100"],
+      "new_repeat_ids": {
+        "no_skill": [1, 2],
+        "manual_skill": [1, 2],
+        "skillx_p100": [0, 1, 2],
+        "trace2tower_p100": [1, 2]
+      },
+      "global_e2e_gpt": "single_repeat_diagnostic_only",
+      "statistical_unit": "task_mean_across_three_repeats",
+      "bootstrap_samples": 10000,
+      "reporting": ["per_repeat_metrics", "three_repeat_aggregate"],
+      "result_count": {
+        "no_skill": 300,
+        "manual_skill": 300,
+        "skillx_p100": 300,
+        "trace2tower_p100": 300
+      },
+      "unresolved_failure_key_count": 0,
+      "error_attempt_count": 242,
+      "mean_reward": {
+        "no_skill": 0.5921666666666667,
+        "manual_skill": 0.6919444444444445,
+        "skillx_p100": 0.6745277777777777,
+        "trace2tower_p100": 0.6545833333333333
+      },
+      "full_success_rate": {
+        "no_skill": 0.4266666666666667,
+        "manual_skill": 0.51,
+        "skillx_p100": 0.48333333333333334,
+        "trace2tower_p100": 0.4866666666666667
+      },
+      "mean_steps": {
+        "no_skill": 9.233333333333333,
+        "manual_skill": 6.586666666666667,
+        "skillx_p100": 7.68,
+        "trace2tower_p100": 8.703333333333333
+      },
+      "mean_input_tokens": {
+        "no_skill": 25672.203333333335,
+        "manual_skill": 18700.47333333333,
+        "skillx_p100": 28444.22333333333,
+        "trace2tower_p100": 41674.97666666667
+      },
+      "reward_by_repeat": {
+        "no_skill": [0.62, 0.5856666666666667, 0.5708333333333333],
+        "manual_skill": [0.6904166666666667, 0.69075, 0.6946666666666667],
+        "skillx_p100": [0.6745833333333333, 0.6814166666666667, 0.6675833333333334],
+        "trace2tower_p100": [0.6573333333333333, 0.6285000000000001, 0.6779166666666667]
+      },
+      "paired": {
+        "trace2tower_minus_no_skill": {
+          "reward_difference": 0.06241666666666667,
+          "reward_ci95": [0.011303472222222239, 0.11386388888888883],
+          "full_success_difference": 0.06,
+          "full_success_ci95": [-0.006666666666666665, 0.12999999999999998]
+        },
+        "trace2tower_minus_skillx": {
+          "reward_difference": -0.019944444444444445,
+          "reward_ci95": [-0.06294444444444444, 0.0235],
+          "full_success_difference": 0.0033333333333333327,
+          "full_success_ci95": [-0.06333333333333332, 0.07333333333333333]
+        },
+        "trace2tower_minus_manual": {
+          "reward_difference": -0.03736111111111111,
+          "reward_ci95": [-0.0819451388888889, 0.008834027777777769],
+          "full_success_difference": -0.02333333333333333,
+          "full_success_ci95": [-0.08333333333333331, 0.03666666666666667]
+        },
+        "skillx_minus_no_skill": {
+          "reward_difference": 0.08236111111111111,
+          "reward_ci95": [0.029832638888888898, 0.13827986111111107]
+        },
+        "manual_minus_no_skill": {
+          "reward_difference": 0.09977777777777778,
+          "reward_ci95": [0.051833333333333335, 0.15005555555555555]
+        }
+      }
+    }
+  }
+}

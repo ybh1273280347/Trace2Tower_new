@@ -1,0 +1,59 @@
+{
+  "method": "trace2tower_graph_backbone_high_v1",
+  "training_trajectories": 800,
+  "structure": {
+    "decision_nodes": 184,
+    "edges": 2046,
+    "observed_transition_edges": 472,
+    "mid_communities": 3,
+    "high_paths": 3,
+    "high_communities": 2,
+    "high_modularity": 0.06461111495517038,
+    "hierarchy_ablation_snapshot_id": "tower_ef59dccffa7228ac"
+  },
+  "runtime_contract": {
+    "execution_provider": "fixed_one_time_high_injector",
+    "high_library_size": 1,
+    "injected_high_count": 1,
+    "max_mid_skills": 0,
+    "rewrite_plan": false
+  },
+  "results": {
+    "validation": {
+      "tasks": 100,
+      "mean_reward": 0.7040166666666665,
+      "full_success_rate": 0.49,
+      "mean_steps": 6.82,
+      "mean_invalid_actions": 0.19,
+      "mean_input_tokens": 17298.48,
+      "delta_vs_no_skill": 0.051666666666666666,
+      "paired_reward_ci95": [0.001166666666666666, 0.1075],
+      "reward_wins_ties_losses": [10, 84, 6]
+    },
+    "test_a": {
+      "tasks": 100,
+      "mean_reward": 0.7143214285714286,
+      "full_success_rate": 0.49,
+      "mean_steps": 6.39,
+      "mean_invalid_actions": 0.15,
+      "mean_input_tokens": 16290.05,
+      "delta_vs_no_skill": 0.033571428571428565,
+      "paired_reward_ci95": [-0.02067886904761905, 0.09099017857142855],
+      "reward_wins_ties_losses": [11, 79, 10]
+    }
+  },
+  "ablations": {
+    "compact_full_hierarchy": {
+      "validation_reward": 0.68785,
+      "test_a_reward": 0.6909166666666667,
+      "high_count": 2,
+      "mid_count": 3,
+      "rewrite_plan": false
+    },
+    "compact_two_high_only_test_a": 0.66475,
+    "skillx_official_validation": 0.6842666666666665,
+    "skillx_official_test_a": 0.664904761904762,
+    "skillx_no_rewrite_validation": 0.6439333333333331,
+    "skillx_no_rewrite_test_a": 0.7205000000000001
+  }
+}

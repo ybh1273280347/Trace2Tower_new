@@ -1,0 +1,28 @@
+{
+  "status": "p100_building",
+  "protocol": "configs/experiments/webshop_scale_v1.json",
+  "p50": {
+    "status": "materialized",
+    "trajectory_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p50.jsonl",
+    "episode_count": 200
+  },
+  "p100": {
+    "status": "building",
+    "collection_run_id": "webshop-scale-v1-flash-p100-add50",
+    "trajectory_pool": "artifacts/trajectories/webshop/scale-v1/webshop-scale-v1-p100.jsonl",
+    "episode_count": 400,
+    "new_episode_count": 200
+  },
+  "p200": {
+    "status": "blocked_by_stage_gate",
+    "planned_new_episode_count": 400,
+    "decision": "experiments/webshop/scale-study/p200-decision.json"
+  },
+  "evaluation": {
+    "model": "deepseek-v4-pro",
+    "task_count": 100,
+    "repeat_ids": [0, 1, 2],
+    "condition_count": 13,
+    "planned_episode_count": 3900
+  }
+}

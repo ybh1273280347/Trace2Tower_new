@@ -1,0 +1,60 @@
+{
+  "protocol_id": "alfworld-trace2tower-full-repeat-v1",
+  "benchmark": "alfworld",
+  "split": "valid_unseen",
+  "total_tasks": 134,
+  "snapshot": "artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json",
+  "snapshot_id": "tower_d2c2d0090ed9b6b4",
+  "manifest": "artifacts/manifests/alfworld_test.jsonl",
+  "runtime_contract": {
+    "retrieval_strategy": "plan_rewrite",
+    "rewrite_contract_version": "budgeted_v2",
+    "rewrite_model_role": "renderer",
+    "reference_high_top_k": 3,
+    "skills_per_step": 4,
+    "max_mid_skills": 8
+  },
+  "runs": [
+    {
+      "repeat_id": 0,
+      "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r0",
+      "success": 118,
+      "success_rate": 0.8805970149,
+      "mean_steps": 10.06,
+      "invalid_actions": 29,
+      "errors": 0
+    },
+    {
+      "repeat_id": 1,
+      "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r1-correct",
+      "success": 106,
+      "success_rate": 0.7910447761,
+      "mean_steps": 11.03,
+      "invalid_actions": 32,
+      "errors": 0
+    },
+    {
+      "repeat_id": 2,
+      "run_id": "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r2-correct",
+      "success": 108,
+      "success_rate": 0.8059701493,
+      "mean_steps": 10.91,
+      "invalid_actions": 37,
+      "errors": 0
+    }
+  ],
+  "aggregate": {
+    "mean_success_rate": 0.8258706468,
+    "sample_sd_success_rate": 0.04797836,
+    "pooled_success": 332,
+    "pooled_tasks": 402,
+    "pooled_success_rate": 0.8258706468,
+    "mean_steps": 10.67,
+    "best_ablation_success_rate": 0.6044776119,
+    "mean_margin_over_best_ablation": 0.2213930349
+  },
+  "invalid_diagnostic_runs": [
+    "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r1",
+    "alfworld-test-v1-flash-v18-budgeted-rewrite-gpt54-full-r2"
+  ]
+}
