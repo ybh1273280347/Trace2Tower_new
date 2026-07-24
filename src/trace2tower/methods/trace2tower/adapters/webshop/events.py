@@ -59,6 +59,7 @@ def webshop_applicable_events(page: WebShopPageType) -> frozenset[WebShopEventTy
                 WebShopEventType.OPTION_SELECTION,
                 WebShopEventType.ATTRIBUTE_INSPECTION,
                 WebShopEventType.PURCHASE_DECISION,
+                WebShopEventType.CANDIDATE_BACKTRACKING,
                 WebShopEventType.SEARCH_BACKTRACKING,
             )
         ),
@@ -109,6 +110,8 @@ class WebShopEventClassifier:
             event = WebShopEventType.RESULT_NAVIGATION
         elif self.page is WebShopPageType.ITEM_DETAIL and value == "< prev":
             event = WebShopEventType.DETAIL_BACKTRACKING
+        elif self.page is WebShopPageType.ITEM and value == "< prev":
+            event = WebShopEventType.CANDIDATE_BACKTRACKING
         elif self.page is WebShopPageType.ITEM and value in DETAIL_VALUES:
             event = WebShopEventType.ATTRIBUTE_INSPECTION
         else:
@@ -149,6 +152,7 @@ class WebShopEventClassifier:
             WebShopEventType.OPTION_SELECTION: WebShopPageType.ITEM,
             WebShopEventType.ATTRIBUTE_INSPECTION: WebShopPageType.ITEM_DETAIL,
             WebShopEventType.DETAIL_BACKTRACKING: WebShopPageType.ITEM,
+            WebShopEventType.CANDIDATE_BACKTRACKING: WebShopPageType.RESULTS,
             WebShopEventType.SEARCH_BACKTRACKING: WebShopPageType.SEARCH,
             WebShopEventType.PURCHASE_DECISION: WebShopPageType.TERMINAL,
         }
@@ -263,6 +267,8 @@ def webshop_segment_signature(
             )
         elif segment.event_type is WebShopEventType.DETAIL_BACKTRACKING:
             action_templates.append("BACK_TO_PRODUCT")
+        elif segment.event_type is WebShopEventType.CANDIDATE_BACKTRACKING:
+            action_templates.append("BACK_TO_RESULTS")
         elif segment.event_type is WebShopEventType.SEARCH_BACKTRACKING:
             action_templates.append("BACK_TO_SEARCH")
         elif segment.event_type is WebShopEventType.PURCHASE_DECISION:

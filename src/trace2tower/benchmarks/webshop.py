@@ -128,6 +128,11 @@ class WebShopEnvironment:
         elif self.page is WebShopPage.ITEM_DETAIL and value == "< prev":
             self.page = WebShopPage.ITEM
             self.current_state = self._item_page()
+        elif self.page is WebShopPage.ITEM and value == "< Prev":
+            self.product = None
+            self.selected_options = {}
+            self.page = WebShopPage.RESULTS
+            self.current_state = self._results_page()
         elif self.page is WebShopPage.ITEM and value == "Buy Now":
             self.current_state = self._purchase()
         elif self.page is WebShopPage.ITEM:
@@ -213,7 +218,6 @@ class WebShopEnvironment:
             f"Product: {product['Title']}",
             f"ASIN: {product['asin']}",
             f"Price: {product.get('pricing', '')}",
-            f"Description: {product.get('Description', '')[:1200]}",
             "Options:",
         ]
         actions = []
@@ -224,6 +228,7 @@ class WebShopEnvironment:
                 actions.append(value)
                 kinds[value] = ClickableKind.OPTION
         for value in (
+            "< Prev",
             "Description",
             "Features",
             "Reviews",

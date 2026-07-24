@@ -53,6 +53,7 @@ class DecisionSignal(StrEnum):
     INSPECT_REVIEWS = "inspect_reviews"
     RESULT_NAVIGATION = "result_navigation"
     DETAIL_BACKTRACK = "detail_backtrack"
+    CANDIDATE_BACKTRACK = "candidate_backtrack"
     SEARCH_BACKTRACK = "search_backtrack"
     PURCHASE = "purchase"
     OTHER = "other"
@@ -499,6 +500,7 @@ def _decision_signal(
     return {
         WebShopEventType.RESULT_NAVIGATION: DecisionSignal.RESULT_NAVIGATION,
         WebShopEventType.DETAIL_BACKTRACKING: DecisionSignal.DETAIL_BACKTRACK,
+        WebShopEventType.CANDIDATE_BACKTRACKING: DecisionSignal.CANDIDATE_BACKTRACK,
         WebShopEventType.SEARCH_BACKTRACKING: DecisionSignal.SEARCH_BACKTRACK,
         WebShopEventType.PURCHASE_DECISION: DecisionSignal.PURCHASE,
     }.get(event, DecisionSignal.OTHER)
