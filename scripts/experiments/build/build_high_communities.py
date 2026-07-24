@@ -93,62 +93,69 @@ async def main(options: argparse.Namespace) -> int:
             )
         }
 
-    runtime = CommonLLMRuntime(
-        max_concurrency=options.concurrency,
-        max_attempts=3,
-        timeout_seconds=120,
-        retry_base_seconds=1,
-    )
     high_cards = []
     usages = []
-    try:
-        for community in discovery.communities:
-            successful = [
-                {"trajectory_id": trajectory_id, **contexts[trajectory_id]}
-                for trajectory_id in community.supporting_trajectory_ids
-            ]
-            member_transitions = {
-                transition
-                for context in successful
-                for transition in zip(context["ordered_mid_ids"], context["ordered_mid_ids"][1:])
-            }
-            unsuccessful = sorted(
-                (
-                    {
-                        "trajectory_id": trajectory_id,
-                        "overlap": len(
-                            member_transitions
-                            & set(zip(sequences[trajectory_id], sequences[trajectory_id][1:]))
-                        ),
-                        **contexts[trajectory_id],
-                    }
-                    for trajectory_id in failed_ids
-                ),
-                key=lambda item: (-item["overlap"], item["trajectory_id"]),
-            )
-            card = reusable_cards.get(community.community_id)
-            result = None
-            if card is None:
-                card, result = await render_high_community_card(
-                    runtime,
-                    options.benchmark,
-                    community.community_id,
-                    tuple(mid_cards_by_id[mid_id] for mid_id in community.member_mid_ids),
-                    _representatives(successful),
-                    _representatives(unsuccessful),
-                    _transition_summary(successful, unsuccessful),
-                )
-            high_cards.append(card)
-            usages.append(
-                {
-                    "community_id": community.community_id,
-                    "successful_trajectory_count": len(successful),
-                    "failure_candidate_count": len(unsuccessful),
-                    "usage": asdict(result.usage) if result else None,
+    if not options.structure_only:
+        runtime = CommonLLMRuntime(
+            max_concurrency=options.concurrency,
+            max_attempts=3,
+            timeout_seconds=120,
+            retry_base_seconds=1,
+        )
+        try:
+            async def render_community(community: HighCommunity) -> tuple[HighSkillCard, dict]:
+                successful = [
+                    {"trajectory_id": trajectory_id, **contexts[trajectory_id]}
+                    for trajectory_id in community.supporting_trajectory_ids
+                ]
+                member_transitions = {
+                    transition
+                    for context in successful
+                    for transition in zip(context["ordered_mid_ids"], context["ordered_mid_ids"][1:])
                 }
+                unsuccessful = sorted(
+                    (
+                        {
+                            "trajectory_id": trajectory_id,
+                            "overlap": len(
+                                member_transitions
+                                & set(zip(sequences[trajectory_id], sequences[trajectory_id][1:]))
+                            ),
+                            **contexts[trajectory_id],
+                        }
+                        for trajectory_id in failed_ids
+                    ),
+                    key=lambda item: (-item["overlap"], item["trajectory_id"]),
+                )
+                card = reusable_cards.get(community.community_id)
+                result = None
+                if card is None:
+                    card, result = await render_high_community_card(
+                        runtime,
+                        options.benchmark,
+                        community.community_id,
+                        tuple(mid_cards_by_id[mid_id] for mid_id in community.member_mid_ids),
+                        _representatives(successful),
+                        _representatives(unsuccessful),
+                        _transition_summary(successful, unsuccessful),
+                    )
+                return (
+                    card,
+                    {
+                        "community_id": community.community_id,
+                        "successful_trajectory_count": len(successful),
+                        "failure_candidate_count": len(unsuccessful),
+                        "usage": asdict(result.usage) if result else None,
+                    },
+                )
+
+            rendered = await asyncio.gather(
+                *(render_community(community) for community in discovery.communities)
             )
-    finally:
-        await runtime.close()
+            high_cards.extend(card for card, _ in rendered)
+            usages.extend(usage for _, usage in rendered)
+        finally:
+            await runtime.close()
 
     write_json(
         options.output_structure,
@@ -161,6 +168,7 @@ async def main(options: argparse.Namespace) -> int:
                 "feature_count": discovery.feature_count,
                 "graph_weight": discovery.graph_weight,
                 "modularity": discovery.modularity,
+                "structure_only": options.structure_only,
                 "rendering": usages,
             },
         },
@@ -197,5 +205,6 @@ if __name__ == "__main__":
     parser.add_argument("--output-cards", type=Path, required=True)
     parser.add_argument("--success-threshold", type=float, default=0.999)
     parser.add_argument("--concurrency", type=int, default=4)
+    parser.add_argument("--structure-only", action="store_true")
     parser.add_argument("--env", type=Path, default=Path(".env"))
     raise SystemExit(asyncio.run(main(parser.parse_args())))
