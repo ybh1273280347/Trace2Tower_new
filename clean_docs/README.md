@@ -11,6 +11,6 @@ experiment directories.
 - `../experiments/webshop/expert-crafted-v1/RESULTS.json` records the frozen
   WebShop Expert-Crafted Skills validation run and paired comparisons.
 - `../experiments/alfworld/official/ALFWORLD_ABLATION_RESULTS.json` records the
-  corrected ALFWorld ablation results and invalidated historical D1 run.
+  corrected ALFWorld ablation results and invalidated a historical mislabeled runtime run.
 - `../experiments/alfworld/official/SKILLX_REWRITE_AUDIT.md` records the exact
   open-source rewrite-and-inject behavior and the ALFWorld runtime diagnostic.

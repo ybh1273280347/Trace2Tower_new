@@ -1,0 +1,200 @@
+{
+  "protocol_id": "alfworld-api-period-baseline-repeats-20260723",
+  "evidence_role": "api_period_stability",
+  "benchmark": "alfworld",
+  "split": "valid_unseen",
+  "total_tasks_per_repeat": 134,
+  "agent_model": "deepseek-v4-flash",
+  "manifest": {
+    "path": "artifacts/manifests/alfworld_test.jsonl",
+    "sha256": "631e359f23fe0ba5e5454c3e8df024b0f3621c21996e4ddbc1a84239daaf1010"
+  },
+  "methods": {
+    "no_skill": {
+      "main_reference": {"success": 71, "total": 134, "success_rate": 0.5298507463},
+      "run_ids": ["alfworld-baseline-noskill-repeat20-22-seq"],
+      "repeats": [
+        {"repeat_id": 20, "success": 58, "total": 134, "success_rate": 0.4328358209},
+        {"repeat_id": 21, "success": 58, "total": 134, "success_rate": 0.4328358209},
+        {"repeat_id": 22, "success": 58, "total": 134, "success_rate": 0.4328358209}
+      ],
+      "mean_success_rate": 0.4328358209,
+      "subsequent_repeat": {
+        "run_ids": [
+          "alfworld-api-period-noskill-repeat23",
+          "alfworld-api-period-noskill-repeat23-repair-01"
+        ],
+        "repeat_id": 23,
+        "success": 57,
+        "total": 134,
+        "success_rate": 0.4253731343,
+        "repair": {
+          "sample_id": "alfworld:valid_unseen:trial_T20190906_182259_116320",
+          "primary_failure_count": 1,
+          "repair_success": true,
+          "episode_success": false
+        },
+        "reporting_boundary": "Primary-plus-repair aggregate with complete 134-key coverage. It does not replace the existing three-repeat summary."
+      }
+    },
+    "trace2skill_combined": {
+      "artifact": {
+        "path": "artifacts/baselines/trace2skill/gpt54/alfworld-p310/artifact.json",
+        "id": "trace2skill_f3061fe54ec973d8",
+        "sha256": "fcc0069b9e675594c0d9df5e9a707042608de47f1eb089b2a24d991174bfd238"
+      },
+      "main_reference": {"success": 79, "total": 134, "success_rate": 0.5895522388},
+      "run_ids": ["alfworld-api-period-trace2skill-combined-repeat20-22-fast"],
+      "repeats": [
+        {"repeat_id": 20, "success": 80, "total": 134, "success_rate": 0.5970149254},
+        {"repeat_id": 21, "success": 84, "total": 134, "success_rate": 0.6268656716},
+        {"repeat_id": 22, "success": 82, "total": 134, "success_rate": 0.6119402985}
+      ],
+      "mean_success_rate": 0.6119402985
+    },
+    "trace2skill_error": {
+      "artifact": {
+        "path": "artifacts/baselines/trace2skill/gpt54/alfworld-p310-error/artifact.json",
+        "id": "trace2skill_6aaea76f0302d888",
+        "sha256": "32cb9cba26ba8efd60e54bbb0e77249af9538981d75cbe82b02b24403ce18fb0"
+      },
+      "main_reference": {"success": 83, "total": 134, "success_rate": 0.6194029851},
+      "run_ids": ["alfworld-api-period-trace2skill-error-repeat20-22-fast"],
+      "repeats": [
+        {"repeat_id": 20, "success": 82, "total": 134, "success_rate": 0.6119402985},
+        {"repeat_id": 21, "success": 83, "total": 134, "success_rate": 0.6194029851},
+        {"repeat_id": 22, "success": 81, "total": 134, "success_rate": 0.6044776119}
+      ],
+      "mean_success_rate": 0.6119402985
+    },
+    "skillx": {
+      "artifact": {
+        "path": "artifacts/skillx/alfworld-global-p310-recovered/execution/library.json",
+        "id": "skillxlib_9f23af185cf6fe0f",
+        "sha256": "d6c1d8002eefba4f934fd073d04e84d6692db647a375dd1f24d5a4c7d742990a"
+      },
+      "main_reference": {"success": 109, "total": 134, "success_rate": 0.8134328358},
+      "run_ids": [
+        "alfworld-test-flash-skillx-global-p310-repeat-01-fresh",
+        "alfworld-test-flash-skillx-global-p310-repeat-01-fresh-repair-01",
+        "alfworld-api-period-skillx-repeat02-03",
+        "alfworld-api-period-skillx-repeat02-03-repair01"
+      ],
+      "repeats": [
+        {"repeat_id": 1, "success": 92, "total": 134, "success_rate": 0.6865671642},
+        {"repeat_id": 2, "success": 94, "total": 134, "success_rate": 0.7014925373},
+        {"repeat_id": 3, "success": 95, "total": 134, "success_rate": 0.7089552239}
+      ],
+      "mean_success_rate": 0.6990049751
+    },
+    "expel": {
+      "artifact": {
+        "path": "artifacts/expel/alfworld-p310/library.json",
+        "id": "expellib_c4f4293b082ab767",
+        "sha256": "2fbfd042aa00199aac39d799c19cf2c10c794aaa0dcf992e7ee673c12b96bf99"
+      },
+      "main_reference": {"success": 108, "total": 134, "success_rate": 0.8059701493},
+      "run_ids": ["alfworld-api-period-expel-repeat20-22"],
+      "repeats": [
+        {"repeat_id": 20, "success": 110, "total": 134, "success_rate": 0.8208955224},
+        {"repeat_id": 21, "success": 110, "total": 134, "success_rate": 0.8208955224},
+        {"repeat_id": 22, "success": 109, "total": 134, "success_rate": 0.8134328358}
+      ],
+      "mean_success_rate": 0.8184079602
+    },
+    "trace2tower": {
+      "artifact": {
+        "path": "artifacts/trace2tower/alfworld/original-concept-v17/p310/tower.json",
+        "id": "tower_d2c2d0090ed9b6b4",
+        "sha256": "34a37e967a6f0cd6df3e72bba358c8a414f7abf4004e73d38a756e315c3d6a40"
+      },
+      "main_reference": {"success": 118, "total": 134, "success_rate": 0.8805970149},
+      "run_ids": [
+        "alfworld-test-flash-tower-formal-repeat-06",
+        "alfworld-test-flash-tower-formal-repeat-06-repair-01",
+        "alfworld-test-flash-tower-formal-repeat-06-repair-02",
+        "alfworld-test-flash-tower-formal-repeat-06-repair-03",
+        "alfworld-test-flash-tower-formal-repeat-07-fresh",
+        "alfworld-test-flash-tower-formal-repeat-09-fresh",
+        "alfworld-test-flash-tower-formal-repeat-09-fresh-repair-01",
+        "alfworld-api-period-tower-repeat10-12",
+        "alfworld-api-period-tower-repeat10-12-repair01"
+      ],
+      "comparison_repeats": [
+        {"repeat_id": 6, "success": 98, "total": 134, "success_rate": 0.7313432836},
+        {"repeat_id": 7, "success": 108, "total": 134, "success_rate": 0.8059701493},
+        {"repeat_id": 9, "success": 102, "total": 134, "success_rate": 0.7611940299}
+      ],
+      "comparison_mean_success_rate": 0.7661691542,
+      "additional_repeats": [
+        {"repeat_id": 10, "success": 92, "total": 134, "success_rate": 0.6865671642},
+        {"repeat_id": 11, "success": 94, "total": 134, "success_rate": 0.7014925373},
+        {"repeat_id": 12, "success": 87, "total": 134, "success_rate": 0.6492537313}
+      ],
+      "additional_mean_success_rate": 0.6791044776,
+      "six_repeat_aggregate": {
+        "success": 581,
+        "total": 804,
+        "mean_success_rate": 0.7226368159,
+        "sample_sd_percentage_points": 5.59
+      },
+      "subsequent_paired_runtime_variant_repeat": {
+        "purpose": "One additional independent Full/High-only pair under the same frozen Tower, manifest, model, environment budget, and plan_rewrite contract.",
+        "run_ids": [
+          "alfworld-api-period-tower-full-repeat16",
+          "alfworld-api-period-tower-highonly-repeat16"
+        ],
+        "full": {"repeat_id": 16, "success": 104, "total": 134, "success_rate": 0.7761194030},
+        "high_only": {"repeat_id": 16, "success": 106, "total": 134, "success_rate": 0.7910447761},
+        "reporting_boundary": "Recorded as a subsequent independent pair. It does not replace the frozen main result, the existing stability-table summary, or prior aggregates."
+      },
+      "subsequent_full_repeat": {
+        "purpose": "One additional independent Full repeat under the frozen formal contract after the paired runtime-variant run.",
+        "run_ids": [
+          "alfworld-api-period-tower-full-repeat17",
+          "alfworld-api-period-tower-full-repeat17-repair-01"
+        ],
+        "repeat_id": 17,
+        "success": 105,
+        "total": 134,
+        "success_rate": 0.7835820896,
+        "repair": {
+          "sample_id": "alfworld:valid_unseen:trial_T20190907_221355_558505",
+          "primary_failure_count": 1,
+          "repair_success": true
+        },
+        "reporting_boundary": "Primary-plus-repair aggregate with complete 134-key coverage. It does not replace the frozen main result, the existing stability-table summary, or prior aggregates."
+      },
+      "high_only_variant": {
+        "purpose": "Trace2Tower runtime variant that holds the Tower, Top-3 High, plan_rewrite/budgeted_v2, model, manifest, and environment budget fixed while setting max_mid_skills to zero.",
+        "method_config": "configs/experiments/alfworld_trace2tower_high_only_rewrite_diagnostic.yaml",
+        "run_ids": [
+          "alfworld-api-period-tower-highonly-repeat13-15",
+          "alfworld-api-period-tower-highonly-repeat13-15-repair13b",
+          "alfworld-api-period-tower-highonly-repeat13-15-repair15b"
+        ],
+        "repeats": [
+          {"repeat_id": 13, "success": 94, "total": 134, "success_rate": 0.7014925373},
+          {"repeat_id": 14, "success": 94, "total": 134, "success_rate": 0.7014925373},
+          {"repeat_id": 15, "success": 89, "total": 134, "success_rate": 0.6641791045}
+        ],
+        "mean_success_rate": 0.6890547264,
+        "sample_sd_percentage_points": 2.15,
+        "subsequent_repeat": {
+          "run_id": "alfworld-api-period-tower-highonly-repeat18",
+          "repeat_id": 18,
+          "success": 107,
+          "total": 134,
+          "success_rate": 0.7985074627,
+          "reporting_boundary": "Independent subsequent repeat. It does not replace the existing three-repeat summary."
+        },
+        "reporting_boundary": "It does not replace the frozen Full main result or runtime-variant main-table point estimates."
+      }
+    }
+  },
+  "invalid_partial_runs": [
+    "alfworld-api-period-trace2skill-combined-repeat20-22",
+    "alfworld-api-period-trace2skill-error-repeat20-22"
+  ],
+  "reporting_boundary": "These runs document method sensitivity under a later API service state. They do not replace frozen main-table, construction-ablation, or runtime-variant results."
+}
